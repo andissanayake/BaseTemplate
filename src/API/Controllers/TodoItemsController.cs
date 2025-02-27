@@ -4,12 +4,11 @@ using BaseTemplate.Application.TodoItems.Commands.DeleteTodoItem;
 using BaseTemplate.Application.TodoItems.Commands.UpdateTodoItem;
 using BaseTemplate.Application.TodoItems.Commands.UpdateTodoItemDetail;
 using BaseTemplate.Application.TodoItems.Queries.GetTodoItemsWithPagination;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BaseTemplate.API.Controllers;
 
-[Authorize]
+//[Authorize]
 public class TodoItemsController : ApiControllerBase
 {
     [HttpGet]

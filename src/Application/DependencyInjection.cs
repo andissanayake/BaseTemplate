@@ -1,11 +1,11 @@
-﻿using BaseTemplate.Application.Common.Behaviours;
-using System.Reflection;
+﻿using System.Reflection;
+using BaseTemplate.Application.Common.Behaviours;
 
 namespace Microsoft.Extensions.DependencyInjection;
 
 public static class DependencyInjection
 {
-    public static IServiceCollection AddApplicationServices(this IServiceCollection services)
+    public static IServiceCollection AddApplication(this IServiceCollection services)
     {
         services.AddAutoMapper(Assembly.GetExecutingAssembly());
 

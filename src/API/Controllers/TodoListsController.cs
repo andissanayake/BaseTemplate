@@ -2,12 +2,11 @@
 using BaseTemplate.Application.TodoLists.Commands.DeleteTodoList;
 using BaseTemplate.Application.TodoLists.Commands.UpdateTodoList;
 using BaseTemplate.Application.TodoLists.Queries.GetTodos;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BaseTemplate.API.Controllers;
 
-[Authorize]
+//[Authorize]
 public class TodoListsController : ApiControllerBase
 {
     [HttpGet]

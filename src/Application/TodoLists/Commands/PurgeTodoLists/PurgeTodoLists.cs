@@ -1,11 +1,9 @@
 ﻿using BaseTemplate.Application.Common.Interfaces;
-using BaseTemplate.Application.Common.Security;
-using BaseTemplate.Domain.Constants;
 
 namespace BaseTemplate.Application.TodoLists.Commands.PurgeTodoLists;
 
-[Authorize(Roles = Roles.Administrator)]
-[Authorize(Policy = Policies.CanPurge)]
+//[Authorize(Roles = Roles.Administrator)]
+//[Authorize(Policy = Policies.CanPurge)]
 public record PurgeTodoListsCommand : IRequest;
 
 public class PurgeTodoListsCommandHandler : IRequestHandler<PurgeTodoListsCommand>

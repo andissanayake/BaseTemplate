@@ -1,11 +1,10 @@
 ﻿using BaseTemplate.Application.Common.Interfaces;
 using BaseTemplate.Application.Common.Models;
-using BaseTemplate.Application.Common.Security;
 using BaseTemplate.Domain.Enums;
 
 namespace BaseTemplate.Application.TodoLists.Queries.GetTodos;
 
-[Authorize]
+//[Authorize]
 public record GetTodosQuery : IRequest<TodosVm>;
 
 public class GetTodosQueryHandler : IRequestHandler<GetTodosQuery, TodosVm>
