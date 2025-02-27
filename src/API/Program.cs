@@ -1,9 +1,3 @@
-using BaseTemplate.API.Infrastructure;
-using BaseTemplate.API.Services;
-using BaseTemplate.Application.Common.Interfaces;
-using BaseTemplate.Infrastructure.Data;
-using Microsoft.AspNetCore.Mvc;
-
 namespace BaseTemplate.API;
 public class Program
 {
@@ -13,22 +7,9 @@ public class Program
 
         builder.Services.AddApplication();
         builder.Services.AddInfrastructure(builder.Configuration);
-        builder.Services.AddDatabaseDeveloperPageExceptionFilter();
-        builder.Services.AddSingleton<IUser, CurrentUserService>();
-        builder.Services.AddHttpContextAccessor();
-        builder.Services.AddExceptionHandler<CustomExceptionHandler>();
-        builder.Services.AddHealthChecks()
-            .AddDbContextCheck<ApplicationDbContext>();
-        builder.Services.AddControllers();
-        builder.Services.Configure<ApiBehaviorOptions>(options =>
-            options.SuppressModelStateInvalidFilter = true);
-
-        builder.Services.AddEndpointsApiExplorer();
-        builder.Services.AddSwaggerGen();
+        builder.Services.AddAPI();
 
         var app = builder.Build();
-
-        // Configure the HTTP request pipeline.
         if (app.Environment.IsDevelopment())
         {
             app.UseSwagger();
