@@ -1,4 +1,4 @@
-
+using BaseTemplate.API.Infrastructure;
 using BaseTemplate.API.Services;
 using BaseTemplate.Application.Common.Interfaces;
 using BaseTemplate.Infrastructure.Data;
@@ -16,13 +16,13 @@ public class Program
         builder.Services.AddDatabaseDeveloperPageExceptionFilter();
         builder.Services.AddSingleton<IUser, CurrentUserService>();
         builder.Services.AddHttpContextAccessor();
+        builder.Services.AddExceptionHandler<CustomExceptionHandler>();
         builder.Services.AddHealthChecks()
             .AddDbContextCheck<ApplicationDbContext>();
         builder.Services.AddControllers();
         builder.Services.Configure<ApiBehaviorOptions>(options =>
             options.SuppressModelStateInvalidFilter = true);
 
-        // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
         builder.Services.AddEndpointsApiExplorer();
         builder.Services.AddSwaggerGen();
 
@@ -39,7 +39,7 @@ public class Program
         app.UseAuthentication();
         app.UseAuthorization();
         app.MapControllers();
-
+        app.UseExceptionHandler(options => { });
         app.Run();
     }
 }
