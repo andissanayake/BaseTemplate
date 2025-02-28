@@ -7,7 +7,7 @@ public class Program
 
         builder.Services.AddApplication();
         builder.Services.AddInfrastructure(builder.Configuration);
-        builder.Services.AddAPI();
+        builder.Services.AddAPI(builder.Configuration);
 
         var app = builder.Build();
         if (app.Environment.IsDevelopment())
