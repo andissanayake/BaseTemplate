@@ -10,6 +10,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { setUser } from "./auth/authSlice";
 import { authPolicy } from "./auth/authPolicy";
 import { Policies } from "./auth/PoliciesEnum";
+import axiosInstance from "./auth/axiosInstance";
 
 export const App = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -29,6 +30,21 @@ export const App = () => {
     };
   }, [dispatch]);
 
+  const fetchData = async () => {
+    try {
+      const response = await axiosInstance.get(
+        "http://localhost:6001/api/test/secure"
+      );
+      console.log(response.data);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  };
+  useEffect(() => {
+    if (user) {
+      fetchData();
+    }
+  }, [user]);
   return (
     <>
       {authPolicy(Policies.User, user) ? (
@@ -39,7 +55,7 @@ export const App = () => {
               handleLogout();
             }}
           >
-            Login
+            Logout
           </a>
         </>
       ) : (

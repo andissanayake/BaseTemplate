@@ -25,9 +25,6 @@ public static class DependencyInjection
             options.SuppressModelStateInvalidFilter = true);
 
         services.AddEndpointsApiExplorer();
-
-        //services.AddSwaggerGen();
-
         services.AddSwaggerGen(config =>
         {
             config.SwaggerDoc("v1", new OpenApiInfo() { Title = "App Api", Version = "v1" });
@@ -56,41 +53,18 @@ public static class DependencyInjection
                 });
         });
 
-        //var jwtSettings = configuration.GetSection("Jwt");
-        //services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-        //    .AddJwtBearer(options =>
-        //    {
-        //        options.Authority = jwtSettings["Authority"];
-        //        options.Audience = jwtSettings["Audience"];
-        //        options.MetadataAddress = jwtSettings["MetadataAddress"]!;
-
-        //        options.RequireHttpsMetadata = true;
-        //        options.TokenValidationParameters = new TokenValidationParameters
-        //        {
-        //            ValidateIssuer = true,
-        //            ValidateAudience = true,
-        //            ValidateLifetime = true,
-        //            ValidateIssuerSigningKey = true
-        //        };
-        //    });
-
-        var projectId = "basetemplate-fb892";
+        var jwtSettings = configuration.GetSection("Jwt");
         services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             .AddJwtBearer(options =>
             {
-                options.Authority = "https://securetoken.google.com/" + projectId;
-                options.Audience = projectId;
-                options.MetadataAddress = "https://www.googleapis.com/identitytoolkit/v3/relyingparty/publicKeys";
-
-                options.RequireHttpsMetadata = true;
+                options.Authority = jwtSettings["Authority"];
                 options.TokenValidationParameters = new TokenValidationParameters
                 {
                     ValidateIssuer = true,
+                    ValidIssuer = jwtSettings["ValidIssuer"],
                     ValidateAudience = true,
-                    ValidateLifetime = true,
-                    ValidateIssuerSigningKey = true,
-                    ValidIssuer = "https://securetoken.google.com/" + projectId,
-                    ValidAudience = projectId
+                    ValidAudience = jwtSettings["ValidAudience"],
+                    ValidateLifetime = true
                 };
             });
 
