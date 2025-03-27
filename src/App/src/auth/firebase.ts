@@ -28,8 +28,7 @@ const handleLogin = async () => {
   const provider = new GoogleAuthProvider();
   try {
     await setPersistence(auth, browserLocalPersistence);
-    const result = await signInWithPopup(auth, provider);
-    console.log("User Info:", result.user);
+    await signInWithPopup(auth, provider);
   } catch (error) {
     console.error("Error signing in:", error);
   }
