@@ -1,4 +1,4 @@
-import { AppUser } from "./authSlice";
+import { AppUser } from "./authStore";
 import { Policies } from "./PoliciesEnum";
 
 export const authPolicy = (policy: Policies, user: AppUser | null): boolean => {

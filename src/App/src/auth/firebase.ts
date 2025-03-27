@@ -6,7 +6,7 @@ import {
   setPersistence,
   signInWithPopup,
 } from "firebase/auth";
-import { AppUser } from "./authSlice";
+import { AppUser } from "./authStore";
 
 const firebaseConfig = {
   apiKey: "AIzaSyBbB_fo_pPycsI517HpetHULiOwil8I-jM",

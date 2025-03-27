@@ -14,7 +14,7 @@ public class Program
         {
             options.AddPolicy(name: CLIENT_POLYCY_KEY, builder =>
             {
-                builder.WithOrigins("http://localhost:6001")
+                builder.WithOrigins("http://localhost:5000")
                    .AllowAnyMethod()
                    .AllowAnyHeader();
             });

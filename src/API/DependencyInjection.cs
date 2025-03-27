@@ -61,9 +61,9 @@ public static class DependencyInjection
                 options.TokenValidationParameters = new TokenValidationParameters
                 {
                     ValidateIssuer = true,
-                    ValidIssuer = jwtSettings["ValidIssuer"],
+                    ValidIssuer = jwtSettings["Issuer"],
                     ValidateAudience = true,
-                    ValidAudience = jwtSettings["ValidAudience"],
+                    ValidAudience = jwtSettings["Audience"],
                     ValidateLifetime = true
                 };
             });
