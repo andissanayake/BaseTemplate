@@ -7,8 +7,8 @@ import {
 } from "./auth/firebase";
 import { authPolicy } from "./auth/authPolicy";
 import { Policies } from "./auth/PoliciesEnum";
-import axiosInstance from "./auth/axiosInstance";
 import { useAuthStore } from "./auth/authStore";
+import { Secure } from "./auth/Secure";
 
 export const App = () => {
   const user = useAuthStore((state) => state.user);
@@ -28,30 +28,13 @@ export const App = () => {
     };
   }, [setUser]);
 
-  const fetchData = async () => {
-    try {
-      const response = await axiosInstance.get(
-        "http://localhost:5001/api/test/secure"
-      );
-      console.log(response.data);
-    } catch (error) {
-      console.error("Error fetching data:", error);
-    }
-  };
-
-  useEffect(() => {
-    if (user) {
-      fetchData();
-    }
-    console.log(user);
-  }, [user]);
-
   return (
     <>
       {authPolicy(Policies.User, user) ? (
         <>
           <h1>Welcome {user?.displayName}</h1>
           <a onClick={handleLogout}>Logout</a>
+          <Secure />
         </>
       ) : (
         <>
