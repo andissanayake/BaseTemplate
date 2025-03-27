@@ -1,15 +1,11 @@
 using BaseTemplate.Application.Common.Interfaces;
-using Microsoft.AspNetCore.Authorization;
 
 namespace BaseTemplate.Infrastructure.Identity;
 
 public class IdentityService : IIdentityService
 {
-    private readonly IAuthorizationService _authorizationService;
-
-    public IdentityService(IAuthorizationService authorizationService)
+    public IdentityService()
     {
-        _authorizationService = authorizationService;
     }
     public async Task<bool> IsInRoleAsync(string userId, string role)
     {

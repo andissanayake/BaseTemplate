@@ -1,4 +1,5 @@
 ﻿using BaseTemplate.Application.Common.Interfaces;
+using BaseTemplate.Domain.Entities;
 using BaseTemplate.Domain.Events;
 
 namespace BaseTemplate.Application.TodoItems.Commands.DeleteTodoItem;
@@ -7,25 +8,25 @@ public record DeleteTodoItemCommand(int Id) : IRequest;
 
 public class DeleteTodoItemCommandHandler : IRequestHandler<DeleteTodoItemCommand>
 {
-    private readonly IApplicationDbContext _context;
+    private readonly IUnitOfWorkFactory _factory;
 
-    public DeleteTodoItemCommandHandler(IApplicationDbContext context)
+    public DeleteTodoItemCommandHandler(IUnitOfWorkFactory factory)
     {
-        _context = context;
+        _factory = factory;
     }
 
     public async Task Handle(DeleteTodoItemCommand request, CancellationToken cancellationToken)
     {
-        var entity = await _context.TodoItems
-            .FindAsync(new object[] { request.Id }, cancellationToken);
+        var uow = _factory.CreateUOW();
+        var entity = await uow.GetAsync<TodoItem>(request.Id);
 
         Guard.Against.NotFound(request.Id, entity);
 
-        _context.TodoItems.Remove(entity);
+        await uow.DeleteAsync(entity);
 
         entity.AddDomainEvent(new TodoItemDeletedEvent(entity));
 
-        await _context.SaveChangesAsync(cancellationToken);
+        uow.Commit();
     }
 
 }

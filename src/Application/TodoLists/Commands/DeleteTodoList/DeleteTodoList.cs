@@ -1,4 +1,5 @@
 ﻿using BaseTemplate.Application.Common.Interfaces;
+using BaseTemplate.Domain.Entities;
 
 namespace BaseTemplate.Application.TodoLists.Commands.DeleteTodoList;
 
@@ -6,23 +7,22 @@ public record DeleteTodoListCommand(int Id) : IRequest;
 
 public class DeleteTodoListCommandHandler : IRequestHandler<DeleteTodoListCommand>
 {
-    private readonly IApplicationDbContext _context;
+    private readonly IUnitOfWorkFactory _factory;
 
-    public DeleteTodoListCommandHandler(IApplicationDbContext context)
+    public DeleteTodoListCommandHandler(IUnitOfWorkFactory factory)
     {
-        _context = context;
+        _factory = factory;
     }
 
     public async Task Handle(DeleteTodoListCommand request, CancellationToken cancellationToken)
     {
-        var entity = await _context.TodoLists
-            .Where(l => l.Id == request.Id)
-            .SingleOrDefaultAsync(cancellationToken);
+        var uow = _factory.CreateUOW();
+        var entity = await uow.GetAsync<TodoItem>(request.Id);
 
         Guard.Against.NotFound(request.Id, entity);
 
-        _context.TodoLists.Remove(entity);
+        await uow.DeleteAsync(entity);
 
-        await _context.SaveChangesAsync(cancellationToken);
+        uow.Commit();
     }
 }

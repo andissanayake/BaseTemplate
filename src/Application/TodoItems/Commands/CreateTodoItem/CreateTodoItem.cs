@@ -13,11 +13,11 @@ public record CreateTodoItemCommand : IRequest<int>
 
 public class CreateTodoItemCommandHandler : IRequestHandler<CreateTodoItemCommand, int>
 {
-    private readonly IApplicationDbContext _context;
+    private readonly IUnitOfWorkFactory _factory;
 
-    public CreateTodoItemCommandHandler(IApplicationDbContext context)
+    public CreateTodoItemCommandHandler(IUnitOfWorkFactory factory)
     {
-        _context = context;
+        _factory = factory;
     }
 
     public async Task<int> Handle(CreateTodoItemCommand request, CancellationToken cancellationToken)
@@ -30,10 +30,10 @@ public class CreateTodoItemCommandHandler : IRequestHandler<CreateTodoItemComman
         };
 
         entity.AddDomainEvent(new TodoItemCreatedEvent(entity));
+        var uow = _factory.CreateUOW();
+        await uow.InsertAsync(entity);
 
-        _context.TodoItems.Add(entity);
-
-        await _context.SaveChangesAsync(cancellationToken);
+        uow.Commit();
 
         return entity.Id;
     }

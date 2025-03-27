@@ -1,4 +1,5 @@
 ﻿using BaseTemplate.Application.Common.Interfaces;
+using BaseTemplate.Domain.Entities;
 
 namespace BaseTemplate.Application.TodoLists.Commands.PurgeTodoLists;
 
@@ -8,17 +9,20 @@ public record PurgeTodoListsCommand : IRequest;
 
 public class PurgeTodoListsCommandHandler : IRequestHandler<PurgeTodoListsCommand>
 {
-    private readonly IApplicationDbContext _context;
+    private readonly IUnitOfWorkFactory _factory;
 
-    public PurgeTodoListsCommandHandler(IApplicationDbContext context)
+    public PurgeTodoListsCommandHandler(IUnitOfWorkFactory factory)
     {
-        _context = context;
+        _factory = factory;
     }
 
     public async Task Handle(PurgeTodoListsCommand request, CancellationToken cancellationToken)
     {
-        _context.TodoLists.RemoveRange(_context.TodoLists);
+        var uow = _factory.CreateUOW();
+        var items = uow.QueryAsync<TodoList>("");
 
-        await _context.SaveChangesAsync(cancellationToken);
+        await uow.DeleteAsync(items);
+
+        uow.Commit();
     }
 }

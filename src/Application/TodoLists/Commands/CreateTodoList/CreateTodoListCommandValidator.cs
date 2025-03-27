@@ -4,11 +4,11 @@ namespace BaseTemplate.Application.TodoLists.Commands.CreateTodoList;
 
 public class CreateTodoListCommandValidator : AbstractValidator<CreateTodoListCommand>
 {
-    private readonly IApplicationDbContext _context;
+    private readonly IUnitOfWorkFactory _factory;
 
-    public CreateTodoListCommandValidator(IApplicationDbContext context)
+    public CreateTodoListCommandValidator(IUnitOfWorkFactory factory)
     {
-        _context = context;
+        _factory = factory;
 
         RuleFor(v => v.Title)
             .NotEmpty()
@@ -20,7 +20,8 @@ public class CreateTodoListCommandValidator : AbstractValidator<CreateTodoListCo
 
     public async Task<bool> BeUniqueTitle(string title, CancellationToken cancellationToken)
     {
-        return await _context.TodoLists
-            .AllAsync(l => l.Title != title, cancellationToken);
+        //return await _context.TodoLists
+        //    .AllAsync(l => l.Title != title, cancellationToken);
+        throw new Exception("Not implemented");
     }
 }

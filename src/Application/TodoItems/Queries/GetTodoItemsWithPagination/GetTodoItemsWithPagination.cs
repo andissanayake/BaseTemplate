@@ -1,5 +1,4 @@
 ﻿using BaseTemplate.Application.Common.Interfaces;
-using BaseTemplate.Application.Common.Mappings;
 using BaseTemplate.Application.Common.Models;
 
 namespace BaseTemplate.Application.TodoItems.Queries.GetTodoItemsWithPagination;
@@ -13,21 +12,24 @@ public record GetTodoItemsWithPaginationQuery : IRequest<PaginatedList<TodoItemB
 
 public class GetTodoItemsWithPaginationQueryHandler : IRequestHandler<GetTodoItemsWithPaginationQuery, PaginatedList<TodoItemBriefDto>>
 {
-    private readonly IApplicationDbContext _context;
+    private readonly IUnitOfWorkFactory _factory;
     private readonly IMapper _mapper;
 
-    public GetTodoItemsWithPaginationQueryHandler(IApplicationDbContext context, IMapper mapper)
+    public GetTodoItemsWithPaginationQueryHandler(IUnitOfWorkFactory factory, IMapper mapper)
     {
-        _context = context;
+        _factory = factory;
         _mapper = mapper;
     }
 
     public async Task<PaginatedList<TodoItemBriefDto>> Handle(GetTodoItemsWithPaginationQuery request, CancellationToken cancellationToken)
     {
-        return await _context.TodoItems
-            .Where(x => x.ListId == request.ListId)
-            .OrderBy(x => x.Title)
-            .ProjectTo<TodoItemBriefDto>(_mapper.ConfigurationProvider)
-            .PaginatedListAsync(request.PageNumber, request.PageSize);
+        var uow = _factory.CreateUOW();
+        //var data = uow.GetAllAsync<TodoItem>();
+        //return await _context.TodoItems
+        //    .Where(x => x.ListId == request.ListId)
+        //    .OrderBy(x => x.Title)
+        //    .ProjectTo<TodoItemBriefDto>(_mapper.ConfigurationProvider)
+        //    .PaginatedListAsync(request.PageNumber, request.PageSize);
+        throw new Exception("Not implemented");
     }
 }
