@@ -14,4 +14,5 @@ public class CurrentUserService : IUser
     }
 
     public string? Id => _httpContextAccessor.HttpContext?.User?.FindFirstValue(ClaimTypes.NameIdentifier);
+    public string? UserName => _httpContextAccessor.HttpContext?.User?.Identity?.Name;
 }

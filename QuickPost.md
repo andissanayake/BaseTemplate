@@ -21,6 +21,39 @@
 
 ---
 
+## 🔗 API Endpoints
+
+### 📄 Posts
+
+| Method | Endpoint              | Description                        | Auth Required |
+|--------|-----------------------|------------------------------------|---------------|
+| `POST` | `/api/posts`          | Create a new post with optional image URL | ✅ |
+| `GET`  | `/api/feed`           | Get public feed (cursor-based pagination) | ❌ |
+| `POST` | `/api/posts/{id}/like`| Like/unlike a post (toggle)        | ✅ |
+
+### 🔔 Notifications
+
+| Method | Endpoint                          | Description                            | Auth Required |
+|--------|-----------------------------------|----------------------------------------|---------------|
+| `GET`  | `/api/notifications`              | Get current user's in-app notifications | ✅ |
+| `GET`  | `/api/notifications/unread-count` | Get number of unread notifications     | ✅ |
+
+> 🧠 Optionally: When a notification is triggered (like or post event), SignalR pushes it to the user if connected.
+
+### 📶 Realtime (SignalR)
+
+| Hub              | Path                   | Description                                 |
+|------------------|------------------------|---------------------------------------------|
+| `NotificationHub`| `/hubs/notifications`  | Push real-time updates (e.g. likes, posts) |
+
+### 🧪 Benchmark
+
+| Method | Endpoint      | Description                                | Auth Required |
+|--------|---------------|--------------------------------------------|---------------|
+| `GET`  | `/benchmark`  | Get uptime, response time, and RPS stats  | ❌ |
+
+---
+
 ## 📊 Tech Stack
 
 | Layer             | Technology |

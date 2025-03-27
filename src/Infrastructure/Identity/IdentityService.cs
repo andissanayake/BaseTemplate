@@ -11,18 +11,13 @@ public class IdentityService : IIdentityService
     {
         _authorizationService = authorizationService;
     }
-
-    public async Task<string?> GetUserNameAsync(string userId)
-    {
-        return "SYSTEM";
-    }
     public async Task<bool> IsInRoleAsync(string userId, string role)
     {
-        return true;
+        return false;
     }
 
     public async Task<bool> AuthorizeAsync(string userId, string policyName)
     {
-        return true;
+        return false;
     }
 }
