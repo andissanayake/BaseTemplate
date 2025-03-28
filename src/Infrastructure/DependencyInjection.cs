@@ -1,5 +1,6 @@
 ﻿using BaseTemplate.Application.Common.Interfaces;
 using BaseTemplate.Infrastructure.Data;
+using BaseTemplate.Infrastructure.Events;
 using BaseTemplate.Infrastructure.Identity;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
@@ -27,6 +28,9 @@ public static class DependencyInjection
         using var connection = new SqlConnection(connectionString);
         DatabaseInitializer.Migrate(connection);
         connection.Dispose();
+
+        services.AddSingleton<IDomainEventQueue, InMemoryDomainEventQueue>();
+        services.AddSingleton<IDomainEventDispatcher, QueuedDomainEventDispatcher>();
 
         return services;
     }
