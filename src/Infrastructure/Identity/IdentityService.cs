@@ -18,6 +18,7 @@ public class IdentityService : IIdentityService
 
     public async Task<bool> AuthorizeAsync(string userId, string policyName)
     {
+        //create a custom claim and validate it we can use claim principal factory and authorization 
         return false;
     }
 }
