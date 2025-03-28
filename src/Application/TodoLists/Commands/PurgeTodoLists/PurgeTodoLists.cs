@@ -19,9 +19,11 @@ public class PurgeTodoListsCommandHandler : IRequestHandler<PurgeTodoListsComman
     public async Task Handle(PurgeTodoListsCommand request, CancellationToken cancellationToken)
     {
         using var uow = _factory.CreateUOW();
-        var items = uow.QueryAsync<TodoList>("");
+        var items = await uow.GetAllAsync<TodoList>();
+        var items2 = await uow.GetAllAsync<TodoItem>();
 
         await uow.DeleteAsync(items);
+        await uow.DeleteAsync(items2);
 
         uow.Commit();
     }

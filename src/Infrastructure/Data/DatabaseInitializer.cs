@@ -47,6 +47,22 @@ public static class DatabaseInitializer
                     LastModifiedBy NVARCHAR(100)
                 );
             END
+            -- =============================================
+            -- Create Table: UserRole
+            -- =============================================
+            IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='UserRole' AND xtype='U')
+            BEGIN
+                CREATE TABLE UserRole (
+                    Id INT PRIMARY KEY IDENTITY(1,1),
+                    UserId NVARCHAR(100),
+                    Role NVARCHAR(100),
+
+                    Created DATETIMEOFFSET NOT NULL,
+                    CreatedBy NVARCHAR(100),
+                    LastModified DATETIMEOFFSET NOT NULL,
+                    LastModifiedBy NVARCHAR(100)
+                );
+            END
             ";
 
         // Execute SQL to create tables and other database objects
