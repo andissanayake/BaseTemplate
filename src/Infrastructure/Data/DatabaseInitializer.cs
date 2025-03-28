@@ -9,7 +9,6 @@ public static class DatabaseInitializer
         dbConnection.Open();
 
         var initScript = @"
-
                 IF NOT EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = 'dbo' AND TABLE_NAME = 'YourEntity1')
                 BEGIN
                     CREATE TABLE [dbo].[YourEntity1] (
