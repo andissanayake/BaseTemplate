@@ -29,8 +29,10 @@ public static class DependencyInjection
         DatabaseInitializer.Migrate(connection);
         connection.Dispose();
 
-        services.AddSingleton<IDomainEventQueue, InMemoryDomainEventQueue>();
+        services.AddSingleton<InMemoryDomainEventWorker>(); // hosted + queue
+        services.AddSingleton<IDomainEventQueue>(sp => sp.GetRequiredService<InMemoryDomainEventWorker>());
         services.AddSingleton<IDomainEventDispatcher, QueuedDomainEventDispatcher>();
+        services.AddHostedService(sp => sp.GetRequiredService<InMemoryDomainEventWorker>());
 
         return services;
     }
