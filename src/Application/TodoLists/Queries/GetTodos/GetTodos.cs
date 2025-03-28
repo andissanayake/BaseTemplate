@@ -34,7 +34,7 @@ public class GetTodosQueryHandler : IRequestHandler<GetTodosQuery, TodosVm>
                 .Cast<PriorityLevel>()
                 .Select(p => new LookupDto { Id = (int)p, Title = p.ToString() })
                 .ToList(),
-            Lists = (IReadOnlyCollection<TodoListDto>)lists
+            Lists = lists.ToList()
 
         };
     }
