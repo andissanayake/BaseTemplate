@@ -26,6 +26,4 @@ public class TodoItem : BaseAuditableEntity
             _done = value;
         }
     }
-
-    public TodoList List { get; set; } = null!;
 }

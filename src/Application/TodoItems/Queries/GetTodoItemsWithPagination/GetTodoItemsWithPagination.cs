@@ -23,13 +23,26 @@ public class GetTodoItemsWithPaginationQueryHandler : IRequestHandler<GetTodoIte
 
     public async Task<PaginatedList<TodoItemBriefDto>> Handle(GetTodoItemsWithPaginationQuery request, CancellationToken cancellationToken)
     {
-        var uow = _factory.CreateUOW();
-        //var data = uow.GetAllAsync<TodoItem>();
-        //return await _context.TodoItems
-        //    .Where(x => x.ListId == request.ListId)
-        //    .OrderBy(x => x.Title)
-        //    .ProjectTo<TodoItemBriefDto>(_mapper.ConfigurationProvider)
-        //    .PaginatedListAsync(request.PageNumber, request.PageSize);
-        throw new Exception("Not implemented");
+        using var uow = _factory.CreateUOW();
+        var offset = (request.PageNumber - 1) * request.PageSize;
+
+        var countSql = "SELECT COUNT(1) FROM TodoItem WHERE ListId = @ListId";
+        var totalCount = await uow.QueryFirstOrDefaultAsync<int>(countSql, new { request.ListId });
+
+        var dataSql = @"
+        SELECT Id, Title, Done, Priority, Reminder
+        FROM TodoItem
+        WHERE ListId = @ListId
+        ORDER BY Title
+        OFFSET @Offset ROWS FETCH NEXT @PageSize ROWS ONLY";
+
+        var items = await uow.QueryAsync<TodoItemBriefDto>(dataSql, new
+        {
+            request.ListId,
+            Offset = offset,
+            request.PageSize
+        });
+
+        return new PaginatedList<TodoItemBriefDto>(items.ToList(), totalCount, request.PageNumber, request.PageSize);
     }
 }

@@ -26,7 +26,7 @@ public class UpdateTodoItemDetailCommandHandler : IRequestHandler<UpdateTodoItem
 
     public async Task Handle(UpdateTodoItemDetailCommand request, CancellationToken cancellationToken)
     {
-        var uow = _factory.CreateUOW();
+        using var uow = _factory.CreateUOW();
         var entity = await uow.GetAsync<TodoItem>(request.Id);
 
         Guard.Against.NotFound(request.Id, entity);
@@ -34,7 +34,7 @@ public class UpdateTodoItemDetailCommandHandler : IRequestHandler<UpdateTodoItem
         entity.ListId = request.ListId;
         entity.Priority = request.Priority;
         entity.Note = request.Note;
-
+        await uow.UpdateAsync(entity);
         uow.Commit();
     }
 }

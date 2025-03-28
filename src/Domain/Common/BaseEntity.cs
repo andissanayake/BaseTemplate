@@ -1,5 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
-using Dapper.Contrib.Extensions;
+﻿using Dapper.Contrib.Extensions;
 
 namespace BaseTemplate.Domain.Common;
 
@@ -12,7 +11,7 @@ public abstract class BaseEntity
 
     private readonly List<BaseEvent> _domainEvents = new();
 
-    [NotMapped]
+    [Computed]
     public IReadOnlyCollection<BaseEvent> DomainEvents => _domainEvents.AsReadOnly();
 
     public void AddDomainEvent(BaseEvent domainEvent)

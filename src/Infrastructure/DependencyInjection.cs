@@ -1,6 +1,7 @@
 ﻿using BaseTemplate.Application.Common.Interfaces;
 using BaseTemplate.Infrastructure.Data;
 using BaseTemplate.Infrastructure.Identity;
+using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
 
 namespace Microsoft.Extensions.DependencyInjection;
@@ -22,6 +23,10 @@ public static class DependencyInjection
 
         services.AddSingleton(TimeProvider.System);
         services.AddTransient<IIdentityService, IdentityService>();
+
+        using var connection = new SqlConnection(connectionString);
+        DatabaseInitializer.Migrate(connection);
+        connection.Dispose();
 
         return services;
     }
