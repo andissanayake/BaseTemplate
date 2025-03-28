@@ -13,12 +13,10 @@ public record GetTodoItemsWithPaginationQuery : IRequest<PaginatedList<TodoItemB
 public class GetTodoItemsWithPaginationQueryHandler : IRequestHandler<GetTodoItemsWithPaginationQuery, PaginatedList<TodoItemBriefDto>>
 {
     private readonly IUnitOfWorkFactory _factory;
-    private readonly IMapper _mapper;
 
-    public GetTodoItemsWithPaginationQueryHandler(IUnitOfWorkFactory factory, IMapper mapper)
+    public GetTodoItemsWithPaginationQueryHandler(IUnitOfWorkFactory factory)
     {
         _factory = factory;
-        _mapper = mapper;
     }
 
     public async Task<PaginatedList<TodoItemBriefDto>> Handle(GetTodoItemsWithPaginationQuery request, CancellationToken cancellationToken)

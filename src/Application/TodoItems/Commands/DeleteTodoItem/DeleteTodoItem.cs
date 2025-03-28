@@ -9,15 +9,16 @@ public record DeleteTodoItemCommand(int Id) : IRequest;
 public class DeleteTodoItemCommandHandler : IRequestHandler<DeleteTodoItemCommand>
 {
     private readonly IUnitOfWorkFactory _factory;
-
-    public DeleteTodoItemCommandHandler(IUnitOfWorkFactory factory)
+    private readonly IDomainEventDispatcher _domainEventDispatcher;
+    public DeleteTodoItemCommandHandler(IUnitOfWorkFactory factory, IDomainEventDispatcher domainEventDispatcher)
     {
         _factory = factory;
+        _domainEventDispatcher = domainEventDispatcher;
     }
 
     public async Task Handle(DeleteTodoItemCommand request, CancellationToken cancellationToken)
     {
-        var uow = _factory.CreateUOW();
+        using var uow = _factory.CreateUOW();
         var entity = await uow.GetAsync<TodoItem>(request.Id);
 
         Guard.Against.NotFound(request.Id, entity);
@@ -27,6 +28,7 @@ public class DeleteTodoItemCommandHandler : IRequestHandler<DeleteTodoItemComman
         entity.AddDomainEvent(new TodoItemDeletedEvent(entity));
 
         uow.Commit();
+        await _domainEventDispatcher.DispatchDomainEventsAsync(entity);
     }
 
 }

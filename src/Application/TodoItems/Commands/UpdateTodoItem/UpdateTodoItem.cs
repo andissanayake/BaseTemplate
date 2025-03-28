@@ -15,10 +15,11 @@ public record UpdateTodoItemCommand : IRequest
 public class UpdateTodoItemCommandHandler : IRequestHandler<UpdateTodoItemCommand>
 {
     private readonly IUnitOfWorkFactory _factory;
-
-    public UpdateTodoItemCommandHandler(IUnitOfWorkFactory factory)
+    private readonly IDomainEventDispatcher _domainEventDispatcher;
+    public UpdateTodoItemCommandHandler(IUnitOfWorkFactory factory, IDomainEventDispatcher domainEventDispatcher)
     {
         _factory = factory;
+        _domainEventDispatcher = domainEventDispatcher;
     }
 
     public async Task Handle(UpdateTodoItemCommand request, CancellationToken cancellationToken)
@@ -32,5 +33,6 @@ public class UpdateTodoItemCommandHandler : IRequestHandler<UpdateTodoItemComman
         entity.Done = request.Done;
         await uow.UpdateAsync(entity);
         uow.Commit();
+        await _domainEventDispatcher.DispatchDomainEventsAsync(entity);
     }
 }
