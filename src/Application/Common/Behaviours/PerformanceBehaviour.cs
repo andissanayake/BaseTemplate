@@ -9,7 +9,6 @@ public class PerformanceBehaviour<TRequest, TResponse> : IPipelineBehavior<TRequ
     private readonly Stopwatch _timer;
     private readonly ILogger<TRequest> _logger;
     private readonly IUser _user;
-    private readonly IIdentityService _identityService;
 
     public PerformanceBehaviour(
         ILogger<TRequest> logger,
@@ -20,7 +19,6 @@ public class PerformanceBehaviour<TRequest, TResponse> : IPipelineBehavior<TRequ
 
         _logger = logger;
         _user = user;
-        _identityService = identityService;
     }
 
     public async Task<TResponse> Handle(TRequest request, RequestHandlerDelegate<TResponse> next, CancellationToken cancellationToken)
@@ -37,12 +35,7 @@ public class PerformanceBehaviour<TRequest, TResponse> : IPipelineBehavior<TRequ
         {
             var requestName = typeof(TRequest).Name;
             var userId = _user.Id ?? string.Empty;
-            var userName = string.Empty;
-
-            if (!string.IsNullOrEmpty(userId))
-            {
-                userName = await _identityService.GetUserNameAsync(userId);
-            }
+            var userName = _user.UserName ?? string.Empty;
 
             _logger.LogWarning("Sample Long Running Request: {Name} ({ElapsedMilliseconds} milliseconds) {@UserId} {@UserName} {@Request}",
                 requestName, elapsedMilliseconds, userId, userName, request);

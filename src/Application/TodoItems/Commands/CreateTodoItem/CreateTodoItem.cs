@@ -13,28 +13,27 @@ public record CreateTodoItemCommand : IRequest<int>
 
 public class CreateTodoItemCommandHandler : IRequestHandler<CreateTodoItemCommand, int>
 {
-    private readonly IApplicationDbContext _context;
-
-    public CreateTodoItemCommandHandler(IApplicationDbContext context)
+    private readonly IUnitOfWorkFactory _factory;
+    private readonly IDomainEventDispatcher _domainEventDispatcher;
+    public CreateTodoItemCommandHandler(IUnitOfWorkFactory factory, IDomainEventDispatcher domainEventDispatcher)
     {
-        _context = context;
+        _factory = factory;
+        _domainEventDispatcher = domainEventDispatcher;
     }
 
     public async Task<int> Handle(CreateTodoItemCommand request, CancellationToken cancellationToken)
     {
+        using var uow = _factory.CreateUOW();
         var entity = new TodoItem
         {
             ListId = request.ListId,
             Title = request.Title,
             Done = false
         };
-
+        await uow.InsertAsync(entity);
         entity.AddDomainEvent(new TodoItemCreatedEvent(entity));
-
-        _context.TodoItems.Add(entity);
-
-        await _context.SaveChangesAsync(cancellationToken);
-
+        uow.Commit();
+        await _domainEventDispatcher.DispatchDomainEventsAsync(entity);
         return entity.Id;
     }
 }

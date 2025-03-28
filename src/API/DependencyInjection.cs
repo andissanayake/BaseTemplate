@@ -1,7 +1,6 @@
 ﻿using BaseTemplate.API.Infrastructure;
 using BaseTemplate.API.Services;
 using BaseTemplate.Application.Common.Interfaces;
-using BaseTemplate.Infrastructure.Data;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
@@ -14,12 +13,10 @@ public static class DependencyInjection
 {
     public static IServiceCollection AddAPI(this IServiceCollection services, IConfiguration configuration)
     {
-        services.AddDatabaseDeveloperPageExceptionFilter();
         services.AddSingleton<IUser, CurrentUserService>();
         services.AddHttpContextAccessor();
         services.AddExceptionHandler<CustomExceptionHandler>();
-        services.AddHealthChecks()
-            .AddDbContextCheck<ApplicationDbContext>();
+        services.AddHealthChecks();
         services.AddControllers();
         services.Configure<ApiBehaviorOptions>(options =>
             options.SuppressModelStateInvalidFilter = true);

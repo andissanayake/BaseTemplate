@@ -1,4 +1,5 @@
 ﻿using BaseTemplate.Application.Common.Interfaces;
+using BaseTemplate.Domain.Entities;
 using BaseTemplate.Domain.Enums;
 
 namespace BaseTemplate.Application.TodoItems.Commands.UpdateTodoItemDetail;
@@ -16,24 +17,27 @@ public record UpdateTodoItemDetailCommand : IRequest
 
 public class UpdateTodoItemDetailCommandHandler : IRequestHandler<UpdateTodoItemDetailCommand>
 {
-    private readonly IApplicationDbContext _context;
+    private readonly IUnitOfWorkFactory _factory;
+    private readonly IDomainEventDispatcher _domainEventDispatcher;
 
-    public UpdateTodoItemDetailCommandHandler(IApplicationDbContext context)
+    public UpdateTodoItemDetailCommandHandler(IUnitOfWorkFactory factory, IDomainEventDispatcher domainEventDispatcher)
     {
-        _context = context;
+        _factory = factory;
+        _domainEventDispatcher = domainEventDispatcher;
     }
 
     public async Task Handle(UpdateTodoItemDetailCommand request, CancellationToken cancellationToken)
     {
-        var entity = await _context.TodoItems
-            .FindAsync(new object[] { request.Id }, cancellationToken);
+        using var uow = _factory.CreateUOW();
+        var entity = await uow.GetAsync<TodoItem>(request.Id);
 
         Guard.Against.NotFound(request.Id, entity);
 
         entity.ListId = request.ListId;
         entity.Priority = request.Priority;
         entity.Note = request.Note;
-
-        await _context.SaveChangesAsync(cancellationToken);
+        await uow.UpdateAsync(entity);
+        uow.Commit();
+        await _domainEventDispatcher.DispatchDomainEventsAsync(entity);
     }
 }

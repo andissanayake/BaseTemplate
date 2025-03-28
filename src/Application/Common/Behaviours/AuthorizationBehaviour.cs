@@ -1,7 +1,7 @@
-﻿using BaseTemplate.Application.Common.Exceptions;
+﻿using System.Reflection;
+using BaseTemplate.Application.Common.Exceptions;
 using BaseTemplate.Application.Common.Interfaces;
 using BaseTemplate.Application.Common.Security;
-using System.Reflection;
 
 namespace BaseTemplate.Application.Common.Behaviours;
 
@@ -15,7 +15,6 @@ public class AuthorizationBehaviour<TRequest, TResponse> : IPipelineBehavior<TRe
         IIdentityService identityService)
     {
         _user = user;
-        _identityService = identityService;
     }
 
     public async Task<TResponse> Handle(TRequest request, RequestHandlerDelegate<TResponse> next, CancellationToken cancellationToken)
@@ -29,8 +28,6 @@ public class AuthorizationBehaviour<TRequest, TResponse> : IPipelineBehavior<TRe
             {
                 throw new UnauthorizedAccessException();
             }
-
-            // Role-based authorization
             var authorizeAttributesWithRoles = authorizeAttributes.Where(a => !string.IsNullOrWhiteSpace(a.Roles));
 
             if (authorizeAttributesWithRoles.Any())

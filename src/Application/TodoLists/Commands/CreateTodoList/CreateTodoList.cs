@@ -10,22 +10,21 @@ public record CreateTodoListCommand : IRequest<int>
 
 public class CreateTodoListCommandHandler : IRequestHandler<CreateTodoListCommand, int>
 {
-    private readonly IApplicationDbContext _context;
+    private readonly IUnitOfWorkFactory _factory;
 
-    public CreateTodoListCommandHandler(IApplicationDbContext context)
+    public CreateTodoListCommandHandler(IUnitOfWorkFactory factory)
     {
-        _context = context;
+        _factory = factory;
     }
 
     public async Task<int> Handle(CreateTodoListCommand request, CancellationToken cancellationToken)
     {
         var entity = new TodoList();
-
         entity.Title = request.Title;
 
-        _context.TodoLists.Add(entity);
-
-        await _context.SaveChangesAsync(cancellationToken);
+        using var uow = _factory.CreateUOW();
+        await uow.InsertAsync(entity);
+        uow.Commit();
 
         return entity.Id;
     }

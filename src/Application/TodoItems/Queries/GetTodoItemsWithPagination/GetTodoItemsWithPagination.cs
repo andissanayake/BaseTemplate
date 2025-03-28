@@ -1,5 +1,4 @@
 ﻿using BaseTemplate.Application.Common.Interfaces;
-using BaseTemplate.Application.Common.Mappings;
 using BaseTemplate.Application.Common.Models;
 
 namespace BaseTemplate.Application.TodoItems.Queries.GetTodoItemsWithPagination;
@@ -13,21 +12,35 @@ public record GetTodoItemsWithPaginationQuery : IRequest<PaginatedList<TodoItemB
 
 public class GetTodoItemsWithPaginationQueryHandler : IRequestHandler<GetTodoItemsWithPaginationQuery, PaginatedList<TodoItemBriefDto>>
 {
-    private readonly IApplicationDbContext _context;
-    private readonly IMapper _mapper;
+    private readonly IUnitOfWorkFactory _factory;
 
-    public GetTodoItemsWithPaginationQueryHandler(IApplicationDbContext context, IMapper mapper)
+    public GetTodoItemsWithPaginationQueryHandler(IUnitOfWorkFactory factory)
     {
-        _context = context;
-        _mapper = mapper;
+        _factory = factory;
     }
 
     public async Task<PaginatedList<TodoItemBriefDto>> Handle(GetTodoItemsWithPaginationQuery request, CancellationToken cancellationToken)
     {
-        return await _context.TodoItems
-            .Where(x => x.ListId == request.ListId)
-            .OrderBy(x => x.Title)
-            .ProjectTo<TodoItemBriefDto>(_mapper.ConfigurationProvider)
-            .PaginatedListAsync(request.PageNumber, request.PageSize);
+        using var uow = _factory.CreateUOW();
+        var offset = (request.PageNumber - 1) * request.PageSize;
+
+        var countSql = "SELECT COUNT(1) FROM TodoItem WHERE ListId = @ListId";
+        var totalCount = await uow.QueryFirstOrDefaultAsync<int>(countSql, new { request.ListId });
+
+        var dataSql = @"
+        SELECT Id, Title, Done, Priority, Reminder
+        FROM TodoItem
+        WHERE ListId = @ListId
+        ORDER BY Title
+        OFFSET @Offset ROWS FETCH NEXT @PageSize ROWS ONLY";
+
+        var items = await uow.QueryAsync<TodoItemBriefDto>(dataSql, new
+        {
+            request.ListId,
+            Offset = offset,
+            request.PageSize
+        });
+
+        return new PaginatedList<TodoItemBriefDto>(items.ToList(), totalCount, request.PageNumber, request.PageSize);
     }
 }

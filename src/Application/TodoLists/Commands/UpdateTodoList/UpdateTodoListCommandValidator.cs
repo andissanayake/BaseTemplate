@@ -4,11 +4,11 @@ namespace BaseTemplate.Application.TodoLists.Commands.UpdateTodoList;
 
 public class UpdateTodoListCommandValidator : AbstractValidator<UpdateTodoListCommand>
 {
-    private readonly IApplicationDbContext _context;
+    private readonly IUnitOfWorkFactory _factory;
 
-    public UpdateTodoListCommandValidator(IApplicationDbContext context)
+    public UpdateTodoListCommandValidator(IUnitOfWorkFactory factory)
     {
-        _context = context;
+        _factory = factory;
 
         RuleFor(v => v.Title)
             .NotEmpty()
@@ -20,8 +20,9 @@ public class UpdateTodoListCommandValidator : AbstractValidator<UpdateTodoListCo
 
     public async Task<bool> BeUniqueTitle(UpdateTodoListCommand model, string title, CancellationToken cancellationToken)
     {
-        return await _context.TodoLists
-            .Where(l => l.Id != model.Id)
-            .AllAsync(l => l.Title != title, cancellationToken);
+        var sql = "SELECT COUNT(1) FROM TodoList WHERE Title = @Title and Id != @Id";
+        using var uow = _factory.CreateUOW();
+        var count = await uow.QueryFirstOrDefaultAsync<int>(sql, new { Title = title, model.Id });
+        return count == 0;
     }
 }

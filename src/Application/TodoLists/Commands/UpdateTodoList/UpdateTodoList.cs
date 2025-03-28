@@ -1,4 +1,5 @@
 ﻿using BaseTemplate.Application.Common.Interfaces;
+using BaseTemplate.Domain.Entities;
 
 namespace BaseTemplate.Application.TodoLists.Commands.UpdateTodoList;
 
@@ -11,23 +12,23 @@ public record UpdateTodoListCommand : IRequest
 
 public class UpdateTodoListCommandHandler : IRequestHandler<UpdateTodoListCommand>
 {
-    private readonly IApplicationDbContext _context;
+    private readonly IUnitOfWorkFactory _factory;
 
-    public UpdateTodoListCommandHandler(IApplicationDbContext context)
+    public UpdateTodoListCommandHandler(IUnitOfWorkFactory factory)
     {
-        _context = context;
+        _factory = factory;
     }
 
     public async Task Handle(UpdateTodoListCommand request, CancellationToken cancellationToken)
     {
-        var entity = await _context.TodoLists
-            .FindAsync(new object[] { request.Id }, cancellationToken);
+        using var uow = _factory.CreateUOW();
+        var entity = await uow.GetAsync<TodoList>(request.Id);
 
         Guard.Against.NotFound(request.Id, entity);
 
         entity.Title = request.Title;
-
-        await _context.SaveChangesAsync(cancellationToken);
+        await uow.UpdateAsync(entity);
+        uow.Commit();
 
     }
 }
