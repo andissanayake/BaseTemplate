@@ -23,17 +23,15 @@ public class CreateTodoItemCommandHandler : IRequestHandler<CreateTodoItemComman
 
     public async Task<int> Handle(CreateTodoItemCommand request, CancellationToken cancellationToken)
     {
+        using var uow = _factory.CreateUOW();
         var entity = new TodoItem
         {
             ListId = request.ListId,
             Title = request.Title,
             Done = false
         };
-
-        entity.AddDomainEvent(new TodoItemCreatedEvent(entity));
-        var uow = _factory.CreateUOW();
         await uow.InsertAsync(entity);
-
+        entity.AddDomainEvent(new TodoItemCreatedEvent(entity));
         uow.Commit();
         await _domainEventDispatcher.DispatchDomainEventsAsync(entity);
         return entity.Id;
