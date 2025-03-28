@@ -23,9 +23,8 @@ public class CreateTodoListCommandHandler : IRequestHandler<CreateTodoListComman
 
         entity.Title = request.Title;
 
-        var uow = _factory.CreateUOW();
+        using var uow = _factory.CreateUOW();
         await uow.InsertAsync(entity);
-
         uow.Commit();
 
         return entity.Id;

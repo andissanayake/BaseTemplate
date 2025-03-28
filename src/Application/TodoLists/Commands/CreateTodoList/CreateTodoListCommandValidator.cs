@@ -20,8 +20,9 @@ public class CreateTodoListCommandValidator : AbstractValidator<CreateTodoListCo
 
     public async Task<bool> BeUniqueTitle(string title, CancellationToken cancellationToken)
     {
-        //return await _context.TodoLists
-        //    .AllAsync(l => l.Title != title, cancellationToken);
-        throw new Exception("Not implemented");
+        var sql = "SELECT COUNT(1) FROM TodoList WHERE Title = @Title";
+        using var uow = _factory.CreateUOW();
+        var count = await uow.QueryFirstOrDefaultAsync<int>(sql, new { Title = title });
+        return count == 0;
     }
 }
