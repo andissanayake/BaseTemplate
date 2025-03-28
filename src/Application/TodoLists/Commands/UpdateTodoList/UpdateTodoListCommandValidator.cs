@@ -20,9 +20,9 @@ public class UpdateTodoListCommandValidator : AbstractValidator<UpdateTodoListCo
 
     public async Task<bool> BeUniqueTitle(UpdateTodoListCommand model, string title, CancellationToken cancellationToken)
     {
-        //return await _context.TodoLists
-        //    .Where(l => l.Id != model.Id)
-        //    .AllAsync(l => l.Title != title, cancellationToken);
-        throw new Exception("Not implemented");
+        var sql = "SELECT COUNT(1) FROM TodoList WHERE Title = @Title and Id != @Id";
+        using var uow = _factory.CreateUOW();
+        var count = await uow.QueryFirstOrDefaultAsync<int>(sql, new { Title = title, model.Id });
+        return count == 0;
     }
 }

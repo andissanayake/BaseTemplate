@@ -22,12 +22,12 @@ public class UpdateTodoListCommandHandler : IRequestHandler<UpdateTodoListComman
     public async Task Handle(UpdateTodoListCommand request, CancellationToken cancellationToken)
     {
         using var uow = _factory.CreateUOW();
-        var entity = await uow.GetAsync<TodoItem>(request.Id);
+        var entity = await uow.GetAsync<TodoList>(request.Id);
 
         Guard.Against.NotFound(request.Id, entity);
 
         entity.Title = request.Title;
-
+        await uow.UpdateAsync(entity);
         uow.Commit();
 
     }
