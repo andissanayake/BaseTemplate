@@ -19,7 +19,7 @@ public class LoggingBehaviour<TRequest> : IRequestPreProcessor<TRequest> where T
     {
         var requestName = typeof(TRequest).Name;
         var userId = _user.Id ?? string.Empty;
-        string? userName = string.Empty;
+        string? userName = _user.UserName ?? string.Empty;
 
         _logger.LogInformation("Sample Request: {Name} {@UserId} {@UserName} {@Request}",
             requestName, userId, userName, request);

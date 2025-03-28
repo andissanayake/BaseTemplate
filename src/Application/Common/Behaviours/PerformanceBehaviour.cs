@@ -35,7 +35,7 @@ public class PerformanceBehaviour<TRequest, TResponse> : IPipelineBehavior<TRequ
         {
             var requestName = typeof(TRequest).Name;
             var userId = _user.Id ?? string.Empty;
-            var userName = string.Empty;
+            var userName = _user.UserName ?? string.Empty;
 
             _logger.LogWarning("Sample Long Running Request: {Name} ({ElapsedMilliseconds} milliseconds) {@UserId} {@UserName} {@Request}",
                 requestName, elapsedMilliseconds, userId, userName, request);
