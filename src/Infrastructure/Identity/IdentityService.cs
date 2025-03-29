@@ -1,13 +1,17 @@
+using System.Security.Claims;
 using BaseTemplate.Application.Common.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 
 namespace BaseTemplate.Infrastructure.Identity;
 
 public class IdentityService : IIdentityService
 {
     private readonly IUnitOfWorkFactory _factory;
-    public IdentityService(IUnitOfWorkFactory factory)
+    private readonly IAuthorizationService _authorizationService;
+    public IdentityService(IUnitOfWorkFactory factory, IAuthorizationService authorizationService)
     {
         _factory = factory;
+        _authorizationService = authorizationService;
     }
     public async Task<bool> IsInRoleAsync(string userId, string role)
     {
@@ -18,7 +22,19 @@ public class IdentityService : IIdentityService
 
     public async Task<bool> AuthorizeAsync(string userId, string policyName)
     {
-        //create a custom claim and validate it we can use claim principal factory and authorization 
-        return false;
+        using var uow = _factory.CreateUOW();
+        var roles = await uow.QueryAsync<string>("Select Role from UserRole where UserId = @userId", new { userId });
+        var claims = new List<Claim>
+        {
+            new Claim(ClaimTypes.NameIdentifier, userId)
+        };
+        foreach (var role in roles)
+        {
+            claims.Add(new Claim("role", role));
+        }
+        var identity = new ClaimsIdentity(claims, "Custom");
+        var principal = new ClaimsPrincipal(identity);
+        var result = await _authorizationService.AuthorizeAsync(principal, policyName);
+        return result.Succeeded;
     }
 }
