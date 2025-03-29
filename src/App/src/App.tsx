@@ -1,47 +1,29 @@
-import { useEffect } from "react";
 import "./App.css";
-import {
-  handleLogin,
-  handleLogout,
-  onAuthStateChangedListener,
-} from "./auth/firebase";
-import { authPolicy } from "./auth/authPolicy";
 import { Policies } from "./auth/PoliciesEnum";
-import { useAuthStore } from "./auth/authStore";
-import { Secure } from "./auth/Secure";
+import { Routes, Route } from "react-router";
+import { DefaultLayout } from "./layout/DefaultLayout";
+import ProtectedRoute from "./layout/ProtectedRoute";
+import { HomePage } from "./pages/HomePage";
+import { NotFoundPage } from "./pages/NotFoundPage";
+import { ProfilePage } from "./pages/ProfilePage";
 
 export const App = () => {
-  const user = useAuthStore((state) => state.user);
-  const setUser = useAuthStore((state) => state.setUser);
-
-  useEffect(() => {
-    const unsubscribe = onAuthStateChangedListener((user) => {
-      if (user) {
-        setUser(user);
-      } else {
-        setUser(null);
-      }
-    }, false);
-
-    return () => {
-      unsubscribe();
-    };
-  }, [setUser]);
-
   return (
     <>
-      {authPolicy(Policies.User, user) ? (
-        <>
-          <h1>Welcome {user?.displayName}</h1>
-          <a onClick={handleLogout}>Logout</a>
-          <Secure />
-        </>
-      ) : (
-        <>
-          <h1>Welcome Guest</h1>
-          <a onClick={handleLogin}>Login</a>
-        </>
-      )}
+      <Routes>
+        <Route path="/" element={<DefaultLayout />}>
+          <Route index element={<HomePage />} />
+          <Route
+            path="/profile"
+            element={
+              <ProtectedRoute policy={Policies.User}>
+                <ProfilePage />
+              </ProtectedRoute>
+            }
+          />
+          <Route path="*" element={<NotFoundPage />} />
+        </Route>
+      </Routes>
     </>
   );
 };
