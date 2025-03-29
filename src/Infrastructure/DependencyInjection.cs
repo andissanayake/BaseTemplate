@@ -1,4 +1,5 @@
 ﻿using BaseTemplate.Application.Common.Interfaces;
+using BaseTemplate.Domain.Constants;
 using BaseTemplate.Infrastructure.Data;
 using BaseTemplate.Infrastructure.Events;
 using BaseTemplate.Infrastructure.Identity;
@@ -33,7 +34,8 @@ public static class DependencyInjection
         services.AddSingleton<IDomainEventQueue>(sp => sp.GetRequiredService<InMemoryDomainEventWorker>());
         services.AddSingleton<IDomainEventDispatcher, QueuedDomainEventDispatcher>();
         services.AddHostedService(sp => sp.GetRequiredService<InMemoryDomainEventWorker>());
-
+        services.AddAuthorizationCore(options =>
+            options.AddPolicy(Policies.CanPurge, policy => policy.RequireRole(Roles.Administrator)));
         return services;
     }
 }
