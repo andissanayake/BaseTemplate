@@ -1,6 +1,6 @@
 // stores/authStore.ts
 import { create } from "zustand";
-import { persist } from "zustand/middleware";
+import { persist, devtools } from "zustand/middleware";
 
 export interface AppUser {
   uid: string;
@@ -16,13 +16,15 @@ interface AuthState {
 }
 
 export const useAuthStore = create<AuthState>()(
-  persist(
-    (set) => ({
-      user: null,
-      setUser: (user) => set({ user }),
-    }),
-    {
-      name: "auth",
-    }
+  devtools(
+    persist(
+      (set) => ({
+        user: null,
+        setUser: (user) => set({ user }),
+      }),
+      {
+        name: "auth",
+      }
+    )
   )
 );
