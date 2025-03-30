@@ -29,7 +29,7 @@ export const useAuthStore = create<AuthState>()(
           if (user) {
             await get().fetchRoles();
           }
-        }, // Fetch roles when user is set
+        },
         fetchRoles: async () => {
           axiosInstance
             .get("/api/user/roles")
