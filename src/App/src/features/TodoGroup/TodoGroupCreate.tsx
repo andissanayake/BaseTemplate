@@ -1,6 +1,6 @@
 import React from "react";
 import { Modal, Form, Input, notification } from "antd";
-import { useTodoGroupStore } from "./todoGroupStore";
+import { TodoGroupService } from "./todoGroupService";
 
 interface TodoGroupModalProps {
   visible: boolean;
@@ -12,11 +12,11 @@ const TodoGroupCreate: React.FC<TodoGroupModalProps> = ({
   onClose,
 }) => {
   const [form] = Form.useForm();
-  const { createTodoGroup } = useTodoGroupStore();
 
   const handleSaveTodoGroup = () => {
     form.validateFields().then(async (values) => {
-      await createTodoGroup(values);
+      const data = await TodoGroupService.createTodoGroup(values);
+      console.log("Todo group created:", data);
       notification.success({ message: "Operation successful!" });
       onClose();
       form.resetFields();

@@ -1,10 +1,10 @@
 import { useEffect } from "react";
 import { useTodoGroupStore } from "./todoGroupStore";
 import { Button, Form, Input, notification, Space } from "antd";
+import { TodoGroupService } from "./todoGroupService";
 
 export const TodoGroupEdit = () => {
-  const { editTodoGroup, setTodoGroupEdit, updateTodoGroup } =
-    useTodoGroupStore();
+  const { editTodoGroup, setTodoGroupEdit } = useTodoGroupStore();
   const [form] = Form.useForm();
 
   useEffect(() => {
@@ -17,7 +17,8 @@ export const TodoGroupEdit = () => {
     form.validateFields().then(async (values) => {
       values.id = editTodoGroup?.id;
 
-      await updateTodoGroup(values);
+      const data = await TodoGroupService.updateTodoGroup(values);
+      console.log("Todo group updated:", data);
       notification.success({ message: "Operation successful!" });
       setTodoGroupEdit(null); // Reset edit mode
     });
