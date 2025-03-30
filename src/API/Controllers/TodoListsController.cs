@@ -3,6 +3,7 @@ using BaseTemplate.Application.TodoLists.Commands.DeleteTodoList;
 using BaseTemplate.Application.TodoLists.Commands.GetTodoListById;
 using BaseTemplate.Application.TodoLists.Commands.PurgeTodoLists;
 using BaseTemplate.Application.TodoLists.Commands.UpdateTodoList;
+using BaseTemplate.Application.TodoLists.Queries;
 using BaseTemplate.Application.TodoLists.Queries.GetTodos;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -21,8 +22,7 @@ public class TodoListsController : ApiControllerBase
     [HttpGet("{id}")]
     public async Task<ActionResult<TodoListDto>> GetById(int id)
     {
-        var data = await Mediator.Send(new GetTodoListByIdQuery(id));
-        return Ok(data);
+        return await Mediator.Send(new GetTodoListByIdQuery(id));
     }
 
     [HttpPost]
