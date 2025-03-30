@@ -33,4 +33,17 @@ export class TodoGroupService {
   static async deleteTodoGroup(data: TodoGroup) {
     return await axiosInstance.delete(`/api/todoLists/${data.id}`);
   }
+  static getColours() {
+    const predefinedColors = [
+      { label: "White", value: "#FFFFFF" },
+      { label: "Red", value: "#FF5733" },
+      { label: "Orange", value: "#FFC300" },
+      { label: "Yellow", value: "#FFFF66" },
+      { label: "Green", value: "#CCFF99" },
+      { label: "Blue", value: "#6666FF" },
+      { label: "Purple", value: "#9966CC" },
+      { label: "Grey", value: "#999999" },
+    ];
+    return predefinedColors;
+  }
 }

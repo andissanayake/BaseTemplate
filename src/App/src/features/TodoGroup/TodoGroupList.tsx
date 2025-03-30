@@ -4,12 +4,14 @@ import { Table, Button, Space, notification, Popconfirm } from "antd";
 import { DeleteOutlined, EditOutlined } from "@ant-design/icons";
 import { useTodoGroupStore } from "./todoGroupStore";
 import { TodoGroup, TodoGroupService } from "./todoGroupService";
+import { render } from "react-dom";
 
 const TodoGroupList: React.FC = () => {
   const { todoGroupList, loading, setTodoGroupEdit, fetchTodoGroups } =
     useTodoGroupStore();
 
   const handleEdit = (record: TodoGroup) => {
+    console.log("Edit record:", record);
     setTodoGroupEdit(record);
   };
 
@@ -25,9 +27,23 @@ const TodoGroupList: React.FC = () => {
 
   const columns = [
     {
-      title: "Todo Group Name",
-      dataIndex: "title",
+      title: "Todo List Title",
       key: "title",
+      render: (_: any, record: TodoGroup) => (
+        <span style={{ display: "flex", alignItems: "center" }}>
+          {record.title}
+          <span
+            style={{
+              display: "inline-block",
+              width: 20,
+              height: 20,
+              backgroundColor: record.colour,
+              marginLeft: 10,
+              borderRadius: "50%",
+            }}
+          />
+        </span>
+      ),
     },
     {
       title: "Actions",

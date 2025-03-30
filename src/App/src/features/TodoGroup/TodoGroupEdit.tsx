@@ -1,6 +1,7 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useEffect } from "react";
 import { useTodoGroupStore } from "./todoGroupStore";
-import { Button, Form, Input, notification, Space } from "antd";
+import { Button, Form, Input, notification, Space, Select } from "antd";
 import { TodoGroupService } from "./todoGroupService";
 
 export const TodoGroupEdit = () => {
@@ -17,10 +18,15 @@ export const TodoGroupEdit = () => {
     form.validateFields().then(async (values) => {
       values.id = editTodoGroup?.id;
 
-      const data = await TodoGroupService.updateTodoGroup(values);
-      console.log("Todo group updated:", data);
-      notification.success({ message: "Operation successful!" });
-      setTodoGroupEdit(null); // Reset edit mode
+      try {
+        const data = await TodoGroupService.updateTodoGroup(values);
+        console.log("Todo group updated:", data);
+        notification.success({ message: "Operation successful!" });
+        setTodoGroupEdit(null);
+      } catch (error: any) {
+        console.error("Error updating todo group:", error);
+        notification.error({ message: "Failed to update todo group!" });
+      }
     });
   };
 
@@ -35,6 +41,50 @@ export const TodoGroupEdit = () => {
           ]}
         >
           <Input placeholder="Enter todo group name" />
+        </Form.Item>
+
+        <Form.Item
+          label="Select Colour"
+          name="colour"
+          rules={[{ required: true, message: "Please select a colour!" }]}
+        >
+          <Select optionLabelProp="label">
+            {TodoGroupService.getColours().map((colour) => (
+              <Select.Option
+                key={colour.value}
+                value={colour.value}
+                label={
+                  <span style={{ display: "flex", alignItems: "center" }}>
+                    <span
+                      style={{
+                        display: "inline-block",
+                        width: 20,
+                        height: 20,
+                        backgroundColor: colour.value,
+                        marginRight: 10,
+                        borderRadius: "50%",
+                      }}
+                    />
+                    {colour.label}
+                  </span>
+                }
+              >
+                <span style={{ display: "flex", alignItems: "center" }}>
+                  <span
+                    style={{
+                      display: "inline-block",
+                      width: 20,
+                      height: 20,
+                      backgroundColor: colour.value,
+                      marginRight: 10,
+                      borderRadius: "50%",
+                    }}
+                  />
+                  {colour.label}
+                </span>
+              </Select.Option>
+            ))}
+          </Select>
         </Form.Item>
 
         <Form.Item>
