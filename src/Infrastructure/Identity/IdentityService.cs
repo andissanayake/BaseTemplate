@@ -19,7 +19,6 @@ public class IdentityService : IIdentityService
         var count = await uow.QueryFirstOrDefaultAsync<int>("Select count(1) from UserRole where UserId = @userId and Role =@role", new { userId, role });
         return count != 0;
     }
-
     public async Task<bool> AuthorizeAsync(string userId, string policyName)
     {
         using var uow = _factory.CreateUOW();
@@ -36,5 +35,10 @@ public class IdentityService : IIdentityService
         var principal = new ClaimsPrincipal(identity);
         var result = await _authorizationService.AuthorizeAsync(principal, policyName);
         return result.Succeeded;
+    }
+    public async Task<IEnumerable<string>> GetRolesAsync(string userId)
+    {
+        using var uow = _factory.CreateUOW();
+        return await uow.QueryAsync<string>("Select Role from UserRole where UserId = @userId", new { userId });
     }
 }
