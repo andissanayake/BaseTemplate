@@ -1,9 +1,8 @@
-﻿using BaseTemplate.API.Infrastructure;
+﻿using BaseTemplate.API.Extensions;
+using BaseTemplate.API.Infrastructure;
 using BaseTemplate.API.Services;
 using BaseTemplate.Application.Common.Interfaces;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 
 
@@ -50,22 +49,8 @@ public static class DependencyInjection
                 });
         });
 
-        var jwtSettings = configuration.GetSection("Jwt");
-        services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-            .AddJwtBearer(options =>
-            {
-                options.Authority = jwtSettings["Authority"];
-                options.TokenValidationParameters = new TokenValidationParameters
-                {
-                    ValidateIssuer = true,
-                    ValidIssuer = jwtSettings["Issuer"],
-                    ValidateAudience = true,
-                    ValidAudience = jwtSettings["Audience"],
-                    ValidateLifetime = true
-                };
-            });
-
-        services.AddAuthorization();
+        services.AddApiAuthentication(configuration);
+        services.AddAppAuthorization();
 
         return services;
     }
