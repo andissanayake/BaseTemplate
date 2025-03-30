@@ -17,7 +17,7 @@ public class DeleteTodoListCommandHandler : IRequestHandler<DeleteTodoListComman
     public async Task Handle(DeleteTodoListCommand request, CancellationToken cancellationToken)
     {
         using var uow = _factory.CreateUOW();
-        var entity = await uow.GetAsync<TodoItem>(request.Id);
+        var entity = await uow.GetAsync<TodoList>(request.Id);
 
         Guard.Against.NotFound(request.Id, entity);
         await uow.DeleteAsync(entity);

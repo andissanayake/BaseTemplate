@@ -23,17 +23,7 @@ public class GetTodosQueryHandler : IRequestHandler<GetTodosQuery, TodosVm>
     {
         using var uow = _factory.CreateUOW();
         var todoLists = await uow.GetAllAsync<TodoList>();
-        var todoItems = await uow.GetAllAsync<TodoItem>();
-
         var todoDtoList = _mapper.Map<List<TodoListDto>>(todoLists);
-        var todoDtoItems = _mapper.Map<List<TodoItemDto>>(todoItems);
-
-        var lists = todoDtoList.Select(list => new TodoListDto
-        {
-            Id = list.Id,
-            Title = list.Title,
-            Items = todoDtoItems.Where(i => i.ListId == list.Id).ToList()
-        });
 
 
         return new TodosVm
@@ -42,7 +32,7 @@ public class GetTodosQueryHandler : IRequestHandler<GetTodosQuery, TodosVm>
                 .Cast<PriorityLevel>()
                 .Select(p => new LookupDto { Id = (int)p, Title = p.ToString() })
                 .ToList(),
-            Lists = lists.ToList()
+            Lists = todoDtoList,
 
         };
     }
