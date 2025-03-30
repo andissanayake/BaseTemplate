@@ -15,7 +15,6 @@ public class TodoItemsController : ApiControllerBase
     [HttpGet]
     public async Task<ActionResult<PaginatedList<TodoItemBriefDto>>> GetTodoItemsWithPagination([FromQuery] GetTodoItemsWithPaginationQuery query)
     {
-        var user = User.Identity?.Name;
         return await Mediator.Send(query);
     }
 

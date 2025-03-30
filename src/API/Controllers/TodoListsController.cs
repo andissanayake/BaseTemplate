@@ -1,5 +1,6 @@
 ﻿using BaseTemplate.Application.TodoLists.Commands.CreateTodoList;
 using BaseTemplate.Application.TodoLists.Commands.DeleteTodoList;
+using BaseTemplate.Application.TodoLists.Commands.GetTodoListById;
 using BaseTemplate.Application.TodoLists.Commands.PurgeTodoLists;
 using BaseTemplate.Application.TodoLists.Commands.UpdateTodoList;
 using BaseTemplate.Application.TodoLists.Queries.GetTodos;
@@ -15,6 +16,13 @@ public class TodoListsController : ApiControllerBase
     public async Task<ActionResult<TodosVm>> Get()
     {
         return await Mediator.Send(new GetTodosQuery());
+    }
+
+    [HttpGet("{id}")]
+    public async Task<ActionResult<TodoListDto>> GetById(int id)
+    {
+        var data = await Mediator.Send(new GetTodoListByIdQuery(id));
+        return Ok(data);
     }
 
     [HttpPost]
