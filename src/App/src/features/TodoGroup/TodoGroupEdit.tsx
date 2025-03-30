@@ -5,7 +5,8 @@ import { Button, Form, Input, notification, Space, Select } from "antd";
 import { TodoGroupService } from "./todoGroupService";
 
 export const TodoGroupEdit = () => {
-  const { editTodoGroup, setTodoGroupEdit } = useTodoGroupStore();
+  const { editTodoGroup, setTodoGroupEdit, fetchTodoGroups } =
+    useTodoGroupStore();
   const [form] = Form.useForm();
 
   useEffect(() => {
@@ -19,10 +20,10 @@ export const TodoGroupEdit = () => {
       values.id = editTodoGroup?.id;
 
       try {
-        const data = await TodoGroupService.updateTodoGroup(values);
-        console.log("Todo group updated:", data);
+        await TodoGroupService.updateTodoGroup(values);
         notification.success({ message: "Operation successful!" });
         setTodoGroupEdit(null);
+        await fetchTodoGroups();
       } catch (error: any) {
         console.error("Error updating todo group:", error);
         notification.error({ message: "Failed to update todo group!" });

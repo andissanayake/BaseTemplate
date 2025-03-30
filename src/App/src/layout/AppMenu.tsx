@@ -35,7 +35,6 @@ export const AppMenu = () => {
 
   useEffect(() => {
     const unsubscribe = onAuthStateChangedListener((user) => {
-      console.log("user", user);
       if (user) {
         setUser(user);
       } else {

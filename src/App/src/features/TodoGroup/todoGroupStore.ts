@@ -29,7 +29,7 @@ export const useTodoGroupStore = create<TodoGroupState>((set) => ({
         set({ todoGroupList: response.data.lists, loading: false });
       }
     } catch (error: unknown) {
-      console.log(error);
+      console.error(error);
       set({ loading: false });
     }
   },

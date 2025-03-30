@@ -14,7 +14,7 @@ export const TodoGroupDashboard = () => {
 
   return (
     <Card>
-      <h1>Manage Todo Groups</h1>
+      <h1>Manage Todo Lists</h1>
       {editTodoGroup ? (
         <TodoGroupEdit />
       ) : (
@@ -26,7 +26,7 @@ export const TodoGroupDashboard = () => {
                 setIsModalVisible(true);
               }}
             >
-              Create Todo Group
+              Create Todo List
             </Button>
           </Space>
           <TodoGroupList />
