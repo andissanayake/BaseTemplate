@@ -3,27 +3,28 @@ import { useEffect } from "react";
 import { useTodoGroupStore } from "./todoGroupStore";
 import { Button, Form, Input, notification, Space, Select } from "antd";
 import { TodoGroupService } from "./todoGroupService";
+import { useNavigate } from "react-router-dom";
 
 export const TodoGroupEdit = () => {
-  const { editTodoGroup, setTodoGroupEdit, fetchTodoGroups } =
-    useTodoGroupStore();
+  const { currentTodoGroup, setTodoGroupCurrent } = useTodoGroupStore();
   const [form] = Form.useForm();
+  const navigate = useNavigate();
 
   useEffect(() => {
-    if (editTodoGroup?.id) {
-      form.setFieldsValue(editTodoGroup);
+    if (currentTodoGroup?.id) {
+      form.setFieldsValue(currentTodoGroup);
     }
-  }, [editTodoGroup, form]);
+  }, [currentTodoGroup, form]);
 
   const handleSaveTodoGroup = () => {
     form.validateFields().then(async (values) => {
-      values.id = editTodoGroup?.id;
+      values.id = currentTodoGroup?.id;
 
       try {
         await TodoGroupService.updateTodoGroup(values);
         notification.success({ message: "Operation successful!" });
-        setTodoGroupEdit(null);
-        await fetchTodoGroups();
+        setTodoGroupCurrent(null, null);
+        navigate("/todo-list");
       } catch (error: any) {
         console.error("Error updating todo group:", error);
         notification.error({ message: "Failed to update todo group!" });
@@ -93,7 +94,7 @@ export const TodoGroupEdit = () => {
             <Button type="primary" htmlType="submit">
               Submit
             </Button>
-            <Button type="default" onClick={() => setTodoGroupEdit(null)}>
+            <Button type="default" onClick={() => navigate("/todo-list")}>
               Cancel
             </Button>
           </Space>

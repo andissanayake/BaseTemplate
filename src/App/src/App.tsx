@@ -6,6 +6,7 @@ import ProtectedRoute from "./layout/ProtectedRoute";
 import { HomePage } from "./pages/HomePage";
 import { NotFoundPage } from "./pages/NotFoundPage";
 import { ProfilePage } from "./pages/ProfilePage";
+import { TodoGroupPage } from "./pages/TodoGroupPage";
 
 export const App = () => {
   return (
@@ -13,6 +14,7 @@ export const App = () => {
       <Routes>
         <Route path="/" element={<DefaultLayout />}>
           <Route index element={<HomePage />} />
+          <Route path="/todo-list/*" element={<TodoGroupPage />} />
           <Route
             path="/profile"
             element={

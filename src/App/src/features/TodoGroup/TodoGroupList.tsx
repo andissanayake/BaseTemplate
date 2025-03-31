@@ -1,18 +1,24 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useEffect } from "react";
 import { Table, Button, Space, notification, Popconfirm } from "antd";
-import { DeleteOutlined, EditOutlined } from "@ant-design/icons";
+import { DeleteOutlined, EditOutlined, FundOutlined } from "@ant-design/icons";
 import { useTodoGroupStore } from "./todoGroupStore";
 import { TodoGroup, TodoGroupService } from "./todoGroupService";
+import { useNavigate } from "react-router-dom";
 
 const TodoGroupList: React.FC = () => {
-  const { todoGroupList, loading, setTodoGroupEdit, fetchTodoGroups } =
+  const { todoGroupList, loading, setTodoGroupCurrent, fetchTodoGroups } =
     useTodoGroupStore();
+  const navigate = useNavigate();
 
   const handleEdit = (record: TodoGroup) => {
-    setTodoGroupEdit(record);
+    setTodoGroupCurrent(record, "edit");
+    navigate(`edit/${record.id}`);
   };
-
+  const handleView = (record: TodoGroup) => {
+    setTodoGroupCurrent(record, "view");
+    navigate(`view/${record.id}`);
+  };
   useEffect(() => {
     fetchTodoGroups();
   }, [fetchTodoGroups]);
@@ -48,6 +54,12 @@ const TodoGroupList: React.FC = () => {
       key: "actions",
       render: (_: any, record: TodoGroup) => (
         <Space>
+          <Button
+            type="link"
+            icon={<FundOutlined />}
+            onClick={() => handleView(record)}
+            size="large"
+          />
           <Button
             type="link"
             icon={<EditOutlined />}

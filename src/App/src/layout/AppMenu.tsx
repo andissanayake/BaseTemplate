@@ -66,6 +66,13 @@ export const AppMenu = () => {
     });
     if (user) {
       menuItems.push({
+        key: "/todo-list",
+        label: <span>Todo List</span>,
+        onClick: (e: any) => {
+          handleClick(e.key);
+        },
+      });
+      menuItems.push({
         key: "/profile",
         label: (
           <span>

@@ -6,9 +6,12 @@ import { TodoGroup, TodoGroupService } from "./todoGroupService";
 interface TodoGroupState {
   todoGroupList: TodoGroup[];
   loading: boolean;
-  editTodoGroup: TodoGroup | null;
-  setTodoGroupEdit: (data: TodoGroup | null) => void;
-  cleanTodoGroupEdit: () => void;
+  currentTodoGroup: TodoGroup | null;
+  displayMode: "edit" | "view" | null;
+  setTodoGroupCurrent: (
+    data: TodoGroup | null,
+    displayMode: "edit" | "view" | null
+  ) => void;
   fetchTodoGroups: () => Promise<void>;
 }
 
@@ -17,9 +20,12 @@ export const useTodoGroupStore = create<TodoGroupState>((set) => ({
   todoGroupList: [],
   loading: false,
   editId: null,
-  editTodoGroup: null,
-  setTodoGroupEdit: (data: TodoGroup | null) => set({ editTodoGroup: data }),
-  cleanTodoGroupEdit: () => set({ editTodoGroup: null }),
+  currentTodoGroup: null,
+  displayMode: null,
+  setTodoGroupCurrent: (
+    data: TodoGroup | null,
+    displayMode: "edit" | "view" | null
+  ) => set({ currentTodoGroup: data, displayMode: displayMode }),
 
   fetchTodoGroups: async () => {
     set({ loading: true });
