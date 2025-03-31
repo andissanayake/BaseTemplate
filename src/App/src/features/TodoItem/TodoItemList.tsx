@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 import { Table, Button, Space, notification, Popconfirm } from "antd";
 import { DeleteOutlined, EditOutlined } from "@ant-design/icons";
 import { useTodoItemStore } from "./todoItemStore";
-import { TodoItem, TodoItemService } from "./todoItemService";
+import { PriorityLevel, TodoItem, TodoItemService } from "./todoItemService";
 import { useParams } from "react-router-dom";
 import { TodoItemEdit } from "./TodoItemEdit";
 
@@ -44,6 +44,15 @@ const TodoItemList: React.FC = () => {
       render: (_: any, record: TodoItem) => (
         <span style={{ display: "flex", alignItems: "center" }}>
           {record.title}
+        </span>
+      ),
+    },
+    {
+      title: "Priority",
+      key: "priority",
+      render: (_: any, record: TodoItem) => (
+        <span style={{ display: "flex", alignItems: "center" }}>
+          {PriorityLevel[record.priority] || ""}
         </span>
       ),
     },
