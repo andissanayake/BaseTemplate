@@ -1,32 +1,33 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { create } from "zustand";
-import { TodoGroup, TodoGroupService } from "./todoItemService";
+import { TodoItem, TodoItemService } from "./todoItemService";
 
 // Define the state interface
-interface TodoGroupState {
-  todoGroupList: TodoGroup[];
+interface TodoItemState {
+  listId: number;
+  todoItemList: TodoItem[];
   loading: boolean;
-  editTodoGroup: TodoGroup | null;
-  setTodoGroupEdit: (data: TodoGroup | null) => void;
-  cleanTodoGroupEdit: () => void;
-  fetchTodoGroups: () => Promise<void>;
+  editTodoItem: TodoItem | null;
+  setTodoItemEdit: (data: TodoItem | null) => void;
+  cleanTodoItemEdit: () => void;
+  fetchTodoItems: () => Promise<void>;
 }
 
 // Create the Zustand store
-export const useTodoGroupStore = create<TodoGroupState>((set) => ({
-  todoGroupList: [],
+export const useTodoItemStore = create<TodoItemState>((set) => ({
+  listId: 0,
+  todoItemList: [],
   loading: false,
-  editId: null,
-  editTodoGroup: null,
-  setTodoGroupEdit: (data: TodoGroup | null) => set({ editTodoGroup: data }),
-  cleanTodoGroupEdit: () => set({ editTodoGroup: null }),
-
-  fetchTodoGroups: async () => {
+  editTodoItem: null,
+  setListId: (id: number) => set({ listId: id }),
+  setTodoItemEdit: (data: TodoItem | null) => set({ editTodoItem: data }),
+  cleanTodoItemEdit: () => set({ editTodoItem: null }),
+  fetchTodoItems: async () => {
     set({ loading: true });
     try {
-      const response = await TodoGroupService.fetchTodoGroups();
+      const response = await TodoItemService.fetchTodoItems();
       if (response && response.data && response.data.lists) {
-        set({ todoGroupList: response.data.lists, loading: false });
+        set({ todoItemList: response.data.lists, loading: false });
       }
     } catch (error: unknown) {
       console.error(error);

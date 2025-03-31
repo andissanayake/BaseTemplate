@@ -2,51 +2,41 @@
 import React, { useEffect } from "react";
 import { Table, Button, Space, notification, Popconfirm } from "antd";
 import { DeleteOutlined, EditOutlined } from "@ant-design/icons";
-import { useTodoGroupStore } from "./todoItemStore";
-import { TodoGroup, TodoGroupService } from "./todoItemService";
+import { useTodoItemStore } from "./todoItemStore";
+import { TodoItem, TodoItemService } from "./todoItemService";
 
-const TodoGroupList: React.FC = () => {
-  const { todoGroupList, loading, setTodoGroupEdit, fetchTodoGroups } =
-    useTodoGroupStore();
+const TodoItemList: React.FC = () => {
+  const { todoItemList, loading, setTodoItemEdit, fetchTodoItems } =
+    useTodoItemStore();
 
-  const handleEdit = (record: TodoGroup) => {
-    setTodoGroupEdit(record);
+  const handleEdit = (record: TodoItem) => {
+    setTodoItemEdit(record);
   };
 
   useEffect(() => {
-    fetchTodoGroups();
-  }, [fetchTodoGroups]);
+    fetchTodoItems();
+  }, [fetchTodoItems]);
 
-  const handleDelete = async (values: TodoGroup) => {
-    await TodoGroupService.deleteTodoGroup(values);
+  const handleDelete = async (values: TodoItem) => {
+    await TodoItemService.deleteTodoItem(values);
     notification.success({ message: "Operation successful!" });
-    await fetchTodoGroups();
+    await fetchTodoItems();
   };
 
   const columns = [
     {
-      title: "Todo List Title",
+      title: "Todo Item Title",
       key: "title",
-      render: (_: any, record: TodoGroup) => (
+      render: (_: any, record: TodoItem) => (
         <span style={{ display: "flex", alignItems: "center" }}>
           {record.title}
-          <span
-            style={{
-              display: "inline-block",
-              width: 20,
-              height: 20,
-              backgroundColor: record.colour,
-              marginLeft: 10,
-              borderRadius: "50%",
-            }}
-          />
         </span>
       ),
     },
     {
       title: "Actions",
       key: "actions",
-      render: (_: any, record: TodoGroup) => (
+      render: (_: any, record: TodoItem) => (
         <Space>
           <Button
             type="link"
@@ -55,7 +45,7 @@ const TodoGroupList: React.FC = () => {
             size="large"
           />
           <Popconfirm
-            title="Are you sure to delete this todo group?"
+            title="Are you sure to delete this todo item?"
             onConfirm={() => handleDelete(record)}
           >
             <Button type="link" icon={<DeleteOutlined />} size="large"></Button>
@@ -69,7 +59,7 @@ const TodoGroupList: React.FC = () => {
     <>
       <Table
         columns={columns}
-        dataSource={todoGroupList}
+        dataSource={todoItemList}
         loading={loading}
         pagination={{ pageSize: 5 }}
         rowKey="id"
@@ -78,4 +68,4 @@ const TodoGroupList: React.FC = () => {
   );
 };
 
-export default TodoGroupList;
+export default TodoItemList;

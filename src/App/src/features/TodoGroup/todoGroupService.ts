@@ -1,12 +1,5 @@
 import axiosInstance from "../../auth/axiosInstance";
 
-export enum PriorityLevel {
-  None = 0,
-  Low = 1,
-  Medium = 2,
-  High = 3,
-}
-
 export interface TodoGroup {
   id: number;
   title?: string;

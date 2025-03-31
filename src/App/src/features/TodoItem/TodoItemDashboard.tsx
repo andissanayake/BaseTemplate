@@ -1,11 +1,12 @@
 import { useState } from "react";
 import { Button, Card, Space } from "antd";
-import { useTodoGroupStore } from "./todoItemStore";
-import { TodoGroupEdit } from "./TodoItemEdit";
-import TodoGroupList from "./TodoItemList";
-import TodoGroupCreate from "./TodoItemCreate";
-export const TodoGroupDashboard = () => {
-  const { editTodoGroup } = useTodoGroupStore();
+import { useTodoItemStore } from "./todoItemStore";
+import { TodoItemEdit } from "./TodoItemEdit";
+import TodoItemList from "./TodoItemList";
+import TodoItemCreate from "./TodoItemCreate";
+
+export const TodoItemDashboard = () => {
+  const { editTodoItem } = useTodoItemStore();
   const [isModalVisible, setIsModalVisible] = useState(false);
 
   const handleCancel = () => {
@@ -14,9 +15,9 @@ export const TodoGroupDashboard = () => {
 
   return (
     <Card>
-      <h1>Manage Todo Lists</h1>
-      {editTodoGroup ? (
-        <TodoGroupEdit />
+      <h1>Manage Todo Items</h1>
+      {editTodoItem ? (
+        <TodoItemEdit />
       ) : (
         <>
           <Space style={{ marginBottom: 16 }}>
@@ -26,11 +27,11 @@ export const TodoGroupDashboard = () => {
                 setIsModalVisible(true);
               }}
             >
-              Create Todo List
+              Create Todo Item
             </Button>
           </Space>
-          <TodoGroupList />
-          <TodoGroupCreate visible={isModalVisible} onClose={handleCancel} />
+          <TodoItemList />
+          <TodoItemCreate visible={isModalVisible} onClose={handleCancel} />
         </>
       )}
     </Card>

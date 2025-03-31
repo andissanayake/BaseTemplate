@@ -1,91 +1,46 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useEffect } from "react";
-import { useTodoGroupStore } from "./todoItemStore";
-import { Button, Form, Input, notification, Space, Select } from "antd";
-import { TodoGroupService } from "./todoItemService";
+import { useTodoItemStore } from "./todoItemStore";
+import { Button, Form, Input, notification, Space } from "antd";
+import { TodoItemService } from "./todoItemService";
 
-export const TodoGroupEdit = () => {
-  const { editTodoGroup, setTodoGroupEdit, fetchTodoGroups } =
-    useTodoGroupStore();
+export const TodoItemEdit = () => {
+  const { editTodoItem, setTodoItemEdit, fetchTodoItems } = useTodoItemStore();
   const [form] = Form.useForm();
 
   useEffect(() => {
-    if (editTodoGroup?.id) {
-      form.setFieldsValue(editTodoGroup);
+    if (editTodoItem?.id) {
+      form.setFieldsValue(editTodoItem);
     }
-  }, [editTodoGroup, form]);
+  }, [editTodoItem, form]);
 
-  const handleSaveTodoGroup = () => {
+  const handleSaveTodoItem = () => {
     form.validateFields().then(async (values) => {
-      values.id = editTodoGroup?.id;
+      values.id = editTodoItem?.id;
 
       try {
-        await TodoGroupService.updateTodoGroup(values);
+        await TodoItemService.updateTodoItem(values);
         notification.success({ message: "Operation successful!" });
-        setTodoGroupEdit(null);
-        await fetchTodoGroups();
+        setTodoItemEdit(null);
+        await fetchTodoItems();
       } catch (error: any) {
-        console.error("Error updating todo group:", error);
-        notification.error({ message: "Failed to update todo group!" });
+        console.error("Error updating todo item:", error);
+        notification.error({ message: "Failed to update todo item!" });
       }
     });
   };
 
   return (
     <div>
-      <Form form={form} layout="vertical" onFinish={handleSaveTodoGroup}>
+      <Form form={form} layout="vertical" onFinish={handleSaveTodoItem}>
         <Form.Item
-          label="Todo Group Name"
+          label="Todo Item Name"
           name="title"
           rules={[
-            { required: true, message: "Please enter the todo group name!" },
+            { required: true, message: "Please enter the todo item name!" },
           ]}
         >
-          <Input placeholder="Enter todo group name" />
-        </Form.Item>
-
-        <Form.Item
-          label="Select Colour"
-          name="colour"
-          rules={[{ required: true, message: "Please select a colour!" }]}
-        >
-          <Select optionLabelProp="label">
-            {TodoGroupService.getColours().map((colour) => (
-              <Select.Option
-                key={colour.value}
-                value={colour.value}
-                label={
-                  <span style={{ display: "flex", alignItems: "center" }}>
-                    <span
-                      style={{
-                        display: "inline-block",
-                        width: 20,
-                        height: 20,
-                        backgroundColor: colour.value,
-                        marginRight: 10,
-                        borderRadius: "50%",
-                      }}
-                    />
-                    {colour.label}
-                  </span>
-                }
-              >
-                <span style={{ display: "flex", alignItems: "center" }}>
-                  <span
-                    style={{
-                      display: "inline-block",
-                      width: 20,
-                      height: 20,
-                      backgroundColor: colour.value,
-                      marginRight: 10,
-                      borderRadius: "50%",
-                    }}
-                  />
-                  {colour.label}
-                </span>
-              </Select.Option>
-            ))}
-          </Select>
+          <Input placeholder="Enter todo item name" />
         </Form.Item>
 
         <Form.Item>
@@ -93,7 +48,7 @@ export const TodoGroupEdit = () => {
             <Button type="primary" htmlType="submit">
               Submit
             </Button>
-            <Button type="default" onClick={() => setTodoGroupEdit(null)}>
+            <Button type="default" onClick={() => setTodoItemEdit(null)}>
               Cancel
             </Button>
           </Space>
