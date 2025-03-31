@@ -28,7 +28,7 @@ public class GetTodoItemsWithPaginationQueryHandler : IRequestHandler<GetTodoIte
         var totalCount = await uow.QueryFirstOrDefaultAsync<int>(countSql, new { request.ListId });
 
         var dataSql = @"
-        SELECT Id, Title, Done, Priority, Reminder
+        SELECT Id, ListId, Title, Done, Priority, Reminder, Note
         FROM TodoItem
         WHERE ListId = @ListId
         ORDER BY Title

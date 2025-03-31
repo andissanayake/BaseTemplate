@@ -2,7 +2,7 @@
 using BaseTemplate.Application.TodoItems.Commands.CreateTodoItem;
 using BaseTemplate.Application.TodoItems.Commands.DeleteTodoItem;
 using BaseTemplate.Application.TodoItems.Commands.UpdateTodoItem;
-using BaseTemplate.Application.TodoItems.Commands.UpdateTodoItemDetail;
+using BaseTemplate.Application.TodoItems.Commands.UpdateTodoItemStatus;
 using BaseTemplate.Application.TodoItems.Queries.GetTodoItemsWithPagination;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -38,7 +38,7 @@ public class TodoItemsController : ApiControllerBase
     }
 
     [HttpPut("[action]")]
-    public async Task<ActionResult> UpdateItemDetails(int id, UpdateTodoItemDetailCommand command)
+    public async Task<ActionResult> UpdateItemStatus(int id, UpdateTodoItemStatusCommand command)
     {
         if (id != command.Id)
         {

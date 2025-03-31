@@ -9,7 +9,11 @@ export enum PriorityLevel {
 
 export interface TodoItem {
   id: number;
+  listId: number;
   title?: string;
+  note?: string;
+  reminder?: Date;
+  priorityLevel: PriorityLevel;
 }
 
 export class TodoItemService {
@@ -37,5 +41,15 @@ export class TodoItemService {
 
   static async deleteTodoItem(data: TodoItem) {
     return await axiosInstance.delete(`/api/todoItems/${data.id}`);
+  }
+
+  static getPriorityLevels() {
+    const priorityOptions = [
+      { label: "None", value: PriorityLevel.None },
+      { label: "Low", value: PriorityLevel.Low },
+      { label: "Medium", value: PriorityLevel.Medium },
+      { label: "High", value: PriorityLevel.High },
+    ];
+    return priorityOptions;
   }
 }

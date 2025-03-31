@@ -1,8 +1,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useEffect } from "react";
 import { useTodoItemStore } from "./todoItemStore";
-import { Form, Input, Modal, notification } from "antd";
+import { Form, Input, Modal, notification, DatePicker, Select } from "antd";
 import { TodoItemService } from "./todoItemService";
+import dayjs from "dayjs";
 
 interface TodoItemModalProps {
   visible: boolean;
@@ -18,16 +19,25 @@ export const TodoItemEdit: React.FC<TodoItemModalProps> = ({
 
   useEffect(() => {
     if (editTodoItem?.id) {
-      form.setFieldsValue(editTodoItem);
+      form.setFieldsValue({
+        ...editTodoItem,
+        reminder: editTodoItem.reminder
+          ? dayjs(editTodoItem.reminder)
+          : undefined,
+      });
     }
   }, [editTodoItem, form]);
 
   const handleSaveTodoItem = () => {
     form.validateFields().then(async (values) => {
-      values.id = editTodoItem?.id;
+      const updatedItem = {
+        ...values,
+        id: editTodoItem?.id,
+        reminder: values.reminder?.toISOString() ?? null,
+      };
 
       try {
-        await TodoItemService.updateTodoItem(values);
+        await TodoItemService.updateTodoItem(updatedItem);
         notification.success({ message: "Operation successful!" });
         setTodoItemEdit(null);
         onClose();
@@ -50,13 +60,27 @@ export const TodoItemEdit: React.FC<TodoItemModalProps> = ({
     >
       <Form form={form} layout="vertical">
         <Form.Item
-          label="Todo Item Name"
+          label="Title"
           name="title"
-          rules={[
-            { required: true, message: "Please enter the todo item name!" },
-          ]}
+          rules={[{ required: true, message: "Please enter the title!" }]}
         >
-          <Input placeholder="Enter todo item name" />
+          <Input placeholder="Enter todo item title" />
+        </Form.Item>
+
+        <Form.Item label="Note" name="note">
+          <Input.TextArea rows={3} placeholder="Optional note..." />
+        </Form.Item>
+
+        <Form.Item label="Reminder" name="reminder">
+          <DatePicker
+            style={{ width: "100%" }}
+            showTime
+            format="YYYY-MM-DD HH:mm"
+          />
+        </Form.Item>
+
+        <Form.Item label="Priority Level" name="priorityLevel">
+          <Select options={TodoItemService.getPriorityLevels()} />
         </Form.Item>
       </Form>
     </Modal>

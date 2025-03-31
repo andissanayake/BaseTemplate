@@ -1,5 +1,6 @@
 ﻿using BaseTemplate.Application.Common.Interfaces;
 using BaseTemplate.Domain.Entities;
+using BaseTemplate.Domain.Enums;
 using BaseTemplate.Domain.Events;
 
 namespace BaseTemplate.Application.TodoItems.Commands.CreateTodoItem;
@@ -7,8 +8,10 @@ namespace BaseTemplate.Application.TodoItems.Commands.CreateTodoItem;
 public record CreateTodoItemCommand : IRequest<int>
 {
     public int ListId { get; init; }
-
     public string? Title { get; init; }
+    public string? Note { get; init; }
+    public DateTime? Reminder { get; set; }
+    public PriorityLevel? PriorityLevel { get; set; }
 }
 
 public class CreateTodoItemCommandHandler : IRequestHandler<CreateTodoItemCommand, int>
@@ -28,6 +31,9 @@ public class CreateTodoItemCommandHandler : IRequestHandler<CreateTodoItemComman
         {
             ListId = request.ListId,
             Title = request.Title,
+            Note = request.Note,
+            Reminder = request.Reminder,
+            Priority = request.PriorityLevel ?? PriorityLevel.None,
             Done = false
         };
         await uow.InsertAsync(entity);

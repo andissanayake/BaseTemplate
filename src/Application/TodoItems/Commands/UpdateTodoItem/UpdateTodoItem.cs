@@ -1,16 +1,16 @@
 ﻿using BaseTemplate.Application.Common.Interfaces;
 using BaseTemplate.Domain.Entities;
-using BaseTemplate.Domain.Events;
+using BaseTemplate.Domain.Enums;
 
 namespace BaseTemplate.Application.TodoItems.Commands.UpdateTodoItem;
 
 public record UpdateTodoItemCommand : IRequest
 {
     public int Id { get; init; }
-
     public string? Title { get; init; }
-
-    public bool Done { get; init; }
+    public string? Note { get; init; }
+    public DateTime? Reminder { get; set; }
+    public PriorityLevel? PriorityLevel { get; set; }
 }
 
 public class UpdateTodoItemCommandHandler : IRequestHandler<UpdateTodoItemCommand>
@@ -31,11 +31,12 @@ public class UpdateTodoItemCommandHandler : IRequestHandler<UpdateTodoItemComman
         Guard.Against.NotFound(request.Id, entity);
 
         entity.Title = request.Title;
-        entity.Done = request.Done;
-        if (entity.Done)
-        {
-            entity.AddDomainEvent(new TodoItemCompletedEvent(entity));
-        }
+        entity.Title = request.Title;
+        entity.Note = request.Note;
+        entity.Reminder = request.Reminder;
+        entity.Done = false;
+        entity.Priority = request.PriorityLevel ?? PriorityLevel.None;
+
         await uow.UpdateAsync(entity);
         uow.Commit();
         await _domainEventDispatcher.DispatchDomainEventsAsync(entity);
