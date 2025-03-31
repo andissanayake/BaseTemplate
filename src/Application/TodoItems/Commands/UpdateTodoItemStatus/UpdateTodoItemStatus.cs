@@ -1,5 +1,6 @@
 ﻿using BaseTemplate.Application.Common.Interfaces;
 using BaseTemplate.Domain.Entities;
+using BaseTemplate.Domain.Events;
 
 namespace BaseTemplate.Application.TodoItems.Commands.UpdateTodoItemStatus;
 
@@ -29,6 +30,7 @@ public class UpdateTodoItemStatusCommandHandler : IRequestHandler<UpdateTodoItem
 
         entity.Done = request.Done;
         await uow.UpdateAsync(entity);
+        if (entity.Done) entity.AddDomainEvent(new TodoItemCompletedEvent(entity));
         uow.Commit();
         await _domainEventDispatcher.DispatchDomainEventsAsync(entity);
     }

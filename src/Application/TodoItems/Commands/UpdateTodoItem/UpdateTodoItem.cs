@@ -39,6 +39,5 @@ public class UpdateTodoItemCommandHandler : IRequestHandler<UpdateTodoItemComman
 
         await uow.UpdateAsync(entity);
         uow.Commit();
-        await _domainEventDispatcher.DispatchDomainEventsAsync(entity);
     }
 }
