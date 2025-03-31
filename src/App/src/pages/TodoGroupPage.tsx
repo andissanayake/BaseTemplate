@@ -7,7 +7,6 @@ import { TodoGroupView } from "../features/TodoGroup/TodoGroupView";
 
 export const TodoGroupPage = () => {
   const navigate = useNavigate();
-
   return (
     <Card>
       <h1>Manage Todo Lists</h1>
@@ -30,10 +29,13 @@ export const TodoGroupPage = () => {
         <Route
           path="create"
           element={
-            <TodoGroupCreate
-              visible={true}
-              onClose={() => navigate("/todo-list")}
-            />
+            <>
+              <TodoGroupCreate
+                visible={true}
+                onClose={() => navigate("/todo-list")}
+              />
+              <TodoGroupList />
+            </>
           }
         />
         <Route path="edit/:id" element={<TodoGroupEdit />} />

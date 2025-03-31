@@ -7,7 +7,6 @@ interface TodoGroupState {
   todoGroupList: TodoGroup[];
   loading: boolean;
   currentTodoGroup: TodoGroup | null;
-  displayMode: "edit" | "view" | null;
   setTodoGroupCurrent: (
     data: TodoGroup | null,
     displayMode: "edit" | "view" | null
@@ -21,11 +20,8 @@ export const useTodoGroupStore = create<TodoGroupState>((set) => ({
   loading: false,
   editId: null,
   currentTodoGroup: null,
-  displayMode: null,
-  setTodoGroupCurrent: (
-    data: TodoGroup | null,
-    displayMode: "edit" | "view" | null
-  ) => set({ currentTodoGroup: data, displayMode: displayMode }),
+  setTodoGroupCurrent: (data: TodoGroup | null) =>
+    set({ currentTodoGroup: data }),
 
   fetchTodoGroups: async () => {
     set({ loading: true });

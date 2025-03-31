@@ -3,12 +3,21 @@ import { useEffect } from "react";
 import { useTodoGroupStore } from "./todoGroupStore";
 import { Button, Form, Input, notification, Space, Select } from "antd";
 import { TodoGroupService } from "./todoGroupService";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 
 export const TodoGroupEdit = () => {
   const { currentTodoGroup, setTodoGroupCurrent } = useTodoGroupStore();
   const [form] = Form.useForm();
   const navigate = useNavigate();
+  const { id } = useParams();
+
+  useEffect(() => {
+    if (id) {
+      TodoGroupService.fetchTodoGroupById(id).then((res) =>
+        setTodoGroupCurrent(res.data, null)
+      );
+    }
+  }, [id, setTodoGroupCurrent]);
 
   useEffect(() => {
     if (currentTodoGroup?.id) {
