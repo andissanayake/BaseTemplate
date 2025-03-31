@@ -1,3 +1,9 @@
+import { Card } from "antd";
+
 export const NotFoundPage = () => {
-  return <span>Not found</span>;
+  return (
+    <Card>
+      <h1>Not found</h1>
+    </Card>
+  );
 };

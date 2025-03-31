@@ -1,7 +1,9 @@
+import { Card } from "antd";
+
 export const HomePage = () => {
   return (
-    <div>
+    <Card>
       <h1>Home Page</h1>
-    </div>
+    </Card>
   );
 };
