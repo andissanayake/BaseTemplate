@@ -15,6 +15,7 @@ interface TodoItemState {
     pageNumber: number,
     pageSize: number
   ) => Promise<void>;
+  updateItemStatus: (id: number, done: boolean) => Promise<void>;
 }
 
 export const useTodoItemStore = create<TodoItemState>((set) => ({
@@ -47,5 +48,21 @@ export const useTodoItemStore = create<TodoItemState>((set) => ({
       console.error(error);
       set({ loading: false });
     }
+  },
+  updateItemStatus: async (id: number, done: boolean) => {
+    set({ loading: true });
+    const res = await TodoItemService.updateTodoItemStatus({
+      id: id,
+      done: done,
+    });
+    if (res) {
+      set((state) => {
+        const updatedTodoItemList = state.todoItemList.map((item) =>
+          item.id === id ? { ...item, done: done } : item
+        );
+        return { todoItemList: updatedTodoItemList };
+      });
+    }
+    set({ loading: false });
   },
 }));

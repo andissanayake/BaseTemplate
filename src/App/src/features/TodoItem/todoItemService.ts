@@ -14,6 +14,7 @@ export interface TodoItem {
   note?: string;
   reminder?: Date;
   priority: PriorityLevel;
+  done: boolean;
 }
 
 export class TodoItemService {
@@ -42,7 +43,12 @@ export class TodoItemService {
   static async deleteTodoItem(data: TodoItem) {
     return await axiosInstance.delete(`/api/todoItems/${data.id}`);
   }
-
+  static async updateTodoItemStatus(data: { id: number; done: boolean }) {
+    return await axiosInstance.put(
+      `/api/todoItems/updateItemStatus?id=${data.id}`,
+      data
+    );
+  }
   static getPriorityLevels() {
     const priorityOptions = [
       { label: "None", value: PriorityLevel.None },
