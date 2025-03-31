@@ -27,7 +27,7 @@ BEGIN
         Title NVARCHAR(255),
         Note NVARCHAR(MAX),
         Priority INT NOT NULL DEFAULT 0,
-        Reminder DATETIME,
+        Reminder DATETIMEOFFSET,
 
         Done BIT NOT NULL DEFAULT 0,
 

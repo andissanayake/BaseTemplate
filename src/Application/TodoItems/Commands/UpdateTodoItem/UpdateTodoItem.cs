@@ -9,8 +9,8 @@ public record UpdateTodoItemCommand : IRequest
     public int Id { get; init; }
     public string? Title { get; init; }
     public string? Note { get; init; }
-    public DateTime? Reminder { get; set; }
-    public PriorityLevel? PriorityLevel { get; set; }
+    public DateTimeOffset? Reminder { get; set; }
+    public PriorityLevel? Priority { get; set; }
 }
 
 public class UpdateTodoItemCommandHandler : IRequestHandler<UpdateTodoItemCommand>
@@ -35,7 +35,7 @@ public class UpdateTodoItemCommandHandler : IRequestHandler<UpdateTodoItemComman
         entity.Note = request.Note;
         entity.Reminder = request.Reminder;
         entity.Done = false;
-        entity.Priority = request.PriorityLevel ?? PriorityLevel.None;
+        entity.Priority = request.Priority ?? PriorityLevel.None;
 
         await uow.UpdateAsync(entity);
         uow.Commit();

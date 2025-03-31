@@ -14,6 +14,7 @@ const TodoGroupCreate: React.FC = () => {
         await TodoGroupService.createTodoGroup(values);
         notification.success({ message: "Operation successful!" });
         form.resetFields();
+        navigate("/todo-list");
       } catch (error: any) {
         console.error("Error creating todo group:", error);
         notification.error({ message: "Failed to create todo group!" });

@@ -20,7 +20,7 @@ const TodoItemCreate: React.FC<TodoItemModalProps> = ({ visible, onClose }) => {
       try {
         await TodoItemService.createTodoItem({
           ...values,
-          reminder: values.reminder ? dayjs(values.reminder) : undefined,
+          reminder: values.reminder ? dayjs(values.reminder).format() : null,
           listId: +listId,
         });
         notification.success({ message: "Operation successful!" });

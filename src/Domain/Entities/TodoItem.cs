@@ -10,7 +10,7 @@ public class TodoItem : BaseAuditableEntity
 
     public PriorityLevel Priority { get; set; }
 
-    public DateTime? Reminder { get; set; }
+    public DateTimeOffset? Reminder { get; set; }
 
     public bool Done { get; set; }
 

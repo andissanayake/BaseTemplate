@@ -39,17 +39,17 @@ export const AppBreadcrumb = () => {
             )
           : labelGetter;
 
-      return (
-        <Breadcrumb.Item key={path}>
-          <Link to={path}>{label}</Link>
-        </Breadcrumb.Item>
-      );
+      return {
+        key: path,
+        title: <Link to={path}>{label}</Link>,
+      };
     })
-    .filter(Boolean); // remove nulls
+    .filter((item) => item !== null); // Ensure no `null` values are included
 
   return (
-    <Breadcrumb style={{ margin: "16px 0" }}>
-      {items.length > 0 ? items : <Breadcrumb.Item>Not Found</Breadcrumb.Item>}
-    </Breadcrumb>
+    <Breadcrumb
+      style={{ margin: "16px 0" }}
+      items={items.length > 0 ? items : [{ title: "Not Found" }]}
+    />
   );
 };

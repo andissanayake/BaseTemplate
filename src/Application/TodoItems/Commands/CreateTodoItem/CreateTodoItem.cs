@@ -10,8 +10,8 @@ public record CreateTodoItemCommand : IRequest<int>
     public int ListId { get; init; }
     public string? Title { get; init; }
     public string? Note { get; init; }
-    public DateTime? Reminder { get; set; }
-    public PriorityLevel? PriorityLevel { get; set; }
+    public DateTimeOffset? Reminder { get; set; }
+    public PriorityLevel? Priority { get; set; }
 }
 
 public class CreateTodoItemCommandHandler : IRequestHandler<CreateTodoItemCommand, int>
@@ -33,7 +33,7 @@ public class CreateTodoItemCommandHandler : IRequestHandler<CreateTodoItemComman
             Title = request.Title,
             Note = request.Note,
             Reminder = request.Reminder,
-            Priority = request.PriorityLevel ?? PriorityLevel.None,
+            Priority = request.Priority ?? PriorityLevel.None,
             Done = false
         };
         await uow.InsertAsync(entity);

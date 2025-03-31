@@ -9,7 +9,7 @@ public class TodoItemBriefDto
     public int ListId { get; init; }
     public string? Title { get; init; }
     public string? Note { get; init; }
-    public DateTime? Reminder { get; set; }
+    public DateTimeOffset? Reminder { get; set; }
     public PriorityLevel Priority { get; set; }
     public bool Done { get; init; }
     private class Mapping : Profile

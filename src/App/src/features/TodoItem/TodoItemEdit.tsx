@@ -19,6 +19,7 @@ export const TodoItemEdit: React.FC<TodoItemModalProps> = ({
 
   useEffect(() => {
     if (editTodoItem?.id) {
+      console.log(editTodoItem.reminder, dayjs(editTodoItem.reminder));
       form.setFieldsValue({
         ...editTodoItem,
         reminder: editTodoItem.reminder
@@ -33,7 +34,7 @@ export const TodoItemEdit: React.FC<TodoItemModalProps> = ({
       const updatedItem = {
         ...values,
         id: editTodoItem?.id,
-        reminder: values.reminder?.toISOString() ?? null,
+        reminder: values.reminder ? dayjs(values.reminder).format() : null,
       };
 
       try {
