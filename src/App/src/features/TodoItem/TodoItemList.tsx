@@ -8,10 +8,12 @@ import { useParams } from "react-router-dom";
 import { TodoItemEdit } from "./TodoItemEdit";
 
 const TodoItemList: React.FC = () => {
-  const { todoItemList, loading, setTodoItemEdit, fetchTodoItems } =
+  const { todoItemList, loading, setTodoItemEdit, fetchTodoItems, totalCount } =
     useTodoItemStore();
   const { listId } = useParams();
   const [isModalVisible, setIsModalVisible] = useState(false);
+  const [pageNumber, setPageNumber] = useState(1);
+  const [pageSize, setPageSize] = useState(5);
 
   if (!listId) throw new Error("listId is required");
 
@@ -22,17 +24,17 @@ const TodoItemList: React.FC = () => {
 
   const handleCancel = async () => {
     setIsModalVisible(false);
-    await fetchTodoItems(+listId, 1, 100);
+    await fetchTodoItems(+listId, pageNumber, pageSize);
   };
 
   useEffect(() => {
-    fetchTodoItems(+listId, 1, 100);
-  }, [fetchTodoItems, listId]);
+    fetchTodoItems(+listId, pageNumber, pageSize);
+  }, [fetchTodoItems, listId, pageNumber, pageSize]);
 
   const handleDelete = async (values: TodoItem) => {
     await TodoItemService.deleteTodoItem(values);
     notification.success({ message: "Operation successful!" });
-    if (listId) await fetchTodoItems(+listId, 1, 100);
+    await fetchTodoItems(+listId, pageNumber, pageSize);
   };
 
   const columns = [
@@ -73,7 +75,14 @@ const TodoItemList: React.FC = () => {
         columns={columns}
         dataSource={todoItemList}
         loading={loading}
-        pagination={{ pageSize: 5 }}
+        pagination={{
+          pageSize: 5,
+          total: totalCount,
+          onChange: (page, size) => {
+            setPageNumber(page);
+            setPageSize(size);
+          },
+        }}
         rowKey="id"
       />
       <TodoItemEdit visible={isModalVisible} onClose={handleCancel} />

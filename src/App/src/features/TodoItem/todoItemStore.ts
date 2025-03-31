@@ -4,8 +4,8 @@ import { TodoItem, TodoItemService } from "./todoItemService";
 
 // Define the state interface
 interface TodoItemState {
-  listId: number;
   todoItemList: TodoItem[];
+  totalCount: number;
   loading: boolean;
   editTodoItem: TodoItem | null;
   setTodoItemEdit: (data: TodoItem | null) => void;
@@ -17,13 +17,11 @@ interface TodoItemState {
   ) => Promise<void>;
 }
 
-// Create the Zustand store
 export const useTodoItemStore = create<TodoItemState>((set) => ({
-  listId: 0,
   todoItemList: [],
   loading: false,
   editTodoItem: null,
-  setListId: (id: number) => set({ listId: id }),
+  totalCount: 0,
   setTodoItemEdit: (data: TodoItem | null) => set({ editTodoItem: data }),
   cleanTodoItemEdit: () => set({ editTodoItem: null }),
   fetchTodoItems: async (
@@ -38,8 +36,12 @@ export const useTodoItemStore = create<TodoItemState>((set) => ({
         pageNumber,
         pageSize
       );
-      if (response && response.data && response.data.items) {
-        set({ todoItemList: response.data.items, loading: false });
+      if (response && response.data && response.data) {
+        set({
+          todoItemList: response.data.items,
+          loading: false,
+          totalCount: response.data.totalCount,
+        });
       }
     } catch (error: unknown) {
       console.error(error);

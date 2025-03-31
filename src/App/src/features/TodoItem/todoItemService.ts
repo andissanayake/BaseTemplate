@@ -18,7 +18,7 @@ export class TodoItemService {
     pageNumber: number,
     pageSize: number
   ) {
-    return await axiosInstance.get<{ items: TodoItem[] }>(
+    return await axiosInstance.get<{ items: TodoItem[]; totalCount: number }>(
       `/api/todoItems?ListId=${listId}&PageNumber=${pageNumber}&PageSize=${pageSize}`
     );
   }
