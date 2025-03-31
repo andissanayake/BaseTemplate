@@ -14,7 +14,6 @@ interface TodoGroupState {
   fetchTodoGroups: () => Promise<void>;
 }
 
-// Create the Zustand store
 export const useTodoGroupStore = create<TodoGroupState>((set) => ({
   todoGroupList: [],
   loading: false,

@@ -6,7 +6,10 @@ import ProtectedRoute from "./layout/ProtectedRoute";
 import { HomePage } from "./pages/HomePage";
 import { NotFoundPage } from "./pages/NotFoundPage";
 import { ProfilePage } from "./pages/ProfilePage";
-import { TodoGroupPage } from "./pages/TodoGroupPage";
+import { TodoGroupListPage } from "./pages/TodoGroupListPage";
+import { TodoGroupCreatePage } from "./pages/TodoGroupCreatePage";
+import { TodoGroupEditPage } from "./pages/TodoGroupEditPage";
+import { TodoGroupViewPage } from "./pages/TodoGroupViewPage";
 
 export const App = () => {
   return (
@@ -14,7 +17,12 @@ export const App = () => {
       <Routes>
         <Route path="/" element={<DefaultLayout />}>
           <Route index element={<HomePage />} />
-          <Route path="/todo-list/*" element={<TodoGroupPage />} />
+          <Route path="/todo-list" element={<TodoGroupListPage />} />
+
+          <Route path="/todo-list/create" element={<TodoGroupCreatePage />} />
+          <Route path="todo-list/edit/:id" element={<TodoGroupEditPage />} />
+          <Route path="todo-list/view/:id" element={<TodoGroupViewPage />} />
+
           <Route
             path="/profile"
             element={
