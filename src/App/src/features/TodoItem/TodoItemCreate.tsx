@@ -2,7 +2,7 @@
 import React from "react";
 import { Modal, Form, Input, notification } from "antd";
 import { TodoItemService } from "./todoItemService";
-import { useTodoItemStore } from "./todoItemStore";
+import { useParams } from "react-router-dom";
 
 interface TodoItemModalProps {
   visible: boolean;
@@ -11,16 +11,15 @@ interface TodoItemModalProps {
 
 const TodoItemCreate: React.FC<TodoItemModalProps> = ({ visible, onClose }) => {
   const [form] = Form.useForm();
-  const { fetchTodoItems } = useTodoItemStore();
-
+  const { listId } = useParams();
+  if (!listId) return null;
   const handleSaveTodoItem = () => {
     form.validateFields().then(async (values) => {
       try {
-        await TodoItemService.createTodoItem(values);
+        await TodoItemService.createTodoItem({ ...values, listId: +listId });
         notification.success({ message: "Operation successful!" });
         onClose();
         form.resetFields();
-        await fetchTodoItems();
       } catch (error: any) {
         console.error("Error creating todo item:", error);
         notification.error({ message: "Failed to create todo item!" });
@@ -30,7 +29,7 @@ const TodoItemCreate: React.FC<TodoItemModalProps> = ({ visible, onClose }) => {
 
   return (
     <Modal
-      title={"Add New Todo List"}
+      title={"Create Todo Item"}
       open={visible}
       onCancel={onClose}
       onOk={handleSaveTodoItem}

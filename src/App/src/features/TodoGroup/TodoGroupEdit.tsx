@@ -9,15 +9,15 @@ export const TodoGroupEdit = () => {
   const { currentTodoGroup, setTodoGroupCurrent } = useTodoGroupStore();
   const [form] = Form.useForm();
   const navigate = useNavigate();
-  const { id } = useParams();
+  const { listId } = useParams();
 
   useEffect(() => {
-    if (id) {
-      TodoGroupService.fetchTodoGroupById(id).then((res) =>
+    if (listId) {
+      TodoGroupService.fetchTodoGroupById(listId).then((res) =>
         setTodoGroupCurrent(res.data, null)
       );
     }
-  }, [id, setTodoGroupCurrent]);
+  }, [listId, setTodoGroupCurrent]);
 
   useEffect(() => {
     if (currentTodoGroup?.id) {

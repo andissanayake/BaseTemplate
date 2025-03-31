@@ -1,26 +1,38 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { Table, Button, Space, notification, Popconfirm } from "antd";
 import { DeleteOutlined, EditOutlined } from "@ant-design/icons";
 import { useTodoItemStore } from "./todoItemStore";
 import { TodoItem, TodoItemService } from "./todoItemService";
+import { useParams } from "react-router-dom";
+import { TodoItemEdit } from "./TodoItemEdit";
 
 const TodoItemList: React.FC = () => {
   const { todoItemList, loading, setTodoItemEdit, fetchTodoItems } =
     useTodoItemStore();
+  const { listId } = useParams();
+  const [isModalVisible, setIsModalVisible] = useState(false);
+
+  if (!listId) throw new Error("listId is required");
 
   const handleEdit = (record: TodoItem) => {
     setTodoItemEdit(record);
+    setIsModalVisible(true);
+  };
+
+  const handleCancel = async () => {
+    setIsModalVisible(false);
+    await fetchTodoItems(+listId, 1, 100);
   };
 
   useEffect(() => {
-    fetchTodoItems();
-  }, [fetchTodoItems]);
+    fetchTodoItems(+listId, 1, 100);
+  }, [fetchTodoItems, listId]);
 
   const handleDelete = async (values: TodoItem) => {
     await TodoItemService.deleteTodoItem(values);
     notification.success({ message: "Operation successful!" });
-    await fetchTodoItems();
+    if (listId) await fetchTodoItems(+listId, 1, 100);
   };
 
   const columns = [
@@ -64,6 +76,7 @@ const TodoItemList: React.FC = () => {
         pagination={{ pageSize: 5 }}
         rowKey="id"
       />
+      <TodoItemEdit visible={isModalVisible} onClose={handleCancel} />
     </>
   );
 };

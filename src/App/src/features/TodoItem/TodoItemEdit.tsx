@@ -1,11 +1,19 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useEffect } from "react";
 import { useTodoItemStore } from "./todoItemStore";
-import { Button, Form, Input, notification, Space } from "antd";
+import { Form, Input, Modal, notification } from "antd";
 import { TodoItemService } from "./todoItemService";
 
-export const TodoItemEdit = () => {
-  const { editTodoItem, setTodoItemEdit, fetchTodoItems } = useTodoItemStore();
+interface TodoItemModalProps {
+  visible: boolean;
+  onClose: () => void;
+}
+
+export const TodoItemEdit: React.FC<TodoItemModalProps> = ({
+  visible,
+  onClose,
+}) => {
+  const { editTodoItem, setTodoItemEdit } = useTodoItemStore();
   const [form] = Form.useForm();
 
   useEffect(() => {
@@ -22,7 +30,7 @@ export const TodoItemEdit = () => {
         await TodoItemService.updateTodoItem(values);
         notification.success({ message: "Operation successful!" });
         setTodoItemEdit(null);
-        await fetchTodoItems();
+        onClose();
       } catch (error: any) {
         console.error("Error updating todo item:", error);
         notification.error({ message: "Failed to update todo item!" });
@@ -31,8 +39,16 @@ export const TodoItemEdit = () => {
   };
 
   return (
-    <div>
-      <Form form={form} layout="vertical" onFinish={handleSaveTodoItem}>
+    <Modal
+      title={"Edit Todo Item"}
+      open={visible}
+      onCancel={() => {
+        setTodoItemEdit(null);
+        onClose();
+      }}
+      onOk={handleSaveTodoItem}
+    >
+      <Form form={form} layout="vertical">
         <Form.Item
           label="Todo Item Name"
           name="title"
@@ -42,18 +58,7 @@ export const TodoItemEdit = () => {
         >
           <Input placeholder="Enter todo item name" />
         </Form.Item>
-
-        <Form.Item>
-          <Space>
-            <Button type="primary" htmlType="submit">
-              Submit
-            </Button>
-            <Button type="default" onClick={() => setTodoItemEdit(null)}>
-              Cancel
-            </Button>
-          </Space>
-        </Form.Item>
       </Form>
-    </div>
+    </Modal>
   );
 };

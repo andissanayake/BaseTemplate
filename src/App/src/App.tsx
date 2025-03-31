@@ -20,8 +20,14 @@ export const App = () => {
           <Route path="/todo-list" element={<TodoGroupListPage />} />
 
           <Route path="/todo-list/create" element={<TodoGroupCreatePage />} />
-          <Route path="todo-list/edit/:id" element={<TodoGroupEditPage />} />
-          <Route path="todo-list/view/:id" element={<TodoGroupViewPage />} />
+          <Route
+            path="todo-list/edit/:listId"
+            element={<TodoGroupEditPage />}
+          />
+          <Route
+            path="todo-list/view/:listId"
+            element={<TodoGroupViewPage />}
+          />
 
           <Route
             path="/profile"
