@@ -79,7 +79,7 @@ export const TodoItemEdit: React.FC<TodoItemModalProps> = ({
           />
         </Form.Item>
 
-        <Form.Item label="Priority Level" name="priorityLevel">
+        <Form.Item label="Priority Level" name="priority">
           <Select options={TodoItemService.getPriorityLevels()} />
         </Form.Item>
       </Form>

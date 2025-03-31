@@ -63,7 +63,7 @@ const TodoItemCreate: React.FC<TodoItemModalProps> = ({ visible, onClose }) => {
 
         <Form.Item
           label="Priority Level"
-          name="priorityLevel"
+          name="priority"
           initialValue={PriorityLevel.None}
         >
           <Select options={TodoItemService.getPriorityLevels()} />

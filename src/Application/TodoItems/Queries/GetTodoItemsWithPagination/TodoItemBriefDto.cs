@@ -10,7 +10,7 @@ public class TodoItemBriefDto
     public string? Title { get; init; }
     public string? Note { get; init; }
     public DateTime? Reminder { get; set; }
-    public PriorityLevel PriorityLevel { get; set; } = PriorityLevel.None;
+    public PriorityLevel Priority { get; set; }
     public bool Done { get; init; }
     private class Mapping : Profile
     {

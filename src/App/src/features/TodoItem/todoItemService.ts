@@ -13,7 +13,7 @@ export interface TodoItem {
   title?: string;
   note?: string;
   reminder?: Date;
-  priorityLevel: PriorityLevel;
+  priority: PriorityLevel;
 }
 
 export class TodoItemService {
