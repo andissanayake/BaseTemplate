@@ -22,12 +22,12 @@ const TodoGroupCreate: React.FC = () => {
     form.validateFields().then(async (values) => {
       try {
         await createTodoGroup(values);
-        notification.success({ message: "Todo group created successfully!" });
+        notification.success({ message: "Todo list created successfully!" });
         form.resetFields();
         navigate("/todo-list");
       } catch (error) {
-        console.error("Error creating todo group:", error);
-        notification.error({ message: "Failed to create todo group!" });
+        console.error("Error creating todo list:", error);
+        notification.error({ message: "Failed to create todo list!" });
       }
     });
   };
@@ -44,10 +44,10 @@ const TodoGroupCreate: React.FC = () => {
           label="Todo Group Name"
           name="title"
           rules={[
-            { required: true, message: "Please enter the todo group name!" },
+            { required: true, message: "Please enter the todo list name!" },
           ]}
         >
-          <Input placeholder="Enter todo group name" />
+          <Input placeholder="Enter todo list name" />
         </Form.Item>
         <Form.Item
           label="Select Colour"

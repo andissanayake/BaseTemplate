@@ -20,7 +20,6 @@ const TodoGroupEdit: React.FC = () => {
   const navigate = useNavigate();
   const { listId } = useParams();
   if (!listId) throw new Error("listId is required");
-  if (!currentTodoGroup?.id) throw new Error("currentTodoGroup Id is required");
 
   useEffect(() => {
     form.setFieldsValue(currentTodoGroup);
@@ -32,12 +31,12 @@ const TodoGroupEdit: React.FC = () => {
 
       try {
         await updateTodoGroup(values);
-        notification.success({ message: "Operation successful!" });
+        notification.success({ message: "Todo list updated successfully!" });
         setTodoGroupCurrent(null); // Clear current todo group from store
         navigate("/todo-list");
       } catch (error) {
-        console.error("Error updating todo group:", error);
-        notification.error({ message: "Failed to update todo group!" });
+        console.error("Error updating todo list:", error);
+        notification.error({ message: "Failed to update todo list!" });
       }
     });
   };
@@ -51,13 +50,13 @@ const TodoGroupEdit: React.FC = () => {
       </Space>
       <Form form={form} layout="vertical" onFinish={handleSaveTodoGroup}>
         <Form.Item
-          label="Todo Group Name"
+          label="Todo list Name"
           name="title"
           rules={[
-            { required: true, message: "Please enter the todo group name!" },
+            { required: true, message: "Please enter the todo list name!" },
           ]}
         >
-          <Input placeholder="Enter todo group name" />
+          <Input placeholder="Enter todo list name" />
         </Form.Item>
         <Form.Item
           label="Select Colour"

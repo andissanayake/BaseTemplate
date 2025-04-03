@@ -45,7 +45,7 @@ const TodoGroupList: React.FC = () => {
 
   const handleDelete = (record: TodoGroup) => {
     deleteTodoGroup(record);
-    notification.success({ message: "Operation successful!" });
+    notification.success({ message: "Todo list deleted successfully!" });
   };
 
   const columns = [

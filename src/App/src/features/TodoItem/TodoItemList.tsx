@@ -54,10 +54,10 @@ const TodoItemList: React.FC = () => {
   const handleDelete = async (id: number) => {
     try {
       await deleteTodoItem(id, +listId);
-      notification.success({ message: "Item deleted successfully!" });
+      notification.success({ message: "Todo Item deleted successfully!" });
     } catch (error) {
       console.log(error);
-      notification.error({ message: "Failed to delete item!" });
+      notification.error({ message: "Failed to delete todo item!" });
     }
   };
 
@@ -75,6 +75,9 @@ const TodoItemList: React.FC = () => {
           onChange={async (e) => {
             const updatedDoneStatus = e.target.checked;
             await updateItemStatus(record.id, updatedDoneStatus, +listId);
+            notification.success({
+              message: "Todo Item status updated successfully!",
+            });
           }}
         />
       ),
