@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { create } from "zustand";
-import { TodoGroup, TodoGroupService } from "./todoGroupService";
+import { TodoGroupService } from "./todoGroupService";
+import { TodoGroup } from "./Model";
 
 // Define the state interface
 interface TodoGroupState {

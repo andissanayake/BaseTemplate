@@ -1,68 +1,111 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { create } from "zustand";
-import { TodoItem, TodoItemService } from "./todoItemService";
+import { TodoItemService } from "./todoItemService";
+import { TodoItem } from "./TodoItemModel";
 
-// Define the state interface
 interface TodoItemState {
   todoItemList: TodoItem[];
   totalCount: number;
   loading: boolean;
+  currentPage: number;
+  pageSize: number;
   editTodoItem: TodoItem | null;
   setTodoItemEdit: (data: TodoItem | null) => void;
-  cleanTodoItemEdit: () => void;
-  fetchTodoItems: (
-    listId: number,
-    pageNumber: number,
-    pageSize: number
-  ) => Promise<void>;
-  updateItemStatus: (id: number, done: boolean) => Promise<void>;
+  fetchTodoItems: (listId: number) => void; // Simplified to use store's pagination
+  updateItemStatus: (id: number, done: boolean, listId: number) => void;
+  deleteTodoItem: (id: number, listId: number) => void;
+  setPagination: (page: number, size: number) => void;
+  createTodoItem: (data: TodoItem, listId: number) => void;
+  updateTodoItem: (data: TodoItem, listId: number) => void;
 }
 
 export const useTodoItemStore = create<TodoItemState>((set) => ({
   todoItemList: [],
-  loading: false,
-  editTodoItem: null,
   totalCount: 0,
-  setTodoItemEdit: (data: TodoItem | null) => set({ editTodoItem: data }),
-  cleanTodoItemEdit: () => set({ editTodoItem: null }),
-  fetchTodoItems: async (
-    listId: number,
-    pageNumber: number,
-    pageSize: number
-  ) => {
+  loading: false,
+  currentPage: 1,
+  pageSize: 5,
+  editTodoItem: null,
+
+  // Fetch todo items with current pagination
+  fetchTodoItems: async (listId) => {
+    const { currentPage, pageSize } = useTodoItemStore.getState();
     set({ loading: true });
     try {
       const response = await TodoItemService.fetchTodoItems(
         listId,
-        pageNumber,
+        currentPage,
         pageSize
       );
-      if (response && response.data && response.data) {
-        set({
-          todoItemList: response.data.items,
-          loading: false,
-          totalCount: response.data.totalCount,
-        });
-      }
-    } catch (error: unknown) {
+      set({
+        todoItemList: response.data.items,
+        totalCount: response.data.totalCount,
+        loading: false,
+      });
+    } catch (error) {
       console.error(error);
       set({ loading: false });
     }
   },
-  updateItemStatus: async (id: number, done: boolean) => {
+
+  // Update the 'done' status of a todo item
+  updateItemStatus: async (id, done, listId) => {
     set({ loading: true });
-    const res = await TodoItemService.updateTodoItemStatus({
-      id: id,
-      done: done,
-    });
-    if (res) {
-      set((state) => {
-        const updatedTodoItemList = state.todoItemList.map((item) =>
-          item.id === id ? { ...item, done: done } : item
-        );
-        return { todoItemList: updatedTodoItemList };
-      });
+    try {
+      await TodoItemService.updateTodoItemStatus({ id, done });
+      set({ loading: false });
+      // Refetch todo items after status update
+      useTodoItemStore.getState().fetchTodoItems(listId);
+    } catch (error) {
+      console.error(error);
+      set({ loading: false });
     }
-    set({ loading: false });
   },
+
+  // Delete a todo item
+  deleteTodoItem: async (id, listId) => {
+    set({ loading: true });
+    try {
+      await TodoItemService.deleteTodoItem({ id } as TodoItem);
+      set({ loading: false });
+      // Refetch todo items after deletion
+      await useTodoItemStore.getState().fetchTodoItems(listId);
+    } catch (error) {
+      console.error(error);
+      set({ loading: false });
+    }
+  },
+
+  // Set pagination details
+  setPagination: (page, size) => set({ currentPage: page, pageSize: size }),
+
+  // Create a new todo item
+  createTodoItem: async (data, listId) => {
+    set({ loading: true });
+    try {
+      await TodoItemService.createTodoItem(data);
+      set({ loading: false });
+      // Refetch todo items after creation
+      useTodoItemStore.getState().fetchTodoItems(listId);
+    } catch (error) {
+      console.error(error);
+      set({ loading: false });
+    }
+  },
+
+  // Update an existing todo item
+  updateTodoItem: async (data, listId) => {
+    set({ loading: true });
+    try {
+      await TodoItemService.updateTodoItem(data);
+      set({ loading: false });
+      // Refetch todo items after update
+      useTodoItemStore.getState().fetchTodoItems(listId);
+    } catch (error) {
+      console.error(error);
+      set({ loading: false });
+    }
+  },
+
+  // Set the todo item to be edited
+  setTodoItemEdit: (data) => set({ editTodoItem: data }),
 }));

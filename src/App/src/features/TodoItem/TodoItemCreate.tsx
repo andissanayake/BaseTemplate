@@ -1,32 +1,38 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
+// TodoItemCreate.tsx
 import React from "react";
-import { Modal, Form, Input, notification, DatePicker, Select } from "antd";
-import { PriorityLevel, TodoItemService } from "./todoItemService";
-import { useParams } from "react-router-dom";
+import { Modal, Form, Input, DatePicker, Select, notification } from "antd";
+import { useTodoItemStore } from "./todoItemStore";
+import { TodoItemService } from "./todoItemService";
 import dayjs from "dayjs";
+import { useParams } from "react-router-dom";
+import { TodoItem } from "./TodoItemModel";
 
-interface TodoItemModalProps {
+interface TodoItemCreateProps {
   visible: boolean;
   onClose: () => void;
 }
 
-const TodoItemCreate: React.FC<TodoItemModalProps> = ({ visible, onClose }) => {
+const TodoItemCreate: React.FC<TodoItemCreateProps> = ({
+  visible,
+  onClose,
+}) => {
   const [form] = Form.useForm();
+  const { createTodoItem } = useTodoItemStore();
   const { listId } = useParams();
-  if (!listId) return null;
 
-  const handleSaveTodoItem = () => {
+  const handleSave = async () => {
     form.validateFields().then(async (values) => {
+      const payload: TodoItem = {
+        ...values,
+        reminder: values.reminder ? dayjs(values.reminder).format() : null,
+        listId: +listId!,
+      };
+
       try {
-        await TodoItemService.createTodoItem({
-          ...values,
-          reminder: values.reminder ? dayjs(values.reminder).format() : null,
-          listId: +listId,
-        });
-        notification.success({ message: "Operation successful!" });
+        await createTodoItem(payload, +listId!);
+        notification.success({ message: "Todo item created successfully!" });
         onClose();
-        form.resetFields();
-      } catch (error: any) {
+      } catch (error) {
         console.error("Error creating todo item:", error);
         notification.error({ message: "Failed to create todo item!" });
       }
@@ -35,37 +41,26 @@ const TodoItemCreate: React.FC<TodoItemModalProps> = ({ visible, onClose }) => {
 
   return (
     <Modal
-      title={"Create Todo Item"}
+      title="Create Todo Item"
       open={visible}
       onCancel={onClose}
-      onOk={handleSaveTodoItem}
+      onOk={handleSave}
     >
       <Form form={form} layout="vertical">
-        <Form.Item
-          label="Title"
-          name="title"
-          rules={[{ required: true, message: "Please enter the title!" }]}
-        >
-          <Input placeholder="Enter todo item title" />
+        <Form.Item label="Title" name="title" rules={[{ required: true }]}>
+          <Input />
         </Form.Item>
-
         <Form.Item label="Note" name="note">
-          <Input.TextArea rows={3} placeholder="Optional note..." />
+          <Input.TextArea rows={3} />
         </Form.Item>
-
         <Form.Item label="Reminder" name="reminder">
           <DatePicker
-            style={{ width: "100%" }}
             showTime
             format="YYYY-MM-DD HH:mm"
+            style={{ width: "100%" }}
           />
         </Form.Item>
-
-        <Form.Item
-          label="Priority Level"
-          name="priority"
-          initialValue={PriorityLevel.None}
-        >
+        <Form.Item label="Priority" name="priority">
           <Select options={TodoItemService.getPriorityLevels()} />
         </Form.Item>
       </Form>

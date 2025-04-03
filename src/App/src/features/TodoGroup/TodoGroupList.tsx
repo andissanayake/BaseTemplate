@@ -3,8 +3,9 @@ import React, { useEffect } from "react";
 import { Table, Button, Space, notification, Popconfirm } from "antd";
 import { DeleteOutlined, EditOutlined, FundOutlined } from "@ant-design/icons";
 import { useTodoGroupStore } from "./todoGroupStore";
-import { TodoGroup, TodoGroupService } from "./todoGroupService";
+import { TodoGroupService } from "./todoGroupService";
 import { useNavigate } from "react-router-dom";
+import { TodoGroup } from "./Model";
 
 const TodoGroupList: React.FC = () => {
   const { todoGroupList, loading, setTodoGroupCurrent, fetchTodoGroups } =

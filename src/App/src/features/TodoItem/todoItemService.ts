@@ -1,21 +1,5 @@
 import axiosInstance from "../../auth/axiosInstance";
-
-export enum PriorityLevel {
-  None = 0,
-  Low = 1,
-  Medium = 2,
-  High = 3,
-}
-
-export interface TodoItem {
-  id: number;
-  listId: number;
-  title?: string;
-  note?: string;
-  reminder?: Date;
-  priority: PriorityLevel;
-  done: boolean;
-}
+import { PriorityLevel, TodoItem } from "./TodoItemModel";
 
 export class TodoItemService {
   static async fetchTodoItems(

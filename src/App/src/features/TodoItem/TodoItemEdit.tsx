@@ -1,48 +1,50 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-import { useEffect } from "react";
+// TodoItemEdit.tsx
+import React, { useEffect } from "react";
+import { Modal, Form, Input, DatePicker, Select, notification } from "antd";
 import { useTodoItemStore } from "./todoItemStore";
-import { Form, Input, Modal, notification, DatePicker, Select } from "antd";
 import { TodoItemService } from "./todoItemService";
 import dayjs from "dayjs";
+import { useParams } from "react-router-dom";
+import { TodoItem } from "./TodoItemModel";
 
-interface TodoItemModalProps {
+interface TodoItemEditProps {
   visible: boolean;
   onClose: () => void;
+  todoItem: TodoItem;
 }
 
-export const TodoItemEdit: React.FC<TodoItemModalProps> = ({
+const TodoItemEdit: React.FC<TodoItemEditProps> = ({
   visible,
   onClose,
+  todoItem,
 }) => {
-  const { editTodoItem, setTodoItemEdit } = useTodoItemStore();
   const [form] = Form.useForm();
+  const { updateTodoItem } = useTodoItemStore();
+  const { listId } = useParams();
 
   useEffect(() => {
-    if (editTodoItem?.id) {
-      console.log(editTodoItem.reminder, dayjs(editTodoItem.reminder));
+    if (todoItem) {
       form.setFieldsValue({
-        ...editTodoItem,
-        reminder: editTodoItem.reminder
-          ? dayjs(editTodoItem.reminder)
-          : undefined,
+        ...todoItem,
+        reminder: todoItem.reminder ? dayjs(todoItem.reminder) : undefined,
       });
     }
-  }, [editTodoItem, form]);
+  }, [todoItem, form]);
 
-  const handleSaveTodoItem = () => {
+  const handleSave = async () => {
     form.validateFields().then(async (values) => {
-      const updatedItem = {
+      const payload: TodoItem = {
         ...values,
-        id: editTodoItem?.id,
         reminder: values.reminder ? dayjs(values.reminder).format() : null,
+        id: todoItem.id,
+        listId: +listId!,
       };
 
       try {
-        await TodoItemService.updateTodoItem(updatedItem);
-        notification.success({ message: "Operation successful!" });
-        setTodoItemEdit(null);
+        await updateTodoItem(payload, +listId!);
+        notification.success({ message: "Todo item updated successfully!" });
         onClose();
-      } catch (error: any) {
+      } catch (error) {
         console.error("Error updating todo item:", error);
         notification.error({ message: "Failed to update todo item!" });
       }
@@ -51,39 +53,31 @@ export const TodoItemEdit: React.FC<TodoItemModalProps> = ({
 
   return (
     <Modal
-      title={"Edit Todo Item"}
+      title="Edit Todo Item"
       open={visible}
-      onCancel={() => {
-        setTodoItemEdit(null);
-        onClose();
-      }}
-      onOk={handleSaveTodoItem}
+      onCancel={onClose}
+      onOk={handleSave}
     >
       <Form form={form} layout="vertical">
-        <Form.Item
-          label="Title"
-          name="title"
-          rules={[{ required: true, message: "Please enter the title!" }]}
-        >
-          <Input placeholder="Enter todo item title" />
+        <Form.Item label="Title" name="title" rules={[{ required: true }]}>
+          <Input />
         </Form.Item>
-
         <Form.Item label="Note" name="note">
-          <Input.TextArea rows={3} placeholder="Optional note..." />
+          <Input.TextArea rows={3} />
         </Form.Item>
-
         <Form.Item label="Reminder" name="reminder">
           <DatePicker
-            style={{ width: "100%" }}
             showTime
             format="YYYY-MM-DD HH:mm"
+            style={{ width: "100%" }}
           />
         </Form.Item>
-
-        <Form.Item label="Priority Level" name="priority">
+        <Form.Item label="Priority" name="priority">
           <Select options={TodoItemService.getPriorityLevels()} />
         </Form.Item>
       </Form>
     </Modal>
   );
 };
+
+export default TodoItemEdit;

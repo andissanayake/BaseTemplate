@@ -1,10 +1,5 @@
 import axiosInstance from "../../auth/axiosInstance";
-
-export interface TodoGroup {
-  id: number;
-  title?: string;
-  colour?: string;
-}
+import { TodoGroup } from "./Model";
 
 export class TodoGroupService {
   static async fetchTodoGroups() {
