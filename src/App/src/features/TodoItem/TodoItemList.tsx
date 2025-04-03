@@ -85,7 +85,7 @@ const TodoItemList: React.FC = () => {
         <span
           style={{
             textDecoration: record.done ? "line-through" : "none",
-            fontWeight: record.done ? "normal" : "bold",
+            fontSize: 18,
           }}
         >
           {record.title}

@@ -56,7 +56,25 @@ const TodoGroupCreate: React.FC = () => {
         >
           <Select optionLabelProp="label">
             {TodoGroupService.getColours().map((colour) => (
-              <Select.Option key={colour.value} value={colour.value}>
+              <Select.Option
+                key={colour.value}
+                value={colour.value}
+                label={
+                  <span style={{ display: "flex", alignItems: "center" }}>
+                    <span
+                      style={{
+                        display: "inline-block",
+                        width: 20,
+                        height: 20,
+                        backgroundColor: colour.value,
+                        marginRight: 10,
+                        borderRadius: "50%",
+                      }}
+                    />
+                    {colour.label}
+                  </span>
+                }
+              >
                 <span style={{ display: "flex", alignItems: "center" }}>
                   <span
                     style={{

@@ -31,6 +31,7 @@ const TodoItemCreate: React.FC<TodoItemCreateProps> = ({
       try {
         await createTodoItem(payload, +listId!);
         notification.success({ message: "Todo item created successfully!" });
+        form.resetFields();
         onClose();
       } catch (error) {
         console.error("Error creating todo item:", error);

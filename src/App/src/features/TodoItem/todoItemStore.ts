@@ -10,12 +10,16 @@ interface TodoItemState {
   pageSize: number;
   editTodoItem: TodoItem | null;
   setTodoItemEdit: (data: TodoItem | null) => void;
-  fetchTodoItems: (listId: number) => void; // Simplified to use store's pagination
-  updateItemStatus: (id: number, done: boolean, listId: number) => void;
-  deleteTodoItem: (id: number, listId: number) => void;
+  fetchTodoItems: (listId: number) => Promise<void>; // Simplified to use store's pagination
+  updateItemStatus: (
+    id: number,
+    done: boolean,
+    listId: number
+  ) => Promise<void>;
+  deleteTodoItem: (id: number, listId: number) => Promise<void>;
   setPagination: (page: number, size: number) => void;
-  createTodoItem: (data: TodoItem, listId: number) => void;
-  updateTodoItem: (data: TodoItem, listId: number) => void;
+  createTodoItem: (data: TodoItem, listId: number) => Promise<void>;
+  updateTodoItem: (data: TodoItem, listId: number) => Promise<void>;
 }
 
 export const useTodoItemStore = create<TodoItemState>((set) => ({
