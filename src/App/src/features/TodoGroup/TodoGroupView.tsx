@@ -1,6 +1,6 @@
 import { useParams } from "react-router-dom";
 import { useTodoGroupStore } from "./todoGroupStore";
-import { Descriptions } from "antd";
+import { Descriptions, Space, Typography } from "antd";
 import { useEffect } from "react";
 import { TodoGroupService } from "./todoGroupService";
 import TodoItemList from "../TodoItem/TodoItemList";
@@ -13,7 +13,7 @@ export const TodoGroupView = () => {
 
   useEffect(() => {
     TodoGroupService.fetchTodoGroupById(listId).then((res) =>
-      setTodoGroupCurrent(res.data, null)
+      setTodoGroupCurrent(res.data)
     );
   }, [listId, setTodoGroupCurrent]);
 
@@ -21,6 +21,11 @@ export const TodoGroupView = () => {
     <>
       {currentTodoGroup && (
         <>
+          <Space className="mb-4">
+            <Typography.Title level={3} style={{ margin: 0 }}>
+              Todo List View
+            </Typography.Title>
+          </Space>
           <Descriptions column={1} bordered>
             <Descriptions.Item label="Name">
               {currentTodoGroup.title}

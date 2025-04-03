@@ -1,28 +1,29 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-import { useEffect } from "react";
+// TodoGroupEdit.tsx
+import React, { useEffect } from "react";
+import {
+  Form,
+  Input,
+  notification,
+  Select,
+  Button,
+  Space,
+  Typography,
+} from "antd";
 import { useTodoGroupStore } from "./todoGroupStore";
-import { Button, Form, Input, notification, Space, Select } from "antd";
-import { TodoGroupService } from "./todoGroupService";
 import { useNavigate, useParams } from "react-router-dom";
+import { TodoGroupService } from "./todoGroupService";
 
-export const TodoGroupEdit = () => {
-  const { currentTodoGroup, setTodoGroupCurrent } = useTodoGroupStore();
+const TodoGroupEdit: React.FC = () => {
+  const { currentTodoGroup, setTodoGroupCurrent, updateTodoGroup } =
+    useTodoGroupStore();
   const [form] = Form.useForm();
   const navigate = useNavigate();
   const { listId } = useParams();
+  if (!listId) throw new Error("listId is required");
+  if (!currentTodoGroup?.id) throw new Error("currentTodoGroup Id is required");
 
   useEffect(() => {
-    if (listId) {
-      TodoGroupService.fetchTodoGroupById(listId).then((res) =>
-        setTodoGroupCurrent(res.data, null)
-      );
-    }
-  }, [listId, setTodoGroupCurrent]);
-
-  useEffect(() => {
-    if (currentTodoGroup?.id) {
-      form.setFieldsValue(currentTodoGroup);
-    }
+    form.setFieldsValue(currentTodoGroup);
   }, [currentTodoGroup, form]);
 
   const handleSaveTodoGroup = () => {
@@ -30,11 +31,11 @@ export const TodoGroupEdit = () => {
       values.id = currentTodoGroup?.id;
 
       try {
-        await TodoGroupService.updateTodoGroup(values);
+        await updateTodoGroup(values);
         notification.success({ message: "Operation successful!" });
-        setTodoGroupCurrent(null, null);
+        setTodoGroupCurrent(null); // Clear current todo group from store
         navigate("/todo-list");
-      } catch (error: any) {
+      } catch (error) {
         console.error("Error updating todo group:", error);
         notification.error({ message: "Failed to update todo group!" });
       }
@@ -42,7 +43,12 @@ export const TodoGroupEdit = () => {
   };
 
   return (
-    <div>
+    <>
+      <Space className="mb-4">
+        <Typography.Title level={3} style={{ margin: 0 }}>
+          Todo List Edit
+        </Typography.Title>
+      </Space>
       <Form form={form} layout="vertical" onFinish={handleSaveTodoGroup}>
         <Form.Item
           label="Todo Group Name"
@@ -53,7 +59,6 @@ export const TodoGroupEdit = () => {
         >
           <Input placeholder="Enter todo group name" />
         </Form.Item>
-
         <Form.Item
           label="Select Colour"
           name="colour"
@@ -61,25 +66,7 @@ export const TodoGroupEdit = () => {
         >
           <Select optionLabelProp="label">
             {TodoGroupService.getColours().map((colour) => (
-              <Select.Option
-                key={colour.value}
-                value={colour.value}
-                label={
-                  <span style={{ display: "flex", alignItems: "center" }}>
-                    <span
-                      style={{
-                        display: "inline-block",
-                        width: 20,
-                        height: 20,
-                        backgroundColor: colour.value,
-                        marginRight: 10,
-                        borderRadius: "50%",
-                      }}
-                    />
-                    {colour.label}
-                  </span>
-                }
-              >
+              <Select.Option key={colour.value} value={colour.value}>
                 <span style={{ display: "flex", alignItems: "center" }}>
                   <span
                     style={{
@@ -97,7 +84,6 @@ export const TodoGroupEdit = () => {
             ))}
           </Select>
         </Form.Item>
-
         <Form.Item>
           <Space>
             <Button type="primary" htmlType="submit">
@@ -109,6 +95,8 @@ export const TodoGroupEdit = () => {
           </Space>
         </Form.Item>
       </Form>
-    </div>
+    </>
   );
 };
+
+export default TodoGroupEdit;
