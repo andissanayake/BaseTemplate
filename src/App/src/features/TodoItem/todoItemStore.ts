@@ -10,7 +10,7 @@ interface TodoItemState {
   pageSize: number;
   editTodoItem: TodoItem | null;
   setTodoItemEdit: (data: TodoItem | null) => void;
-  fetchTodoItems: (listId: number) => Promise<void>; // Simplified to use store's pagination
+  fetchTodoItems: (listId: number) => Promise<void>;
   updateItemStatus: (
     id: number,
     done: boolean,
@@ -30,7 +30,6 @@ export const useTodoItemStore = create<TodoItemState>((set) => ({
   pageSize: 5,
   editTodoItem: null,
 
-  // Fetch todo items with current pagination
   fetchTodoItems: async (listId) => {
     const { currentPage, pageSize } = useTodoItemStore.getState();
     set({ loading: true });
@@ -51,13 +50,11 @@ export const useTodoItemStore = create<TodoItemState>((set) => ({
     }
   },
 
-  // Update the 'done' status of a todo item
   updateItemStatus: async (id, done, listId) => {
     set({ loading: true });
     try {
       await TodoItemService.updateTodoItemStatus({ id, done });
       set({ loading: false });
-      // Refetch todo items after status update
       useTodoItemStore.getState().fetchTodoItems(listId);
     } catch (error) {
       console.error(error);
@@ -65,30 +62,38 @@ export const useTodoItemStore = create<TodoItemState>((set) => ({
     }
   },
 
-  // Delete a todo item
   deleteTodoItem: async (id, listId) => {
     set({ loading: true });
     try {
-      await TodoItemService.deleteTodoItem({ id } as TodoItem);
-      set({ loading: false });
-      // Refetch todo items after deletion
+      //await TodoItemService.deleteTodoItem({ id } as TodoItem);
+      //set({ loading: false });
+      //await useTodoItemStore.getState().fetchTodoItems(listId);
+      const { currentPage, pageSize, totalCount } = useTodoItemStore.getState();
+      // Deleting the item
+      await TodoItemService.deleteTodoItem(id);
+      // Check if the current page becomes empty after deletion
+      const newTotalCount = totalCount - 1;
+      const lastPage = Math.ceil(newTotalCount / pageSize);
+      // If we are on the last page and the number of items is less than pageSize, move to the previous page
+      if (currentPage > lastPage && lastPage > 0) {
+        set({ currentPage: lastPage });
+      }
+      // Fetch the updated todo items
       await useTodoItemStore.getState().fetchTodoItems(listId);
+      set({ loading: false });
     } catch (error) {
       console.error(error);
       set({ loading: false });
     }
   },
 
-  // Set pagination details
   setPagination: (page, size) => set({ currentPage: page, pageSize: size }),
 
-  // Create a new todo item
   createTodoItem: async (data, listId) => {
     set({ loading: true });
     try {
       await TodoItemService.createTodoItem(data);
       set({ loading: false });
-      // Refetch todo items after creation
       useTodoItemStore.getState().fetchTodoItems(listId);
     } catch (error) {
       console.error(error);
@@ -96,20 +101,16 @@ export const useTodoItemStore = create<TodoItemState>((set) => ({
     }
   },
 
-  // Update an existing todo item
   updateTodoItem: async (data, listId) => {
     set({ loading: true });
     try {
       await TodoItemService.updateTodoItem(data);
       set({ loading: false });
-      // Refetch todo items after update
       useTodoItemStore.getState().fetchTodoItems(listId);
     } catch (error) {
       console.error(error);
       set({ loading: false });
     }
   },
-
-  // Set the todo item to be edited
   setTodoItemEdit: (data) => set({ editTodoItem: data }),
 }));

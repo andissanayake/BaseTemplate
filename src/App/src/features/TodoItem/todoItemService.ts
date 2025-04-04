@@ -24,8 +24,8 @@ export class TodoItemService {
     return await axiosInstance.put(`/api/todoItems/${data.id}`, data);
   }
 
-  static async deleteTodoItem(data: TodoItem) {
-    return await axiosInstance.delete(`/api/todoItems/${data.id}`);
+  static async deleteTodoItem(id: number) {
+    return await axiosInstance.delete(`/api/todoItems/${id}`);
   }
   static async updateTodoItemStatus(data: { id: number; done: boolean }) {
     return await axiosInstance.put(

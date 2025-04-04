@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-// TodoItemList.tsx
 import React, { useState, useEffect } from "react";
 import {
   Table,
@@ -35,7 +34,6 @@ const TodoItemList: React.FC = () => {
   const [currentTodoItem, setCurrentTodoItem] = useState<TodoItem | null>(null);
 
   if (!listId) throw "List Id is required.";
-  // Fetch todo items when the listId changes
   useEffect(() => {
     if (listId) {
       fetchTodoItems(+listId);

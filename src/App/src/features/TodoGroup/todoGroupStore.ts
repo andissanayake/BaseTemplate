@@ -1,4 +1,3 @@
-// todoGroupStore.ts
 import { create } from "zustand";
 import { TodoGroupService } from "./todoGroupService";
 import { TodoGroup } from "./Model";
@@ -19,7 +18,6 @@ export const useTodoGroupStore = create<TodoGroupState>((set) => ({
   loading: false,
   currentTodoGroup: null,
 
-  // Fetch all todo groups
   fetchTodoGroups: async () => {
     set({ loading: true });
     try {
@@ -33,12 +31,11 @@ export const useTodoGroupStore = create<TodoGroupState>((set) => ({
     }
   },
 
-  // Create a new todo group
   createTodoGroup: async (data) => {
     set({ loading: true });
     try {
       await TodoGroupService.createTodoGroup(data);
-      await useTodoGroupStore.getState().fetchTodoGroups(); // Refresh the todo group list after creation
+      await useTodoGroupStore.getState().fetchTodoGroups();
       set({ loading: false });
     } catch (error) {
       console.error(error);
@@ -46,12 +43,11 @@ export const useTodoGroupStore = create<TodoGroupState>((set) => ({
     }
   },
 
-  // Update an existing todo group
   updateTodoGroup: async (data) => {
     set({ loading: true });
     try {
       await TodoGroupService.updateTodoGroup(data);
-      await useTodoGroupStore.getState().fetchTodoGroups(); // Refresh the todo group list after update
+      await useTodoGroupStore.getState().fetchTodoGroups();
       set({ loading: false });
     } catch (error) {
       console.error(error);
@@ -59,20 +55,17 @@ export const useTodoGroupStore = create<TodoGroupState>((set) => ({
     }
   },
 
-  // Delete a todo group
   deleteTodoGroup: async (data) => {
     set({ loading: true });
     try {
       await TodoGroupService.deleteTodoGroup(data);
-      await useTodoGroupStore.getState().fetchTodoGroups(); // Refresh the todo group list after deletion
+      await useTodoGroupStore.getState().fetchTodoGroups();
       set({ loading: false });
     } catch (error) {
       console.error(error);
       set({ loading: false });
     }
   },
-
-  // Set current todo group for editing or viewing
   setTodoGroupCurrent: (data: TodoGroup | null) =>
     set({ currentTodoGroup: data }),
 }));

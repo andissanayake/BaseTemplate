@@ -30,7 +30,7 @@ const TodoGroupList: React.FC = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    fetchTodoGroups(); // Fetch the todo groups when the component loads
+    fetchTodoGroups();
   }, [fetchTodoGroups]);
 
   const handleView = (record: TodoGroup) => {
