@@ -65,7 +65,7 @@ jobs:
 
       # Optional: upload artifacts
       - name: Upload publish folder
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: fullstack-publish
           path: publish
