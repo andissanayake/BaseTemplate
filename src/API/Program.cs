@@ -25,15 +25,24 @@ public class Program
         {
             app.UseSwagger();
             app.UseSwaggerUI();
+            app.UseCors(CLIENT_POLYCY_KEY);
         }
 
         app.UseHealthChecks("/health");
         //app.UseHttpsRedirection();
-        app.UseCors(CLIENT_POLYCY_KEY);
         app.UseAuthentication();
         app.UseAuthorization();
+
+        // Serve static files from wwwroot
+        app.UseDefaultFiles();
+        app.UseStaticFiles();
+
         app.MapControllers();
-        app.UseExceptionHandler(options => { });
+
+        // Handle SPA routing - serve index.html for all unmatched routes
+        app.MapFallbackToFile("index.html");
+
+        //app.UseExceptionHandler(options => { });
         app.Run();
     }
 }
