@@ -1,0 +1,71 @@
+name: Build Fullstack App
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    env:
+      DOTNET_VERSION: "8.0.x"
+      NODE_VERSION: "18.x"
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      # ----------------------------
+      # 🔧 Build Frontend
+      # ----------------------------
+      - name: Install frontend dependencies
+        working-directory: src/App
+        run: npm install
+
+      - name: Build frontend
+        working-directory: src/App
+        run: npm run build
+
+      # ----------------------------
+      # 🔁 Copy frontend dist to backend
+      # ----------------------------
+      - name: Copy frontend to API wwwroot
+        run: |
+          rm -rf src/API/wwwroot
+          mkdir -p src/API/wwwroot
+          cp -r src/App/dist/* src/API/wwwroot/
+
+      # ----------------------------
+      # 🧱 Build Backend
+      # ----------------------------
+      - name: Restore .NET dependencies
+        working-directory: src/API
+        run: dotnet restore
+
+      - name: Build .NET project
+        working-directory: src/API
+        run: dotnet build --configuration Release --no-restore
+
+      - name: Publish .NET project
+        working-directory: src/API
+        run: dotnet publish -c Release -o ../../publish
+
+      # Optional: upload artifacts
+      - name: Upload publish folder
+        uses: actions/upload-artifact@v3
+        with:
+          name: fullstack-publish
+          path: publish
