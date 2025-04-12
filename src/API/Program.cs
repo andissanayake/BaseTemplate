@@ -32,8 +32,11 @@ public class Program
         app.UseCors(CLIENT_POLYCY_KEY);
         app.UseAuthentication();
         app.UseAuthorization();
+        app.UseDefaultFiles(); // looks for index.html
+        app.UseStaticFiles();  // enables serving static content
         app.MapControllers();
-        app.UseExceptionHandler(options => { });
+        //app.UseExceptionHandler(options => { });
+        app.MapFallbackToFile("index.html");
         app.Run();
     }
 }
