@@ -1,12 +1,12 @@
+using System.Globalization;
 using BaseTemplate.Application.Common.Interfaces;
 using CsvHelper;
-using System.Globalization;
 
 namespace BaseTemplate.Infrastructure.Services;
 
 public class CsvService : ICsvService
 {
-    public async Task<byte[]> WriteToCsvAsync<T>(IEnumerable<T> items, string[] headers, Func<T, object[]> rowSelector)
+    public async Task<byte[]> WriteToCsvAsync<T>(IEnumerable<T> items, string[] headers, Func<T, string[]> rowSelector)
     {
         using var memoryStream = new MemoryStream();
         using var writer = new StreamWriter(memoryStream);
@@ -33,4 +33,4 @@ public class CsvService : ICsvService
         await writer.FlushAsync();
         return memoryStream.ToArray();
     }
-} 
+}
