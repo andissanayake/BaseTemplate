@@ -1,7 +1,7 @@
 ﻿using System.Collections.Concurrent;
 using BaseTemplate.Application.Common.Interfaces;
 using BaseTemplate.Domain.Common;
-using MediatR;
+using MediatorS;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
@@ -32,7 +32,7 @@ public class InMemoryDomainEventWorker : BackgroundService, IDomainEventQueue
                 {
                     using var scope = _provider.CreateScope();
                     var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
-                    await mediator.Publish(domainEvent, stoppingToken);
+                    //await mediator.Publish(domainEvent, stoppingToken);
                 }
                 catch (Exception ex)
                 {

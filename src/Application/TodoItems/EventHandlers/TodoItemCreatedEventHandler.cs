@@ -4,7 +4,7 @@ using Microsoft.Extensions.Logging;
 
 namespace BaseTemplate.Application.TodoItems.EventHandlers;
 
-public class TodoItemCreatedEventHandler : INotificationHandler<TodoItemCreatedEvent>
+public class TodoItemCreatedEventHandler //: INotificationHandler<TodoItemCreatedEvent>
 {
     private readonly ILogger<TodoItemCreatedEventHandler> _logger;
     private readonly IUnitOfWorkFactory _factory;

@@ -4,9 +4,9 @@ using BaseTemplate.Domain.Events;
 
 namespace BaseTemplate.Application.TodoItems.Commands.DeleteTodoItem;
 
-public record DeleteTodoItemCommand(int Id) : IRequest;
+public record DeleteTodoItemCommand(int Id) : IRequest<bool>;
 
-public class DeleteTodoItemCommandHandler : IRequestHandler<DeleteTodoItemCommand>
+public class DeleteTodoItemCommandHandler : IRequestHandler<DeleteTodoItemCommand, bool>
 {
     private readonly IUnitOfWorkFactory _factory;
     private readonly IDomainEventDispatcher _domainEventDispatcher;
@@ -16,7 +16,7 @@ public class DeleteTodoItemCommandHandler : IRequestHandler<DeleteTodoItemComman
         _domainEventDispatcher = domainEventDispatcher;
     }
 
-    public async Task Handle(DeleteTodoItemCommand request, CancellationToken cancellationToken)
+    public async Task<Result<bool>> HandleAsync(DeleteTodoItemCommand request, CancellationToken cancellationToken)
     {
         using var uow = _factory.CreateUOW();
         var entity = await uow.GetAsync<TodoItem>(request.Id);
@@ -29,6 +29,7 @@ public class DeleteTodoItemCommandHandler : IRequestHandler<DeleteTodoItemComman
 
         uow.Commit();
         await _domainEventDispatcher.DispatchDomainEventsAsync(entity);
+        return Result<bool>.Success(true);
     }
 
 }

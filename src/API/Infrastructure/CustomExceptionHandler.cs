@@ -1,9 +1,5 @@
-﻿using BaseTemplate.Application.Common.Exceptions;
-using Microsoft.AspNetCore.Diagnostics;
-using Microsoft.AspNetCore.Mvc;
-
-namespace BaseTemplate.API.Infrastructure;
-
+﻿namespace BaseTemplate.API.Infrastructure;
+/*
 public class CustomExceptionHandler : IExceptionHandler
 {
     private readonly Dictionary<Type, Func<HttpContext, Exception, Task>> _exceptionHandlers;
@@ -69,3 +65,4 @@ public class CustomExceptionHandler : IExceptionHandler
         });
     }
 }
+*/

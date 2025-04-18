@@ -23,8 +23,17 @@ public class CreateTodoItemCommandHandler : IRequestHandler<CreateTodoItemComman
         _factory = factory;
         _domainEventDispatcher = domainEventDispatcher;
     }
+    public Result<int> ValidateAsync(CreateTodoItemCommand request, CancellationToken cancellationToken)
+    {
+        /*
+                 RuleFor(v => v.Title)
+            .MaximumLength(200)
+            .NotEmpty();
+        */
+        return Result<int>.Success(0);
+    }
 
-    public async Task<int> Handle(CreateTodoItemCommand request, CancellationToken cancellationToken)
+    public async Task<Result<int>> HandleAsync(CreateTodoItemCommand request, CancellationToken cancellationToken)
     {
         using var uow = _factory.CreateUOW();
         var entity = new TodoItem
@@ -40,6 +49,6 @@ public class CreateTodoItemCommandHandler : IRequestHandler<CreateTodoItemComman
         entity.AddDomainEvent(new TodoItemCreatedEvent(entity));
         uow.Commit();
         await _domainEventDispatcher.DispatchDomainEventsAsync(entity);
-        return entity.Id;
+        return Result<int>.Success(entity.Id);
     }
 }

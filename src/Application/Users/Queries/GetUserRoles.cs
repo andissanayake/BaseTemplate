@@ -1,9 +1,7 @@
 ﻿using BaseTemplate.Application.Common.Interfaces;
-using BaseTemplate.Application.Common.Security;
 
 namespace BaseTemplate.Application.Users.Queries;
 
-[Authorize]
 public record GetUserRolesQuery : IRequest<IEnumerable<string>>
 {
 }
@@ -19,8 +17,14 @@ public class GetUserRolesQueryHandler : IRequestHandler<GetUserRolesQuery, IEnum
         _user = user;
     }
 
-    public async Task<IEnumerable<string>> Handle(GetUserRolesQuery request, CancellationToken cancellationToken)
+    public async Task<Result<IEnumerable<string>>> AuthorizeAsync(GetUserRolesQuery request, CancellationToken cancellationToken)
     {
-        return await _identityService.GetRolesAsync(_user.Id!);
+        // [Authorize]
+        return Result<IEnumerable<string>>.Success(new List<string>());
+    }
+    public async Task<Result<IEnumerable<string>>> HandleAsync(GetUserRolesQuery request, CancellationToken cancellationToken)
+    {
+        var res = await _identityService.GetRolesAsync(_user.Id!);
+        return Result<IEnumerable<string>>.Success(res);
     }
 }

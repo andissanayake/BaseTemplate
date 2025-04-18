@@ -1,4 +1,5 @@
 ﻿using BaseTemplate.Application.Users.Queries;
+using MediatorS;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -7,9 +8,9 @@ namespace BaseTemplate.API.Controllers;
 public class UserController : ApiControllerBase
 {
     [HttpGet("roles")]
-    public async Task<ActionResult<IEnumerable<string>>> GetUserRoles()
+    public async Task<ActionResult<Result<IEnumerable<string>>>> GetUserRoles()
     {
-        var roles = await Mediator.Send(new GetUserRolesQuery());
+        var roles = await Mediator.SendAsync(new GetUserRolesQuery());
         return Ok(roles);
     }
 }

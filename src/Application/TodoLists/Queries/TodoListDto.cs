@@ -1,6 +1,4 @@
-﻿using BaseTemplate.Domain.Entities;
-
-namespace BaseTemplate.Application.TodoLists.Queries;
+﻿namespace BaseTemplate.Application.TodoLists.Queries;
 
 public class TodoListDto
 {
@@ -10,11 +8,4 @@ public class TodoListDto
 
     public string? Colour { get; init; }
 
-    private class Mapping : Profile
-    {
-        public Mapping()
-        {
-            CreateMap<TodoList, TodoListDto>();
-        }
-    }
 }

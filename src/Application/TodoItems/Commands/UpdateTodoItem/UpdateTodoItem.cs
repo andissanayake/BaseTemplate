@@ -4,7 +4,7 @@ using BaseTemplate.Domain.Enums;
 
 namespace BaseTemplate.Application.TodoItems.Commands.UpdateTodoItem;
 
-public record UpdateTodoItemCommand : IRequest
+public record UpdateTodoItemCommand : IRequest<bool>
 {
     public int Id { get; init; }
     public string? Title { get; init; }
@@ -13,17 +13,23 @@ public record UpdateTodoItemCommand : IRequest
     public PriorityLevel? Priority { get; set; }
 }
 
-public class UpdateTodoItemCommandHandler : IRequestHandler<UpdateTodoItemCommand>
+public class UpdateTodoItemCommandHandler : IRequestHandler<UpdateTodoItemCommand, bool>
 {
     private readonly IUnitOfWorkFactory _factory;
-    private readonly IDomainEventDispatcher _domainEventDispatcher;
-    public UpdateTodoItemCommandHandler(IUnitOfWorkFactory factory, IDomainEventDispatcher domainEventDispatcher)
+    public UpdateTodoItemCommandHandler(IUnitOfWorkFactory factory)
     {
         _factory = factory;
-        _domainEventDispatcher = domainEventDispatcher;
     }
-
-    public async Task Handle(UpdateTodoItemCommand request, CancellationToken cancellationToken)
+    public async Task<Result<bool>> ValidateAsync(UpdateTodoItemCommand request, CancellationToken cancellationToken)
+    {
+        /*
+                 RuleFor(v => v.Title)
+            .MaximumLength(200)
+            .NotEmpty();
+        */
+        return Result<bool>.Success(true);
+    }
+    public async Task<Result<bool>> HandleAsync(UpdateTodoItemCommand request, CancellationToken cancellationToken)
     {
         using var uow = _factory.CreateUOW();
         var entity = await uow.GetAsync<TodoItem>(request.Id);
@@ -39,5 +45,6 @@ public class UpdateTodoItemCommandHandler : IRequestHandler<UpdateTodoItemComman
 
         await uow.UpdateAsync(entity);
         uow.Commit();
+        return Result<bool>.Success(true);
     }
 }

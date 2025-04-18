@@ -19,7 +19,21 @@ public class GetTodoItemsWithPaginationQueryHandler : IRequestHandler<GetTodoIte
         _factory = factory;
     }
 
-    public async Task<PaginatedList<TodoItemBriefDto>> Handle(GetTodoItemsWithPaginationQuery request, CancellationToken cancellationToken)
+    public async Task<Result<PaginatedList<TodoItemBriefDto>>> ValidateAsync(GetTodoItemsWithPaginationQuery request, CancellationToken cancellationToken)
+    {
+        /*
+         *         RuleFor(x => x.ListId)
+            .NotEmpty().WithMessage("ListId is required.");
+
+        RuleFor(x => x.PageNumber)
+            .GreaterThanOrEqualTo(1).WithMessage("PageNumber at least greater than or equal to 1.");
+
+        RuleFor(x => x.PageSize)
+            .GreaterThanOrEqualTo(1).WithMessage("PageSize at least greater than or equal to 1.");
+         */
+        return Result<PaginatedList<TodoItemBriefDto>>.Success(new PaginatedList<TodoItemBriefDto>(new List<TodoItemBriefDto>(), 0, request.PageNumber, request.PageSize));
+    }
+    public async Task<Result<PaginatedList<TodoItemBriefDto>>> HandleAsync(GetTodoItemsWithPaginationQuery request, CancellationToken cancellationToken)
     {
         using var uow = _factory.CreateUOW();
         var offset = (request.PageNumber - 1) * request.PageSize;
@@ -41,6 +55,6 @@ public class GetTodoItemsWithPaginationQueryHandler : IRequestHandler<GetTodoIte
             request.PageSize
         });
 
-        return new PaginatedList<TodoItemBriefDto>(items.ToList(), totalCount, request.PageNumber, request.PageSize);
+        return Result<PaginatedList<TodoItemBriefDto>>.Success(new PaginatedList<TodoItemBriefDto>(items.ToList(), totalCount, request.PageNumber, request.PageSize));
     }
 }

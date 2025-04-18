@@ -18,8 +18,29 @@ public class CreateTodoListCommandHandler : IRequestHandler<CreateTodoListComman
     {
         _factory = factory;
     }
+    public async Task<Result<int>> ValidateAsync(CreateTodoListCommand request, CancellationToken cancellationToken)
+    {
+        /*
+         
+        RuleFor(v => v.Title)
+            .NotEmpty()
+            .MaximumLength(200)
+            .MustAsync(BeUniqueTitle)
+                .WithMessage("'{PropertyName}' must be unique.")
+                .WithErrorCode("Unique");
+    }
 
-    public async Task<int> Handle(CreateTodoListCommand request, CancellationToken cancellationToken)
+    public async Task<bool> BeUniqueTitle(string title, CancellationToken cancellationToken)
+    {
+        var sql = "SELECT COUNT(1) FROM TodoList WHERE Title = @Title";
+        using var uow = _factory.CreateUOW();
+        var count = await uow.QueryFirstOrDefaultAsync<int>(sql, new { Title = title });
+        return count == 0;
+    }
+         */
+        return Result<int>.Success(0);
+    }
+    public async Task<Result<int>> HandleAsync(CreateTodoListCommand request, CancellationToken cancellationToken)
     {
         var entity = new TodoList();
         entity.Title = request.Title;
@@ -29,6 +50,6 @@ public class CreateTodoListCommandHandler : IRequestHandler<CreateTodoListComman
         await uow.InsertAsync(entity);
         uow.Commit();
 
-        return entity.Id;
+        return Result<int>.Success(entity.Id);
     }
 }
