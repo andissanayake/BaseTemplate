@@ -21,11 +21,11 @@ public abstract class ApiControllerBase : ControllerBase
         return result.Code switch
         {
             var code when ResultCodeMapper.IsSuccess(code) => Ok(result),
-            var code when code == ResultCodeMapper.DefaultValidationErrorCode => BadRequest(result),
+            var code when code == ResultCodeMapper.DefaultValidationErrorCode => BadRequest(result.Details),
             var code when code == ResultCodeMapper.DefaultServerErrorCode => StatusCode(500, result),
             var code when code == ResultCodeMapper.DefaultNotFoundCode => NotFound(result),
             var code when code == ResultCodeMapper.DefaultUnauthorizedCode => Unauthorized(result),
-            _ => BadRequest(result)
+            _ => BadRequest(result.Details)
         };
     }
 }
