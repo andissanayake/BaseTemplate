@@ -17,19 +17,19 @@ public class TodoListsController : ApiControllerBase
     [HttpGet]
     public async Task<ActionResult<Result<TodosVm>>> Get()
     {
-        return await Mediator.SendAsync(new GetTodosQuery());
+        return await SendAsync(new GetTodosQuery());
     }
 
     [HttpGet("{id}")]
     public async Task<ActionResult<Result<TodoListDto>>> GetById(int id)
     {
-        return await Mediator.SendAsync(new GetTodoListByIdQuery(id));
+        return await SendAsync(new GetTodoListByIdQuery(id));
     }
 
     [HttpPost]
     public async Task<ActionResult<Result<int>>> Create(CreateTodoListCommand command)
     {
-        return await Mediator.SendAsync(command);
+        return await SendAsync(command);
     }
 
     [HttpPut("{id}")]
@@ -40,23 +40,18 @@ public class TodoListsController : ApiControllerBase
             return BadRequest();
         }
 
-        await Mediator.SendAsync(command);
-
-        return NoContent();
+        return await SendAsync(command);
     }
 
     [HttpDelete("{id}")]
     public async Task<ActionResult<Result<bool>>> Delete(int id)
     {
-        await Mediator.SendAsync(new DeleteTodoListCommand(id));
-
-        return NoContent();
+        return await SendAsync(new DeleteTodoListCommand(id));
     }
 
     [HttpDelete("purge")]
     public async Task<ActionResult<Result<bool>>> Purge()
     {
-        await Mediator.SendAsync(new PurgeTodoListsCommand());
-        return NoContent();
+        return await SendAsync(new PurgeTodoListsCommand());
     }
 }

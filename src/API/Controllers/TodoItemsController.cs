@@ -16,13 +16,13 @@ public class TodoItemsController : ApiControllerBase
     [HttpGet]
     public async Task<ActionResult<Result<PaginatedList<TodoItemBriefDto>>>> GetTodoItemsWithPagination([FromQuery] GetTodoItemsWithPaginationQuery query)
     {
-        return await Mediator.SendAsync(query);
+        return await SendAsync(query);
     }
 
     [HttpPost]
     public async Task<ActionResult<Result<int>>> Create(CreateTodoItemCommand command)
     {
-        return await Mediator.SendAsync(command);
+        return await SendAsync(command);
     }
 
     [HttpPut("{id}")]
@@ -33,9 +33,7 @@ public class TodoItemsController : ApiControllerBase
             return BadRequest();
         }
 
-        await Mediator.SendAsync(command);
-
-        return NoContent();
+        return await SendAsync(command);
     }
 
     [HttpPut("[action]")]
@@ -46,16 +44,13 @@ public class TodoItemsController : ApiControllerBase
             return BadRequest();
         }
 
-        await Mediator.SendAsync(command);
+        return await SendAsync(command);
 
-        return NoContent();
     }
 
     [HttpDelete("{id}")]
     public async Task<ActionResult<Result<bool>>> Delete(int id)
     {
-        await Mediator.SendAsync(new DeleteTodoItemCommand(id));
-
-        return NoContent();
+        return await SendAsync(new DeleteTodoItemCommand(id));
     }
 }

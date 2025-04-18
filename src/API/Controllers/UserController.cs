@@ -10,7 +10,6 @@ public class UserController : ApiControllerBase
     [HttpGet("roles")]
     public async Task<ActionResult<Result<IEnumerable<string>>>> GetUserRoles()
     {
-        var roles = await Mediator.SendAsync(new GetUserRolesQuery());
-        return Ok(roles);
+        return await SendAsync(new GetUserRolesQuery());
     }
 }
