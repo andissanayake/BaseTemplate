@@ -65,9 +65,6 @@ export const useTodoItemStore = create<TodoItemState>((set) => ({
   deleteTodoItem: async (id, listId) => {
     set({ loading: true });
     try {
-      //await TodoItemService.deleteTodoItem({ id } as TodoItem);
-      //set({ loading: false });
-      //await useTodoItemStore.getState().fetchTodoItems(listId);
       const { currentPage, pageSize, totalCount } = useTodoItemStore.getState();
       // Deleting the item
       await TodoItemService.deleteTodoItem(id);
