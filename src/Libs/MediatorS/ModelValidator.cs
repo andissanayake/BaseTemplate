@@ -3,7 +3,7 @@
 namespace MediatorS;
 public static class ModelValidator
 {
-    public static Dictionary<string, string[]> Validate(object model)
+    public static (bool IsValied, Dictionary<string, string[]> Errors) Validate<T>(IRequest<T> model)
     {
         var context = new ValidationContext(model);
         var results = new List<ValidationResult>();
@@ -23,6 +23,7 @@ public static class ModelValidator
             }
         }
 
-        return errorDict.ToDictionary(kv => kv.Key, kv => kv.Value.ToArray());
+        var ret = errorDict.ToDictionary(kv => kv.Key, kv => kv.Value.ToArray());
+        return (ret.Count == 0, ret);
     }
 }

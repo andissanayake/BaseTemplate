@@ -39,11 +39,13 @@ export const useTodoItemStore = create<TodoItemState>((set) => ({
         currentPage,
         pageSize
       );
-      set({
-        todoItemList: response.data.items,
-        totalCount: response.data.totalCount,
-        loading: false,
-      });
+      if (response.status == 200 && response.data) {
+        set({
+          todoItemList: response.data.data?.items || [],
+          totalCount: response.data.data?.totalCount || 0,
+          loading: false,
+        });
+      }
     } catch (error) {
       console.error(error);
       set({ loading: false });
@@ -66,16 +68,12 @@ export const useTodoItemStore = create<TodoItemState>((set) => ({
     set({ loading: true });
     try {
       const { currentPage, pageSize, totalCount } = useTodoItemStore.getState();
-      // Deleting the item
       await TodoItemService.deleteTodoItem(id);
-      // Check if the current page becomes empty after deletion
       const newTotalCount = totalCount - 1;
       const lastPage = Math.ceil(newTotalCount / pageSize);
-      // If we are on the last page and the number of items is less than pageSize, move to the previous page
       if (currentPage > lastPage && lastPage > 0) {
         set({ currentPage: lastPage });
       }
-      // Fetch the updated todo items
       await useTodoItemStore.getState().fetchTodoItems(listId);
       set({ loading: false });
     } catch (error) {

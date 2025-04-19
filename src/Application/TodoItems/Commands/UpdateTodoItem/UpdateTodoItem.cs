@@ -1,4 +1,5 @@
-﻿using BaseTemplate.Application.Common.Interfaces;
+﻿using System.ComponentModel.DataAnnotations;
+using BaseTemplate.Application.Common.Interfaces;
 using BaseTemplate.Domain.Entities;
 using BaseTemplate.Domain.Enums;
 
@@ -7,6 +8,8 @@ namespace BaseTemplate.Application.TodoItems.Commands.UpdateTodoItem;
 public record UpdateTodoItemCommand : IRequest<bool>
 {
     public int Id { get; init; }
+
+    [MaxLength(200, ErrorMessage = "The title cannot exceed 200 characters.")]
     public string? Title { get; init; }
     public string? Note { get; init; }
     public DateTimeOffset? Reminder { get; set; }
@@ -20,21 +23,15 @@ public class UpdateTodoItemCommandHandler : IRequestHandler<UpdateTodoItemComman
     {
         _factory = factory;
     }
-    public async Task<Result<bool>> ValidateAsync(UpdateTodoItemCommand request, CancellationToken cancellationToken)
-    {
-        /*
-                 RuleFor(v => v.Title)
-            .MaximumLength(200)
-            .NotEmpty();
-        */
-        return Result<bool>.Success(true);
-    }
     public async Task<Result<bool>> HandleAsync(UpdateTodoItemCommand request, CancellationToken cancellationToken)
     {
         using var uow = _factory.CreateUOW();
         var entity = await uow.GetAsync<TodoItem>(request.Id);
 
-        Guard.Against.NotFound(request.Id, entity);
+        if (entity is null)
+        {
+            return Result<bool>.NotFound($"TodoItem with id {request.Id} not found.");
+        }
 
         entity.Title = request.Title;
         entity.Title = request.Title;

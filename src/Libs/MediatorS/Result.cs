@@ -69,7 +69,8 @@
 
         public static Result<T> Unauthorized(string? message = null) =>
             Failure(ResultCodeMapper.DefaultUnauthorizedCode, message ?? "Unauthorized");
-
+        public static Result<T> Forbidden(string? message = null) =>
+            Failure(ResultCodeMapper.DefaultUnauthorizedCode, message ?? "Forbidden");
         public static Result<T> NotFound(string? message = null) =>
             Failure(ResultCodeMapper.DefaultNotFoundCode, message ?? "Resource not found");
 

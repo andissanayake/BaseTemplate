@@ -21,7 +21,10 @@ public class DeleteTodoItemCommandHandler : IRequestHandler<DeleteTodoItemComman
         using var uow = _factory.CreateUOW();
         var entity = await uow.GetAsync<TodoItem>(request.Id);
 
-        Guard.Against.NotFound(request.Id, entity);
+        if (entity is null)
+        {
+            return Result<bool>.NotFound($"TodoItem with id {request.Id} not found.");
+        }
 
         await uow.DeleteAsync(entity);
 

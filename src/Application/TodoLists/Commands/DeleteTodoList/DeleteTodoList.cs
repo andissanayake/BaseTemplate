@@ -19,7 +19,11 @@ public class DeleteTodoListCommandHandler : IRequestHandler<DeleteTodoListComman
         using var uow = _factory.CreateUOW();
         var entity = await uow.GetAsync<TodoList>(request.Id);
 
-        Guard.Against.NotFound(request.Id, entity);
+        if (entity is null)
+        {
+            return Result<bool>.NotFound($"TodoList with id {request.Id} not found.");
+        }
+
         await uow.DeleteAsync(entity);
         uow.Commit();
         return Result<bool>.Success(true);

@@ -26,7 +26,10 @@ public class UpdateTodoItemStatusCommandHandler : IRequestHandler<UpdateTodoItem
         using var uow = _factory.CreateUOW();
         var entity = await uow.GetAsync<TodoItem>(request.Id);
 
-        Guard.Against.NotFound(request.Id, entity);
+        if (entity is null)
+        {
+            return Result<bool>.NotFound($"TodoItem with id {request.Id} not found.");
+        }
 
         entity.Done = request.Done;
         await uow.UpdateAsync(entity);

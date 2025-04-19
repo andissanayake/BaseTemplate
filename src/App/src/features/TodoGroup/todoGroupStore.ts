@@ -22,6 +22,7 @@ export const useTodoGroupStore = create<TodoGroupState>((set) => ({
     set({ loading: true });
     try {
       const response = await TodoGroupService.fetchTodoGroups();
+      console.log("Todo groups fetched:", response);
       if (response && response.data && response.data.lists) {
         set({ todoGroupList: response.data.lists, loading: false });
       }

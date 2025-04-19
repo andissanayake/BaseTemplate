@@ -16,11 +16,6 @@ public class GetTodosQueryHandler : IRequestHandler<GetTodosQuery, TodosVm>
     {
         _factory = factory;
     }
-    public async Task<Result<TodosVm>> AuthorizeAsync(GetTodosQuery request, CancellationToken cancellationToken)
-    {
-        // [Authorize]
-        return Result<TodosVm>.Success(new TodosVm());
-    }
     public async Task<Result<TodosVm>> HandleAsync(GetTodosQuery request, CancellationToken cancellationToken)
     {
         using var uow = _factory.CreateUOW();

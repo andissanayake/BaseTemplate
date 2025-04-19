@@ -26,10 +26,6 @@ public class CreateTodoItemCommandHandler : IRequestHandler<CreateTodoItemComman
         _factory = factory;
         _domainEventDispatcher = domainEventDispatcher;
     }
-    public Result<int> ValidateAsync(CreateTodoItemCommand request, CancellationToken cancellationToken)
-    {
-        return Result<int>.Success(0);
-    }
 
     public async Task<Result<int>> HandleAsync(CreateTodoItemCommand request, CancellationToken cancellationToken)
     {

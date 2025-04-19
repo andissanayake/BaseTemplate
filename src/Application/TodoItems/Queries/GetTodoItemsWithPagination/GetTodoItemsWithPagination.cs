@@ -1,12 +1,17 @@
-﻿using BaseTemplate.Application.Common.Interfaces;
+﻿using System.ComponentModel.DataAnnotations;
+using BaseTemplate.Application.Common.Interfaces;
 using BaseTemplate.Application.Common.Models;
 
 namespace BaseTemplate.Application.TodoItems.Queries.GetTodoItemsWithPagination;
 
 public record GetTodoItemsWithPaginationQuery : IRequest<PaginatedList<TodoItemBriefDto>>
 {
-    public int ListId { get; init; }
+    public required int ListId { get; init; }
+
+    [Range(1, int.MaxValue, ErrorMessage = "Page number must be greater than or equal to 1.")]
     public int PageNumber { get; init; } = 1;
+
+    [Range(1, int.MaxValue, ErrorMessage = "Page number must be greater than or equal to 1.")]
     public int PageSize { get; init; } = 10;
 }
 
@@ -17,21 +22,6 @@ public class GetTodoItemsWithPaginationQueryHandler : IRequestHandler<GetTodoIte
     public GetTodoItemsWithPaginationQueryHandler(IUnitOfWorkFactory factory)
     {
         _factory = factory;
-    }
-
-    public async Task<Result<PaginatedList<TodoItemBriefDto>>> ValidateAsync(GetTodoItemsWithPaginationQuery request, CancellationToken cancellationToken)
-    {
-        /*
-         *         RuleFor(x => x.ListId)
-            .NotEmpty().WithMessage("ListId is required.");
-
-        RuleFor(x => x.PageNumber)
-            .GreaterThanOrEqualTo(1).WithMessage("PageNumber at least greater than or equal to 1.");
-
-        RuleFor(x => x.PageSize)
-            .GreaterThanOrEqualTo(1).WithMessage("PageSize at least greater than or equal to 1.");
-         */
-        return Result<PaginatedList<TodoItemBriefDto>>.Success(new PaginatedList<TodoItemBriefDto>(new List<TodoItemBriefDto>(), 0, request.PageNumber, request.PageSize));
     }
     public async Task<Result<PaginatedList<TodoItemBriefDto>>> HandleAsync(GetTodoItemsWithPaginationQuery request, CancellationToken cancellationToken)
     {

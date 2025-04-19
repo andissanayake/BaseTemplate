@@ -1,4 +1,5 @@
 import axiosInstance from "../../auth/axiosInstance";
+import { Result } from "../../common/Result";
 import { PriorityLevel, TodoItem } from "./TodoItemModel";
 
 export class TodoItemService {
@@ -7,28 +8,33 @@ export class TodoItemService {
     pageNumber: number,
     pageSize: number
   ) {
-    return await axiosInstance.get<{ items: TodoItem[]; totalCount: number }>(
+    return await axiosInstance.get<
+      Result<{ items: TodoItem[]; totalCount: number }>
+    >(
       `/api/todoItems?ListId=${listId}&PageNumber=${pageNumber}&PageSize=${pageSize}`
     );
   }
 
   static async fetchTodoItemById(id: string) {
-    return await axiosInstance.get<TodoItem>(`/api/todoItems/${id}`);
+    return await axiosInstance.get<Result<TodoItem>>(`/api/todoItems/${id}`);
   }
 
   static async createTodoItem(data: TodoItem) {
-    return await axiosInstance.post<number>("/api/todoItems", data);
+    return await axiosInstance.post<Result<number>>("/api/todoItems", data);
   }
 
   static async updateTodoItem(data: TodoItem) {
-    return await axiosInstance.put(`/api/todoItems/${data.id}`, data);
+    return await axiosInstance.put<Result<boolean>>(
+      `/api/todoItems/${data.id}`,
+      data
+    );
   }
 
   static async deleteTodoItem(id: number) {
-    return await axiosInstance.delete(`/api/todoItems/${id}`);
+    return await axiosInstance.delete<Result<boolean>>(`/api/todoItems/${id}`);
   }
   static async updateTodoItemStatus(data: { id: number; done: boolean }) {
-    return await axiosInstance.put(
+    return (await axiosInstance.put)<Result<boolean>>(
       `/api/todoItems/updateItemStatus?id=${data.id}`,
       data
     );

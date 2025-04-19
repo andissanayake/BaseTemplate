@@ -5,6 +5,7 @@ using BaseTemplate.Application.TodoLists.Commands.PurgeTodoLists;
 using BaseTemplate.Application.TodoLists.Commands.UpdateTodoList;
 using BaseTemplate.Application.TodoLists.Queries;
 using BaseTemplate.Application.TodoLists.Queries.GetTodos;
+using BaseTemplate.Domain.Constants;
 using MediatorS;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -50,6 +51,7 @@ public class TodoListsController : ApiControllerBase
     }
 
     [HttpDelete("purge")]
+    [Authorize(policy: Policies.CanPurge)]
     public async Task<ActionResult<Result<bool>>> Purge()
     {
         return await SendAsync(new PurgeTodoListsCommand());

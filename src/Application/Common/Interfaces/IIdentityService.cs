@@ -2,9 +2,9 @@
 
 public interface IIdentityService
 {
-    Task<bool> IsInRoleAsync(string userId, string role);
+    Task<bool> IsInRoleAsync(string role);
 
-    Task<bool> AuthorizeAsync(string userId, string policyName);
+    Task<bool> AuthorizeAsync(string policyName);
 
-    Task<IEnumerable<string>> GetRolesAsync(string userId);
+    Task<IEnumerable<string>> GetRolesAsync();
 }
