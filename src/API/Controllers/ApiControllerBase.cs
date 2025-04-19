@@ -17,15 +17,26 @@ public abstract class ApiControllerBase : ControllerBase
         IRequest<T> request,
         CancellationToken cancellationToken = default)
     {
-        var result = await Mediator.SendAsync(request, cancellationToken);
-        return result.Code switch
+        try
         {
-            var code when ResultCodeMapper.IsSuccess(code) => Ok(result),
-            var code when code == ResultCodeMapper.DefaultValidationErrorCode => BadRequest(result.Details),
-            var code when code == ResultCodeMapper.DefaultServerErrorCode => StatusCode(500, result),
-            var code when code == ResultCodeMapper.DefaultNotFoundCode => NotFound(result),
-            var code when code == ResultCodeMapper.DefaultUnauthorizedCode => Unauthorized(result),
-            _ => BadRequest(result.Details)
-        };
+            var result = await Mediator.SendAsync(request, cancellationToken);
+            return result.Code switch
+            {
+                var code when ResultCodeMapper.IsSuccess(code) => Ok(result),
+                var code when code == ResultCodeMapper.DefaultValidationErrorCode => BadRequest(result.Details),
+                var code when code == ResultCodeMapper.DefaultServerErrorCode => StatusCode(500, result.Details),
+                var code when code == ResultCodeMapper.DefaultNotFoundCode => NotFound(result.Details),
+                var code when code == ResultCodeMapper.DefaultUnauthorizedCode => Unauthorized(result.Details),
+                _ => BadRequest(result.Details)
+            };
+        }
+        catch (Exception ex)
+        {
+            var errorDetails = new Dictionary<string, string[]>
+            {
+                ["error"] = new[] { ex.Message }
+            };
+            return StatusCode(500, errorDetails);
+        }
     }
 }

@@ -14,6 +14,7 @@ namespace BaseTemplate.API.Controllers;
 public class TodoItemsController : ApiControllerBase
 {
     [HttpGet]
+
     public async Task<ActionResult<Result<PaginatedList<TodoItemBriefDto>>>> GetTodoItemsWithPagination([FromQuery] GetTodoItemsWithPaginationQuery query)
     {
         return await SendAsync(query);

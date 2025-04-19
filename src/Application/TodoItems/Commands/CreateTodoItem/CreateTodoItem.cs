@@ -1,4 +1,5 @@
-﻿using BaseTemplate.Application.Common.Interfaces;
+﻿using System.ComponentModel.DataAnnotations;
+using BaseTemplate.Application.Common.Interfaces;
 using BaseTemplate.Domain.Entities;
 using BaseTemplate.Domain.Enums;
 using BaseTemplate.Domain.Events;
@@ -8,6 +9,8 @@ namespace BaseTemplate.Application.TodoItems.Commands.CreateTodoItem;
 public record CreateTodoItemCommand : IRequest<int>
 {
     public int ListId { get; init; }
+
+    [MaxLength(200, ErrorMessage = "The title cannot exceed 200 characters.")]
     public string? Title { get; init; }
     public string? Note { get; init; }
     public DateTimeOffset? Reminder { get; set; }
@@ -25,11 +28,6 @@ public class CreateTodoItemCommandHandler : IRequestHandler<CreateTodoItemComman
     }
     public Result<int> ValidateAsync(CreateTodoItemCommand request, CancellationToken cancellationToken)
     {
-        /*
-                 RuleFor(v => v.Title)
-            .MaximumLength(200)
-            .NotEmpty();
-        */
         return Result<int>.Success(0);
     }
 
