@@ -1,5 +1,6 @@
 import axiosInstance from "../../auth/axiosInstance";
-import { Result } from "../../common/Result";
+import { handleApi } from "../../common/handleApi";
+import { Result } from "../../common/result";
 import { PriorityLevel, TodoItem } from "./TodoItemModel";
 
 export class TodoItemService {
@@ -7,38 +8,41 @@ export class TodoItemService {
     listId: number,
     pageNumber: number,
     pageSize: number
-  ) {
-    return await axiosInstance.get<
-      Result<{ items: TodoItem[]; totalCount: number }>
-    >(
-      `/api/todoItems?ListId=${listId}&PageNumber=${pageNumber}&PageSize=${pageSize}`
+  ): Promise<Result<{ items: TodoItem[]; totalCount: number }>> {
+    return await handleApi(
+      axiosInstance.get(
+        `/api/todoItems?ListId=${listId}&PageNumber=${pageNumber}&PageSize=${pageSize}`
+      )
     );
   }
 
-  static async fetchTodoItemById(id: string) {
-    return await axiosInstance.get<Result<TodoItem>>(`/api/todoItems/${id}`);
+  static async fetchTodoItemById(id: string): Promise<Result<TodoItem>> {
+    return await handleApi(axiosInstance.get(`/api/todoItems/${id}`));
   }
 
-  static async createTodoItem(data: TodoItem) {
-    return await axiosInstance.post<Result<number>>("/api/todoItems", data);
+  static async createTodoItem(data: TodoItem): Promise<Result<number>> {
+    return await handleApi(axiosInstance.post("/api/todoItems", data));
   }
 
-  static async updateTodoItem(data: TodoItem) {
-    return await axiosInstance.put<Result<boolean>>(
-      `/api/todoItems/${data.id}`,
-      data
+  static async updateTodoItem(data: TodoItem): Promise<Result<boolean>> {
+    return await handleApi(
+      axiosInstance.put(`/api/todoItems/${data.id}`, data)
     );
   }
 
-  static async deleteTodoItem(id: number) {
-    return await axiosInstance.delete<Result<boolean>>(`/api/todoItems/${id}`);
+  static async deleteTodoItem(id: number): Promise<Result<boolean>> {
+    return await handleApi(axiosInstance.delete(`/api/todoItems/${id}`));
   }
-  static async updateTodoItemStatus(data: { id: number; done: boolean }) {
-    return (await axiosInstance.put)<Result<boolean>>(
-      `/api/todoItems/updateItemStatus?id=${data.id}`,
-      data
+
+  static async updateTodoItemStatus(data: {
+    id: number;
+    done: boolean;
+  }): Promise<Result<boolean>> {
+    return await handleApi(
+      axiosInstance.put(`/api/todoItems/updateItemStatus?id=${data.id}`, data)
     );
   }
+
   static getPriorityLevels() {
     const priorityOptions = [
       { label: "None", value: PriorityLevel.None },

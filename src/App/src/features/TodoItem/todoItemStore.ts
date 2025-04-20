@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import { TodoItemService } from "./todoItemService";
 import { TodoItem } from "./TodoItemModel";
+import { handleResult } from "../../common/handleResult";
 
 interface TodoItemState {
   todoItemList: TodoItem[];
@@ -31,81 +32,85 @@ export const useTodoItemStore = create<TodoItemState>((set) => ({
   editTodoItem: null,
 
   fetchTodoItems: async (listId) => {
-    const { currentPage, pageSize } = useTodoItemStore.getState();
     set({ loading: true });
-    try {
-      const response = await TodoItemService.fetchTodoItems(
-        listId,
-        currentPage,
-        pageSize
-      );
-      if (response.status == 200 && response.data) {
+    const { currentPage, pageSize } = useTodoItemStore.getState();
+    const response = await TodoItemService.fetchTodoItems(
+      listId,
+      currentPage,
+      pageSize
+    );
+    handleResult(response, {
+      onSuccess: (data) => {
         set({
-          todoItemList: response.data.data?.items || [],
-          totalCount: response.data.data?.totalCount || 0,
+          todoItemList: data?.items || [],
+          totalCount: data?.totalCount || 0,
           loading: false,
         });
-      }
-    } catch (error) {
-      console.error(error);
-      set({ loading: false });
-    }
+      },
+      onFinally: () => {
+        set({ loading: false });
+      },
+    });
   },
 
   updateItemStatus: async (id, done, listId) => {
     set({ loading: true });
-    try {
-      await TodoItemService.updateTodoItemStatus({ id, done });
-      set({ loading: false });
-      useTodoItemStore.getState().fetchTodoItems(listId);
-    } catch (error) {
-      console.error(error);
-      set({ loading: false });
-    }
+    const response = await TodoItemService.updateTodoItemStatus({ id, done });
+    handleResult(response, {
+      onSuccess: () => {
+        useTodoItemStore.getState().fetchTodoItems(listId);
+      },
+      onFinally: () => {
+        set({ loading: false });
+      },
+    });
   },
 
   deleteTodoItem: async (id, listId) => {
     set({ loading: true });
-    try {
-      const { currentPage, pageSize, totalCount } = useTodoItemStore.getState();
-      await TodoItemService.deleteTodoItem(id);
-      const newTotalCount = totalCount - 1;
-      const lastPage = Math.ceil(newTotalCount / pageSize);
-      if (currentPage > lastPage && lastPage > 0) {
-        set({ currentPage: lastPage });
-      }
-      await useTodoItemStore.getState().fetchTodoItems(listId);
-      set({ loading: false });
-    } catch (error) {
-      console.error(error);
-      set({ loading: false });
-    }
+    const { currentPage, pageSize, totalCount } = useTodoItemStore.getState();
+    const response = await TodoItemService.deleteTodoItem(id);
+    handleResult(response, {
+      onSuccess: () => {
+        const newTotalCount = totalCount - 1;
+        const lastPage = Math.ceil(newTotalCount / pageSize);
+        if (currentPage > lastPage && lastPage > 0) {
+          set({ currentPage: lastPage });
+        }
+        useTodoItemStore.getState().fetchTodoItems(listId);
+      },
+      onFinally: () => {
+        set({ loading: false });
+      },
+    });
   },
 
   setPagination: (page, size) => set({ currentPage: page, pageSize: size }),
 
   createTodoItem: async (data, listId) => {
     set({ loading: true });
-    try {
-      await TodoItemService.createTodoItem(data);
-      set({ loading: false });
-      useTodoItemStore.getState().fetchTodoItems(listId);
-    } catch (error) {
-      console.error(error);
-      set({ loading: false });
-    }
+    const response = await TodoItemService.createTodoItem(data);
+    handleResult(response, {
+      onSuccess: () => {
+        useTodoItemStore.getState().fetchTodoItems(listId);
+      },
+      onFinally: () => {
+        set({ loading: false });
+      },
+    });
   },
 
   updateTodoItem: async (data, listId) => {
     set({ loading: true });
-    try {
-      await TodoItemService.updateTodoItem(data);
-      set({ loading: false });
-      useTodoItemStore.getState().fetchTodoItems(listId);
-    } catch (error) {
-      console.error(error);
-      set({ loading: false });
-    }
+    const response = await TodoItemService.updateTodoItem(data);
+    handleResult(response, {
+      onSuccess: () => {
+        useTodoItemStore.getState().fetchTodoItems(listId);
+      },
+      onFinally: () => {
+        set({ loading: false });
+      },
+    });
   },
   setTodoItemEdit: (data) => set({ editTodoItem: data }),
 }));

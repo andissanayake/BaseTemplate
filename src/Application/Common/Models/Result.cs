@@ -7,7 +7,7 @@ public static class ResultCodeMapper
     public static string DefaultSuccessCode { get; set; } = "success";
     public static string DefaultValidationErrorCode { get; set; } = "validation_error";
     public static string DefaultUnauthorizedCode { get; set; } = "unauthorized";
-    public static string DefaultGeneralErrorCode { get; set; } = "error";
+    public static string DefaultForbiddenCode { get; set; } = "forbidden";
     public static string DefaultNotFoundCode { get; set; } = "not_found";
     public static string DefaultServerErrorCode { get; set; } = "server_error";
 }
@@ -33,6 +33,9 @@ public class Result
 
     public static Result Unauthorized(string? message = null) =>
         Failure(ResultCodeMapper.DefaultUnauthorizedCode, message ?? "Unauthorized");
+
+    public static Result Forbidden(string? message = null) =>
+     Failure(ResultCodeMapper.DefaultForbiddenCode, message ?? "Forbidden");
 
     public static Result NotFound(string? message = null) =>
         Failure(ResultCodeMapper.DefaultNotFoundCode, message ?? "Resource not found");
@@ -70,7 +73,7 @@ public class Result<T>
     public static Result<T> Unauthorized(string? message = null) =>
         Failure(ResultCodeMapper.DefaultUnauthorizedCode, message ?? "Unauthorized");
     public static Result<T> Forbidden(string? message = null) =>
-        Failure(ResultCodeMapper.DefaultUnauthorizedCode, message ?? "Forbidden");
+        Failure(ResultCodeMapper.DefaultForbiddenCode, message ?? "Forbidden");
     public static Result<T> NotFound(string? message = null) =>
         Failure(ResultCodeMapper.DefaultNotFoundCode, message ?? "Resource not found");
 

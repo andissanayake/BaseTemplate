@@ -31,7 +31,7 @@ public class UpdateTodoListCommandHandler : BaseRequestHandler<UpdateTodoListCom
     public override async Task<Result<bool>> ValidateAsync(UpdateTodoListCommand request, CancellationToken cancellationToken)
     {
         var val = ModelValidator.Validate(request);
-        if (!val.IsValied)
+        if (!val.IsValid)
             return Result<bool>.Validation("validation", val.Errors);
 
         var sql = "SELECT COUNT(1) FROM TodoList WHERE Title = @Title";

@@ -10,32 +10,18 @@ namespace BaseTemplate.Application.TodoLists.Commands.PurgeTodoLists;
 [Authorize(Roles = Roles.Administrator, Policy = Policies.CanPurge)]
 public record PurgeTodoListsCommand : IRequest<bool>;
 
-public class PurgeTodoListsCommandHandler : IRequestHandler<PurgeTodoListsCommand, bool>
+public class PurgeTodoListsCommandHandler : BaseRequestHandler<PurgeTodoListsCommand, bool>
 {
     private readonly IUnitOfWorkFactory _factory;
     private readonly IIdentityService _identityService;
 
-    public PurgeTodoListsCommandHandler(IUnitOfWorkFactory factory, IIdentityService identityService)
+
+    public PurgeTodoListsCommandHandler(IUnitOfWorkFactory factory, IIdentityService identityService) : base(identityService)
     {
         _factory = factory;
         _identityService = identityService;
     }
-    public async Task<Result<bool>> AuthorizeAsync(PurgeTodoListsCommand request, CancellationToken cancellationToken)
-    {
-        if (!await _identityService.IsInRoleAsync(Roles.Administrator))
-        {
-            return Result<bool>.Forbidden("You are not authorized to perform this action.");
-        }
-        else if (!await _identityService.IsInRoleAsync(Policies.CanPurge))
-        {
-            return Result<bool>.Forbidden("You are not authorized to perform this action.");
-        }
-        else
-        {
-            return Result<bool>.Success(true);
-        }
-    }
-    public async Task<Result<bool>> HandleAsync(PurgeTodoListsCommand request, CancellationToken cancellationToken)
+    public override async Task<Result<bool>> HandleAsync(PurgeTodoListsCommand request, CancellationToken cancellationToken)
     {
         using var uow = _factory.CreateUOW();
         var items = await uow.GetAllAsync<TodoList>();

@@ -1,26 +1,31 @@
 import axiosInstance from "../../auth/axiosInstance";
+import { handleApi } from "../../common/handleApi";
+import { Result } from "../../common/result";
 import { TodoGroup } from "./Model";
 
 export class TodoGroupService {
-  static async fetchTodoGroups() {
-    return await axiosInstance.get<{ lists: TodoGroup[] }>("/api/todoLists");
+  static async fetchTodoGroups(): Promise<Result<{ lists: TodoGroup[] }>> {
+    return await handleApi(axiosInstance.get("/api/todoLists"));
   }
 
-  static async fetchTodoGroupById(id: string) {
-    return await axiosInstance.get<TodoGroup>(`/api/todoLists/${id}`);
+  static async fetchTodoGroupById(id: string): Promise<Result<TodoGroup>> {
+    return await handleApi(axiosInstance.get(`/api/todoLists/${id}`));
   }
 
-  static async createTodoGroup(data: TodoGroup) {
-    return await axiosInstance.post<number>("/api/todoLists", data);
+  static async createTodoGroup(data: TodoGroup): Promise<Result<number>> {
+    return await handleApi(axiosInstance.post("/api/todoLists", data));
   }
 
-  static async updateTodoGroup(data: TodoGroup) {
-    return await axiosInstance.put(`/api/todoLists/${data.id}`, data);
+  static async updateTodoGroup(data: TodoGroup): Promise<Result<boolean>> {
+    return await handleApi(
+      axiosInstance.put(`/api/todoLists/${data.id}`, data)
+    );
   }
 
-  static async deleteTodoGroup(data: TodoGroup) {
-    return await axiosInstance.delete(`/api/todoLists/${data.id}`);
+  static async deleteTodoGroup(data: TodoGroup): Promise<Result<boolean>> {
+    return await handleApi(axiosInstance.delete(`/api/todoLists/${data.id}`));
   }
+
   static getColours() {
     const predefinedColors = [
       { label: "White", value: "#FFFFFF" },

@@ -27,6 +27,7 @@ public abstract class ApiControllerBase : ControllerBase
                 var code when code == ResultCodeMapper.DefaultServerErrorCode => StatusCode(500, result),
                 var code when code == ResultCodeMapper.DefaultNotFoundCode => NotFound(result),
                 var code when code == ResultCodeMapper.DefaultUnauthorizedCode => Unauthorized(result),
+                var code when code == ResultCodeMapper.DefaultForbiddenCode => Forbid(result.Details.SelectMany(kv => kv.Value).ToArray()),
                 _ => BadRequest(result)
             };
         }

@@ -23,13 +23,12 @@ export const setupAxios = () => {
     (response) => response,
     (error) => {
       const originalRequest = error.config;
-      if (error.response?.status === 500) {
-        console.error("Internal Server Error", error);
-      } else if (error.response?.status === 401 && !originalRequest._retry) {
+      if (
+        (error.response?.status === 401 || error.response?.status === 403) &&
+        !originalRequest._retry
+      ) {
         originalRequest._retry = true;
         return axiosInstance(originalRequest);
-      } else {
-        console.error("Response Error", error);
       }
       return Promise.reject(error);
     }

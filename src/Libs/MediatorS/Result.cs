@@ -7,7 +7,6 @@
         public static string DefaultSuccessCode { get; set; } = "success";
         public static string DefaultValidationErrorCode { get; set; } = "validation_error";
         public static string DefaultUnauthorizedCode { get; set; } = "unauthorized";
-        public static string DefaultGeneralErrorCode { get; set; } = "error";
         public static string DefaultNotFoundCode { get; set; } = "not_found";
         public static string DefaultServerErrorCode { get; set; } = "server_error";
     }
