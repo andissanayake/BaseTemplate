@@ -3,7 +3,6 @@ using BaseTemplate.Application.Common.Interfaces;
 using BaseTemplate.Application.Common.Models;
 using BaseTemplate.Application.Common.Security;
 using BaseTemplate.Application.Common.Validation;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace BaseTemplate.Application.Common.RequestHandler;
 public interface IRequest<TResponse> { }
@@ -11,6 +10,30 @@ public interface IRequest<TResponse> { }
 public interface IRequestHandler<in TRequest, TResponse>
     where TRequest : IRequest<TResponse>
 {
+    Task<Result<TResponse>> AuthorizeAsync(TRequest request, CancellationToken cancellationToken);
+    Task<Result<TResponse>> ValidateAsync(TRequest request, CancellationToken cancellationToken);
+    Task<Result<TResponse>> HandleAsync(TRequest request, CancellationToken cancellationToken);
+    Task<Result<TResponse>> ExecuteAsync(TRequest request, CancellationToken cancellationToken);
+}
+
+/*
+public interface IRequestHandler<in TRequest, TResponse>
+    where TRequest : IRequest<TResponse>
+{
+
+    public virtual async Task<Result<TResponse>> AuthorizeAsync(TRequest request, CancellationToken cancellationToken) =>
+        Result<TResponse>.Success(default!);
+
+    public virtual async Task<Result<TResponse>> ValidateAsync(TRequest request, CancellationToken cancellationToken)
+    {
+        var result = ModelValidator.Validate(request);
+        if (result.IsValied)
+            return Result<TResponse>.Success(default!);
+        return Result<TResponse>.Validation("Validation Errors", result.Errors);
+    }
+
+    public Task<Result<TResponse>> HandleAsync(TRequest request, CancellationToken cancellationToken);
+
     public virtual async Task<Result<TResponse>> ExecuteAsync(TRequest request, CancellationToken cancellationToken)
     {
         var authResult = await AuthorizeAsync(request, cancellationToken);
@@ -23,22 +46,9 @@ public interface IRequestHandler<in TRequest, TResponse>
 
         return await HandleAsync(request, cancellationToken);
     }
-
-    public virtual Task<Result<TResponse>> AuthorizeAsync(TRequest request, CancellationToken cancellationToken) =>
-        Task.FromResult(Result<TResponse>.Success(default!));
-
-    public virtual Task<Result<TResponse>> ValidateAsync(TRequest request, CancellationToken cancellationToken)
-    {
-        var result = ModelValidator.Validate(request);
-        if (result.IsValied)
-            return Task.FromResult(Result<TResponse>.Success(default!));
-        return Task.FromResult(Result<TResponse>.Validation("Validation Errors", result.Errors));
-    }
-
-    Task<Result<TResponse>> HandleAsync(TRequest request, CancellationToken cancellationToken);
 }
-
-public class BaseRequestHandler<TRequest, TResponse> : IRequestHandler<TRequest, TResponse>
+*/
+public abstract class BaseRequestHandler<TRequest, TResponse> : IRequestHandler<TRequest, TResponse>
     where TRequest : IRequest<TResponse>
 {
     private readonly IIdentityService _identityService;
@@ -57,70 +67,48 @@ public class BaseRequestHandler<TRequest, TResponse> : IRequestHandler<TRequest,
     }
     public virtual async Task<Result<TResponse>> AuthorizeAsync(TRequest request, CancellationToken cancellationToken)
     {
-        var authorizeAttributes = request.GetType().GetCustomAttributes<AuthorizeAttribute>();
+        var attributes = request.GetType().GetCustomAttributes<AuthorizeAttribute>();
 
-        if (authorizeAttributes.Any())
+        if (!attributes.Any()) return Result<TResponse>.Success(default!);
+
+        if (!_identityService.IsAuthenticated)
+            return Result<TResponse>.Unauthorized(default!);
+
+        var roles = attributes
+            .Where(a => !string.IsNullOrWhiteSpace(a.Roles))
+            .SelectMany(a => a.Roles.Split(',').Select(r => r.Trim()));
+
+        if (roles.Any())
         {
-            // Must be authenticated user
-            if (_identityService.IsAuthenticated)
-            {
-                return Result<TResponse>.Unauthorized(default!);
-            }
-            var authorizeAttributesWithRoles = authorizeAttributes.Where(a => !string.IsNullOrWhiteSpace(a.Roles));
-
-            if (authorizeAttributesWithRoles.Any())
-            {
-                var authorized = false;
-
-                foreach (var roles in authorizeAttributesWithRoles.Select(a => a.Roles.Split(',')))
-                {
-                    foreach (var role in roles)
-                    {
-                        var isInRole = await _identityService.IsInRoleAsync(role.Trim());
-                        if (isInRole)
-                        {
-                            authorized = true;
-                            break;
-                        }
-                    }
-                }
-
-                // Must be a member of at least one role in roles
-                if (!authorized)
-                {
-                    return Result<TResponse>.Forbidden(default!);
-                }
-            }
-
-            // Policy-based authorization
-            var authorizeAttributesWithPolicies = authorizeAttributes.Where(a => !string.IsNullOrWhiteSpace(a.Policy));
-            if (authorizeAttributesWithPolicies.Any())
-            {
-                foreach (var policy in authorizeAttributesWithPolicies.Select(a => a.Policy))
-                {
-                    var authorized = await _identityService.AuthorizeAsync(policy);
-
-                    if (!authorized)
-                    {
-                        return Result<TResponse>.Forbidden(default!);
-                    }
-                }
-            }
+            var isAuthorizedByRole = await Task.WhenAny(roles.Select(_identityService.IsInRoleAsync));
+            if (!isAuthorizedByRole.Result)
+                return Result<TResponse>.Forbidden(default!);
         }
+
+        foreach (var policy in attributes
+            .Where(a => !string.IsNullOrWhiteSpace(a.Policy))
+            .Select(a => a.Policy))
+        {
+            if (!await _identityService.AuthorizeAsync(policy))
+                return Result<TResponse>.Forbidden(default!);
+        }
+
         return Result<TResponse>.Success(default!);
     }
-    public virtual async Task<Result<TResponse>> ExecuteAsync(TRequest request, CancellationToken cancellationToken)
+    public abstract Task<Result<TResponse>> HandleAsync(TRequest request, CancellationToken cancellationToken);
+
+    public async Task<Result<TResponse>> ExecuteAsync(TRequest request, CancellationToken cancellationToken)
     {
         var authResult = await AuthorizeAsync(request, cancellationToken);
         if (!ResultCodeMapper.IsSuccess(authResult.Code))
             return authResult;
+
         var validationResult = await ValidateAsync(request, cancellationToken);
         if (!ResultCodeMapper.IsSuccess(validationResult.Code))
             return validationResult;
+
         return await HandleAsync(request, cancellationToken);
     }
-    public virtual Task<Result<TResponse>> HandleAsync(TRequest request, CancellationToken cancellationToken) =>
-        Task.FromResult(Result<TResponse>.Success(default!));
 }
 
 public interface IMediator
@@ -147,12 +135,24 @@ public class Mediator : IMediator
             });
         }
 
-        var handler = _provider.GetService<IRequestHandler<IRequest<TResponse>, TResponse>>();
+        // Build the closed generic interface type for this request
+        var handlerType = typeof(IRequestHandler<,>).MakeGenericType(request.GetType(), typeof(TResponse));
+
+        var handler = _provider.GetService(handlerType);
+
         if (handler is null)
         {
             return Result<TResponse>.NotFound($"Handler for request type '{request.GetType().Name}' not found.");
         }
 
-        return await handler.ExecuteAsync(request, cancellationToken); ;
+        // Call ExecuteAsync via reflection
+        var method = handlerType.GetMethod("ExecuteAsync");
+        if (method == null)
+        {
+            return Result<TResponse>.ServerError("Handler does not implement ExecuteAsync.");
+        }
+
+        var task = (Task<Result<TResponse>>)method.Invoke(handler, [request, cancellationToken])!;
+        return await task;
     }
 }

@@ -3,8 +3,16 @@
 namespace BaseTemplate.Application.Common.Validation;
 public static class ModelValidator
 {
-    public static (bool IsValied, Dictionary<string, string[]> Errors) Validate<T>(T model)
+    public static (bool IsValid, Dictionary<string, string[]> Errors) Validate<T>(T model)
     {
+        if (model is null)
+        {
+            return (false, new Dictionary<string, string[]>
+            {
+                ["model"] = ["Model cannot be null."]
+            });
+        }
+
         var context = new ValidationContext(model);
         var results = new List<ValidationResult>();
 
@@ -27,3 +35,4 @@ public static class ModelValidator
         return (ret.Count == 0, ret);
     }
 }
+

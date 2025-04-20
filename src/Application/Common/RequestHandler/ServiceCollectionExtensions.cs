@@ -8,17 +8,18 @@ public static class ServiceCollectionExtensions
     public static IServiceCollection AddRequestHandlers(this IServiceCollection services, Assembly assembly)
     {
         services.AddScoped<IMediator, Mediator>();
+
         var handlerTypes = assembly.GetTypes()
             .Where(t => !t.IsAbstract && !t.IsInterface)
             .SelectMany(t => t.GetInterfaces(), (t, i) => new { Implementation = t, Interface = i })
             .Where(x =>
-                x.i.IsGenericType &&
-                x.i.GetGenericTypeDefinition() == typeof(IRequestHandler<,>))
+                x.Interface.IsGenericType &&
+                x.Interface.GetGenericTypeDefinition() == typeof(IRequestHandler<,>))
             .ToList();
 
-        foreach (var handler in handlerTypes)
+        foreach (var handler in handlerTypes.Distinct())
         {
-            services.AddScoped(handler.i, handler.t);
+            services.AddScoped(handler.Interface, handler.Implementation);
         }
 
         return services;
