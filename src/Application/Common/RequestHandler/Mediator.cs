@@ -16,38 +16,6 @@ public interface IRequestHandler<in TRequest, TResponse>
     Task<Result<TResponse>> ExecuteAsync(TRequest request, CancellationToken cancellationToken);
 }
 
-/*
-public interface IRequestHandler<in TRequest, TResponse>
-    where TRequest : IRequest<TResponse>
-{
-
-    public virtual async Task<Result<TResponse>> AuthorizeAsync(TRequest request, CancellationToken cancellationToken) =>
-        Result<TResponse>.Success(default!);
-
-    public virtual async Task<Result<TResponse>> ValidateAsync(TRequest request, CancellationToken cancellationToken)
-    {
-        var result = ModelValidator.Validate(request);
-        if (result.IsValied)
-            return Result<TResponse>.Success(default!);
-        return Result<TResponse>.Validation("Validation Errors", result.Errors);
-    }
-
-    public Task<Result<TResponse>> HandleAsync(TRequest request, CancellationToken cancellationToken);
-
-    public virtual async Task<Result<TResponse>> ExecuteAsync(TRequest request, CancellationToken cancellationToken)
-    {
-        var authResult = await AuthorizeAsync(request, cancellationToken);
-        if (!ResultCodeMapper.IsSuccess(authResult.Code))
-            return authResult;
-
-        var validationResult = await ValidateAsync(request, cancellationToken);
-        if (!ResultCodeMapper.IsSuccess(validationResult.Code))
-            return validationResult;
-
-        return await HandleAsync(request, cancellationToken);
-    }
-}
-*/
 public abstract class BaseRequestHandler<TRequest, TResponse> : IRequestHandler<TRequest, TResponse>
     where TRequest : IRequest<TResponse>
 {
@@ -61,7 +29,7 @@ public abstract class BaseRequestHandler<TRequest, TResponse> : IRequestHandler<
     public virtual Task<Result<TResponse>> ValidateAsync(TRequest request, CancellationToken cancellationToken)
     {
         var result = ModelValidator.Validate(request);
-        if (result.IsValied)
+        if (result.IsValid)
             return Task.FromResult(Result<TResponse>.Success(default!));
         return Task.FromResult(Result<TResponse>.Validation("Validation Errors", result.Errors));
     }
