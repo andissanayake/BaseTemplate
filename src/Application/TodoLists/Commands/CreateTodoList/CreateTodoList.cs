@@ -1,10 +1,15 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using BaseTemplate.Application.Common.Interfaces;
+using BaseTemplate.Application.Common.Models;
+using BaseTemplate.Application.Common.RequestHandler;
+using BaseTemplate.Application.Common.Security;
+using BaseTemplate.Application.Common.Validation;
 using BaseTemplate.Domain.Entities;
 using BaseTemplate.Domain.ValueObjects;
 
 namespace BaseTemplate.Application.TodoLists.Commands.CreateTodoList;
 
+[Authorize]
 public record CreateTodoListCommand : IRequest<int>
 {
     [MaxLength(200, ErrorMessage = "The title cannot exceed 200 characters.")]
@@ -12,15 +17,15 @@ public record CreateTodoListCommand : IRequest<int>
     public string? Colour { get; init; }
 }
 
-public class CreateTodoListCommandHandler : IRequestHandler<CreateTodoListCommand, int>
+public class CreateTodoListCommandHandler : BaseRequestHandler<CreateTodoListCommand, int>
 {
     private readonly IUnitOfWorkFactory _factory;
 
-    public CreateTodoListCommandHandler(IUnitOfWorkFactory factory)
+    public CreateTodoListCommandHandler(IUnitOfWorkFactory factory, IIdentityService identityService) : base(identityService)
     {
         _factory = factory;
     }
-    public async Task<Result<int>> ValidateAsync(CreateTodoListCommand request, CancellationToken cancellationToken)
+    public override async Task<Result<int>> ValidateAsync(CreateTodoListCommand request, CancellationToken cancellationToken)
     {
         var val = ModelValidator.Validate(request);
         if (!val.IsValied)
@@ -37,7 +42,7 @@ public class CreateTodoListCommandHandler : IRequestHandler<CreateTodoListComman
             });
         return Result<int>.Success(0);
     }
-    public async Task<Result<int>> HandleAsync(CreateTodoListCommand request, CancellationToken cancellationToken)
+    public override async Task<Result<int>> HandleAsync(CreateTodoListCommand request, CancellationToken cancellationToken)
     {
         var entity = new TodoList();
         entity.Title = request.Title;

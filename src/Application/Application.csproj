@@ -19,7 +19,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Domain\Domain.csproj" />
-    <ProjectReference Include="..\Libs\MediatorS\MediatorS.csproj" />
   </ItemGroup>
 
 </Project>

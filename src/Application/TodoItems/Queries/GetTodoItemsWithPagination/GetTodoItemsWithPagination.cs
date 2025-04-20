@@ -1,9 +1,12 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using BaseTemplate.Application.Common.Interfaces;
 using BaseTemplate.Application.Common.Models;
+using BaseTemplate.Application.Common.RequestHandler;
+using BaseTemplate.Application.Common.Security;
 
 namespace BaseTemplate.Application.TodoItems.Queries.GetTodoItemsWithPagination;
 
+[Authorize]
 public record GetTodoItemsWithPaginationQuery : IRequest<PaginatedList<TodoItemBriefDto>>
 {
     public required int ListId { get; init; }
@@ -15,15 +18,15 @@ public record GetTodoItemsWithPaginationQuery : IRequest<PaginatedList<TodoItemB
     public int PageSize { get; init; } = 10;
 }
 
-public class GetTodoItemsWithPaginationQueryHandler : IRequestHandler<GetTodoItemsWithPaginationQuery, PaginatedList<TodoItemBriefDto>>
+public class GetTodoItemsWithPaginationQueryHandler : BaseRequestHandler<GetTodoItemsWithPaginationQuery, PaginatedList<TodoItemBriefDto>>
 {
     private readonly IUnitOfWorkFactory _factory;
 
-    public GetTodoItemsWithPaginationQueryHandler(IUnitOfWorkFactory factory)
+    public GetTodoItemsWithPaginationQueryHandler(IUnitOfWorkFactory factory, IIdentityService identityService) : base(identityService)
     {
         _factory = factory;
     }
-    public async Task<Result<PaginatedList<TodoItemBriefDto>>> HandleAsync(GetTodoItemsWithPaginationQuery request, CancellationToken cancellationToken)
+    public override async Task<Result<PaginatedList<TodoItemBriefDto>>> HandleAsync(GetTodoItemsWithPaginationQuery request, CancellationToken cancellationToken)
     {
         using var uow = _factory.CreateUOW();
         var offset = (request.PageNumber - 1) * request.PageSize;

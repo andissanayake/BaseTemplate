@@ -1,22 +1,24 @@
 ﻿using BaseTemplate.Application.Common.Interfaces;
 using BaseTemplate.Application.Common.Models;
+using BaseTemplate.Application.Common.RequestHandler;
+using BaseTemplate.Application.Common.Security;
 using BaseTemplate.Domain.Entities;
 using BaseTemplate.Domain.Enums;
 
 namespace BaseTemplate.Application.TodoLists.Queries.GetTodos;
 
-
+[Authorize]
 public record GetTodosQuery : IRequest<TodosVm>;
 
-public class GetTodosQueryHandler : IRequestHandler<GetTodosQuery, TodosVm>
+public class GetTodosQueryHandler : BaseRequestHandler<GetTodosQuery, TodosVm>
 {
     private readonly IUnitOfWorkFactory _factory;
 
-    public GetTodosQueryHandler(IUnitOfWorkFactory factory)
+    public GetTodosQueryHandler(IUnitOfWorkFactory factory, IIdentityService identityService) : base(identityService)
     {
         _factory = factory;
     }
-    public async Task<Result<TodosVm>> HandleAsync(GetTodosQuery request, CancellationToken cancellationToken)
+    public override async Task<Result<TodosVm>> HandleAsync(GetTodosQuery request, CancellationToken cancellationToken)
     {
         using var uow = _factory.CreateUOW();
         var todoLists = await uow.GetAllAsync<TodoList>();

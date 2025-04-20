@@ -1,20 +1,24 @@
 ﻿using BaseTemplate.Application.Common.Interfaces;
+using BaseTemplate.Application.Common.Models;
+using BaseTemplate.Application.Common.RequestHandler;
+using BaseTemplate.Application.Common.Security;
 using BaseTemplate.Domain.Entities;
 
 namespace BaseTemplate.Application.TodoLists.Commands.DeleteTodoList;
 
+[Authorize]
 public record DeleteTodoListCommand(int Id) : IRequest<bool>;
 
-public class DeleteTodoListCommandHandler : IRequestHandler<DeleteTodoListCommand, bool>
+public class DeleteTodoListCommandHandler : BaseRequestHandler<DeleteTodoListCommand, bool>
 {
     private readonly IUnitOfWorkFactory _factory;
 
-    public DeleteTodoListCommandHandler(IUnitOfWorkFactory factory)
+    public DeleteTodoListCommandHandler(IUnitOfWorkFactory factory, IIdentityService identityService) : base(identityService)
     {
         _factory = factory;
     }
 
-    public async Task<Result<bool>> HandleAsync(DeleteTodoListCommand request, CancellationToken cancellationToken)
+    public override async Task<Result<bool>> HandleAsync(DeleteTodoListCommand request, CancellationToken cancellationToken)
     {
         using var uow = _factory.CreateUOW();
         var entity = await uow.GetAsync<TodoList>(request.Id);

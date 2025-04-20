@@ -1,7 +1,7 @@
 ﻿using System.Collections.Concurrent;
 using BaseTemplate.Application.Common.Interfaces;
+using BaseTemplate.Application.Common.RequestHandler;
 using BaseTemplate.Domain.Common;
-using MediatorS;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 

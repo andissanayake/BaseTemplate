@@ -1,4 +1,5 @@
 ﻿using System.Reflection;
+using BaseTemplate.Application.Common.RequestHandler;
 
 namespace Microsoft.Extensions.DependencyInjection;
 

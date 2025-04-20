@@ -16,6 +16,7 @@ public class IdentityService : IIdentityService
         _user = user;
     }
 
+    public bool IsAuthenticated => _user != null && _user.IsAuthenticated != null && _user.IsAuthenticated == true;
     public async Task<bool> IsInRoleAsync(string role)
     {
         if (_user == null || _user.Id == null)

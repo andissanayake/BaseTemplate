@@ -1,10 +1,13 @@
 ﻿using BaseTemplate.Application.Common.Interfaces;
+using BaseTemplate.Application.Common.Models;
+using BaseTemplate.Application.Common.RequestHandler;
+using BaseTemplate.Application.Common.Security;
 using BaseTemplate.Domain.Constants;
 using BaseTemplate.Domain.Entities;
 
 namespace BaseTemplate.Application.TodoLists.Commands.PurgeTodoLists;
 
-
+[Authorize(Roles = Roles.Administrator, Policy = Policies.CanPurge)]
 public record PurgeTodoListsCommand : IRequest<bool>;
 
 public class PurgeTodoListsCommandHandler : IRequestHandler<PurgeTodoListsCommand, bool>

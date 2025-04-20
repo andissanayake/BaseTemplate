@@ -1,5 +1,5 @@
-﻿using BaseTemplate.Application.Users.Queries;
-using MediatorS;
+﻿using BaseTemplate.Application.Common.Models;
+using BaseTemplate.Application.Users.Queries;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 

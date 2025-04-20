@@ -4,7 +4,6 @@ using BaseTemplate.Application.TodoItems.Commands.DeleteTodoItem;
 using BaseTemplate.Application.TodoItems.Commands.UpdateTodoItem;
 using BaseTemplate.Application.TodoItems.Commands.UpdateTodoItemStatus;
 using BaseTemplate.Application.TodoItems.Queries.GetTodoItemsWithPagination;
-using MediatorS;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 

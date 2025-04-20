@@ -1,10 +1,15 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using BaseTemplate.Application.Common.Interfaces;
+using BaseTemplate.Application.Common.Models;
+using BaseTemplate.Application.Common.RequestHandler;
+using BaseTemplate.Application.Common.Security;
+using BaseTemplate.Application.Common.Validation;
 using BaseTemplate.Domain.Entities;
 using BaseTemplate.Domain.ValueObjects;
 
 namespace BaseTemplate.Application.TodoLists.Commands.UpdateTodoList;
 
+[Authorize]
 public record UpdateTodoListCommand : IRequest<bool>
 {
     public int Id { get; init; }
@@ -14,16 +19,16 @@ public record UpdateTodoListCommand : IRequest<bool>
     public string? Colour { get; init; }
 }
 
-public class UpdateTodoListCommandHandler : IRequestHandler<UpdateTodoListCommand, bool>
+public class UpdateTodoListCommandHandler : BaseRequestHandler<UpdateTodoListCommand, bool>
 {
     private readonly IUnitOfWorkFactory _factory;
 
-    public UpdateTodoListCommandHandler(IUnitOfWorkFactory factory)
+    public UpdateTodoListCommandHandler(IUnitOfWorkFactory factory, IIdentityService identityService) : base(identityService)
     {
         _factory = factory;
     }
 
-    public async Task<Result<bool>> ValidateAsync(UpdateTodoListCommand request, CancellationToken cancellationToken)
+    public override async Task<Result<bool>> ValidateAsync(UpdateTodoListCommand request, CancellationToken cancellationToken)
     {
         var val = ModelValidator.Validate(request);
         if (!val.IsValied)
@@ -40,7 +45,7 @@ public class UpdateTodoListCommandHandler : IRequestHandler<UpdateTodoListComman
             });
         return Result<bool>.Success(true);
     }
-    public async Task<Result<bool>> HandleAsync(UpdateTodoListCommand request, CancellationToken cancellationToken)
+    public override async Task<Result<bool>> HandleAsync(UpdateTodoListCommand request, CancellationToken cancellationToken)
     {
         using var uow = _factory.CreateUOW();
         var entity = await uow.GetAsync<TodoList>(request.Id);

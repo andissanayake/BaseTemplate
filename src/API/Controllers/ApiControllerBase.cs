@@ -1,6 +1,6 @@
 ﻿
-
-using MediatorS;
+using BaseTemplate.Application.Common.Models;
+using BaseTemplate.Application.Common.RequestHandler;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BaseTemplate.API.Controllers;

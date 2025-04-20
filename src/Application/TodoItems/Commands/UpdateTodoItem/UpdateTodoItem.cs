@@ -1,10 +1,14 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using BaseTemplate.Application.Common.Interfaces;
+using BaseTemplate.Application.Common.Models;
+using BaseTemplate.Application.Common.RequestHandler;
+using BaseTemplate.Application.Common.Security;
 using BaseTemplate.Domain.Entities;
 using BaseTemplate.Domain.Enums;
 
 namespace BaseTemplate.Application.TodoItems.Commands.UpdateTodoItem;
 
+[Authorize]
 public record UpdateTodoItemCommand : IRequest<bool>
 {
     public int Id { get; init; }
@@ -16,14 +20,14 @@ public record UpdateTodoItemCommand : IRequest<bool>
     public PriorityLevel? Priority { get; set; }
 }
 
-public class UpdateTodoItemCommandHandler : IRequestHandler<UpdateTodoItemCommand, bool>
+public class UpdateTodoItemCommandHandler : BaseRequestHandler<UpdateTodoItemCommand, bool>
 {
     private readonly IUnitOfWorkFactory _factory;
-    public UpdateTodoItemCommandHandler(IUnitOfWorkFactory factory)
+    public UpdateTodoItemCommandHandler(IUnitOfWorkFactory factory, IIdentityService identityService) : base(identityService)
     {
         _factory = factory;
     }
-    public async Task<Result<bool>> HandleAsync(UpdateTodoItemCommand request, CancellationToken cancellationToken)
+    public override async Task<Result<bool>> HandleAsync(UpdateTodoItemCommand request, CancellationToken cancellationToken)
     {
         using var uow = _factory.CreateUOW();
         var entity = await uow.GetAsync<TodoItem>(request.Id);
