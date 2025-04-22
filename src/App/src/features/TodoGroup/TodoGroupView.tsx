@@ -1,21 +1,19 @@
 import { useParams } from "react-router-dom";
 import { useTodoGroupStore } from "./todoGroupStore";
 import { Descriptions, Space, Typography } from "antd";
-import { useEffect } from "react";
-import { TodoGroupService } from "./todoGroupService";
 import TodoItemList from "../TodoItem/TodoItemList";
+import { useAsyncEffect } from "../../common/useAsyncEffect";
 
 export const TodoGroupView = () => {
-  const { currentTodoGroup, setTodoGroupCurrent } = useTodoGroupStore();
+  const { currentTodoGroup, getTodoGroupById } = useTodoGroupStore();
   const { listId } = useParams();
 
   if (!listId) throw new Error("listId is required");
 
-  useEffect(() => {
-    TodoGroupService.fetchTodoGroupById(listId).then((res) =>
-      setTodoGroupCurrent(res.data)
-    );
-  }, [listId, setTodoGroupCurrent]);
+  useAsyncEffect(async () => {
+    const data = await getTodoGroupById(listId);
+    console.log("data", data);
+  }, [listId, getTodoGroupById]);
 
   return (
     <>

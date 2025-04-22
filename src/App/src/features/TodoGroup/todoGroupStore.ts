@@ -9,9 +9,12 @@ interface TodoGroupState {
   currentTodoGroup: TodoGroup | null;
   setTodoGroupCurrent: (data: TodoGroup | null) => void;
   fetchTodoGroups: () => Promise<void>;
-  createTodoGroup: (data: TodoGroup) => Promise<void>;
-  updateTodoGroup: (data: TodoGroup) => Promise<void>;
+  createTodoGroup: (data: TodoGroup) => Promise<boolean>;
+  updateTodoGroup: (data: TodoGroup) => Promise<boolean>;
   deleteTodoGroup: (data: TodoGroup) => Promise<void>;
+  createErrors: Record<string, string[]>;
+  updateErrors: Record<string, string[]>;
+  getTodoGroupById: (id: string) => Promise<boolean>;
 }
 
 export const useTodoGroupStore = create<TodoGroupState>((set) => ({
@@ -34,28 +37,42 @@ export const useTodoGroupStore = create<TodoGroupState>((set) => ({
 
   createTodoGroup: async (data) => {
     set({ loading: true });
+    let success = false;
     const response = await TodoGroupService.createTodoGroup(data);
     handleResult(response, {
       onSuccess: () => {
+        success = true;
         useTodoGroupStore.getState().fetchTodoGroups();
+      },
+      onValidationError: (errors) => {
+        console.log("errors", errors);
+        set({ createErrors: errors });
       },
       onFinally: () => {
         set({ loading: false });
       },
     });
+    return success;
   },
 
   updateTodoGroup: async (data) => {
     set({ loading: true });
+    let success = false;
     const response = await TodoGroupService.updateTodoGroup(data);
     handleResult(response, {
       onSuccess: () => {
+        success = true;
         useTodoGroupStore.getState().fetchTodoGroups();
+      },
+      onValidationError: (errors) => {
+        console.log("errors", errors);
+        set({ updateErrors: errors });
       },
       onFinally: () => {
         set({ loading: false });
       },
     });
+    return success;
   },
 
   deleteTodoGroup: async (data) => {
@@ -72,4 +89,21 @@ export const useTodoGroupStore = create<TodoGroupState>((set) => ({
   },
   setTodoGroupCurrent: (data: TodoGroup | null) =>
     set({ currentTodoGroup: data }),
+  createErrors: {},
+  updateErrors: {},
+  getTodoGroupById: async (id: string) => {
+    set({ loading: true });
+    let success = false;
+    const response = await TodoGroupService.fetchTodoGroupById(id);
+    handleResult(response, {
+      onSuccess: (data) => {
+        set({ currentTodoGroup: data });
+        success = true;
+      },
+      onFinally: () => {
+        set({ loading: false });
+      },
+    });
+    return success;
+  },
 }));

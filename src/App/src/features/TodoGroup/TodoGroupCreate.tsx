@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import {
   Form,
   Input,
@@ -15,21 +15,30 @@ import { TodoGroupService } from "./todoGroupService";
 const TodoGroupCreate: React.FC = () => {
   const [form] = Form.useForm();
   const navigate = useNavigate();
-  const { createTodoGroup } = useTodoGroupStore();
+  const { createTodoGroup, createErrors } = useTodoGroupStore();
 
   const handleSaveTodoGroup = () => {
     form.validateFields().then(async (values) => {
       try {
-        await createTodoGroup(values);
-        notification.success({ message: "Todo list created successfully!" });
-        form.resetFields();
-        navigate("/todo-list");
+        const data = await createTodoGroup(values);
+        if (data) {
+          notification.success({ message: "Todo list created successfully!" });
+          form.resetFields();
+          navigate("/todo-list");
+        }
       } catch (error) {
         console.error("Error creating todo list:", error);
         notification.error({ message: "Failed to create todo list!" });
       }
     });
   };
+  useEffect(() => {
+    const fields = Object.entries(createErrors).map(([name, errors]) => ({
+      name,
+      errors,
+    }));
+    form.setFields(fields);
+  }, [createErrors, form]);
 
   return (
     <>

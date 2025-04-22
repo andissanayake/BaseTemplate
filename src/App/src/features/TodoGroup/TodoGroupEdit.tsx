@@ -13,8 +13,12 @@ import { useNavigate, useParams } from "react-router-dom";
 import { TodoGroupService } from "./todoGroupService";
 
 const TodoGroupEdit: React.FC = () => {
-  const { currentTodoGroup, setTodoGroupCurrent, updateTodoGroup } =
-    useTodoGroupStore();
+  const {
+    currentTodoGroup,
+    setTodoGroupCurrent,
+    updateTodoGroup,
+    updateErrors,
+  } = useTodoGroupStore();
   const [form] = Form.useForm();
   const navigate = useNavigate();
   const { listId } = useParams();
@@ -29,16 +33,25 @@ const TodoGroupEdit: React.FC = () => {
       values.id = currentTodoGroup?.id;
 
       try {
-        await updateTodoGroup(values);
-        notification.success({ message: "Todo list updated successfully!" });
-        setTodoGroupCurrent(null); // Clear current todo group from store
-        navigate("/todo-list");
+        const data = await updateTodoGroup(values);
+        if (data) {
+          notification.success({ message: "Todo list updated successfully!" });
+          setTodoGroupCurrent(null); // Clear current todo group from store
+          navigate("/todo-list");
+        }
       } catch (error) {
         console.error("Error updating todo list:", error);
         notification.error({ message: "Failed to update todo list!" });
       }
     });
   };
+  useEffect(() => {
+    const fields = Object.entries(updateErrors).map(([name, errors]) => ({
+      name: name.toLowerCase(),
+      errors,
+    }));
+    form.setFields(fields);
+  }, [updateErrors, form]);
 
   return (
     <>
