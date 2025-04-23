@@ -34,7 +34,7 @@ const TodoGroupCreate: React.FC = () => {
   };
   useEffect(() => {
     const fields = Object.entries(createErrors).map(([name, errors]) => ({
-      name,
+      name: name.toLowerCase(),
       errors,
     }));
     form.setFields(fields);

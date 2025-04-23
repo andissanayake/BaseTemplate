@@ -11,7 +11,7 @@ import {
 } from "antd";
 import { useTodoGroupStore } from "./todoGroupStore";
 import { useNavigate } from "react-router-dom";
-import { TodoGroup } from "./Model";
+import { TodoGroup } from "./TodoGroupModel";
 import {
   DeleteOutlined,
   EditOutlined,
@@ -43,9 +43,13 @@ const TodoGroupList: React.FC = () => {
     navigate(`edit/${record.id}`);
   };
 
-  const handleDelete = (record: TodoGroup) => {
-    deleteTodoGroup(record);
-    notification.success({ message: "Todo list deleted successfully!" });
+  const handleDelete = async (record: TodoGroup) => {
+    const data = await deleteTodoGroup(record);
+    if (data) {
+      notification.success({ message: "Todo list deleted successfully!" });
+    } else {
+      notification.error({ message: "Failed to delete todo list!" });
+    }
   };
 
   const columns = [

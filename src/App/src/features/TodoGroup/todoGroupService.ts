@@ -1,7 +1,7 @@
 import axiosInstance from "../../auth/axiosInstance";
 import { handleApi } from "../../common/handleApi";
 import { Result } from "../../common/result";
-import { TodoGroup } from "./Model";
+import { TodoGroup } from "./TodoGroupModel";
 
 export class TodoGroupService {
   static async fetchTodoGroups(): Promise<Result<{ lists: TodoGroup[] }>> {
@@ -27,7 +27,7 @@ export class TodoGroupService {
   }
 
   static getColours() {
-    const predefinedColors = [
+    const predefinedColours = [
       { label: "White", value: "#FFFFFF" },
       { label: "Red", value: "#FF5733" },
       { label: "Orange", value: "#FFC300" },
@@ -37,6 +37,6 @@ export class TodoGroupService {
       { label: "Purple", value: "#9966CC" },
       { label: "Grey", value: "#999999" },
     ];
-    return predefinedColors;
+    return predefinedColours;
   }
 }

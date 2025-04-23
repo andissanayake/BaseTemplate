@@ -19,6 +19,7 @@ const TodoGroupEdit: React.FC = () => {
     updateTodoGroup,
     updateErrors,
   } = useTodoGroupStore();
+
   const [form] = Form.useForm();
   const navigate = useNavigate();
   const { listId } = useParams();
@@ -36,7 +37,7 @@ const TodoGroupEdit: React.FC = () => {
         const data = await updateTodoGroup(values);
         if (data) {
           notification.success({ message: "Todo list updated successfully!" });
-          setTodoGroupCurrent(null); // Clear current todo group from store
+          setTodoGroupCurrent(null);
           navigate("/todo-list");
         }
       } catch (error) {

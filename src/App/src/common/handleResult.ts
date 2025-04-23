@@ -8,13 +8,13 @@ export interface ResultHandlers<T> {
   onForbidden?: (details?: Record<string, string[]>) => void;
   onServerError?: (details?: Record<string, string[]>) => void;
   onFallback?: (result?: Result<T>) => void;
-  onFinally?: () => void; // ✅ default no-op
+  onFinally?: () => void;
 }
 
 export function handleResult<T>(
   result: Result<T>,
   handlers: ResultHandlers<T> = {}
-) {
+): boolean {
   const {
     onSuccess = (r) => console.log("[Result:Success]", r),
     onValidationError = (r) => console.warn("[Result:ValidationError]", r),
@@ -22,33 +22,41 @@ export function handleResult<T>(
     onForbidden = (r) => console.warn("[Result:Forbidden]", r),
     onServerError = (r) => console.error("[Result:ServerError]", r),
     onFallback = (r) => console.error("[Result:Fallback]", r),
-    onFinally = () => {}, // ✅ default no-op
+    onFinally = () => {},
   } = handlers;
-
+  let success = false;
   try {
     switch (result.code) {
       case ResultCodeMapper.DefaultSuccessCode:
-        return onSuccess(result.data);
+        onSuccess(result.data);
+        success = true;
+        break;
 
       case ResultCodeMapper.DefaultValidationErrorCode:
-        return onValidationError(result.details);
+        onValidationError(result.details);
+        break;
 
       case ResultCodeMapper.DefaultUnauthorizedCode:
-        return onUnauthorized(result.details);
+        onUnauthorized(result.details);
+        break;
 
       case ResultCodeMapper.DefaultForbiddenCode:
-        return onForbidden(result.details);
+        onForbidden(result.details);
+        break;
 
       case ResultCodeMapper.DefaultServerErrorCode:
-        return onServerError(result.details);
+        onServerError(result.details);
+        break;
 
       default:
-        return onFallback(result);
+        onFallback(result);
+        break;
     }
   } catch (ex) {
     console.error("[Result:Exception]", ex);
-    onFallback(result); // Call fallback in case of exception
+    onFallback(result);
   } finally {
-    onFinally(); // ✅ always called
+    onFinally();
   }
+  return success;
 }

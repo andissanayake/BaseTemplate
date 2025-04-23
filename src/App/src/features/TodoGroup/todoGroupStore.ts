@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import { TodoGroupService } from "./todoGroupService";
-import { TodoGroup } from "./Model";
+import { TodoGroup } from "./TodoGroupModel";
 import { handleResult } from "../../common/handleResult";
 
 interface TodoGroupState {
@@ -8,10 +8,10 @@ interface TodoGroupState {
   loading: boolean;
   currentTodoGroup: TodoGroup | null;
   setTodoGroupCurrent: (data: TodoGroup | null) => void;
-  fetchTodoGroups: () => Promise<void>;
+  fetchTodoGroups: () => Promise<boolean>;
   createTodoGroup: (data: TodoGroup) => Promise<boolean>;
   updateTodoGroup: (data: TodoGroup) => Promise<boolean>;
-  deleteTodoGroup: (data: TodoGroup) => Promise<void>;
+  deleteTodoGroup: (data: TodoGroup) => Promise<boolean>;
   createErrors: Record<string, string[]>;
   updateErrors: Record<string, string[]>;
   getTodoGroupById: (id: string) => Promise<boolean>;
@@ -25,7 +25,7 @@ export const useTodoGroupStore = create<TodoGroupState>((set) => ({
   fetchTodoGroups: async () => {
     set({ loading: true });
     const response = await TodoGroupService.fetchTodoGroups();
-    handleResult(response, {
+    return handleResult(response, {
       onSuccess: (data) => {
         set({ todoGroupList: data?.lists ?? [] });
       },
@@ -37,11 +37,9 @@ export const useTodoGroupStore = create<TodoGroupState>((set) => ({
 
   createTodoGroup: async (data) => {
     set({ loading: true });
-    let success = false;
     const response = await TodoGroupService.createTodoGroup(data);
-    handleResult(response, {
+    return handleResult(response, {
       onSuccess: () => {
-        success = true;
         useTodoGroupStore.getState().fetchTodoGroups();
       },
       onValidationError: (errors) => {
@@ -52,16 +50,13 @@ export const useTodoGroupStore = create<TodoGroupState>((set) => ({
         set({ loading: false });
       },
     });
-    return success;
   },
 
   updateTodoGroup: async (data) => {
     set({ loading: true });
-    let success = false;
     const response = await TodoGroupService.updateTodoGroup(data);
-    handleResult(response, {
+    return handleResult(response, {
       onSuccess: () => {
-        success = true;
         useTodoGroupStore.getState().fetchTodoGroups();
       },
       onValidationError: (errors) => {
@@ -72,13 +67,12 @@ export const useTodoGroupStore = create<TodoGroupState>((set) => ({
         set({ loading: false });
       },
     });
-    return success;
   },
 
   deleteTodoGroup: async (data) => {
     set({ loading: true });
     const response = await TodoGroupService.deleteTodoGroup(data);
-    handleResult(response, {
+    return handleResult(response, {
       onSuccess: () => {
         useTodoGroupStore.getState().fetchTodoGroups();
       },
