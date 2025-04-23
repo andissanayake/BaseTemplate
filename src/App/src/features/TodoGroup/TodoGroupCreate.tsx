@@ -49,7 +49,7 @@ const TodoGroupCreate: React.FC = () => {
       </Space>
       <Form form={form} layout="vertical" onFinish={handleSaveTodoGroup}>
         <Form.Item
-          label="Todo Group Name"
+          label="Todo List Name"
           name="title"
           rules={[
             { required: true, message: "Please enter the todo list name!" },

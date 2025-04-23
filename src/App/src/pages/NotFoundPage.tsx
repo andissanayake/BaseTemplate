@@ -1,9 +1,13 @@
-import { Card } from "antd";
+import { Card, Space, Typography } from "antd";
 
 export const NotFoundPage = () => {
   return (
     <Card>
-      <h1>Not found</h1>
+      <Space className="mb-4">
+        <Typography.Title level={3} style={{ margin: 0 }}>
+          Not found
+        </Typography.Title>
+      </Space>
     </Card>
   );
 };
