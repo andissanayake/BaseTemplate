@@ -8,9 +8,11 @@ import React from "react";
 const renderApp = () => {
   const root = createRoot(document.getElementById("root")!);
   root.render(
-    <BrowserRouter>
-      <App />
-    </BrowserRouter>
+    <React.StrictMode>
+      <BrowserRouter>
+        <App />
+      </BrowserRouter>
+    </React.StrictMode>
   );
 };
 
