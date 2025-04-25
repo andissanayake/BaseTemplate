@@ -20,13 +20,8 @@ import {
 } from "@ant-design/icons";
 
 const TodoGroupList: React.FC = () => {
-  const {
-    todoGroupList,
-    loading,
-    fetchTodoGroups,
-    deleteTodoGroup,
-    setTodoGroupCurrent,
-  } = useTodoGroupStore();
+  const { todoGroupList, loading, fetchTodoGroups, deleteTodoGroup } =
+    useTodoGroupStore();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -34,12 +29,10 @@ const TodoGroupList: React.FC = () => {
   }, [fetchTodoGroups]);
 
   const handleView = (record: TodoGroup) => {
-    setTodoGroupCurrent(record);
     navigate(`view/${record.id}`);
   };
 
   const handleEdit = (record: TodoGroup) => {
-    setTodoGroupCurrent(record);
     navigate(`edit/${record.id}`);
   };
 

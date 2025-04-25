@@ -11,6 +11,7 @@ import {
 import { useTodoGroupStore } from "./todoGroupStore";
 import { useNavigate, useParams } from "react-router-dom";
 import { TodoGroupService } from "./todoGroupService";
+import { useAsyncEffect } from "../../common/useAsyncEffect";
 
 const TodoGroupEdit: React.FC = () => {
   const {
@@ -18,16 +19,13 @@ const TodoGroupEdit: React.FC = () => {
     setTodoGroupCurrent,
     updateTodoGroup,
     updateErrors,
+    getTodoGroupById,
   } = useTodoGroupStore();
 
   const [form] = Form.useForm();
   const navigate = useNavigate();
   const { listId } = useParams();
   if (!listId) throw new Error("listId is required");
-
-  useEffect(() => {
-    form.setFieldsValue(currentTodoGroup);
-  }, [currentTodoGroup, form]);
 
   const handleSaveTodoGroup = () => {
     form.validateFields().then(async (values) => {
@@ -36,7 +34,9 @@ const TodoGroupEdit: React.FC = () => {
       try {
         const data = await updateTodoGroup(values);
         if (data) {
-          notification.success({ message: "Todo list updated successfully!" });
+          notification.success({
+            message: "Todo list updated successfully!",
+          });
           setTodoGroupCurrent(null);
           navigate("/todo-list");
         }
@@ -46,6 +46,18 @@ const TodoGroupEdit: React.FC = () => {
       }
     });
   };
+
+  useAsyncEffect(async () => {
+    const data = await getTodoGroupById(listId);
+    if (!data) {
+      notification.error({ message: "Failed to fetch todo list item!" });
+    }
+  }, [listId, getTodoGroupById]);
+
+  useEffect(() => {
+    form.setFieldsValue(currentTodoGroup);
+  }, [currentTodoGroup, form]);
+
   useEffect(() => {
     const fields = Object.entries(updateErrors).map(([name, errors]) => ({
       name: name.toLowerCase(),

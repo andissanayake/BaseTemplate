@@ -1,6 +1,6 @@
 import { useParams } from "react-router-dom";
 import { useTodoGroupStore } from "./todoGroupStore";
-import { Descriptions, Space, Typography } from "antd";
+import { Descriptions, notification, Space, Typography } from "antd";
 import TodoItemList from "../TodoItem/TodoItemList";
 import { useAsyncEffect } from "../../common/useAsyncEffect";
 
@@ -12,7 +12,9 @@ export const TodoGroupView = () => {
 
   useAsyncEffect(async () => {
     const data = await getTodoGroupById(listId);
-    console.log("data", data);
+    if (!data) {
+      notification.error({ message: "Failed to fetch todo list item!" });
+    }
   }, [listId, getTodoGroupById]);
 
   return (
