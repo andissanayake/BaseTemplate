@@ -1,9 +1,9 @@
 import { Result } from "./result";
-import { ResultCodeMapper } from "./ResultCodeMapper";
+import { ResultCodeMapper } from "./resultCodeMapper";
 
 export interface ResultHandlers<T> {
   onSuccess?: (data?: T) => void;
-  onValidationError?: (details?: Record<string, string[]>) => void;
+  onValidationError?: (details: Record<string, string[]>) => void;
   onUnauthorized?: (details?: Record<string, string[]>) => void;
   onForbidden?: (details?: Record<string, string[]>) => void;
   onServerError?: (details?: Record<string, string[]>) => void;
@@ -33,7 +33,7 @@ export function handleResult<T>(
         break;
 
       case ResultCodeMapper.DefaultValidationErrorCode:
-        onValidationError(result.details);
+        onValidationError(result.details ?? {});
         break;
 
       case ResultCodeMapper.DefaultUnauthorizedCode:

@@ -34,9 +34,9 @@ public class UpdateTodoListCommandHandler : BaseRequestHandler<UpdateTodoListCom
         if (!val.IsValid)
             return Result<bool>.Validation("validation", val.Errors);
 
-        var sql = "SELECT COUNT(1) FROM TodoList WHERE Title = @Title";
+        var sql = "SELECT COUNT(1) FROM TodoList WHERE Title = @Title and Id != @Id";
         using var uow = _factory.CreateUOW();
-        var count = await uow.QueryFirstOrDefaultAsync<int>(sql, new { request.Title });
+        var count = await uow.QueryFirstOrDefaultAsync<int>(sql, new { request.Title, request.Id });
 
         if (count > 0)
             return Result<bool>.Validation("validation", new Dictionary<string, string[]>

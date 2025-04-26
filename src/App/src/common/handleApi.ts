@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { AxiosResponse } from "axios";
 import { Result } from "../common/result";
-import { ResultCodeMapper } from "./ResultCodeMapper";
+import { ResultCodeMapper } from "./resultCodeMapper";
 
 export async function handleApi<T>(
   promise: Promise<AxiosResponse<T>>

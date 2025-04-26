@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import {
   Table,
   Button,
@@ -15,18 +15,21 @@ import { useParams } from "react-router-dom";
 import TodoItemCreate from "./TodoItemCreate";
 import TodoItemEdit from "./TodoItemEdit";
 import { PriorityLevel, TodoItem } from "./TodoItemModel";
+import { TodoItemService } from "./todoItemService";
+import { handleResult } from "../../common/handleResult";
 
 const TodoItemList: React.FC = () => {
   const {
     todoItemList,
     loading,
-    fetchTodoItems,
     totalCount,
-    deleteTodoItem,
     currentPage,
     pageSize,
     setPagination,
-    updateItemStatus,
+    setLoading,
+    setTotalCount,
+    setTodoItemList,
+    setCurrentPage,
   } = useTodoItemStore();
   const { listId } = useParams();
   const [isCreateModalVisible, setIsCreateModalVisible] = useState(false);
@@ -34,11 +37,35 @@ const TodoItemList: React.FC = () => {
   const [currentTodoItem, setCurrentTodoItem] = useState<TodoItem | null>(null);
 
   if (!listId) throw "List Id is required.";
+
+  const loadTodoItems = useCallback(async () => {
+    setLoading(true);
+    const response = await TodoItemService.fetchTodoItems(
+      +listId,
+      currentPage,
+      pageSize
+    );
+    handleResult(response, {
+      onSuccess: (data) => {
+        setTotalCount(data?.totalCount || 0);
+        setTodoItemList(data?.items || []);
+      },
+      onFinally: () => {
+        setLoading(false);
+      },
+    });
+  }, [
+    listId,
+    currentPage,
+    pageSize,
+    setLoading,
+    setTotalCount,
+    setTodoItemList,
+  ]);
+
   useEffect(() => {
-    if (listId) {
-      fetchTodoItems(+listId);
-    }
-  }, [listId, fetchTodoItems, currentPage, pageSize]);
+    loadTodoItems();
+  }, [loadTodoItems]);
 
   const handleEdit = (item: TodoItem) => {
     setCurrentTodoItem(item);
@@ -50,20 +77,47 @@ const TodoItemList: React.FC = () => {
   };
 
   const handleDelete = async (id: number) => {
-    try {
-      await deleteTodoItem(id, +listId);
-      notification.success({ message: "Todo Item deleted successfully!" });
-    } catch (error) {
-      console.log(error);
-      notification.error({ message: "Failed to delete todo item!" });
-    }
+    setLoading(true);
+    const response = await TodoItemService.deleteTodoItem(id);
+    handleResult(response, {
+      onSuccess: () => {
+        const newTotalCount = totalCount - 1;
+        const lastPage = Math.ceil(newTotalCount / pageSize);
+        if (currentPage > lastPage && lastPage > 0) {
+          setCurrentPage(lastPage);
+        }
+        notification.success({ message: "Todo Item deleted successfully!" });
+        loadTodoItems();
+      },
+      onServerError: () => {
+        notification.error({ message: "Failed to delete todo item!" });
+      },
+      onFinally: () => {
+        setLoading(false);
+      },
+    });
   };
 
   const handlePaginationChange = (page: number, pageSize: number) => {
     setPagination(page, pageSize);
-    fetchTodoItems(+listId);
+    loadTodoItems();
   };
 
+  const updateItemStatus = async (id: number, done: boolean) => {
+    setLoading(true);
+    const response = await TodoItemService.updateTodoItemStatus({ id, done });
+    handleResult(response, {
+      onSuccess: () => {
+        notification.success({
+          message: "Todo Item status updated successfully!",
+        });
+        loadTodoItems();
+      },
+      onFinally: () => {
+        setLoading(false);
+      },
+    });
+  };
   const columns = [
     {
       title: "Done",
@@ -72,10 +126,7 @@ const TodoItemList: React.FC = () => {
           checked={record.done}
           onChange={async (e) => {
             const updatedDoneStatus = e.target.checked;
-            await updateItemStatus(record.id, updatedDoneStatus, +listId);
-            notification.success({
-              message: "Todo Item status updated successfully!",
-            });
+            await updateItemStatus(record.id, updatedDoneStatus);
           }}
         />
       ),
@@ -144,12 +195,19 @@ const TodoItemList: React.FC = () => {
       />
       <TodoItemCreate
         visible={isCreateModalVisible}
-        onClose={() => setIsCreateModalVisible(false)}
+        onClose={() => {
+          setIsCreateModalVisible(false);
+        }}
+        refresh={loadTodoItems}
       />
       <TodoItemEdit
         visible={isEditModalVisible}
-        onClose={() => setIsEditModalVisible(false)}
+        onClose={() => {
+          setIsEditModalVisible(false);
+          loadTodoItems();
+        }}
         todoItem={currentTodoItem!}
+        refresh={loadTodoItems}
       />
     </>
   );

@@ -3,19 +3,36 @@ import { useTodoGroupStore } from "./todoGroupStore";
 import { Descriptions, notification, Space, Typography } from "antd";
 import TodoItemList from "../TodoItem/TodoItemList";
 import { useAsyncEffect } from "../../common/useAsyncEffect";
+import { TodoGroup } from "./TodoGroupModel";
+import { TodoGroupService } from "./todoGroupService";
+import { handleResult } from "../../common/handleResult";
+import { useState } from "react";
 
 export const TodoGroupView = () => {
-  const { currentTodoGroup, getTodoGroupById } = useTodoGroupStore();
+  const [currentTodoGroup, setCurrentTodoGroup] = useState<TodoGroup | null>(
+    null
+  );
+  const { setLoading } = useTodoGroupStore();
   const { listId } = useParams();
 
   if (!listId) throw new Error("listId is required");
 
   useAsyncEffect(async () => {
-    const data = await getTodoGroupById(listId);
-    if (!data) {
-      notification.error({ message: "Failed to fetch todo list item!" });
-    }
-  }, [listId, getTodoGroupById]);
+    setLoading(true);
+    const response = await TodoGroupService.fetchTodoGroupById(listId);
+    handleResult(response, {
+      onSuccess: (data) => {
+        setCurrentTodoGroup(data ? data : null);
+      },
+      onServerError: () => {
+        notification.error({ message: "Failed to fetch todo list item!" });
+      },
+
+      onFinally: () => {
+        setLoading(false);
+      },
+    });
+  }, [listId, setLoading]);
 
   return (
     <>

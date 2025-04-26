@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 import {
   Form,
   Input,
@@ -11,34 +11,39 @@ import {
 import { useTodoGroupStore } from "./todoGroupStore";
 import { useNavigate } from "react-router-dom";
 import { TodoGroupService } from "./todoGroupService";
+import { handleResult } from "../../common/handleResult";
 
 const TodoGroupCreate: React.FC = () => {
   const [form] = Form.useForm();
   const navigate = useNavigate();
-  const { createTodoGroup, createErrors } = useTodoGroupStore();
+  const { setLoading } = useTodoGroupStore();
 
   const handleSaveTodoGroup = () => {
     form.validateFields().then(async (values) => {
-      try {
-        const data = await createTodoGroup(values);
-        if (data) {
+      setLoading(true);
+      const response = await TodoGroupService.createTodoGroup(values);
+      handleResult(response, {
+        onSuccess: () => {
           notification.success({ message: "Todo list created successfully!" });
           form.resetFields();
           navigate("/todo-list");
-        }
-      } catch (error) {
-        console.error("Error creating todo list:", error);
-        notification.error({ message: "Failed to create todo list!" });
-      }
+        },
+        onValidationError: (createErrors) => {
+          const fields = Object.entries(createErrors).map(([name, errors]) => ({
+            name: name.toLowerCase(),
+            errors,
+          }));
+          form.setFields(fields);
+        },
+        onServerError: () => {
+          notification.error({ message: "Failed to create todo list!" });
+        },
+        onFinally: () => {
+          setLoading(false);
+        },
+      });
     });
   };
-  useEffect(() => {
-    const fields = Object.entries(createErrors).map(([name, errors]) => ({
-      name: name.toLowerCase(),
-      errors,
-    }));
-    form.setFields(fields);
-  }, [createErrors, form]);
 
   return (
     <>

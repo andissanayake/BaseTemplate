@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 // TodoGroupList.tsx
-import React, { useEffect } from "react";
+import React from "react";
 import {
   Table,
   Button,
@@ -18,15 +18,27 @@ import {
   FundOutlined,
   PlusOutlined,
 } from "@ant-design/icons";
+import { useAsyncEffect } from "../../common/useAsyncEffect";
+import { TodoGroupService } from "./todoGroupService";
+import { handleResult } from "../../common/handleResult";
 
 const TodoGroupList: React.FC = () => {
-  const { todoGroupList, loading, fetchTodoGroups, deleteTodoGroup } =
+  const { todoGroupList, loading, setLoading, setTodoGroupList } =
     useTodoGroupStore();
   const navigate = useNavigate();
 
-  useEffect(() => {
-    fetchTodoGroups();
-  }, [fetchTodoGroups]);
+  const loadTodoGroupList = async () => {
+    setLoading(true);
+    const response = await TodoGroupService.fetchTodoGroups();
+    handleResult(response, {
+      onSuccess: (data) => {
+        setTodoGroupList(data?.lists ?? []);
+      },
+      onFinally: () => {
+        setLoading(false);
+      },
+    });
+  };
 
   const handleView = (record: TodoGroup) => {
     navigate(`view/${record.id}`);
@@ -37,13 +49,25 @@ const TodoGroupList: React.FC = () => {
   };
 
   const handleDelete = async (record: TodoGroup) => {
-    const data = await deleteTodoGroup(record);
-    if (data) {
-      notification.success({ message: "Todo list deleted successfully!" });
-    } else {
-      notification.error({ message: "Failed to delete todo list!" });
-    }
+    setLoading(true);
+    const response = await TodoGroupService.deleteTodoGroup(record);
+    return handleResult(response, {
+      onSuccess: () => {
+        loadTodoGroupList();
+        notification.success({ message: "Todo list deleted successfully!" });
+      },
+      onServerError: () => {
+        notification.error({ message: "Failed to delete todo list!" });
+      },
+      onFinally: () => {
+        setLoading(false);
+      },
+    });
   };
+
+  useAsyncEffect(async () => {
+    loadTodoGroupList();
+  }, []);
 
   const columns = [
     {
