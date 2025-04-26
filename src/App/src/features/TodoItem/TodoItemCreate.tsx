@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Modal, Form, Input, DatePicker, Select, notification } from "antd";
 import { useTodoItemStore } from "./todoItemStore";
 import { TodoItemService } from "./todoItemService";
@@ -46,6 +46,11 @@ const TodoItemCreate: React.FC<TodoItemCreateProps> = ({
       });
     });
   };
+  useEffect(() => {
+    if (visible) {
+      form.resetFields();
+    }
+  }, [visible, form]);
 
   return (
     <Modal
