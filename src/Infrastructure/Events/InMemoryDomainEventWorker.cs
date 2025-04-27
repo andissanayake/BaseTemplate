@@ -1,9 +1,10 @@
 ﻿using System.Collections.Concurrent;
+using BaseTemplate.Application.Common.Events;
 using BaseTemplate.Application.Common.Interfaces;
-using BaseTemplate.Application.Common.RequestHandler;
 using BaseTemplate.Domain.Common;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 
 namespace BaseTemplate.Infrastructure.Events;
 
@@ -11,10 +12,12 @@ public class InMemoryDomainEventWorker : BackgroundService, IDomainEventQueue
 {
     private readonly ConcurrentQueue<BaseEvent> _queue = new();
     private readonly IServiceProvider _provider;
+    private readonly ILogger<InMemoryDomainEventWorker> _logger;
 
-    public InMemoryDomainEventWorker(IServiceProvider provider)
+    public InMemoryDomainEventWorker(IServiceProvider provider, ILogger<InMemoryDomainEventWorker> logger)
     {
         _provider = provider;
+        _logger = logger;
     }
 
     public void Enqueue(BaseEvent domainEvent)
@@ -31,13 +34,24 @@ public class InMemoryDomainEventWorker : BackgroundService, IDomainEventQueue
                 try
                 {
                     using var scope = _provider.CreateScope();
-                    var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
-                    //await mediator.Publish(domainEvent, stoppingToken);
+                    var scopedProvider = scope.ServiceProvider;
+
+                    var handlerType = typeof(IDomainEventHandler<>).MakeGenericType(domainEvent.GetType());
+                    var handlers = scopedProvider.GetServices(handlerType);
+
+                    foreach (var handler in handlers)
+                    {
+                        var handleMethod = handlerType.GetMethod("HandleAsync");
+                        if (handleMethod != null)
+                        {
+                            var task = (Task)handleMethod.Invoke(handler, new object[] { domainEvent, stoppingToken })!;
+                            await task;
+                        }
+                    }
                 }
                 catch (Exception ex)
                 {
-                    // TODO: Replace with real logging or retry strategy
-                    Console.WriteLine($"Error processing domain event: {ex.Message}");
+                    _logger.LogError(ex, $"Error processing domain event ${domainEvent.GetType()}");
                 }
             }
 

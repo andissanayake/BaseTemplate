@@ -4,16 +4,16 @@ using Microsoft.Extensions.Logging;
 
 namespace BaseTemplate.Application.TodoItems.EventHandlers;
 
-public class TodoItemCompletedEventHandler : IDomainEventHandler<TodoItemCompletedEvent>
+public class TodoItemDeletedEventHandler : IDomainEventHandler<TodoItemDeletedEvent>
 {
     private readonly ILogger<TodoItemCompletedEventHandler> _logger;
 
-    public TodoItemCompletedEventHandler(ILogger<TodoItemCompletedEventHandler> logger)
+    public TodoItemDeletedEventHandler(ILogger<TodoItemCompletedEventHandler> logger)
     {
         _logger = logger;
     }
 
-    public Task HandleAsync(TodoItemCompletedEvent notification, CancellationToken cancellationToken)
+    public Task HandleAsync(TodoItemDeletedEvent notification, CancellationToken cancellationToken)
     {
         _logger.LogInformation("Sample Domain Event: {DomainEvent}", notification.GetType().Name);
 
