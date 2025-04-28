@@ -1,37 +1,64 @@
-﻿using BaseTemplate.Application.Common.Interfaces;
+﻿using System.ComponentModel.DataAnnotations;
+using BaseTemplate.Application.Common.Interfaces;
+using BaseTemplate.Application.Common.Models;
+using BaseTemplate.Application.Common.RequestHandler;
+using BaseTemplate.Application.Common.Security;
+using BaseTemplate.Application.Common.Validation;
 using BaseTemplate.Domain.Entities;
 using BaseTemplate.Domain.ValueObjects;
 
 namespace BaseTemplate.Application.TodoLists.Commands.UpdateTodoList;
 
-public record UpdateTodoListCommand : IRequest
+[Authorize]
+public record UpdateTodoListCommand : IRequest<bool>
 {
     public int Id { get; init; }
 
-    public string? Title { get; init; }
+    [MaxLength(200, ErrorMessage = "The title cannot exceed 200 characters.")]
+    public required string Title { get; init; }
     public string? Colour { get; init; }
 }
 
-public class UpdateTodoListCommandHandler : IRequestHandler<UpdateTodoListCommand>
+public class UpdateTodoListCommandHandler : BaseRequestHandler<UpdateTodoListCommand, bool>
 {
     private readonly IUnitOfWorkFactory _factory;
 
-    public UpdateTodoListCommandHandler(IUnitOfWorkFactory factory)
+    public UpdateTodoListCommandHandler(IUnitOfWorkFactory factory, IIdentityService identityService) : base(identityService)
     {
         _factory = factory;
     }
 
-    public async Task Handle(UpdateTodoListCommand request, CancellationToken cancellationToken)
+    public override async Task<Result<bool>> ValidateAsync(UpdateTodoListCommand request, CancellationToken cancellationToken)
+    {
+        var val = ModelValidator.Validate(request);
+        if (!val.IsValid)
+            return Result<bool>.Validation("validation", val.Errors);
+
+        var sql = "SELECT COUNT(1) FROM TodoList WHERE Title = @Title and Id != @Id";
+        using var uow = _factory.CreateUOW();
+        var count = await uow.QueryFirstOrDefaultAsync<int>(sql, new { request.Title, request.Id });
+
+        if (count > 0)
+            return Result<bool>.Validation("validation", new Dictionary<string, string[]>
+            {
+                ["Title"] = ["The title already exists."]
+            });
+        return Result<bool>.Success(true);
+    }
+    public override async Task<Result<bool>> HandleAsync(UpdateTodoListCommand request, CancellationToken cancellationToken)
     {
         using var uow = _factory.CreateUOW();
         var entity = await uow.GetAsync<TodoList>(request.Id);
 
-        Guard.Against.NotFound(request.Id, entity);
+        if (entity is null)
+        {
+            return Result<bool>.NotFound($"TodoList with id {request.Id} not found.");
+        }
 
         entity.Title = request.Title;
         entity.Colour = request.Colour ?? Colour.White.Code;
         await uow.UpdateAsync(entity);
         uow.Commit();
-
+        return Result<bool>.Success(true);
     }
 }

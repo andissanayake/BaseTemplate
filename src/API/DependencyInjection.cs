@@ -1,5 +1,4 @@
 ﻿using BaseTemplate.API.Extensions;
-using BaseTemplate.API.Infrastructure;
 using BaseTemplate.API.Services;
 using BaseTemplate.Application.Common.Interfaces;
 using Microsoft.AspNetCore.Mvc;
@@ -14,7 +13,7 @@ public static class DependencyInjection
     {
         services.AddSingleton<IUser, CurrentUserService>();
         services.AddHttpContextAccessor();
-        services.AddExceptionHandler<CustomExceptionHandler>();
+        //services.AddExceptionHandler<CustomExceptionHandler>();
         services.AddHealthChecks();
         services.AddControllers();
         services.Configure<ApiBehaviorOptions>(options =>

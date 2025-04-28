@@ -11,23 +11,37 @@ import {
 import { useTodoGroupStore } from "./todoGroupStore";
 import { useNavigate } from "react-router-dom";
 import { TodoGroupService } from "./todoGroupService";
+import { handleResult } from "../../common/handleResult";
 
 const TodoGroupCreate: React.FC = () => {
   const [form] = Form.useForm();
   const navigate = useNavigate();
-  const { createTodoGroup } = useTodoGroupStore();
+  const { setLoading } = useTodoGroupStore();
 
   const handleSaveTodoGroup = () => {
     form.validateFields().then(async (values) => {
-      try {
-        await createTodoGroup(values);
-        notification.success({ message: "Todo list created successfully!" });
-        form.resetFields();
-        navigate("/todo-list");
-      } catch (error) {
-        console.error("Error creating todo list:", error);
-        notification.error({ message: "Failed to create todo list!" });
-      }
+      setLoading(true);
+      const response = await TodoGroupService.createTodoGroup(values);
+      handleResult(response, {
+        onSuccess: () => {
+          notification.success({ message: "Todo list created successfully!" });
+          form.resetFields();
+          navigate("/todo-list");
+        },
+        onValidationError: (createErrors) => {
+          const fields = Object.entries(createErrors).map(([name, errors]) => ({
+            name: name.toLowerCase(),
+            errors,
+          }));
+          form.setFields(fields);
+        },
+        onServerError: () => {
+          notification.error({ message: "Failed to create todo list!" });
+        },
+        onFinally: () => {
+          setLoading(false);
+        },
+      });
     });
   };
 
@@ -40,7 +54,7 @@ const TodoGroupCreate: React.FC = () => {
       </Space>
       <Form form={form} layout="vertical" onFinish={handleSaveTodoGroup}>
         <Form.Item
-          label="Todo Group Name"
+          label="Todo List Name"
           name="title"
           rules={[
             { required: true, message: "Please enter the todo list name!" },

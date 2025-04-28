@@ -1,9 +1,10 @@
-﻿using BaseTemplate.Domain.Events;
+﻿using BaseTemplate.Application.Common.Events;
+using BaseTemplate.Domain.Events;
 using Microsoft.Extensions.Logging;
 
 namespace BaseTemplate.Application.TodoItems.EventHandlers;
 
-public class TodoItemCompletedEventHandler : INotificationHandler<TodoItemCompletedEvent>
+public class TodoItemCompletedEventHandler : IDomainEventHandler<TodoItemCompletedEvent>
 {
     private readonly ILogger<TodoItemCompletedEventHandler> _logger;
 
@@ -12,7 +13,7 @@ public class TodoItemCompletedEventHandler : INotificationHandler<TodoItemComple
         _logger = logger;
     }
 
-    public Task Handle(TodoItemCompletedEvent notification, CancellationToken cancellationToken)
+    public Task HandleAsync(TodoItemCompletedEvent notification, CancellationToken cancellationToken)
     {
         _logger.LogInformation("Sample Domain Event: {DomainEvent}", notification.GetType().Name);
 

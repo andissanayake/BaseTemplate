@@ -1,10 +1,12 @@
-﻿using BaseTemplate.Application.TodoLists.Commands.CreateTodoList;
+﻿using BaseTemplate.Application.Common.Models;
+using BaseTemplate.Application.TodoLists.Commands.CreateTodoList;
 using BaseTemplate.Application.TodoLists.Commands.DeleteTodoList;
 using BaseTemplate.Application.TodoLists.Commands.GetTodoListById;
 using BaseTemplate.Application.TodoLists.Commands.PurgeTodoLists;
 using BaseTemplate.Application.TodoLists.Commands.UpdateTodoList;
 using BaseTemplate.Application.TodoLists.Queries;
 using BaseTemplate.Application.TodoLists.Queries.GetTodos;
+using BaseTemplate.Domain.Constants;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -14,48 +16,44 @@ namespace BaseTemplate.API.Controllers;
 public class TodoListsController : ApiControllerBase
 {
     [HttpGet]
-    public async Task<ActionResult<TodosVm>> Get()
+    public async Task<ActionResult<Result<TodosVm>>> Get()
     {
-        return await Mediator.Send(new GetTodosQuery());
+        return await SendAsync(new GetTodosQuery());
     }
 
     [HttpGet("{id}")]
-    public async Task<ActionResult<TodoListDto>> GetById(int id)
+    public async Task<ActionResult<Result<TodoListDto>>> GetById(int id)
     {
-        return await Mediator.Send(new GetTodoListByIdQuery(id));
+        return await SendAsync(new GetTodoListByIdQuery(id));
     }
 
     [HttpPost]
-    public async Task<ActionResult<int>> Create(CreateTodoListCommand command)
+    public async Task<ActionResult<Result<int>>> Create(CreateTodoListCommand command)
     {
-        return await Mediator.Send(command);
+        return await SendAsync(command);
     }
 
     [HttpPut("{id}")]
-    public async Task<ActionResult> Update(int id, UpdateTodoListCommand command)
+    public async Task<ActionResult<Result<bool>>> Update(int id, UpdateTodoListCommand command)
     {
         if (id != command.Id)
         {
             return BadRequest();
         }
 
-        await Mediator.Send(command);
-
-        return NoContent();
+        return await SendAsync(command);
     }
 
     [HttpDelete("{id}")]
-    public async Task<ActionResult> Delete(int id)
+    public async Task<ActionResult<Result<bool>>> Delete(int id)
     {
-        await Mediator.Send(new DeleteTodoListCommand(id));
-
-        return NoContent();
+        return await SendAsync(new DeleteTodoListCommand(id));
     }
 
     [HttpDelete("purge")]
-    public async Task<ActionResult> Purge()
+    [Authorize(policy: Policies.CanPurge)]
+    public async Task<ActionResult<Result<bool>>> Purge()
     {
-        await Mediator.Send(new PurgeTodoListsCommand());
-        return NoContent();
+        return await SendAsync(new PurgeTodoListsCommand());
     }
 }

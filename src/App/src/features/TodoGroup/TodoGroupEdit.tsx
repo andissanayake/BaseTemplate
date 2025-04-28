@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 import {
   Form,
   Input,
@@ -11,34 +11,60 @@ import {
 import { useTodoGroupStore } from "./todoGroupStore";
 import { useNavigate, useParams } from "react-router-dom";
 import { TodoGroupService } from "./todoGroupService";
+import { useAsyncEffect } from "../../common/useAsyncEffect";
+import { handleResult } from "../../common/handleResult";
 
 const TodoGroupEdit: React.FC = () => {
-  const { currentTodoGroup, setTodoGroupCurrent, updateTodoGroup } =
-    useTodoGroupStore();
+  const { setLoading } = useTodoGroupStore();
+
   const [form] = Form.useForm();
   const navigate = useNavigate();
   const { listId } = useParams();
   if (!listId) throw new Error("listId is required");
 
-  useEffect(() => {
-    form.setFieldsValue(currentTodoGroup);
-  }, [currentTodoGroup, form]);
-
   const handleSaveTodoGroup = () => {
     form.validateFields().then(async (values) => {
-      values.id = currentTodoGroup?.id;
-
-      try {
-        await updateTodoGroup(values);
-        notification.success({ message: "Todo list updated successfully!" });
-        setTodoGroupCurrent(null); // Clear current todo group from store
-        navigate("/todo-list");
-      } catch (error) {
-        console.error("Error updating todo list:", error);
-        notification.error({ message: "Failed to update todo list!" });
-      }
+      values.id = +listId;
+      setLoading(true);
+      const response = await TodoGroupService.updateTodoGroup(values);
+      return handleResult(response, {
+        onSuccess: () => {
+          notification.success({
+            message: "Todo list updated successfully!",
+          });
+          navigate("/todo-list");
+        },
+        onValidationError: (updateErrors) => {
+          const fields = Object.entries(updateErrors).map(([name, errors]) => ({
+            name: name.toLowerCase(),
+            errors,
+          }));
+          form.setFields(fields);
+        },
+        onFinally: () => {
+          setLoading(false);
+        },
+      });
     });
   };
+
+  useAsyncEffect(async () => {
+    form.resetFields();
+    setLoading(true);
+    const response = await TodoGroupService.fetchTodoGroupById(listId);
+    handleResult(response, {
+      onSuccess: (data) => {
+        form.setFieldsValue(data);
+      },
+      onServerError: () => {
+        notification.error({ message: "Failed to fetch todo list item!" });
+      },
+
+      onFinally: () => {
+        setLoading(false);
+      },
+    });
+  }, [listId, form]);
 
   return (
     <>

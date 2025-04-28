@@ -13,48 +13,44 @@ namespace BaseTemplate.API.Controllers;
 public class TodoItemsController : ApiControllerBase
 {
     [HttpGet]
-    public async Task<ActionResult<PaginatedList<TodoItemBriefDto>>> GetTodoItemsWithPagination([FromQuery] GetTodoItemsWithPaginationQuery query)
+
+    public async Task<ActionResult<Result<PaginatedList<TodoItemBriefDto>>>> GetTodoItemsWithPagination([FromQuery] GetTodoItemsWithPaginationQuery query)
     {
-        return await Mediator.Send(query);
+        return await SendAsync(query);
     }
 
     [HttpPost]
-    public async Task<ActionResult<int>> Create(CreateTodoItemCommand command)
+    public async Task<ActionResult<Result<int>>> Create(CreateTodoItemCommand command)
     {
-        return await Mediator.Send(command);
+        return await SendAsync(command);
     }
 
     [HttpPut("{id}")]
-    public async Task<ActionResult> Update(int id, UpdateTodoItemCommand command)
+    public async Task<ActionResult<Result<bool>>> Update(int id, UpdateTodoItemCommand command)
     {
         if (id != command.Id)
         {
             return BadRequest();
         }
 
-        await Mediator.Send(command);
-
-        return NoContent();
+        return await SendAsync(command);
     }
 
     [HttpPut("[action]")]
-    public async Task<ActionResult> UpdateItemStatus(int id, UpdateTodoItemStatusCommand command)
+    public async Task<ActionResult<Result<bool>>> UpdateItemStatus(int id, UpdateTodoItemStatusCommand command)
     {
         if (id != command.Id)
         {
             return BadRequest();
         }
 
-        await Mediator.Send(command);
+        return await SendAsync(command);
 
-        return NoContent();
     }
 
     [HttpDelete("{id}")]
-    public async Task<ActionResult> Delete(int id)
+    public async Task<ActionResult<Result<bool>>> Delete(int id)
     {
-        await Mediator.Send(new DeleteTodoItemCommand(id));
-
-        return NoContent();
+        return await SendAsync(new DeleteTodoItemCommand(id));
     }
 }

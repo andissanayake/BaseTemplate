@@ -8,24 +8,36 @@ public class IdentityService : IIdentityService
 {
     private readonly IUnitOfWorkFactory _factory;
     private readonly IAuthorizationService _authorizationService;
-    public IdentityService(IUnitOfWorkFactory factory, IAuthorizationService authorizationService)
+    private readonly IUser _user;
+    public IdentityService(IUnitOfWorkFactory factory, IAuthorizationService authorizationService, IUser user)
     {
         _factory = factory;
         _authorizationService = authorizationService;
+        _user = user;
     }
-    public async Task<bool> IsInRoleAsync(string userId, string role)
+
+    public bool IsAuthenticated => _user != null && _user.IsAuthenticated != null && _user.IsAuthenticated == true;
+    public async Task<bool> IsInRoleAsync(string role)
     {
+        if (_user == null || _user.Id == null)
+        {
+            return false;
+        }
         using var uow = _factory.CreateUOW();
-        var count = await uow.QueryFirstOrDefaultAsync<int>("Select count(1) from UserRole where UserId = @userId and Role =@role", new { userId, role });
+        var count = await uow.QueryFirstOrDefaultAsync<int>("Select count(1) from UserRole where UserId = @userId and Role =@role", new { userId = _user.Id, role });
         return count != 0;
     }
-    public async Task<bool> AuthorizeAsync(string userId, string policyName)
+    public async Task<bool> AuthorizeAsync(string policyName)
     {
+        if (_user == null || _user.Id == null)
+        {
+            return false;
+        }
         using var uow = _factory.CreateUOW();
-        var roles = await uow.QueryAsync<string>("Select Role from UserRole where UserId = @userId", new { userId });
+        var roles = await uow.QueryAsync<string>("Select Role from UserRole where UserId = @userId", new { userId = _user.Id });
         var claims = new List<Claim>
         {
-            new Claim(ClaimTypes.NameIdentifier, userId)
+            new Claim(ClaimTypes.NameIdentifier, _user.Id)
         };
         foreach (var role in roles)
         {
@@ -36,9 +48,13 @@ public class IdentityService : IIdentityService
         var result = await _authorizationService.AuthorizeAsync(principal, policyName);
         return result.Succeeded;
     }
-    public async Task<IEnumerable<string>> GetRolesAsync(string userId)
+    public async Task<IEnumerable<string>> GetRolesAsync()
     {
+        if (_user == null || _user.Id == null)
+        {
+            return [];
+        }
         using var uow = _factory.CreateUOW();
-        return await uow.QueryAsync<string>("Select Role from UserRole where UserId = @userId", new { userId });
+        return await uow.QueryAsync<string>("Select Role from UserRole where UserId = @userId", new { userId = _user.Id });
     }
 }

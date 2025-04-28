@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 // TodoGroupList.tsx
-import React, { useEffect } from "react";
+import React from "react";
 import {
   Table,
   Button,
@@ -11,42 +11,63 @@ import {
 } from "antd";
 import { useTodoGroupStore } from "./todoGroupStore";
 import { useNavigate } from "react-router-dom";
-import { TodoGroup } from "./Model";
+import { TodoGroup } from "./TodoGroupModel";
 import {
   DeleteOutlined,
   EditOutlined,
   FundOutlined,
   PlusOutlined,
 } from "@ant-design/icons";
+import { useAsyncEffect } from "../../common/useAsyncEffect";
+import { TodoGroupService } from "./todoGroupService";
+import { handleResult } from "../../common/handleResult";
 
 const TodoGroupList: React.FC = () => {
-  const {
-    todoGroupList,
-    loading,
-    fetchTodoGroups,
-    deleteTodoGroup,
-    setTodoGroupCurrent,
-  } = useTodoGroupStore();
+  const { todoGroupList, loading, setLoading, setTodoGroupList } =
+    useTodoGroupStore();
   const navigate = useNavigate();
 
-  useEffect(() => {
-    fetchTodoGroups();
-  }, [fetchTodoGroups]);
+  const loadTodoGroupList = async () => {
+    setLoading(true);
+    const response = await TodoGroupService.fetchTodoGroups();
+    handleResult(response, {
+      onSuccess: (data) => {
+        setTodoGroupList(data?.lists ?? []);
+      },
+      onFinally: () => {
+        setLoading(false);
+      },
+    });
+  };
 
   const handleView = (record: TodoGroup) => {
-    setTodoGroupCurrent(record);
     navigate(`view/${record.id}`);
   };
 
   const handleEdit = (record: TodoGroup) => {
-    setTodoGroupCurrent(record);
     navigate(`edit/${record.id}`);
   };
 
-  const handleDelete = (record: TodoGroup) => {
-    deleteTodoGroup(record);
-    notification.success({ message: "Todo list deleted successfully!" });
+  const handleDelete = async (record: TodoGroup) => {
+    setLoading(true);
+    const response = await TodoGroupService.deleteTodoGroup(record);
+    return handleResult(response, {
+      onSuccess: () => {
+        loadTodoGroupList();
+        notification.success({ message: "Todo list deleted successfully!" });
+      },
+      onServerError: () => {
+        notification.error({ message: "Failed to delete todo list!" });
+      },
+      onFinally: () => {
+        setLoading(false);
+      },
+    });
   };
+
+  useAsyncEffect(async () => {
+    loadTodoGroupList();
+  }, []);
 
   const columns = [
     {

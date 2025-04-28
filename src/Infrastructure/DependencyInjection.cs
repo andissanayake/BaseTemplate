@@ -13,13 +13,11 @@ public static class DependencyInjection
     {
         var connectionString = configuration.GetConnectionString("DefaultConnection");
 
-        Guard.Against.Null(connectionString, message: "Connection string 'DefaultConnection' not found.");
-
         services.AddScoped<IUnitOfWorkFactory>(provider =>
         {
             var config = provider.GetRequiredService<IConfiguration>();
             var user = provider.GetRequiredService<IUser>();
-            return new UnitOfWorkFactory(connectionString, user);
+            return new UnitOfWorkFactory(connectionString!, user);
         });
 
         services.AddSingleton(TimeProvider.System);

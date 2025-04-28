@@ -1,21 +1,38 @@
 import { useParams } from "react-router-dom";
 import { useTodoGroupStore } from "./todoGroupStore";
-import { Descriptions, Space, Typography } from "antd";
-import { useEffect } from "react";
-import { TodoGroupService } from "./todoGroupService";
+import { Descriptions, notification, Space, Typography } from "antd";
 import TodoItemList from "../TodoItem/TodoItemList";
+import { useAsyncEffect } from "../../common/useAsyncEffect";
+import { TodoGroup } from "./TodoGroupModel";
+import { TodoGroupService } from "./todoGroupService";
+import { handleResult } from "../../common/handleResult";
+import { useState } from "react";
 
 export const TodoGroupView = () => {
-  const { currentTodoGroup, setTodoGroupCurrent } = useTodoGroupStore();
+  const [currentTodoGroup, setCurrentTodoGroup] = useState<TodoGroup | null>(
+    null
+  );
+  const { setLoading } = useTodoGroupStore();
   const { listId } = useParams();
 
   if (!listId) throw new Error("listId is required");
 
-  useEffect(() => {
-    TodoGroupService.fetchTodoGroupById(listId).then((res) =>
-      setTodoGroupCurrent(res.data)
-    );
-  }, [listId, setTodoGroupCurrent]);
+  useAsyncEffect(async () => {
+    setLoading(true);
+    const response = await TodoGroupService.fetchTodoGroupById(listId);
+    handleResult(response, {
+      onSuccess: (data) => {
+        setCurrentTodoGroup(data ? data : null);
+      },
+      onServerError: () => {
+        notification.error({ message: "Failed to fetch todo list item!" });
+      },
+
+      onFinally: () => {
+        setLoading(false);
+      },
+    });
+  }, [listId, setLoading]);
 
   return (
     <>

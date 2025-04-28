@@ -5,20 +5,23 @@ import { TodoItemService } from "./todoItemService";
 import dayjs from "dayjs";
 import { useParams } from "react-router-dom";
 import { TodoItem } from "./TodoItemModel";
+import { handleResult } from "../../common/handleResult";
 
 interface TodoItemEditProps {
   visible: boolean;
   onClose: () => void;
   todoItem: TodoItem;
+  refresh: () => void;
 }
 
 const TodoItemEdit: React.FC<TodoItemEditProps> = ({
   visible,
   onClose,
   todoItem,
+  refresh,
 }) => {
   const [form] = Form.useForm();
-  const { updateTodoItem } = useTodoItemStore();
+  const { setLoading } = useTodoItemStore();
   const { listId } = useParams();
 
   useEffect(() => {
@@ -38,15 +41,23 @@ const TodoItemEdit: React.FC<TodoItemEditProps> = ({
         id: todoItem.id,
         listId: +listId!,
       };
-
-      try {
-        await updateTodoItem(payload, +listId!);
-        notification.success({ message: "Todo item updated successfully!" });
-        onClose();
-      } catch (error) {
-        console.error("Error updating todo item:", error);
-        notification.error({ message: "Failed to update todo item!" });
-      }
+      setLoading(true);
+      const response = await TodoItemService.updateTodoItem(payload);
+      handleResult(response, {
+        onSuccess: () => {
+          notification.success({
+            message: "Todo item updated successfully!",
+          });
+          refresh();
+          onClose();
+        },
+        onServerError: () => {
+          notification.error({ message: "Failed to update todo item!" });
+        },
+        onFinally: () => {
+          setLoading(false);
+        },
+      });
     });
   };
 

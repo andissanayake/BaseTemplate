@@ -1,5 +1,4 @@
-﻿using BaseTemplate.Domain.Entities;
-using BaseTemplate.Domain.Enums;
+﻿using BaseTemplate.Domain.Enums;
 
 namespace BaseTemplate.Application.TodoItems.Queries.GetTodoItemsWithPagination;
 
@@ -12,11 +11,4 @@ public class TodoItemBriefDto
     public DateTimeOffset? Reminder { get; set; }
     public PriorityLevel Priority { get; set; }
     public bool Done { get; init; }
-    private class Mapping : Profile
-    {
-        public Mapping()
-        {
-            CreateMap<TodoItem, TodoItemBriefDto>();
-        }
-    }
 }

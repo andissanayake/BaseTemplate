@@ -1,22 +1,25 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Modal, Form, Input, DatePicker, Select, notification } from "antd";
 import { useTodoItemStore } from "./todoItemStore";
 import { TodoItemService } from "./todoItemService";
 import dayjs from "dayjs";
 import { useParams } from "react-router-dom";
 import { TodoItem } from "./TodoItemModel";
+import { handleResult } from "../../common/handleResult";
 
 interface TodoItemCreateProps {
   visible: boolean;
   onClose: () => void;
+  refresh: () => void;
 }
 
 const TodoItemCreate: React.FC<TodoItemCreateProps> = ({
   visible,
   onClose,
+  refresh,
 }) => {
   const [form] = Form.useForm();
-  const { createTodoItem } = useTodoItemStore();
+  const { setLoading } = useTodoItemStore();
   const { listId } = useParams();
 
   const handleSave = async () => {
@@ -26,18 +29,28 @@ const TodoItemCreate: React.FC<TodoItemCreateProps> = ({
         reminder: values.reminder ? dayjs(values.reminder).format() : null,
         listId: +listId!,
       };
-
-      try {
-        await createTodoItem(payload, +listId!);
-        notification.success({ message: "Todo item created successfully!" });
-        form.resetFields();
-        onClose();
-      } catch (error) {
-        console.error("Error creating todo item:", error);
-        notification.error({ message: "Failed to create todo item!" });
-      }
+      setLoading(true);
+      const response = await TodoItemService.createTodoItem(payload);
+      handleResult(response, {
+        onSuccess: () => {
+          notification.success({ message: "Todo item created successfully!" });
+          refresh();
+          onClose();
+        },
+        onServerError: () => {
+          notification.error({ message: "Failed to create todo item!" });
+        },
+        onFinally: () => {
+          setLoading(false);
+        },
+      });
     });
   };
+  useEffect(() => {
+    if (visible) {
+      form.resetFields();
+    }
+  }, [visible, form]);
 
   return (
     <Modal
