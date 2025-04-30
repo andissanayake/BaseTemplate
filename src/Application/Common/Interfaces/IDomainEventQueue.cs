@@ -3,5 +3,5 @@
 namespace BaseTemplate.Application.Common.Interfaces;
 public interface IDomainEventQueue
 {
-    void Enqueue(BaseEvent domainEvent);
+    Task Enqueue(BaseEvent domainEvent);
 }
