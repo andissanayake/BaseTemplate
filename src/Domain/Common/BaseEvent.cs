@@ -4,12 +4,6 @@ namespace BaseTemplate.Domain.Common;
 
 public abstract class BaseEvent
 {
-    public Guid EventId { get; private set; }
-    public DateTimeOffset CreatedDate { get; private set; }
-
-    protected BaseEvent()
-    {
-        EventId = Guid.NewGuid();
-        CreatedDate = DateTimeOffset.Now;
-    }
+    public Guid EventId { get; set; }
+    public DateTimeOffset CreatedDate { get; set; }
 }

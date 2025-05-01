@@ -5,7 +5,7 @@ public class DomainEvent : BaseAuditableEntity
     public required string EventType { get; set; }
     public required string EventData { get; set; }
     public required string Status { get; set; }      // Status of the event ("Pending", "Processed", "Failed")
-    public DateTime CreatedAt { get; set; }
-    public DateTime? ProcessedAt { get; set; }
+    public DateTimeOffset CreatedAt { get; set; }
+    public DateTimeOffset? ProcessedAt { get; set; }
     public string? Result { get; set; }
 }

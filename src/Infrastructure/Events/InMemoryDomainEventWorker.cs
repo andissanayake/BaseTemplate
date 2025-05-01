@@ -1,4 +1,5 @@
 ﻿using System.Collections.Concurrent;
+using System.Reflection;
 using System.Text.Json;
 using BaseTemplate.Application.Common.Events;
 using BaseTemplate.Application.Common.Interfaces;
@@ -26,8 +27,10 @@ public class InMemoryDomainEventWorker : BackgroundService, IDomainEventQueue
 
     public async Task Enqueue(BaseEvent domainEvent)
     {
-        _queue.Enqueue(domainEvent);
+        domainEvent.EventId = Guid.NewGuid();
+        domainEvent.CreatedDate = DateTime.UtcNow;
         await SaveEventToDb(domainEvent);
+        _queue.Enqueue(domainEvent);
     }
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -75,7 +78,7 @@ public class InMemoryDomainEventWorker : BackgroundService, IDomainEventQueue
             var ed = new DomainEvent
             {
                 EventId = domainEvent.EventId,
-                EventType = domainEvent.GetType().Name,
+                EventType = domainEvent.GetType().FullName!,
                 Status = "Pending",
                 EventData = JsonSerializer.Serialize(domainEvent)
 
@@ -94,10 +97,12 @@ public class InMemoryDomainEventWorker : BackgroundService, IDomainEventQueue
         try
         {
             using var uow = _factory.CreateUOW();
-            var domainEvents = await uow.QueryAsync<DomainEvent>("SELECT * FROM DomainEvents WHERE Status = 'Pending'");
+            var domainEvents = await uow.QueryAsync<DomainEvent>("SELECT * FROM DomainEvent WHERE Status = 'Pending'");
             foreach (var domainEvent in domainEvents)
             {
-                var eventType = Type.GetType(domainEvent.EventType);
+                //var eventType = Type.GetType(domainEvent.EventType);
+                var domainAssembly = Assembly.Load("Domain");
+                var eventType = domainAssembly.GetType(domainEvent.EventType);
                 if (eventType != null)
                 {
                     // Deserialize the event data back into the correct type
@@ -123,7 +128,7 @@ public class InMemoryDomainEventWorker : BackgroundService, IDomainEventQueue
         try
         {
             using var uow = _factory.CreateUOW();
-            var domainEvents = await uow.ExecuteAsync("UPDATE DomainEvents SET Status = @Status, ProcessedAt = @ProcessedAt, Result = @Result WHERE EventId = @EventId",
+            var domainEvents = await uow.ExecuteAsync("UPDATE DomainEvent SET Status = @Status, ProcessedAt = @ProcessedAt, Result = @Result WHERE EventId = @EventId",
                     new
                     {
                         Status = status,
@@ -131,6 +136,7 @@ public class InMemoryDomainEventWorker : BackgroundService, IDomainEventQueue
                         Result = result,
                         EventId = domainEvent.EventId
                     });
+            uow.Commit();
         }
         catch (Exception ex)
         {
