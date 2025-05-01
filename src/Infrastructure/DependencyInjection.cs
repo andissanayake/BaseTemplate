@@ -13,7 +13,7 @@ public static class DependencyInjection
     {
         var connectionString = configuration.GetConnectionString("DefaultConnection");
 
-        services.AddScoped<IUnitOfWorkFactory>(provider =>
+        services.AddSingleton<IUnitOfWorkFactory>(provider =>
         {
             var config = provider.GetRequiredService<IConfiguration>();
             var user = provider.GetRequiredService<IUser>();
