@@ -23,7 +23,7 @@ public class IdentityService : IIdentityService
         {
             return false;
         }
-        using var uow = _factory.CreateUOW();
+        using var uow = _factory.Create();
         var count = await uow.QueryFirstOrDefaultAsync<int>("Select count(1) from UserRole where UserId = @userId and Role =@role", new { userId = _user.Id, role });
         return count != 0;
     }
@@ -33,7 +33,7 @@ public class IdentityService : IIdentityService
         {
             return false;
         }
-        using var uow = _factory.CreateUOW();
+        using var uow = _factory.Create();
         var roles = await uow.QueryAsync<string>("Select Role from UserRole where UserId = @userId", new { userId = _user.Id });
         var claims = new List<Claim>
         {
@@ -54,7 +54,7 @@ public class IdentityService : IIdentityService
         {
             return [];
         }
-        using var uow = _factory.CreateUOW();
+        using var uow = _factory.Create();
         return await uow.QueryAsync<string>("Select Role from UserRole where UserId = @userId", new { userId = _user.Id });
     }
 }

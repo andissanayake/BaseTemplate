@@ -1,8 +1,4 @@
-﻿using System.Reflection;
-using BaseTemplate.Application.Common.Interfaces;
-using BaseTemplate.Application.Common.Models;
-using BaseTemplate.Application.Common.Security;
-using BaseTemplate.Application.Common.Validation;
+﻿using BaseTemplate.Application.Common.Models;
 
 namespace BaseTemplate.Application.Common.RequestHandler;
 public interface IRequest<TResponse> { }
@@ -10,73 +6,7 @@ public interface IRequest<TResponse> { }
 public interface IRequestHandler<in TRequest, TResponse>
     where TRequest : IRequest<TResponse>
 {
-    Task<Result<TResponse>> AuthorizeAsync(TRequest request, CancellationToken cancellationToken);
-    Task<Result<TResponse>> ValidateAsync(TRequest request, CancellationToken cancellationToken);
     Task<Result<TResponse>> HandleAsync(TRequest request, CancellationToken cancellationToken);
-    Task<Result<TResponse>> ExecuteAsync(TRequest request, CancellationToken cancellationToken);
-}
-
-public abstract class BaseRequestHandler<TRequest, TResponse> : IRequestHandler<TRequest, TResponse>
-    where TRequest : IRequest<TResponse>
-{
-    private readonly IIdentityService _identityService;
-
-    public BaseRequestHandler(
-        IIdentityService identityService)
-    {
-        _identityService = identityService;
-    }
-    public virtual Task<Result<TResponse>> ValidateAsync(TRequest request, CancellationToken cancellationToken)
-    {
-        var result = ModelValidator.Validate(request);
-        if (result.IsValid)
-            return Task.FromResult(Result<TResponse>.Success(default!));
-        return Task.FromResult(Result<TResponse>.Validation("Validation Errors", result.Errors));
-    }
-    public virtual async Task<Result<TResponse>> AuthorizeAsync(TRequest request, CancellationToken cancellationToken)
-    {
-        var attributes = request.GetType().GetCustomAttributes<AuthorizeAttribute>();
-
-        if (!attributes.Any()) return Result<TResponse>.Success(default!);
-
-        if (!_identityService.IsAuthenticated)
-            return Result<TResponse>.Unauthorized(default!);
-
-        var roles = attributes
-            .Where(a => !string.IsNullOrWhiteSpace(a.Roles))
-            .SelectMany(a => a.Roles.Split(',').Select(r => r.Trim()));
-
-        if (roles.Any())
-        {
-            var isAuthorizedByRole = await Task.WhenAny(roles.Select(_identityService.IsInRoleAsync));
-            if (!isAuthorizedByRole.Result)
-                return Result<TResponse>.Forbidden(default!);
-        }
-
-        foreach (var policy in attributes
-            .Where(a => !string.IsNullOrWhiteSpace(a.Policy))
-            .Select(a => a.Policy))
-        {
-            if (!await _identityService.AuthorizeAsync(policy))
-                return Result<TResponse>.Forbidden(default!);
-        }
-
-        return Result<TResponse>.Success(default!);
-    }
-    public abstract Task<Result<TResponse>> HandleAsync(TRequest request, CancellationToken cancellationToken);
-
-    public async Task<Result<TResponse>> ExecuteAsync(TRequest request, CancellationToken cancellationToken)
-    {
-        var authResult = await AuthorizeAsync(request, cancellationToken);
-        if (!ResultCodeMapper.IsSuccess(authResult.Code))
-            return authResult;
-
-        var validationResult = await ValidateAsync(request, cancellationToken);
-        if (!ResultCodeMapper.IsSuccess(validationResult.Code))
-            return validationResult;
-
-        return await HandleAsync(request, cancellationToken);
-    }
 }
 
 public interface IMediator
@@ -114,10 +44,10 @@ public class Mediator : IMediator
         }
 
         // Call ExecuteAsync via reflection
-        var method = handlerType.GetMethod("ExecuteAsync");
+        var method = handlerType.GetMethod("HandleAsync");
         if (method == null)
         {
-            return Result<TResponse>.ServerError("Handler does not implement ExecuteAsync.");
+            return Result<TResponse>.ServerError("Handler does not implement HandleAsync.");
         }
 
         var task = (Task<Result<TResponse>>)method.Invoke(handler, [request, cancellationToken])!;

@@ -18,17 +18,17 @@ public record GetTodoItemsWithPaginationQuery : IRequest<PaginatedList<TodoItemB
     public int PageSize { get; init; } = 10;
 }
 
-public class GetTodoItemsWithPaginationQueryHandler : BaseRequestHandler<GetTodoItemsWithPaginationQuery, PaginatedList<TodoItemBriefDto>>
+public class GetTodoItemsWithPaginationQueryHandler : IRequestHandler<GetTodoItemsWithPaginationQuery, PaginatedList<TodoItemBriefDto>>
 {
     private readonly IUnitOfWorkFactory _factory;
 
-    public GetTodoItemsWithPaginationQueryHandler(IUnitOfWorkFactory factory, IIdentityService identityService) : base(identityService)
+    public GetTodoItemsWithPaginationQueryHandler(IUnitOfWorkFactory factory)
     {
         _factory = factory;
     }
-    public override async Task<Result<PaginatedList<TodoItemBriefDto>>> HandleAsync(GetTodoItemsWithPaginationQuery request, CancellationToken cancellationToken)
+    public async Task<Result<PaginatedList<TodoItemBriefDto>>> HandleAsync(GetTodoItemsWithPaginationQuery request, CancellationToken cancellationToken)
     {
-        using var uow = _factory.CreateUOW();
+        using var uow = _factory.Create();
         var offset = (request.PageNumber - 1) * request.PageSize;
 
         var countSql = "SELECT COUNT(1) FROM TodoItem WHERE ListId = @ListId";
