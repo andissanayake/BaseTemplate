@@ -1,121 +1,55 @@
-# CoreHub - Modular ASP.NET Core Sample App
+## Shopping Mart Web App - Marketing MVP
 
-CoreHub is a modular, scalable, and production-grade ASP.NET Core sample template designed to demonstrate best practices, cross-cutting concerns, performance benchmarking, and realistic application scenarios.
+### Overview:
 
----
+This application is designed as a marketing platform for local stores in a specific area of Sri Lanka. The goal is to highlight store promotions, provide location-based filtering, and give users easy access to local business information without the complexity of inventory management.
 
-## 🚀 Overview
+### Features:
 
-CoreHub includes two real-world example modules:
+#### 1. Home Page:
 
-1. **QuickPost** – A lightweight social feed API
-2. **GroceryGo** – A mini grocery store + ordering system
+* Display popular stores and featured promotions.
+* Categories like Groceries, Electronics, Clothing, and more.
+* Highlight time-sensitive offers with countdown timers.
 
-Both modules share common infrastructure, cross-cutting logic, and are designed to run efficiently on small cloud instances like AWS T3 Micro or Azure B1 series.
+#### 2. Store Directory:
 
----
+* List of all registered stores.
+* Display store details: Address, Contact info, Store timings, and Map location.
+* Filters to refine search by Category, Distance, and Current Offers.
 
-## 🧱 Base Template Features
+#### 3. Store Details Page:
 
-### ✅ Cross-Cutting Concerns
-- Centralized error handling
-- Serilog-based logging
-- Global model validation
-- JWT Authentication (SSO-ready)
-- Response formatting/wrapping
-- Health check endpoints
-- Localization-ready
-- CORS & Security headers
-- Basic rate limiting
+* Show detailed information about the store.
+* Display current promotions and special deals.
+* High-resolution images of the store and products.
+* Integrated map view for easy navigation.
+* Share button for easy social media sharing.
 
-### ✅ Hosting & Deployment
-- Kestrel self-hosted
-- Docker support
-- AWS T2 Nano/T3 Micro-ready
-- Azure B1s/B2s-ready
-- RPS benchmarking middleware
-- Health check diagnostics
+#### 4. Promotions Page:
 
-### ✅ Shared Infrastructure
-- PostgreSQL via Dapper
-- In-memory cache (MemoryCache)
-- Optional Redis support
-- Hosted background jobs
-- Benchmark endpoints for performance testing
+* Aggregated view of all current promotions.
+* Search by category or store.
+* "Expires Soon" filter for urgent offers.
 
----
+#### 5. Location-based Filtering:
 
-## 📦 Module 1: QuickPost (Social Feed API)
+* Geolocation to filter stores within a specific radius.
+* Map view with pins representing store locations.
 
-| Feature               | Description                                             |
-|----------------------|---------------------------------------------------------|
-| Create Post          | Upload post with optional image                         |
-| Like & Comment       | Basic interaction + triggers notification               |
-| Realtime Updates     | Optional SignalR hub for updates                        |
-| Notification System  | In-app + pluggable push/email notification abstraction  |
-| Feed Pagination      | Public feed, sorted & cached                            |
-| Background Cleanup   | Removes old posts using background worker               |
-| Benchmark Endpoint   | Response time + RPS measurement route                   |
+#### 6. Search Functionality:
+
+* Search for stores, products, or promotions.
+* Autocomplete suggestions for quick searching.
+
+#### 7. Basic Admin Portal:
+
+* Allows store owners or administrators to add/edit store information.
+* Manage promotions and featured listings.
+* View analytics on store page visits and promotions.
 
 ---
 
-## 🛒 Module 2: GroceryGo (Mini Grocery Store API)
-
-| Feature               | Description                                              |
-|----------------------|----------------------------------------------------------|
-| Store Management     | CRUD for grocery stores                                  |
-| Product Catalog      | Manage products, pricing, and images                    |
-| Order Placement      | Create orders, manage stock                             |
-| Order Tracking       | Order status flow: pending → processing → delivered     |
-| Pickup/Delivery Modes| Route logic split by delivery type                      |
-| Notifications        | Order confirmation & updates                            |
-| Auto-Cancel Orders   | Background task for expired unpaid orders               |
-
 ---
 
-## 🌐 Project Structure (Suggested)
-
-```
-/src
-  /CoreHub.Api
-  /CoreHub.Application
-  /CoreHub.Domain
-  /CoreHub.Infrastructure
-  /Modules
-    /QuickPost
-    /GroceryGo
-/tests
-  /CoreHub.Tests
-```
-
----
-
-## 📊 Performance Targets by Hosting Tier
-
-| Tier          | Host Type      | Cost (est.) | RPM        | RPS       | Response Time |
-|---------------|----------------|-------------|------------|-----------|----------------|
-| Ultra-Small   | T2 Nano / B1s  | ~$5/month   | ~10,000    | ~5–10     | ~100–150ms     |
-| Small (MVP)   | T3 Micro / B1ms| ~$10/month  | ~30,000    | ~15–25    | ~80–120ms      |
-| Medium        | T3 Medium / B2s| ~$60/month  | ~60,000    | ~40–60    | ~60–100ms      |
-| High-Traffic  | Multi T3 LG    | ~$300/month | ~150,000   | ~120–200  | ~40–80ms       |
-| Enterprise    | Dedicated       | $1,000+/mo  | 500,000+   | 400+      | ~20–50ms       |
-
----
-
-## ✅ Ready for Growth
-- Start small (T3 Micro or B1ms) with 30,000 RPM
-- Modular structure allows clean scaling
-- Easily extendable to new domains (e.g., ecommerce, inventory, chat)
-
----
-
-## 📍Next Steps
-- Scaffold QuickPost module first
-- Add core services (logging, validation, health)
-- Add GroceryGo module and shared infra
-- Write benchmark/load tests (K6, Artillery, etc.)
-
----
-
-Happy coding! 🎯
-
+This project is licensed under the MIT License.
