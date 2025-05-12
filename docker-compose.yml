@@ -1,3 +1,5 @@
+version: '3.9'
+
 services:
   api:
     image: ${DOCKER_REGISTRY-}api
@@ -5,43 +7,53 @@ services:
       context: .
       dockerfile: src/API/Dockerfile
     depends_on:
-      - sqlserver
+      - postgres
     networks:
       - mynetwork
     deploy:
       resources:
         limits:
-          cpus: "0.5" 
-          memory: 512M 
+          cpus: "0.5"
+          memory: 512M
         reservations:
           cpus: "0.2"
           memory: 256M
-  sqlserver:
-    image: mcr.microsoft.com/mssql/server:2019-latest  # SQL Server image (with Express edition)
-    container_name: sql_server_express
+
+  postgres:
+    image: postgres:15
+    container_name: postgres_container
     environment:
-      - ACCEPT_EULA=Y  # Accept the End User License Agreement
-      - SA_PASSWORD=YourStrong!Passw0rd  # Set the System Administrator (SA) password
-      - MSSQL_PID=Developer  # Specify the SQL Server Express edition
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: JOker1988++++
+      POSTGRES_DB: BaseTemplate
     ports:
-      - "1433:1433"  # Expose port 1433 for SQL Server
+      - "15432:5432"
     volumes:
-      - sql_data:/var/opt/mssql  # Persist database data between container restarts
+      - pg_data:/var/lib/postgresql/data
     networks:
       - mynetwork
-    restart: unless-stopped  # Automatically restart unless stopped manually
+    restart: unless-stopped
     deploy:
       resources:
-          limits:
-            cpus: "2"        # Allow SQL Server to use up to 2 CPU cores
-            memory: 4G       # Allow up to 4GB RAM (if available on host)
-          reservations:
-            cpus: "1"        # Reserve 1 core so it gets enough CPU time
-            memory: 2G       # Reserve 2GB memory to avoid starving under load
+        limits:
+          cpus: "2"
+          memory: 2G
+        reservations:
+          cpus: "1"
+          memory: 1G
+    command: >
+      postgres -c max_connections=5000
+               -c max_worker_processes=16
+               -c max_parallel_workers=16
+               -c max_parallel_workers_per_gather=4
+               -c work_mem=64MB
+               -c shared_buffers=512MB
+               -c maintenance_work_mem=128MB
+
 volumes:
-  sql_data:
-    driver: local  # Use a local driver for data persistence
+  pg_data:
+    driver: local
 
 networks:
   mynetwork:
-    driver: bridge  # Use a bridge network for the SQL Server container
+    driver: bridge

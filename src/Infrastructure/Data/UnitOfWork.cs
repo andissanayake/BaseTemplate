@@ -40,6 +40,8 @@ public class UnitOfWork : IUnitOfWork
     {
         _connection = connection;
         _user = user;
+        if (_connection.State == ConnectionState.Closed)
+            _connection.Open();
 
     }
     public ITransaction BeginTransaction()
@@ -96,6 +98,7 @@ public class UnitOfWork : IUnitOfWork
         {
             _transaction?.Dispose();
             _connection.Close();
+            _connection.Dispose();
             _disposed = true;
         }
     }
