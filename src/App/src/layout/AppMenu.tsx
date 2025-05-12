@@ -11,12 +11,13 @@ import {
 //import { Policies } from "../auth/PoliciesEnum";
 import { useLocation, useNavigate } from "react-router";
 import { useAuthStore } from "../auth/authStore";
+import { UserService } from "../auth/userService";
+import { handleResult } from "../common/handleResult";
 
 export const AppMenu = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const user = useAuthStore((state) => state.user);
-  const setUser = useAuthStore((state) => state.setUser);
+  const { user, setUser, setRoles } = useAuthStore((state) => state);
 
   const [current, setCurrent] = useState(
     location.pathname === "/" || location.pathname === ""
@@ -34,11 +35,21 @@ export const AppMenu = () => {
   );
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChangedListener((user) => {
+    const unsubscribe = onAuthStateChangedListener(async (user) => {
       if (user) {
         setUser(user);
+        const res = await UserService.fetchRoles();
+        handleResult(res, {
+          onSuccess: (data) => {
+            setRoles(data ?? []);
+          },
+          onServerError: () => {
+            console.error("Failed to fetch roles!");
+          },
+        });
       } else {
         setUser(null);
+        setRoles([]);
       }
     }, false);
 

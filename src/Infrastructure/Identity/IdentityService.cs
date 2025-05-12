@@ -24,7 +24,7 @@ public class IdentityService : IIdentityService
             return false;
         }
         using var uow = _factory.Create();
-        var count = await uow.QueryFirstOrDefaultAsync<int>("Select count(1) from UserRole where UserId = @userId and Role =@role", new { userId = _user.Id, role });
+        var count = await uow.QueryFirstOrDefaultAsync<int>("select count(1) from user_role where user_id = @userId and role =@role", new { userId = _user.Id, role });
         return count != 0;
     }
     public async Task<bool> AuthorizeAsync(string policyName)
@@ -34,7 +34,7 @@ public class IdentityService : IIdentityService
             return false;
         }
         using var uow = _factory.Create();
-        var roles = await uow.QueryAsync<string>("Select Role from UserRole where UserId = @userId", new { userId = _user.Id });
+        var roles = await uow.QueryAsync<string>("select role from user_role where user_id = @userId", new { userId = _user.Id });
         var claims = new List<Claim>
         {
             new Claim(ClaimTypes.NameIdentifier, _user.Id)
@@ -55,6 +55,6 @@ public class IdentityService : IIdentityService
             return [];
         }
         using var uow = _factory.Create();
-        return await uow.QueryAsync<string>("Select Role from UserRole where UserId = @userId", new { userId = _user.Id });
+        return await uow.QueryAsync<string>("select role from user_role where user_id = @userId", new { userId = _user.Id });
     }
 }

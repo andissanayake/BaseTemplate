@@ -2,7 +2,6 @@
 using BaseTemplate.Infrastructure.Data;
 using BaseTemplate.Infrastructure.Identity;
 using Dapper;
-using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
 
 namespace Microsoft.Extensions.DependencyInjection;
@@ -11,7 +10,10 @@ public static class DependencyInjection
 {
     public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
     {
+        DefaultTypeMap.MatchNamesWithUnderscores = true;
         SimpleCRUD.SetDialect(SimpleCRUD.Dialect.PostgreSQL);
+        SimpleCRUD.SetTableNameResolver(new SnakeCaseTableNameResolver());
+        SimpleCRUD.SetColumnNameResolver(new SnakeCaseColumnNameResolver());
         var connectionString = configuration.GetConnectionString("DefaultConnection")!;
         services.AddSingleton<IDbConnectionFactory>(provider =>
         {
@@ -23,7 +25,7 @@ public static class DependencyInjection
         services.AddSingleton(TimeProvider.System);
         services.AddTransient<IIdentityService, IdentityService>();
 
-        using var connection = new SqlConnection(connectionString);
+        using var connection = new PostgresConnectionFactory(connectionString).CreateConnection();
         DatabaseInitializer.Migrate(connection);
         connection.Dispose();
         return services;

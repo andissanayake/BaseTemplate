@@ -36,7 +36,7 @@ public class CreateTodoItemCommandHandler : IRequestHandler<CreateTodoItemComman
             ListId = request.ListId,
             Title = request.Title,
             Note = request.Note,
-            Reminder = request.Reminder,
+            Reminder = request.Reminder?.UtcDateTime,
             Priority = request.Priority ?? PriorityLevel.None,
             Done = false
         };

@@ -36,11 +36,9 @@ public class UpdateTodoItemCommandHandler : IRequestHandler<UpdateTodoItemComman
         {
             return Result<bool>.NotFound($"TodoItem with id {request.Id} not found.");
         }
-
-        entity.Title = request.Title;
         entity.Title = request.Title;
         entity.Note = request.Note;
-        entity.Reminder = request.Reminder;
+        entity.Reminder = request.Reminder?.UtcDateTime;
         entity.Done = false;
         entity.Priority = request.Priority ?? PriorityLevel.None;
         await uow.UpdateAsync(entity);

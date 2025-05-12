@@ -2,8 +2,7 @@ import { Avatar, Card, Descriptions, Space, Tag, Typography } from "antd";
 import { useAuthStore } from "../auth/authStore";
 
 export const ProfilePage = () => {
-  const user = useAuthStore((state) => state.user);
-  const roles = useAuthStore((state) => state.roles);
+  const { user, roles } = useAuthStore((state) => state);
   if (!user) throw new Error("User not found");
   return (
     <Card>

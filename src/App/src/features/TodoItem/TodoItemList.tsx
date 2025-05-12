@@ -204,7 +204,6 @@ const TodoItemList: React.FC = () => {
         visible={isEditModalVisible}
         onClose={() => {
           setIsEditModalVisible(false);
-          loadTodoItems();
         }}
         todoItem={currentTodoItem!}
         refresh={loadTodoItems}

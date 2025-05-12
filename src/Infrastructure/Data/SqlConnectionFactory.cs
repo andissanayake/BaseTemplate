@@ -35,3 +35,4 @@ public class PostgresConnectionFactory : IDbConnectionFactory
         return connection;
     }
 }
+
