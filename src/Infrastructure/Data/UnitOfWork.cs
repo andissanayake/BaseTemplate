@@ -2,7 +2,6 @@
 using BaseTemplate.Application.Common.Interfaces;
 using BaseTemplate.Domain.Common;
 using Dapper;
-using Dapper.Contrib.Extensions;
 
 namespace BaseTemplate.Infrastructure.Data;
 
@@ -41,7 +40,7 @@ public class UnitOfWork : IUnitOfWork
     {
         _connection = connection;
         _user = user;
-        SqlMapperExtensions.TableNameMapper = (type) => type.Name;
+
     }
     public ITransaction BeginTransaction()
     {
@@ -77,7 +76,7 @@ public class UnitOfWork : IUnitOfWork
         await _connection.GetAsync<T>(id, _transaction);
 
     public async Task<IEnumerable<T>> GetAllAsync<T>() where T : class =>
-        await _connection.GetAllAsync<T>(_transaction);
+        await _connection.GetListAsync<T>(_transaction);
 
     public async Task<IEnumerable<T>> QueryAsync<T>(string sql, object? param = null) =>
         await _connection.QueryAsync<T>(sql, param, _transaction);
