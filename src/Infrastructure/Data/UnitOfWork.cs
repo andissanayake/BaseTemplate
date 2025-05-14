@@ -36,12 +36,10 @@ public class UnitOfWork : IUnitOfWork
     private IDbTransaction? _transaction;
     private bool _disposed;
     private readonly IUser _user;
-    public UnitOfWork(IDbConnection connection, IUser user)
+    public UnitOfWork(IDbConnectionFactory dbfactory, IUser user)
     {
-        _connection = connection;
+        _connection = dbfactory.CreateConnection();
         _user = user;
-        if (_connection.State == ConnectionState.Closed)
-            _connection.Open();
 
     }
     public ITransaction BeginTransaction()
@@ -113,5 +111,5 @@ public class UnitOfWorkFactory : IUnitOfWorkFactory
         _dbfactory = dbfactory;
         _user = user;
     }
-    public IUnitOfWork Create() => new UnitOfWork(_dbfactory.CreateConnection(), _user);
+    public IUnitOfWork Create() => new UnitOfWork(_dbfactory, _user);
 }
