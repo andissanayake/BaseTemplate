@@ -8,4 +8,6 @@ public interface IIdentityService
     Task<bool> AuthorizeAsync(string policyName);
 
     Task<IEnumerable<string>> GetRolesAsync();
+
+    //Task EnsureUser();
 }

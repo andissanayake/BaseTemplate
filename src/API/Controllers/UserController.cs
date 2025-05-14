@@ -7,9 +7,9 @@ namespace BaseTemplate.API.Controllers;
 [Authorize]
 public class UserController : ApiControllerBase
 {
-    [HttpGet("roles")]
-    public async Task<ActionResult<Result<IEnumerable<string>>>> GetUserRoles()
+    [HttpPost("userDetails")]
+    public async Task<ActionResult<Result<GetUserResponse>>> GetUser()
     {
-        return await SendAsync(new GetUserRolesQuery());
+        return await SendAsync(new GetUserQuery());
     }
 }

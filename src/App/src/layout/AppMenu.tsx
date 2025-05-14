@@ -38,10 +38,10 @@ export const AppMenu = () => {
     const unsubscribe = onAuthStateChangedListener(async (user) => {
       if (user) {
         setUser(user);
-        const res = await UserService.fetchRoles();
+        const res = await UserService.details();
         handleResult(res, {
           onSuccess: (data) => {
-            setRoles(data ?? []);
+            setRoles(data?.roles ?? []);
           },
           onServerError: () => {
             console.error("Failed to fetch roles!");

@@ -3,6 +3,7 @@
 public interface IUser
 {
     bool? IsAuthenticated { get; }
-    string? Id { get; }
-    string? UserName { get; }
+    string? Identifier { get; }
+    string? Name { get; }
+    string? Email { get; }
 }

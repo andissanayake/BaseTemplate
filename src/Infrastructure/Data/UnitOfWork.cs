@@ -54,7 +54,7 @@ public class UnitOfWork : IUnitOfWork
         {
             var now = DateTimeOffset.UtcNow;
             auditable.Created = now;
-            auditable.CreatedBy = _user.Id;
+            auditable.CreatedBy = _user.Identifier;
         }
         await _connection.InsertAsync(entity, _transaction);
     }
@@ -64,7 +64,7 @@ public class UnitOfWork : IUnitOfWork
         if (entity is BaseAuditableEntity auditable)
         {
             auditable.LastModified = DateTimeOffset.UtcNow;
-            auditable.LastModifiedBy = _user.Id;
+            auditable.LastModifiedBy = _user.Identifier;
         }
         await _connection.UpdateAsync(entity, _transaction);
     }

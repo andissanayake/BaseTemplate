@@ -36,7 +36,7 @@ public class DatabaseInitializer
             "SELECT script_name FROM migration_history"
         ).ToHashSet();
 
-        var sqlFiles = Directory.GetFiles(scriptsFolder, "*.sql").OrderBy(f => f).ToList();
+        var sqlFiles = Directory.GetFiles(scriptsFolder, "*.psql").OrderBy(f => f).ToList();
         _logger.LogInformation($"Found {sqlFiles.Count} SQL scripts to execute...");
 
         foreach (var file in sqlFiles)

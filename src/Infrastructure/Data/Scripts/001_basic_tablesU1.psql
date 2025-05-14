@@ -36,7 +36,7 @@ CREATE TABLE IF NOT EXISTS todo_item (
 -- =============================================
 CREATE TABLE IF NOT EXISTS user_role (
     id SERIAL PRIMARY KEY,
-    user_id VARCHAR(100),
+    user_identifier VARCHAR(100),
     role VARCHAR(100),
     
     created TIMESTAMPTZ NOT NULL DEFAULT NOW(),
@@ -71,10 +71,22 @@ DO $$
 BEGIN
     IF NOT EXISTS (
         SELECT 1 FROM user_role 
-        WHERE user_id = 'i53MEl0y7jOwIh0BvmHqd0PMDnf2' 
+        WHERE user_identifier = 'i53MEl0y7jOwIh0BvmHqd0PMDnf2' 
         AND role = 'Administrator'
     ) THEN
-        INSERT INTO user_role (user_id, role, created, created_by) 
+        INSERT INTO user_role (user_identifier, role, created, created_by) 
         VALUES ('i53MEl0y7jOwIh0BvmHqd0PMDnf2', 'Administrator', NOW(), 'SYSTEM');
     END IF;
 END $$;
+
+
+CREATE TABLE IF NOT EXISTS app_user (
+    id SERIAL PRIMARY KEY,
+    identifier VARCHAR(100) NOT NULL,
+    name VARCHAR(255),
+    email VARCHAR(255),
+    created TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    created_by VARCHAR(255),
+    last_modified TIMESTAMPTZ,
+    last_modified_by VARCHAR(255)
+);
