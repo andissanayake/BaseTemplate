@@ -1,101 +1,77 @@
 ﻿using System.Data;
 using Dapper;
+using Microsoft.Extensions.Logging;
 namespace BaseTemplate.Infrastructure.Data;
-
-public static class DatabaseInitializer
+public class DatabaseInitializer
 {
-    public static void Migrate(IDbConnection dbConnection)
+    private readonly ILogger<DatabaseInitializer> _logger;
+    public DatabaseInitializer(ILogger<DatabaseInitializer> logger)
     {
-        dbConnection.Open();
+        _logger = logger;
+    }
 
-        var initScript = @"
--- =============================================
--- Create Table: todo_list
--- =============================================
-CREATE TABLE IF NOT EXISTS todo_list (
-    id SERIAL PRIMARY KEY,
-    title VARCHAR(255),
-    colour VARCHAR(7) NOT NULL DEFAULT '#FFFFFF',
-    
-    created TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-    created_by VARCHAR(100),
-    last_modified TIMESTAMPTZ,
-    last_modified_by VARCHAR(100)
-);
+    public void Migrate(IDbConnection connection, string scriptsFolder)
+    {
+        connection.Open();
 
--- =============================================
--- Create Table: todo_item
--- =============================================
-CREATE TABLE IF NOT EXISTS todo_item (
-    id SERIAL PRIMARY KEY,
-    list_id INT REFERENCES todo_list(id) ON DELETE CASCADE,
-    title VARCHAR(255),
-    note TEXT,
-    priority INT NOT NULL DEFAULT 0,
-    reminder TIMESTAMPTZ,
-    
-    done BOOLEAN NOT NULL DEFAULT FALSE,
+        _logger.LogInformation("Starting database migrations...");
 
-    created TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-    created_by VARCHAR(100),
-    last_modified TIMESTAMPTZ,
-    last_modified_by VARCHAR(100)
-);
+        // Ensure the migration history table exists
+        connection.Execute(@"
+                CREATE TABLE IF NOT EXISTS migration_history (
+                    id SERIAL PRIMARY KEY,
+                    script_name VARCHAR(255) NOT NULL,
+                    executed_at TIMESTAMPTZ DEFAULT NOW()
+                );
+            ");
 
--- =============================================
--- Create Table: user_role
--- =============================================
-CREATE TABLE IF NOT EXISTS user_role (
-    id SERIAL PRIMARY KEY,
-    user_id VARCHAR(100),
-    role VARCHAR(100),
-    
-    created TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-    created_by VARCHAR(100),
-    last_modified TIMESTAMPTZ,
-    last_modified_by VARCHAR(100)
-);
+        if (!Directory.Exists(scriptsFolder))
+        {
+            _logger.LogWarning("No migration scripts found in the Scripts folder.");
+            return;
+        }
 
--- =============================================
--- Create Table: domain_event
--- =============================================
-CREATE TABLE IF NOT EXISTS domain_event (
-    id SERIAL PRIMARY KEY,
-    event_id UUID NOT NULL,
-    event_type VARCHAR(255) NOT NULL,
-    event_data TEXT NOT NULL,
-    status VARCHAR(50) NOT NULL,
-    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-    processed_at TIMESTAMPTZ NULL,
-    result VARCHAR(255) NULL,
+        // 🔄 Fetch all executed scripts ONCE (no repetitive querying)
+        var executedScripts = connection.Query<string>(
+            "SELECT script_name FROM migration_history"
+        ).ToHashSet();
 
-    created TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-    created_by VARCHAR(100),
-    last_modified TIMESTAMPTZ,
-    last_modified_by VARCHAR(100)
-);
+        var sqlFiles = Directory.GetFiles(scriptsFolder, "*.sql").OrderBy(f => f).ToList();
+        _logger.LogInformation($"Found {sqlFiles.Count} SQL scripts to execute...");
 
--- =============================================
--- Insert Default user_role if not exists
--- =============================================
-DO $$
-BEGIN
-    IF NOT EXISTS (
-        SELECT 1 FROM user_role 
-        WHERE user_id = 'i53MEl0y7jOwIh0BvmHqd0PMDnf2' 
-        AND role = 'Administrator'
-    ) THEN
-        INSERT INTO user_role (user_id, role, created, created_by) 
-        VALUES ('i53MEl0y7jOwIh0BvmHqd0PMDnf2', 'Administrator', NOW(), 'SYSTEM');
-    END IF;
-END $$;
+        foreach (var file in sqlFiles)
+        {
+            var scriptName = Path.GetFileName(file);
 
-            
-            ";
+            // ✅ In-Memory check — no database call needed
+            if (executedScripts.Contains(scriptName))
+            {
+                _logger.LogInformation($"⚠️ Skipping {scriptName} - already executed.");
+                continue;
+            }
 
-        // Execute SQL to create tables and other database objects
-        dbConnection.Execute(initScript);
-        dbConnection.Close();
+            try
+            {
+                _logger.LogInformation($"🚀 Executing script: {scriptName}");
+                var scriptContent = File.ReadAllText(file);
+                connection.Execute(scriptContent);
+
+                // Log it as executed
+                connection.Execute(
+                    "INSERT INTO migration_history (script_name) VALUES (@scriptName)",
+                    new { scriptName }
+                );
+
+                _logger.LogInformation($"✅ Successfully executed: {scriptName}");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"❌ Error executing {scriptName}");
+                break;
+            }
+        }
+
+        connection.Close();
+        _logger.LogInformation("Database migration completed successfully.");
     }
 }
-

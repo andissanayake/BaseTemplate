@@ -3,6 +3,7 @@ using BaseTemplate.Infrastructure.Data;
 using BaseTemplate.Infrastructure.Identity;
 using Dapper;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 
 namespace Microsoft.Extensions.DependencyInjection;
 
@@ -25,8 +26,19 @@ public static class DependencyInjection
         services.AddSingleton(TimeProvider.System);
         services.AddTransient<IIdentityService, IdentityService>();
 
+
+        // Initialize Logger
+        using var loggerFactory = LoggerFactory.Create(builder =>
+        {
+            //builder.AddConsole();
+            builder.SetMinimumLevel(LogLevel.Debug);
+        });
+
+        // Create a logger instance
+        ILogger<DatabaseInitializer> logger = loggerFactory.CreateLogger<DatabaseInitializer>();
+
         using var connection = new PostgresConnectionFactory(connectionString).CreateConnection();
-        DatabaseInitializer.Migrate(connection);
+        new DatabaseInitializer(logger).Migrate(connection, "C:\\Users\\Acer\\source\\test\\BaseTemplate\\src\\Infrastructure\\Data\\Scripts");
         connection.Dispose();
         return services;
     }
