@@ -57,17 +57,3 @@ To integrate:
    ```
 
 This will register all necessary services provided by this project into the application's dependency injection container.
-
-## Contributing
-
-Standard contribution guidelines apply:
-
-1. Fork the repository.
-2. Create a new branch (`git checkout -b feature/YourFeature`).
-3. Commit your changes (`git commit -am 'Add some feature'`).
-4. Push to the branch (`git push origin feature/YourFeature`).
-5. Create a new Pull Request.
-
-## License
-
-Specify the license for this project (e.g., MIT, Apache 2.0).
