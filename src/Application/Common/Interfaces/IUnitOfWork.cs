@@ -1,7 +1,7 @@
 ﻿namespace BaseTemplate.Application.Common.Interfaces;
 public interface IUnitOfWork : IDisposable
 {
-    Task InsertAsync<T>(T entity) where T : class;
+    Task<int> InsertAsync<T>(T entity) where T : class;
     Task UpdateAsync<T>(T entity) where T : class;
     Task DeleteAsync<T>(T entity) where T : class;
     Task<T?> GetAsync<T>(object id) where T : class;

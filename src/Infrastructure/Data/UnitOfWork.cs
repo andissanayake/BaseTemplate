@@ -48,7 +48,7 @@ public class UnitOfWork : IUnitOfWork
         return new UOWTransaction(_transaction);
     }
 
-    public async Task InsertAsync<T>(T entity) where T : class
+    public async Task<int> InsertAsync<T>(T entity) where T : class
     {
         if (entity is BaseAuditableEntity auditable)
         {
@@ -56,7 +56,8 @@ public class UnitOfWork : IUnitOfWork
             auditable.Created = now;
             auditable.CreatedBy = _user.Identifier;
         }
-        await _connection.InsertAsync(entity, _transaction);
+        var data = await _connection.InsertAsync(entity, _transaction);
+        return data ?? 0;
     }
 
     public async Task UpdateAsync<T>(T entity) where T : class
