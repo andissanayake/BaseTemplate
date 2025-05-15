@@ -10,6 +10,9 @@ import { TodoGroupListPage } from "./pages/TodoGroupListPage";
 import { TodoGroupCreatePage } from "./pages/TodoGroupCreatePage";
 import { TodoGroupEditPage } from "./pages/TodoGroupEditPage";
 import { TodoGroupViewPage } from "./pages/TodoGroupViewPage";
+import { TenantCreatePage } from "./pages/TenantCreatePage";
+import { TenantEditPage } from "./pages/TenantEditPage";
+import { TenantViewPage } from "./pages/TenantViewPage";
 
 export const App = () => {
   return (
@@ -28,6 +31,10 @@ export const App = () => {
             path="todo-list/view/:listId"
             element={<TodoGroupViewPage />}
           />
+
+          <Route path="/tenants/create" element={<TenantCreatePage />} />
+          <Route path="/tenants/edit/:tenantId" element={<TenantEditPage />} />
+          <Route path="/tenants/view/:tenantId" element={<TenantViewPage />} />
 
           <Route
             path="/profile"

@@ -1,4 +1,4 @@
--- =============================================
+﻿-- =============================================
 -- Create Table: todo_list
 -- =============================================
 CREATE TABLE IF NOT EXISTS todo_list (
@@ -89,4 +89,19 @@ CREATE TABLE IF NOT EXISTS app_user (
     created_by VARCHAR(255),
     last_modified TIMESTAMPTZ,
     last_modified_by VARCHAR(255)
+);
+
+CREATE TABLE IF NOT EXISTS tenant (
+    id SERIAL PRIMARY KEY,
+    identifier VARCHAR(100),
+    name VARCHAR(255) NOT NULL,
+    address TEXT,
+    owner_identifier VARCHAR(100) NOT NULL,
+    created TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    created_by VARCHAR(255),
+    last_modified TIMESTAMPTZ,
+    last_modified_by VARCHAR(255),
+
+    -- 🔗 Foreign Key to "app_user" Table (identifier, not ID)
+    CONSTRAINT fk_owner FOREIGN KEY (owner_identifier) REFERENCES app_user(identifier) ON DELETE CASCADE
 );
