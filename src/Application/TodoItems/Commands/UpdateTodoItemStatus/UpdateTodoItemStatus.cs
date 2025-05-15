@@ -3,7 +3,6 @@ using BaseTemplate.Application.Common.Models;
 using BaseTemplate.Application.Common.RequestHandler;
 using BaseTemplate.Application.Common.Security;
 using BaseTemplate.Domain.Entities;
-using BaseTemplate.Domain.Events;
 
 namespace BaseTemplate.Application.TodoItems.Commands.UpdateTodoItemStatus;
 
@@ -14,20 +13,18 @@ public record UpdateTodoItemStatusCommand : IRequest<bool>
     public bool Done { get; init; }
 }
 
-public class UpdateTodoItemStatusCommandHandler : BaseRequestHandler<UpdateTodoItemStatusCommand, bool>
+public class UpdateTodoItemStatusCommandHandler : IRequestHandler<UpdateTodoItemStatusCommand, bool>
 {
     private readonly IUnitOfWorkFactory _factory;
-    private readonly IDomainEventDispatcher _domainEventDispatcher;
 
-    public UpdateTodoItemStatusCommandHandler(IUnitOfWorkFactory factory, IDomainEventDispatcher domainEventDispatcher, IIdentityService identityService) : base(identityService)
+    public UpdateTodoItemStatusCommandHandler(IUnitOfWorkFactory factory, IIdentityService identityService)
     {
         _factory = factory;
-        _domainEventDispatcher = domainEventDispatcher;
     }
 
-    public override async Task<Result<bool>> HandleAsync(UpdateTodoItemStatusCommand request, CancellationToken cancellationToken)
+    public async Task<Result<bool>> HandleAsync(UpdateTodoItemStatusCommand request, CancellationToken cancellationToken)
     {
-        using var uow = _factory.CreateUOW();
+        using var uow = _factory.Create();
         var entity = await uow.GetAsync<TodoItem>(request.Id);
 
         if (entity is null)
@@ -37,9 +34,6 @@ public class UpdateTodoItemStatusCommandHandler : BaseRequestHandler<UpdateTodoI
 
         entity.Done = request.Done;
         await uow.UpdateAsync(entity);
-        if (entity.Done) entity.AddDomainEvent(new TodoItemCompletedEvent(entity));
-        uow.Commit();
-        await _domainEventDispatcher.DispatchDomainEventsAsync(entity);
         return Result<bool>.Success(true);
     }
 }

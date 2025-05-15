@@ -9,27 +9,25 @@ namespace BaseTemplate.Application.TodoLists.Commands.DeleteTodoList;
 [Authorize]
 public record DeleteTodoListCommand(int Id) : IRequest<bool>;
 
-public class DeleteTodoListCommandHandler : BaseRequestHandler<DeleteTodoListCommand, bool>
+public class DeleteTodoListCommandHandler : IRequestHandler<DeleteTodoListCommand, bool>
 {
     private readonly IUnitOfWorkFactory _factory;
 
-    public DeleteTodoListCommandHandler(IUnitOfWorkFactory factory, IIdentityService identityService) : base(identityService)
+    public DeleteTodoListCommandHandler(IUnitOfWorkFactory factory)
     {
         _factory = factory;
     }
 
-    public override async Task<Result<bool>> HandleAsync(DeleteTodoListCommand request, CancellationToken cancellationToken)
+    public async Task<Result<bool>> HandleAsync(DeleteTodoListCommand request, CancellationToken cancellationToken)
     {
-        using var uow = _factory.CreateUOW();
+        using var uow = _factory.Create();
         var entity = await uow.GetAsync<TodoList>(request.Id);
 
         if (entity is null)
         {
             return Result<bool>.NotFound($"TodoList with id {request.Id} not found.");
         }
-
         await uow.DeleteAsync(entity);
-        uow.Commit();
         return Result<bool>.Success(true);
     }
 }

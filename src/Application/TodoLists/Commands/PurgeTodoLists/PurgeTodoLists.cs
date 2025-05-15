@@ -10,27 +10,25 @@ namespace BaseTemplate.Application.TodoLists.Commands.PurgeTodoLists;
 [Authorize(Roles = Roles.Administrator, Policy = Policies.CanPurge)]
 public record PurgeTodoListsCommand : IRequest<bool>;
 
-public class PurgeTodoListsCommandHandler : BaseRequestHandler<PurgeTodoListsCommand, bool>
+public class PurgeTodoListsCommandHandler : IRequestHandler<PurgeTodoListsCommand, bool>
 {
     private readonly IUnitOfWorkFactory _factory;
-    private readonly IIdentityService _identityService;
 
 
-    public PurgeTodoListsCommandHandler(IUnitOfWorkFactory factory, IIdentityService identityService) : base(identityService)
+    public PurgeTodoListsCommandHandler(IUnitOfWorkFactory factory)
     {
         _factory = factory;
-        _identityService = identityService;
     }
-    public override async Task<Result<bool>> HandleAsync(PurgeTodoListsCommand request, CancellationToken cancellationToken)
+    public async Task<Result<bool>> HandleAsync(PurgeTodoListsCommand request, CancellationToken cancellationToken)
     {
-        using var uow = _factory.CreateUOW();
+        using var uow = _factory.Create();
+        var transaction = uow.BeginTransaction();
         var items = await uow.GetAllAsync<TodoList>();
         var items2 = await uow.GetAllAsync<TodoItem>();
 
         await uow.DeleteAsync(items);
         await uow.DeleteAsync(items2);
-
-        uow.Commit();
+        transaction.Commit();
         return Result<bool>.Success(true);
     }
 }

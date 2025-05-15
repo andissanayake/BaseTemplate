@@ -7,17 +7,25 @@ import {
   handleLogout,
   handleLogin,
 } from "../auth/firebase";
-//import { authPolicy } from "../auth/authPolicy";
-//import { Policies } from "../auth/PoliciesEnum";
 import { useLocation, useNavigate } from "react-router";
 import { useAuthStore } from "../auth/authStore";
+import { UserService } from "../auth/userService";
+import { handleResult } from "../common/handleResult";
+import { useTenantStore } from "../features/Tenant/tenantStore";
 
 export const AppMenu = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const user = useAuthStore((state) => state.user);
-  const setUser = useAuthStore((state) => state.setUser);
-
+  const {
+    user,
+    setUser,
+    setRoles,
+    setTenantId,
+    setTenantName,
+    tenantId,
+    tenantName,
+  } = useAuthStore((state) => state);
+  const { currentTenant } = useTenantStore((state) => state);
   const [current, setCurrent] = useState(
     location.pathname === "/" || location.pathname === ""
       ? "/"
@@ -34,18 +42,37 @@ export const AppMenu = () => {
   );
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChangedListener((user) => {
+    const unsubscribe = onAuthStateChangedListener(async (user) => {
       if (user) {
         setUser(user);
+        const res = await UserService.details();
+        handleResult(res, {
+          onSuccess: (data) => {
+            setRoles(data?.roles ?? []);
+            setTenantId(data?.tenantId ?? null);
+            setTenantName(data?.tenantName ?? null);
+          },
+          onServerError: () => {
+            console.error("Failed to fetch roles!");
+          },
+        });
       } else {
         setUser(null);
+        setRoles([]);
       }
     }, false);
 
     return () => {
       unsubscribe();
     };
-  }, [setUser]);
+  }, [
+    setUser,
+    setTenantId,
+    setTenantName,
+    setRoles,
+    currentTenant?.id,
+    currentTenant?.name,
+  ]);
 
   useEffect(() => {
     if (location) {
@@ -84,6 +111,24 @@ export const AppMenu = () => {
           handleClick(e.key);
         },
       });
+      if (tenantId) {
+        menuItems.push({
+          key: "/tenants/view/" + tenantId,
+          label: <span>{tenantName}</span>,
+          onClick: (e: any) => {
+            handleClick(e.key);
+          },
+        });
+      }
+      if (!tenantId) {
+        menuItems.push({
+          key: "/tenants/create",
+          label: "Become a Tenant",
+          onClick: (e: any) => {
+            handleClick(e.key);
+          },
+        });
+      }
       menuItems.push({
         key: "/logout",
         label: "Logout",
@@ -102,7 +147,15 @@ export const AppMenu = () => {
       });
     }
     setItems(menuItems);
-  }, [user, navigate, current, location.pathname, handleClick]);
+  }, [
+    user,
+    navigate,
+    current,
+    location.pathname,
+    handleClick,
+    tenantId,
+    tenantName,
+  ]);
 
   return (
     <Menu

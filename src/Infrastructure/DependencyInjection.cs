@@ -1,8 +1,7 @@
 ﻿using BaseTemplate.Application.Common.Interfaces;
 using BaseTemplate.Infrastructure.Data;
-using BaseTemplate.Infrastructure.Events;
 using BaseTemplate.Infrastructure.Identity;
-using Microsoft.Data.SqlClient;
+using Dapper;
 using Microsoft.Extensions.Configuration;
 
 namespace Microsoft.Extensions.DependencyInjection;
@@ -11,26 +10,21 @@ public static class DependencyInjection
 {
     public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
     {
-        var connectionString = configuration.GetConnectionString("DefaultConnection");
-
-        services.AddSingleton<IUnitOfWorkFactory>(provider =>
+        DefaultTypeMap.MatchNamesWithUnderscores = true;
+        SimpleCRUD.SetDialect(SimpleCRUD.Dialect.PostgreSQL);
+        SimpleCRUD.SetTableNameResolver(new SnakeCaseTableNameResolver());
+        SimpleCRUD.SetColumnNameResolver(new SnakeCaseColumnNameResolver());
+        var connectionString = configuration.GetConnectionString("DefaultConnection")!;
+        services.AddSingleton<IDbConnectionFactory>(provider =>
         {
             var config = provider.GetRequiredService<IConfiguration>();
-            var user = provider.GetRequiredService<IUser>();
-            return new UnitOfWorkFactory(connectionString!, user);
+            return new PostgresConnectionFactory(connectionString);
         });
+        services.AddSingleton<IUnitOfWorkFactory, UnitOfWorkFactory>();
 
         services.AddSingleton(TimeProvider.System);
         services.AddTransient<IIdentityService, IdentityService>();
-
-        using var connection = new SqlConnection(connectionString);
-        DatabaseInitializer.Migrate(connection);
-        connection.Dispose();
-
-        services.AddSingleton<InMemoryDomainEventWorker>();
-        services.AddSingleton<IDomainEventQueue>(sp => sp.GetRequiredService<InMemoryDomainEventWorker>());
-        services.AddSingleton<IDomainEventDispatcher, QueuedDomainEventDispatcher>();
-        services.AddHostedService(sp => sp.GetRequiredService<InMemoryDomainEventWorker>());
+        services.AddSingleton<DatabaseInitializer>();
         return services;
     }
 }

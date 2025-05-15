@@ -1,44 +1,63 @@
 ﻿using System.Data;
-using System.Reflection;
 using BaseTemplate.Application.Common.Interfaces;
 using BaseTemplate.Domain.Common;
 using Dapper;
-using Dapper.Contrib.Extensions;
-using Microsoft.Data.SqlClient;
 
 namespace BaseTemplate.Infrastructure.Data;
-public class UnitOfWork : IUnitOfWork
-{
-    public IDbConnection Connection { get; }
-    private readonly IDbTransaction? _transaction;
-    private bool _isCompleted;
-    private readonly IUser _user;
 
-    public UnitOfWork(IDbConnection connection, IUser user, bool transactional = true)
+public class UOWTransaction : ITransaction
+{
+    private readonly IDbTransaction _transaction;
+
+    public UOWTransaction(IDbTransaction transaction)
     {
-        SqlMapperExtensions.TableNameMapper = (type) => type.Name;
-        _user = user;
-        Connection = connection;
-        Connection.Open();
-        if (transactional)
-        {
-            _transaction = Connection.BeginTransaction();
-        }
-        else
-        {
-            _isCompleted = true;
-        }
+        _transaction = transaction;
     }
 
-    public async Task InsertAsync<T>(T entity) where T : class
+    public void Commit()
+    {
+        _transaction.Commit();
+    }
+
+    public void Rollback()
+    {
+        _transaction.Rollback();
+    }
+
+    public void Dispose()
+    {
+        _transaction.Dispose();
+    }
+}
+public class UnitOfWork : IUnitOfWork
+{
+
+    private readonly IDbConnection _connection;
+    private IDbTransaction? _transaction;
+    private bool _disposed;
+    private readonly IUser _user;
+    public UnitOfWork(IDbConnectionFactory dbfactory, IUser user)
+    {
+        _connection = dbfactory.CreateConnection();
+        _user = user;
+
+    }
+    public ITransaction BeginTransaction()
+    {
+        _transaction = _connection.BeginTransaction();
+        return new UOWTransaction(_transaction);
+    }
+
+    public async Task<int> InsertAsync<T>(T entity) where T : class
     {
         if (entity is BaseAuditableEntity auditable)
         {
             var now = DateTimeOffset.UtcNow;
             auditable.Created = now;
-            auditable.CreatedBy = _user.Id;
+            auditable.CreatedBy = _user.Identifier;
         }
-        await Connection.InsertAsync(entity, _transaction);
+        var data = await _connection.InsertAsync(entity, _transaction);
+        return data ?? 0;
     }
 
     public async Task UpdateAsync<T>(T entity) where T : class
@@ -46,122 +65,52 @@ public class UnitOfWork : IUnitOfWork
         if (entity is BaseAuditableEntity auditable)
         {
             auditable.LastModified = DateTimeOffset.UtcNow;
-            auditable.LastModifiedBy = _user.Id;
+            auditable.LastModifiedBy = _user.Identifier;
         }
-        await Connection.UpdateAsync(entity, _transaction);
+        await _connection.UpdateAsync(entity, _transaction);
     }
 
     public async Task DeleteAsync<T>(T entity) where T : class =>
-        await Connection.DeleteAsync(entity, _transaction);
+        await _connection.DeleteAsync(entity, _transaction);
 
     public async Task<T?> GetAsync<T>(object id) where T : class =>
-        await Connection.GetAsync<T>(id, _transaction);
+        await _connection.GetAsync<T>(id, _transaction);
+
     public async Task<IEnumerable<T>> GetAllAsync<T>() where T : class =>
-        await Connection.GetAllAsync<T>(_transaction);
+        await _connection.GetListAsync<T>(_transaction);
+
     public async Task<IEnumerable<T>> QueryAsync<T>(string sql, object? param = null) =>
-        await Connection.QueryAsync<T>(sql, param, _transaction);
+        await _connection.QueryAsync<T>(sql, param, _transaction);
 
     public async Task<T> QuerySingleAsync<T>(string sql, object? param = null) =>
-        await Connection.QuerySingleAsync<T>(sql, param, _transaction);
+        await _connection.QuerySingleAsync<T>(sql, param, _transaction);
 
     public async Task<T?> QueryFirstOrDefaultAsync<T>(string sql, object? param = null) =>
-        await Connection.QueryFirstOrDefaultAsync<T>(sql, param, _transaction);
+        await _connection.QueryFirstOrDefaultAsync<T>(sql, param, _transaction);
 
     public async Task<int> ExecuteAsync(string sql, object? param = null) =>
-        await Connection.ExecuteAsync(sql, param, _transaction);
-
-    public async Task BulkCopyAsync<T>(IEnumerable<T> items, string? tableName = null)
-    {
-        if (Connection is not SqlConnection sqlConnection)
-            throw new NotSupportedException("Bulk insert is only supported with SqlConnection.");
-
-        var actualTableName = tableName ?? typeof(T).Name;
-
-        var props = typeof(T)
-            .GetProperties(BindingFlags.Public | BindingFlags.Instance)
-            .Where(p => p.CanWrite)
-            .ToArray();
-
-        var dataTable = new DataTable();
-        foreach (var prop in props)
-        {
-            var type = Nullable.GetUnderlyingType(prop.PropertyType) ?? prop.PropertyType;
-            if (type == typeof(DateTimeOffset))
-                type = typeof(DateTime);
-            dataTable.Columns.Add(prop.Name, type);
-        }
-
-        var now = DateTimeOffset.UtcNow;
-        var userId = _user.Id ?? "SYSTEM";
-
-        foreach (var item in items)
-        {
-            // ✅ Assign new Guid if Id is Guid.Empty
-            var idProp = typeof(T).GetProperty("Id");
-            if (idProp != null && idProp.PropertyType == typeof(Guid))
-            {
-                var idValue = (Guid?)idProp.GetValue(item);
-                if (idValue == null || idValue == Guid.Empty)
-                {
-                    idProp.SetValue(item, Guid.NewGuid());
-                }
-            }
-
-            // ✅ Set audit fields
-            if (item is BaseAuditableEntity auditable)
-            {
-                auditable.Created = now;
-                auditable.CreatedBy = userId;
-            }
-
-            // ✅ Collect values for each row
-            var values = props.Select(p =>
-            {
-                var value = p.GetValue(item);
-                if (value is DateTimeOffset dto)
-                    return dto.UtcDateTime;
-                return value ?? DBNull.Value;
-            }).ToArray();
-
-            dataTable.Rows.Add(values);
-        }
-
-        using var bulkCopy = new SqlBulkCopy(sqlConnection, SqlBulkCopyOptions.Default, (SqlTransaction?)_transaction)
-        {
-            DestinationTableName = actualTableName
-        };
-
-        foreach (DataColumn column in dataTable.Columns)
-        {
-            bulkCopy.ColumnMappings.Add(column.ColumnName, column.ColumnName);
-        }
-
-        await bulkCopy.WriteToServerAsync(dataTable);
-    }
-
-    public void Commit()
-    {
-        if (_isCompleted) return;
-        _transaction?.Commit();
-        _isCompleted = true;
-    }
-
-    public void Rollback()
-    {
-        if (_isCompleted) return;
-        _transaction?.Rollback();
-        _isCompleted = true;
-    }
+        await _connection.ExecuteAsync(sql, param, _transaction);
 
     public void Dispose()
     {
-        if (!_isCompleted)
+        if (!_disposed)
         {
-            try { _transaction?.Rollback(); } catch { }
+            _transaction?.Dispose();
+            _connection.Close();
+            _connection.Dispose();
+            _disposed = true;
         }
-        _transaction?.Dispose();
-        Connection.Dispose();
     }
 }
 
-
+public class UnitOfWorkFactory : IUnitOfWorkFactory
+{
+    private readonly IDbConnectionFactory _dbfactory;
+    private readonly IUser _user;
+    public UnitOfWorkFactory(IDbConnectionFactory dbfactory, IUser user)
+    {
+        _dbfactory = dbfactory;
+        _user = user;
+    }
+    public IUnitOfWork Create() => new UnitOfWork(_dbfactory, _user);
+}

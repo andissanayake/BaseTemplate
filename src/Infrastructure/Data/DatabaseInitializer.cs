@@ -1,95 +1,77 @@
 ﻿using System.Data;
 using Dapper;
+using Microsoft.Extensions.Logging;
 namespace BaseTemplate.Infrastructure.Data;
-
-public static class DatabaseInitializer
+public class DatabaseInitializer
 {
-    public static void Migrate(IDbConnection dbConnection)
+    private readonly ILogger<DatabaseInitializer> _logger;
+    public DatabaseInitializer(ILogger<DatabaseInitializer> logger)
     {
-        dbConnection.Open();
+        _logger = logger;
+    }
 
-        var initScript = @"
-            -- =============================================
-            -- Create Table: TodoList
-            -- =============================================
-            IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='TodoList' AND xtype='U')
-            BEGIN
-                CREATE TABLE TodoList (
-                    Id INT PRIMARY KEY IDENTITY(1,1),
-                    Title NVARCHAR(255),
-                    Colour NVARCHAR(7) NOT NULL DEFAULT '#FFFFFF',
+    public void Migrate(IDbConnection connection, string scriptsFolder)
+    {
+        connection.Open();
 
-                    Created DATETIMEOFFSET NOT NULL,
-                    CreatedBy NVARCHAR(100),
-                    LastModified DATETIMEOFFSET NOT NULL,
-                    LastModifiedBy NVARCHAR(100)
+        _logger.LogInformation("Starting database migrations...");
+
+        // Ensure the migration history table exists
+        connection.Execute(@"
+                CREATE TABLE IF NOT EXISTS migration_history (
+                    id SERIAL PRIMARY KEY,
+                    script_name VARCHAR(255) NOT NULL,
+                    executed_at TIMESTAMPTZ DEFAULT NOW()
                 );
-            END
+            ");
 
-            -- =============================================
-            -- Create Table: TodoItem
-            -- =============================================
-            IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='TodoItem' AND xtype='U')
-            BEGIN
-                CREATE TABLE TodoItem (
-                    Id INT PRIMARY KEY IDENTITY(1,1),
-                    ListId INT NULL,
-                    Title NVARCHAR(255),
-                    Note NVARCHAR(MAX),
-                    Priority INT NOT NULL DEFAULT 0,
-                    Reminder DATETIME,
+        if (!Directory.Exists(scriptsFolder))
+        {
+            _logger.LogWarning("No migration scripts found in the Scripts folder.");
+            return;
+        }
 
-                    Done BIT NOT NULL DEFAULT 0,
+        // 🔄 Fetch all executed scripts ONCE (no repetitive querying)
+        var executedScripts = connection.Query<string>(
+            "SELECT script_name FROM migration_history"
+        ).ToHashSet();
 
-                    Created DATETIMEOFFSET NOT NULL,
-                    CreatedBy NVARCHAR(100),
-                    LastModified DATETIMEOFFSET NOT NULL,
-                    LastModifiedBy NVARCHAR(100)
+        var sqlFiles = Directory.GetFiles(scriptsFolder, "*.psql").OrderBy(f => f).ToList();
+        _logger.LogInformation($"Found {sqlFiles.Count} SQL scripts to execute...");
+
+        foreach (var file in sqlFiles)
+        {
+            var scriptName = Path.GetFileName(file);
+
+            // ✅ In-Memory check — no database call needed
+            if (executedScripts.Contains(scriptName))
+            {
+                _logger.LogInformation($"⚠️ Skipping {scriptName} - already executed.");
+                continue;
+            }
+
+            try
+            {
+                _logger.LogInformation($"🚀 Executing script: {scriptName}");
+                var scriptContent = File.ReadAllText(file);
+                connection.Execute(scriptContent);
+
+                // Log it as executed
+                connection.Execute(
+                    "INSERT INTO migration_history (script_name) VALUES (@scriptName)",
+                    new { scriptName }
                 );
-            END
-            -- =============================================
-            -- Create Table: UserRole
-            -- =============================================
-            IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='UserRole' AND xtype='U')
-            BEGIN
-                CREATE TABLE UserRole (
-                    Id INT PRIMARY KEY IDENTITY(1,1),
-                    UserId NVARCHAR(100),
-                    Role NVARCHAR(100),
 
-                    Created DATETIMEOFFSET NOT NULL,
-                    CreatedBy NVARCHAR(100),
-                    LastModified DATETIMEOFFSET NOT NULL,
-                    LastModifiedBy NVARCHAR(100)
-                );
-            END
+                _logger.LogInformation($"✅ Successfully executed: {scriptName}");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"❌ Error executing {scriptName}");
+                break;
+            }
+        }
 
-            -- =============================================
-            -- Create Table: DomainEvent
-            -- =============================================
-            IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='DomainEvent' AND xtype='U')
-            BEGIN
-                CREATE TABLE DomainEvent (
-                    Id INT PRIMARY KEY IDENTITY(1,1),
-                    EventId UNIQUEIDENTIFIER NOT NULL,
-                    EventType NVARCHAR(255) NOT NULL,
-                    EventData NVARCHAR(MAX) NOT NULL,
-                    Status NVARCHAR(50) NOT NULL,
-                    CreatedAt DATETIMEOFFSET NOT NULL,
-                    ProcessedAt DATETIMEOFFSET NULL,
-                    Result NVARCHAR(255) NULL,
-                    Created DATETIMEOFFSET NOT NULL,
-                    CreatedBy NVARCHAR(100),
-                    LastModified DATETIMEOFFSET,
-                    LastModifiedBy NVARCHAR(100)
-                );
-            END
-            
-            ";
-
-        // Execute SQL to create tables and other database objects
-        dbConnection.Execute(initScript);
-        dbConnection.Close();
+        connection.Close();
+        _logger.LogInformation("Database migration completed successfully.");
     }
 }
-

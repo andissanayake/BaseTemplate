@@ -20,32 +20,28 @@ public record UpdateTodoItemCommand : IRequest<bool>
     public PriorityLevel? Priority { get; set; }
 }
 
-public class UpdateTodoItemCommandHandler : BaseRequestHandler<UpdateTodoItemCommand, bool>
+public class UpdateTodoItemCommandHandler : IRequestHandler<UpdateTodoItemCommand, bool>
 {
     private readonly IUnitOfWorkFactory _factory;
-    public UpdateTodoItemCommandHandler(IUnitOfWorkFactory factory, IIdentityService identityService) : base(identityService)
+    public UpdateTodoItemCommandHandler(IUnitOfWorkFactory factory, IIdentityService identityService)
     {
         _factory = factory;
     }
-    public override async Task<Result<bool>> HandleAsync(UpdateTodoItemCommand request, CancellationToken cancellationToken)
+    public async Task<Result<bool>> HandleAsync(UpdateTodoItemCommand request, CancellationToken cancellationToken)
     {
-        using var uow = _factory.CreateUOW();
+        using var uow = _factory.Create();
         var entity = await uow.GetAsync<TodoItem>(request.Id);
 
         if (entity is null)
         {
             return Result<bool>.NotFound($"TodoItem with id {request.Id} not found.");
         }
-
-        entity.Title = request.Title;
         entity.Title = request.Title;
         entity.Note = request.Note;
-        entity.Reminder = request.Reminder;
+        entity.Reminder = request.Reminder?.UtcDateTime;
         entity.Done = false;
         entity.Priority = request.Priority ?? PriorityLevel.None;
-
         await uow.UpdateAsync(entity);
-        uow.Commit();
         return Result<bool>.Success(true);
     }
 }

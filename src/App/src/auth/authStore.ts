@@ -1,7 +1,6 @@
 // stores/authStore.ts
 import { create } from "zustand";
 import { persist, devtools } from "zustand/middleware";
-import axiosInstance from "./axiosInstance";
 
 export interface AppUser {
   uid: string;
@@ -14,35 +13,28 @@ export interface AppUser {
 interface AuthState {
   user: AppUser | null;
   roles: string[];
+  tenantId: string | null;
+  tenantName: string | null;
   setUser: (user: AppUser | null) => void;
-  fetchRoles: () => Promise<void>;
+  setRoles: (roles: string[]) => void;
+  setTenantId: (tenantId: string | null) => void;
+  setTenantName: (tenantName: string | null) => void;
 }
 
 export const useAuthStore = create<AuthState>()(
   devtools(
     persist(
-      (set, get) => ({
+      (set) => ({
         user: null,
         roles: [],
+        tenantId: null,
+        tenantName: null,
         setUser: async (user) => {
           set({ user });
-          if (user) {
-            await get().fetchRoles();
-          }
         },
-        fetchRoles: async () => {
-          axiosInstance
-            .get("/api/user/roles")
-            .then((response) => {
-              if (response.data) {
-                set({ roles: response.data });
-              }
-            })
-            .catch((error) => {
-              console.error("Error fetching roles:", error);
-              set({ roles: [] });
-            });
-        },
+        setRoles: (roles) => set({ roles }),
+        setTenantId: (tenantId) => set({ tenantId }),
+        setTenantName: (tenantName) => set({ tenantName }),
       }),
       {
         name: "auth",

@@ -100,7 +100,6 @@ const TodoItemList: React.FC = () => {
 
   const handlePaginationChange = (page: number, pageSize: number) => {
     setPagination(page, pageSize);
-    loadTodoItems();
   };
 
   const updateItemStatus = async (id: number, done: boolean) => {
@@ -204,7 +203,6 @@ const TodoItemList: React.FC = () => {
         visible={isEditModalVisible}
         onClose={() => {
           setIsEditModalVisible(false);
-          loadTodoItems();
         }}
         todoItem={currentTodoItem!}
         refresh={loadTodoItems}

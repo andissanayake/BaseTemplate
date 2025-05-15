@@ -10,17 +10,17 @@ namespace BaseTemplate.Application.TodoLists.Queries.GetTodos;
 [Authorize]
 public record GetTodosQuery : IRequest<TodosVm>;
 
-public class GetTodosQueryHandler : BaseRequestHandler<GetTodosQuery, TodosVm>
+public class GetTodosQueryHandler : IRequestHandler<GetTodosQuery, TodosVm>
 {
     private readonly IUnitOfWorkFactory _factory;
 
-    public GetTodosQueryHandler(IUnitOfWorkFactory factory, IIdentityService identityService) : base(identityService)
+    public GetTodosQueryHandler(IUnitOfWorkFactory factory)
     {
         _factory = factory;
     }
-    public override async Task<Result<TodosVm>> HandleAsync(GetTodosQuery request, CancellationToken cancellationToken)
+    public async Task<Result<TodosVm>> HandleAsync(GetTodosQuery request, CancellationToken cancellationToken)
     {
-        using var uow = _factory.CreateUOW();
+        using var uow = _factory.Create();
         var todoLists = await uow.GetAllAsync<TodoList>();
 
         var todoDtoList = todoLists.Select(x => new TodoListDto { Colour = x.Colour, Id = x.Id, Title = x.Title }).ToList();

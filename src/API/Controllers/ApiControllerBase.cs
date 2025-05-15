@@ -10,9 +10,10 @@ namespace BaseTemplate.API.Controllers;
 public abstract class ApiControllerBase : ControllerBase
 {
     private IMediator _mediator = null!;
+    private ILogger<ApiControllerBase> _log = null!;
 
     protected IMediator Mediator => _mediator ??= HttpContext.RequestServices.GetRequiredService<IMediator>();
-
+    protected ILogger<ApiControllerBase> Log => _log ??= HttpContext.RequestServices.GetRequiredService<ILogger<ApiControllerBase>>();
     public async Task<ActionResult<Result<T>>> SendAsync<T>(
         IRequest<T> request,
         CancellationToken cancellationToken = default)
@@ -33,6 +34,7 @@ public abstract class ApiControllerBase : ControllerBase
         }
         catch (Exception ex)
         {
+            Log.LogError(ex, "Unhandled Exception", [request]);
             return StatusCode(500, Result<T>.ServerError(ex.Message));
         }
     }
