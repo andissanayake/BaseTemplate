@@ -46,25 +46,6 @@ CREATE TABLE IF NOT EXISTS user_role (
 );
 
 -- =============================================
--- Create Table: domain_event
--- =============================================
-CREATE TABLE IF NOT EXISTS domain_event (
-    id SERIAL PRIMARY KEY,
-    event_id UUID NOT NULL,
-    event_type VARCHAR(255) NOT NULL,
-    event_data TEXT NOT NULL,
-    status VARCHAR(50) NOT NULL,
-    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-    processed_at TIMESTAMPTZ NULL,
-    result VARCHAR(255) NULL,
-
-    created TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-    created_by VARCHAR(100),
-    last_modified TIMESTAMPTZ,
-    last_modified_by VARCHAR(100)
-);
-
--- =============================================
 -- Insert Default user_role if not exists
 -- =============================================
 DO $$
@@ -100,8 +81,5 @@ CREATE TABLE IF NOT EXISTS tenant (
     created TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     created_by VARCHAR(255),
     last_modified TIMESTAMPTZ,
-    last_modified_by VARCHAR(255),
-
-    -- 🔗 Foreign Key to "app_user" Table (identifier, not ID)
-    CONSTRAINT fk_owner FOREIGN KEY (owner_identifier) REFERENCES app_user(identifier) ON DELETE CASCADE
+    last_modified_by VARCHAR(255)
 );
