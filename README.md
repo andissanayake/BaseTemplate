@@ -1,103 +1,193 @@
-﻿## Shopping Mart Web App - Marketing MVP
+# App (Frontend Project)
 
-### Overview:
+This project is a frontend application built with Vite, React, TypeScript, and Ant Design. It utilizes Firebase for backend services and Zustand for state management.
 
-This application is designed as a marketing platform for local stores in a specific area of Sri Lanka. The goal is to highlight store promotions, provide location-based filtering, and give users easy access to local business information without the complexity of inventory management.
+## Project Structure (within src/App/)
 
-### Features:
+This README describes the project located within the `src/App/` directory of the workspace.
 
-#### 1. Home Page:
+Here is an overview of the key files and directories in this project:
 
-* Display popular stores and featured promotions.
-* Categories like Groceries, Electronics, Clothing, and more.
-* Highlight time-sensitive offers with countdown timers.
+- `/` (Root of `src/App/`)
+  - `nginx.default.conf`: Configuration file for Nginx (likely for deployment).
+  - `vite.config.ts`: Configuration file for Vite.
+  - `Dockerfile`: Instructions for building a Docker image for the application.
+  - `package.json`: Lists project dependencies (React, Vite, Firebase, Zustand, AntD, etc.) and scripts.
+  - `package-lock.json`: Records the exact versions of dependencies.
+  - `tsconfig.json`, `tsconfig.app.json`, `tsconfig.node.json`: TypeScript configuration files.
+  - `index.html`: The main HTML entry point for the Vite application.
+  - `eslint.config.js`: Configuration for ESLint.
+  - `App.esproj`, `App.esproj.user`: Project files, likely for Visual Studio.
+  - `.gitignore`: Specifies intentionally untracked files.
+  - `src/`: Contains the application's React source code (components, pages, store, services, etc.).
+  - `public/`: Contains static assets.
+  - `dist/`: Contains the built/production-ready files (generated after `npm run build`).
+  - `node_modules/`: Contains all project dependencies.
+  - `.vscode/`: Contains VS Code specific settings for this sub-project (if present).
+  - `obj/`: Likely contains intermediate object files.
 
-#### 2. Store Directory:
+## Firebase Usage
 
-* List of all registered stores.
-* Display store details: Address, Contact info, Store timings, and Map location.
-* Filters to refine search by Category, Distance, and Current Offers.
+This project uses Firebase (`firebase` version 11.5.0).
 
-#### 3. Store Details Page:
+**1. Setup & Initialization:**
 
-* Show detailed information about the store.
-* Display current promotions and special deals.
-* High-resolution images of the store and products.
-* Integrated map view for easy navigation.
-* Share button for easy social media sharing.
+- Ensure you have a Firebase project created at [https://console.firebase.google.com/](https://console.firebase.google.com/).
+- Obtain your Firebase project configuration (apiKey, authDomain, projectId, etc.).
+- Typically, you would initialize Firebase in a dedicated file (e.g., `src/App/src/firebase.ts` or `src/App/src/services/firebaseConfig.ts`).
 
-#### 4. Promotions Page:
+  ```typescript
+  // Example: src/App/src/firebaseConfig.ts
+  import { initializeApp } from "firebase/app";
+  // import { getAnalytics } from "firebase/analytics"; // Optional
+  // import { getAuth } from "firebase/auth";
+  // import { getFirestore } from "firebase/firestore";
+  // import { getStorage } from "firebase/storage";
 
-* Aggregated view of all current promotions.
-* Search by category or store.
-* "Expires Soon" filter for urgent offers.
+  const firebaseConfig = {
+    apiKey: "YOUR_API_KEY",
+    authDomain: "YOUR_AUTH_DOMAIN",
+    projectId: "YOUR_PROJECT_ID",
+    storageBucket: "YOUR_STORAGE_BUCKET",
+    messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+    appId: "YOUR_APP_ID",
+    // measurementId: "YOUR_MEASUREMENT_ID" // Optional
+  };
 
-#### 5. Location-based Filtering:
+  // Initialize Firebase
+  const app = initializeApp(firebaseConfig);
+  // const analytics = getAnalytics(app); // Optional
+  // export const auth = getAuth(app);
+  // export const db = getFirestore(app);
+  // export const storage = getStorage(app);
 
-* Geolocation to filter stores within a specific radius.
-* Map view with pins representing store locations.
+  export default app;
+  ```
 
-#### 6. Search Functionality:
+- Import and use the initialized Firebase services (Auth, Firestore, etc.) throughout your application.
 
-* Search for stores, products, or promotions.
-* Autocomplete suggestions for quick searching.
+**2. Services Used:** \* [Specify which Firebase services like Authentication, Firestore, Storage, etc., are actively used and for what purpose. You'll need to fill this based on your actual implementation.]
 
-#### 7. Basic Admin Portal:
+## Store Service Implementation (Zustand)
 
-* Allows store owners or administrators to add/edit store information.
-* Manage promotions and featured listings.
-* View analytics on store page visits and promotions.
+This project uses Zustand (`zustand` version 5.0.3) for state management.
 
----
+**1. Creating a Store:**
 
----
+- Define your store in a file, for example, `src/App/src/store/userStore.ts`.
 
-This project is licensed under the MIT License.
+  ```typescript
+  // Example: src/App/src/store/userStore.ts
+  import { create } from "zustand";
 
+  interface UserState {
+    userId: string | null;
+    username: string | null;
+    isLoading: boolean;
+    error: string | null;
+    setUserId: (id: string | null) => void;
+    setUsername: (name: string | null) => void;
+    fetchUserData: (userId: string) => Promise<void>; // Example async action
+  }
 
-C:\Users\Acer\source\test\BaseTemplate>k6 run api-post-k6.js
+  const useUserStore = create<UserState>((set) => ({
+    userId: null,
+    username: null,
+    isLoading: false,
+    error: null,
+    setUserId: (id) => set({ userId: id }),
+    setUsername: (name) => set({ username: name }),
+    fetchUserData: async (userId) => {
+      set({ isLoading: true, error: null });
+      try {
+        // Replace with your actual data fetching logic, e.g., using Axios and Firebase
+        // const response = await axios.get(`/api/users/${userId}`);
+        // const userData = response.data;
+        // For example, if fetching from Firestore:
+        // const userDoc = await getDoc(doc(db, "users", userId));
+        // if (userDoc.exists()) {
+        //   set({ username: userDoc.data().username, userId: userDoc.id, isLoading: false });
+        // } else {
+        //   throw new Error("User not found");
+        // }
+        await new Promise((resolve) => setTimeout(resolve, 1000)); // Simulate API call
+        set({ username: `User ${userId}`, userId: userId, isLoading: false });
+      } catch (err) {
+        set({
+          error: err instanceof Error ? err.message : String(err),
+          isLoading: false,
+        });
+      }
+    },
+  }));
 
-         /\      Grafana   /‾‾/
-    /\  /  \     |\  __   /  /
-   /  \/    \    | |/ /  /   ‾‾\
-  /          \   |   (  |  (‾)  |
- / __________ \  |_|\_\  \_____/
+  export default useUserStore;
+  ```
 
-     execution: local
-        script: api-post-k6.js
-        output: -
+**2. Using the Store in Components:**
 
-     scenarios: (100.00%) 1 scenario, 6000 max VUs, 48s max duration (incl. graceful stop):
-              * default: Up to 6000 looping VUs for 18s over 6 stages (gracefulRampDown: 30s, gracefulStop: 30s)
+- Import and use the store in your React components.
 
+  ```tsx
+  // Example: src/App/src/components/UserProfile.tsx
+  import React, { useEffect } from "react";
+  import useUserStore from "../store/userStore";
 
+  const UserProfile: React.FC = () => {
+    const { userId, username, isLoading, error, fetchUserData, setUsername } =
+      useUserStore();
 
-  █ TOTAL RESULTS
+    useEffect(() => {
+      if (!userId && !username) {
+        // Example: Fetch data for a default user or based on some logic
+        fetchUserData("123");
+      }
+    }, [userId, username, fetchUserData]);
 
-    checks_total.......................: 14418   668.055801/s
-    checks_succeeded...................: 100.00% 14418 out of 14418
-    checks_failed......................: 0.00%   0 out of 14418
+    if (isLoading) return <p>Loading user data...</p>;
+    if (error) return <p>Error: {error}</p>;
 
-    ✓ status is 200
+    return (
+      <div>
+        <h1>User Profile</h1>
+        {username ? (
+          <>
+            <p>ID: {userId}</p>
+            <p>Name: {username}</p>
+            <button onClick={() => setUsername("New Name From Client")}>
+              Change Name (Client)
+            </button>
+          </>
+        ) : (
+          <p>No user data.</p>
+        )}
+      </div>
+    );
+  };
 
-    HTTP
-    http_req_duration.......................................................: avg=2.36s min=521.29µs med=1.26s max=6.57s p(90)=6.2s p(95)=6.39s
-      { expected_response:true }............................................: avg=2.36s min=521.29µs med=1.26s max=6.57s p(90)=6.2s p(95)=6.39s
-    http_req_failed.........................................................: 0.00%  0 out of 14418
-    http_reqs...............................................................: 14418  668.055801/s
+  export default UserProfile;
+  ```
 
-    EXECUTION
-    iteration_duration......................................................: avg=3.36s min=1s       med=2.27s max=7.57s p(90)=7.2s p(95)=7.39s
-    iterations..............................................................: 14418  668.055801/s
-    vus.....................................................................: 1941   min=64         max=5899
-    vus_max.................................................................: 6000   min=6000       max=6000
+## Getting Started
 
-    NETWORK
-    data_received...........................................................: 3.1 MB 143 kB/s
-    data_sent...............................................................: 21 MB  975 kB/s
-
-
-
-
-running (21.6s), 0000/6000 VUs, 14418 complete and 0 interrupted iterations
-default ✓ [======================================] 0000/6000 VUs  18s
+1.  **Navigate to the App directory:**
+    ```bash
+    cd src/App
+    ```
+2.  **Install dependencies:**
+    ```bash
+    npm install
+    ```
+3.  **Set up Firebase:**
+    - Create a `src/App/src/firebaseConfig.ts` (or similar) with your Firebase project credentials (see "Firebase Usage" section).
+    - Update the example API calls in the Zustand store or your components to use your actual Firebase services.
+4.  **Run the development server:**
+    ```bash
+    npm run dev
+    ```
+    The application should be available at `http://localhost:5000`.
+5.  **Build for production:**
+    ```bash
+    npm run build
+    ```
+    The production files will be in `src/App/dist/`.
