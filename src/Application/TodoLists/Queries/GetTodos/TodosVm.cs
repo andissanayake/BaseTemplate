@@ -1,6 +1,4 @@
-﻿using BaseTemplate.Application.Common.Models;
-
-namespace BaseTemplate.Application.TodoLists.Queries.GetTodos;
+﻿namespace BaseTemplate.Application.TodoLists.Queries.GetTodos;
 
 public class TodosVm
 {

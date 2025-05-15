@@ -1,10 +1,4 @@
-﻿using BaseTemplate.Application.Common.Interfaces;
-using BaseTemplate.Application.Common.Models;
-using BaseTemplate.Application.Common.RequestHandler;
-using BaseTemplate.Application.Common.Security;
-using BaseTemplate.Domain.Entities;
-
-namespace BaseTemplate.Application.TodoItems.Commands.DeleteTodoItem;
+﻿namespace BaseTemplate.Application.TodoItems.Commands.DeleteTodoItem;
 
 [Authorize]
 public record DeleteTodoItemCommand(int Id) : IRequest<bool>;

@@ -1,6 +1,4 @@
-﻿using BaseTemplate.Application.Common.Models;
-
-namespace BaseTemplate.Application.Common.RequestHandler;
+﻿namespace BaseTemplate.Application.Common.RequestHandler;
 public interface IRequest<TResponse> { }
 
 public interface IRequestHandler<in TRequest, TResponse>

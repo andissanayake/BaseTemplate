@@ -1,8 +1,4 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using BaseTemplate.Application.Common.Interfaces;
-using BaseTemplate.Application.Common.Models;
-using BaseTemplate.Application.Common.RequestHandler;
-using BaseTemplate.Domain.Entities;
 using BaseTemplate.Domain.Enums;
 
 namespace BaseTemplate.Application.TodoItems.Commands.CreateTodoItem;

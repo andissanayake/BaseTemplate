@@ -13,7 +13,6 @@ public static class DependencyInjection
     {
         services.AddSingleton<IUser, CurrentUserService>();
         services.AddHttpContextAccessor();
-        //services.AddExceptionHandler<CustomExceptionHandler>();
         services.AddHealthChecks();
         services.AddControllers();
         services.Configure<ApiBehaviorOptions>(options =>
@@ -47,10 +46,7 @@ public static class DependencyInjection
                         }
                 });
         });
-
         services.AddApiAuthentication(configuration);
-        services.AddAppAuthorization();
-
         return services;
     }
 }

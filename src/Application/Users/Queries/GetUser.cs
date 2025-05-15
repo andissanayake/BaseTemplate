@@ -1,10 +1,4 @@
-﻿using BaseTemplate.Application.Common.Interfaces;
-using BaseTemplate.Application.Common.Models;
-using BaseTemplate.Application.Common.RequestHandler;
-using BaseTemplate.Application.Common.Security;
-using BaseTemplate.Domain.Entities;
-
-namespace BaseTemplate.Application.Users.Queries;
+﻿namespace BaseTemplate.Application.Users.Queries;
 
 [Authorize]
 public record GetUserQuery : IRequest<GetUserResponse>
@@ -56,7 +50,7 @@ public class GetUserQueryHandler : IRequestHandler<GetUserQuery, GetUserResponse
         else
         {
             // Load minimal AppUser for update
-            var existingUser = new AppUser { Id = userInfo.Id, Identifier = userInfo.Identifier }; 
+            var existingUser = new AppUser { Id = userInfo.Id, Identifier = userInfo.Identifier };
             bool changed = false;
             if (userInfo.Name != _user.Name)
             {
@@ -69,7 +63,7 @@ public class GetUserQueryHandler : IRequestHandler<GetUserQuery, GetUserResponse
                 changed = true;
             }
 
-            if(changed)
+            if (changed)
             {
                 await uow.UpdateAsync(existingUser);
             }
