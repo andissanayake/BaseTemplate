@@ -1,5 +1,5 @@
 ﻿using BaseTemplate.Application.Common.Models;
-using BaseTemplate.Application.TenantLists.Commands.GetTenantListById;
+using BaseTemplate.Application.TenantLists.Commands.GetTenantById;
 using BaseTemplate.Application.Tenants.Commands.CreateTenant;
 using BaseTemplate.Application.Tenants.Commands.UpdateTenant;
 using Microsoft.AspNetCore.Authorization;

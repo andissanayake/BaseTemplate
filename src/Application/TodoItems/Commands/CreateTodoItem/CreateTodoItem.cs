@@ -3,7 +3,7 @@ using BaseTemplate.Domain.Enums;
 
 namespace BaseTemplate.Application.TodoItems.Commands.CreateTodoItem;
 
-//[Authorize]
+[Authorize]
 public record CreateTodoItemCommand : IRequest<int>
 {
     public int ListId { get; init; }
