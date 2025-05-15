@@ -1,103 +1,73 @@
-﻿## Shopping Mart Web App - Marketing MVP
+﻿# Infrastructure - BaseTemplate
 
-### Overview:
+## Description
 
-This application is designed as a marketing platform for local stores in a specific area of Sri Lanka. The goal is to highlight store promotions, provide location-based filtering, and give users easy access to local business information without the complexity of inventory management.
+This project provides core infrastructure services for the BaseTemplate application. It handles data access using Dapper with PostgreSQL, identity management, CSV processing, and other essential services. This project primarily implements interfaces defined in the `BaseTemplate.Application` layer.
 
-### Features:
+## Key Components & Responsibilities
 
-#### 1. Home Page:
+### Data Access
 
-* Display popular stores and featured promotions.
-* Categories like Groceries, Electronics, Clothing, and more.
-* Highlight time-sensitive offers with countdown timers.
+- **ORM**: Utilizes Dapper and Dapper.SimpleCRUD for efficient data operations against a PostgreSQL database.
+- **Unit of Work**: Implements a Unit of Work pattern (`Data/UnitOfWork.cs`, registered as `IUnitOfWorkFactory`) to ensure atomic operations.
+- **Connection Management**: Uses `Infrastructure/Data/PostgresConnectionFactory.cs` (registered as `IDbConnectionFactory`) to create and manage database connections. This is configured via the "DefaultConnection" connection string.
+- **Naming Conventions**: Handles mapping between database snake_case and C# PascalCase naming conventions (see `Data/NameResolver.cs` and Dapper setup in `DependencyInjection.cs`).
+- **Database Initialization**: Includes a `Data/DatabaseInitializer.cs` component, which is responsible for setting up the database schema and potentially seeding initial data. It may use SQL scripts located in the `Data/Scripts/` directory.
 
-#### 2. Store Directory:
+### Identity Management
 
-* List of all registered stores.
-* Display store details: Address, Contact info, Store timings, and Map location.
-* Filters to refine search by Category, Distance, and Current Offers.
+- Provides an `IIdentityService` implementation (`Identity/IdentityService.cs`) for user-related operations and authentication/authorization concerns. _(Specific functionalities depend on the implementation within `IdentityService.cs`)_.
 
-#### 3. Store Details Page:
+### CSV Handling
 
-* Show detailed information about the store.
-* Display current promotions and special deals.
-* High-resolution images of the store and products.
-* Integrated map view for easy navigation.
-* Share button for easy social media sharing.
+- Integrates the `CsvHelper` library, suggesting capabilities for processing CSV files.
 
-#### 4. Promotions Page:
+### Dependency Injection
 
-* Aggregated view of all current promotions.
-* Search by category or store.
-* "Expires Soon" filter for urgent offers.
+- All core services are registered via the `AddInfrastructure()` extension method in `DependencyInjection.cs`. This method configures Dapper, connection factories, unit of work, identity services, and the database initializer.
 
-#### 5. Location-based Filtering:
+## Prerequisites
 
-* Geolocation to filter stores within a specific radius.
-* Map view with pins representing store locations.
+- **.NET SDK**: Version 8.0.408 (or as specified in the `global.json` file).
+- **PostgreSQL Database**: A running instance of PostgreSQL is required.
+- **`BaseTemplate.Application` Project**: This infrastructure project depends on `BaseTemplate.Application` for contracts (interfaces) it implements.
 
-#### 6. Search Functionality:
+## Configuration
 
-* Search for stores, products, or promotions.
-* Autocomplete suggestions for quick searching.
+This project expects the following configurations to be provided by the consuming application (e.g., `BaseTemplate.API` via its `appsettings.json`):
 
-#### 7. Basic Admin Portal:
+- **Connection Strings**:
+  - `DefaultConnection`: The connection string for the PostgreSQL database.
+    Example: `"Server=your_postgres_server;Database=your_database;User Id=your_user;Password=your_password;"`
 
-* Allows store owners or administrators to add/edit store information.
-* Manage promotions and featured listings.
-* View analytics on store page visits and promotions.
+## Integration
 
----
+This `Infrastructure` project is designed to be consumed by other layers of the BaseTemplate application, typically the API or main application host.
 
----
+To integrate:
 
-This project is licensed under the MIT License.
+1. Add a project reference to `BaseTemplate.Infrastructure`.
+2. In the main application's `Startup.cs` or `Program.cs`, call the `AddInfrastructure()` extension method on `IServiceCollection`, passing the `IConfiguration` instance:
 
+   ```csharp
+   // Example in Program.cs or Startup.cs
+   builder.Services.AddInfrastructure(builder.Configuration);
+   // or
+   // services.AddInfrastructure(Configuration);
+   ```
 
-C:\Users\Acer\source\test\BaseTemplate>k6 run api-post-k6.js
+This will register all necessary services provided by this project into the application's dependency injection container.
 
-         /\      Grafana   /‾‾/
-    /\  /  \     |\  __   /  /
-   /  \/    \    | |/ /  /   ‾‾\
-  /          \   |   (  |  (‾)  |
- / __________ \  |_|\_\  \_____/
+## Contributing
 
-     execution: local
-        script: api-post-k6.js
-        output: -
+Standard contribution guidelines apply:
 
-     scenarios: (100.00%) 1 scenario, 6000 max VUs, 48s max duration (incl. graceful stop):
-              * default: Up to 6000 looping VUs for 18s over 6 stages (gracefulRampDown: 30s, gracefulStop: 30s)
+1. Fork the repository.
+2. Create a new branch (`git checkout -b feature/YourFeature`).
+3. Commit your changes (`git commit -am 'Add some feature'`).
+4. Push to the branch (`git push origin feature/YourFeature`).
+5. Create a new Pull Request.
 
+## License
 
-
-  █ TOTAL RESULTS
-
-    checks_total.......................: 14418   668.055801/s
-    checks_succeeded...................: 100.00% 14418 out of 14418
-    checks_failed......................: 0.00%   0 out of 14418
-
-    ✓ status is 200
-
-    HTTP
-    http_req_duration.......................................................: avg=2.36s min=521.29µs med=1.26s max=6.57s p(90)=6.2s p(95)=6.39s
-      { expected_response:true }............................................: avg=2.36s min=521.29µs med=1.26s max=6.57s p(90)=6.2s p(95)=6.39s
-    http_req_failed.........................................................: 0.00%  0 out of 14418
-    http_reqs...............................................................: 14418  668.055801/s
-
-    EXECUTION
-    iteration_duration......................................................: avg=3.36s min=1s       med=2.27s max=7.57s p(90)=7.2s p(95)=7.39s
-    iterations..............................................................: 14418  668.055801/s
-    vus.....................................................................: 1941   min=64         max=5899
-    vus_max.................................................................: 6000   min=6000       max=6000
-
-    NETWORK
-    data_received...........................................................: 3.1 MB 143 kB/s
-    data_sent...............................................................: 21 MB  975 kB/s
-
-
-
-
-running (21.6s), 0000/6000 VUs, 14418 complete and 0 interrupted iterations
-default ✓ [======================================] 0000/6000 VUs  18s
+Specify the license for this project (e.g., MIT, Apache 2.0).
