@@ -48,13 +48,4 @@ public class IdentityService : IIdentityService
         var result = await _authorizationService.AuthorizeAsync(principal, policyName);
         return result.Succeeded;
     }
-    public async Task<IEnumerable<string>> GetRolesAsync()
-    {
-        if (_user == null || _user.Identifier == null)
-        {
-            return [];
-        }
-        using var uow = _factory.Create();
-        return await uow.QueryAsync<string>("select role from user_role where user_id = @userId", new { userId = _user.Identifier });
-    }
 }
