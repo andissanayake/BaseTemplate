@@ -1,7 +1,8 @@
 ﻿namespace BaseTemplate.Application.Common.RequestHandler;
-using BaseTemplate.Application.Common.Security;
-using BaseTemplate.Application.Common.Interfaces;
+using System.ComponentModel.DataAnnotations;
 using System.Reflection;
+using BaseTemplate.Application.Common.Interfaces;
+using BaseTemplate.Application.Common.Security;
 
 public interface IRequest<TResponse> { }
 
@@ -72,6 +73,19 @@ public class Mediator : IMediator
                     return Result<TResponse>.Forbidden("User does not meet the policy requirements.");
                 }
             }
+        }
+
+        // Validate the request
+        var validationResults = new List<ValidationResult>();
+        var validationContext = new ValidationContext(request, null, null);
+        if (!Validator.TryValidateObject(request, validationContext, validationResults, true))
+        {
+            var errors = validationResults
+                .SelectMany(vr => vr.MemberNames.Select(mn => new { MemberName = mn, vr.ErrorMessage }))
+                .GroupBy(e => e.MemberName)
+                .ToDictionary(g => g.Key.ToLower(), g => g.Select(e => e.ErrorMessage ?? "Validation error").ToArray());
+
+            return Result<TResponse>.Validation("Request validation failed", errors);
         }
 
         // Build the closed generic interface type for this request
