@@ -1,9 +1,4 @@
-﻿using BaseTemplate.Application.Common.Interfaces;
-using BaseTemplate.Application.Common.Models;
-using BaseTemplate.Application.Common.RequestHandler;
-using BaseTemplate.Application.Common.Security;
-using BaseTemplate.Application.TodoLists.Queries;
-using BaseTemplate.Domain.Entities;
+﻿using BaseTemplate.Application.TodoLists.Queries;
 
 namespace BaseTemplate.Application.TodoLists.Commands.GetTodoListById;
 

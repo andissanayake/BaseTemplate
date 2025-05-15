@@ -1,18 +1,15 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using BaseTemplate.Application.Common.Interfaces;
-using BaseTemplate.Application.Common.Models;
-using BaseTemplate.Application.Common.RequestHandler;
-using BaseTemplate.Domain.Entities;
 using BaseTemplate.Domain.Enums;
 
 namespace BaseTemplate.Application.TodoItems.Commands.CreateTodoItem;
 
-//[Authorize]
+[Authorize]
 public record CreateTodoItemCommand : IRequest<int>
 {
     public int ListId { get; init; }
 
     [MaxLength(200, ErrorMessage = "The title cannot exceed 200 characters.")]
+    [MinLength(50, ErrorMessage = "Title must be at least 50 characters long.")]
     public string? Title { get; init; }
     public string? Note { get; init; }
     public DateTimeOffset? Reminder { get; set; }

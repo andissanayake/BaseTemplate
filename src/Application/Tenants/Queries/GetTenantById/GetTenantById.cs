@@ -1,12 +1,8 @@
-﻿using BaseTemplate.Application.Common.Interfaces;
-using BaseTemplate.Application.Common.Models;
-using BaseTemplate.Application.Common.RequestHandler;
-using BaseTemplate.Application.Common.Security;
-using BaseTemplate.Domain.Entities;
+﻿using BaseTemplate.Domain.Constants;
 
-namespace BaseTemplate.Application.TenantLists.Commands.GetTenantListById;
+namespace BaseTemplate.Application.TenantLists.Commands.GetTenantById;
 
-[Authorize]
+[Authorize(Roles = Roles.Administrator)]
 public record GetTenantByIdQuery(int Id) : IRequest<GetTenantResponce>;
 
 public record GetTenantResponce
