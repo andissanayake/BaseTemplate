@@ -13,6 +13,18 @@ public record GetUserQuery : IRequest<GetUserResponse>
 public record GetUserResponse
 {
     public IEnumerable<string> Roles { get; set; } = new List<string>();
+    public string? TenantId { get; set; }
+    public string? TenantName { get; set; }
+}
+
+public record UserWithTenantInfo
+{
+    public int Id { get; set; }
+    public string Identifier { get; set; } = string.Empty;
+    public string? Name { get; set; }
+    public string? Email { get; set; }
+    public string? TenantId { get; set; }
+    public string? TenantName { get; set; }
 }
 
 public class GetUserQueryHandler : IRequestHandler<GetUserQuery, GetUserResponse>
@@ -29,21 +41,40 @@ public class GetUserQueryHandler : IRequestHandler<GetUserQuery, GetUserResponse
     {
         var uow = _factory.Create();
         //Ensure the user exists in the database
-        var user = await uow.QueryFirstOrDefaultAsync<AppUser>(@"
-            SELECT *
-            FROM app_user
-            WHERE identifier = @Identifier", new { _user.Identifier });
-        if (user == null)
+        var userInfo = await uow.QueryFirstOrDefaultAsync<UserWithTenantInfo>(@"
+            SELECT u.Id, u.Identifier, u.Name, u.Email, t.Id as TenantId, t.Name as TenantName
+            FROM app_user u
+            LEFT JOIN Tenant t ON u.identifier = t.owner_identifier
+            WHERE u.identifier = @Identifier", new { _user.Identifier });
+
+        if (userInfo == null)
         {
-            await uow.InsertAsync(new AppUser() { Identifier = _user.Identifier!, Name = _user.Name, Email = _user.Email });
+            var newAppUser = new AppUser() { Identifier = _user.Identifier!, Name = _user.Name, Email = _user.Email };
+            await uow.InsertAsync(newAppUser);
+            return Result<GetUserResponse>.Success(new GetUserResponse() { Roles = new List<string>() });
         }
         else
         {
-            user.Name = _user.Name;
-            user.Email = _user.Email;
-            await uow.UpdateAsync(user);
+            // Load minimal AppUser for update
+            var existingUser = new AppUser { Id = userInfo.Id, Identifier = userInfo.Identifier }; 
+            bool changed = false;
+            if (userInfo.Name != _user.Name)
+            {
+                existingUser.Name = _user.Name;
+                changed = true;
+            }
+            if (userInfo.Email != _user.Email)
+            {
+                existingUser.Email = _user.Email;
+                changed = true;
+            }
+
+            if(changed)
+            {
+                await uow.UpdateAsync(existingUser);
+            }
         }
         var roles = await uow.QueryAsync<string>("select role from user_role where user_identifier = @Identifier", new { _user.Identifier });
-        return Result<GetUserResponse>.Success(new GetUserResponse() { Roles = roles });
+        return Result<GetUserResponse>.Success(new GetUserResponse() { Roles = roles, TenantId = userInfo?.TenantId, TenantName = userInfo?.TenantName });
     }
 }

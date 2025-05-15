@@ -1,6 +1,14 @@
 import React from "react";
-import { useParams } from "react-router-dom";
-import { Descriptions, notification, Space, Typography, Spin } from "antd";
+import { Link, useParams } from "react-router-dom";
+import {
+  Descriptions,
+  notification,
+  Space,
+  Typography,
+  Spin,
+  Button,
+} from "antd";
+import { EditOutlined } from "@ant-design/icons";
 import { useTenantStore } from "./tenantStore";
 import { TenantService } from "./tenantService";
 import { handleResult } from "../../common/handleResult";
@@ -39,12 +47,7 @@ export const TenantView: React.FC = () => {
   }, [tenantId, setCurrentTenant, setLoading]);
 
   if (loading) {
-    return (
-      <Spin
-        tip="Loading tenant details..."
-        style={{ display: "block", marginTop: "20px" }}
-      />
-    );
+    return <Spin style={{ display: "block", marginTop: "20px" }} />;
   }
 
   if (!currentTenant) {
@@ -55,10 +58,22 @@ export const TenantView: React.FC = () => {
 
   return (
     <>
-      <Space className="mb-4">
+      <Space
+        className="mb-4"
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+        }}
+      >
         <Typography.Title level={3} style={{ margin: 0 }}>
           Tenant View
         </Typography.Title>
+        {currentTenant && (
+          <Link to={`/tenants/edit/${currentTenant.id}`}>
+            <Button type="primary" shape="circle" icon={<EditOutlined />} />
+          </Link>
+        )}
       </Space>
       <Descriptions column={1} bordered>
         <Descriptions.Item label="ID">{currentTenant.id}</Descriptions.Item>
