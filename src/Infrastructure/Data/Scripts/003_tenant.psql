@@ -1,0 +1,14 @@
+-- =============================================
+-- Create Table: tenant
+-- =============================================
+CREATE TABLE IF NOT EXISTS tenant (
+    id SERIAL PRIMARY KEY,
+    uniq_name VARCHAR(100),
+    name VARCHAR(255) NOT NULL,
+    address TEXT,
+    owner_sso_id VARCHAR(100) NOT NULL REFERENCES app_user(sso_id),
+    created TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    created_by VARCHAR(255),
+    last_modified TIMESTAMPTZ,
+    last_modified_by VARCHAR(255)
+); 
