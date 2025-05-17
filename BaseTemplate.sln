@@ -17,9 +17,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 	ProjectSection(SolutionItems) = preProject
 		.editorconfig = .editorconfig
 		.gitignore = .gitignore
-		global.json = global.json
 		api-post-k6.js = api-post-k6.js
-		README.md = README.md
+		global.json = global.json
 	EndProjectSection
 EndProject
 Project("{54A90642-561A-4BB1-A94E-469ADEE60C69}") = "App", "src\App\App.esproj", "{5F085D80-44DA-8C84-C13E-4C423568B04F}"
