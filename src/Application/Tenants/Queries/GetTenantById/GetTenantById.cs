@@ -3,9 +3,9 @@
 namespace BaseTemplate.Application.TenantLists.Commands.GetTenantById;
 
 [Authorize(Roles = Roles.Administrator)]
-public record GetTenantByIdQuery(int Id) : IRequest<GetTenantResponce>;
+public record GetTenantByIdQuery(int Id) : IRequest<GetTenantResponse>;
 
-public record GetTenantResponce
+public record GetTenantResponse
 {
     public int Id { get; init; }
     public string Name { get; set; } = string.Empty;
@@ -13,7 +13,7 @@ public record GetTenantResponce
 
 }
 
-public class GetTenantByIdQueryHandler : IRequestHandler<GetTenantByIdQuery, GetTenantResponce>
+public class GetTenantByIdQueryHandler : IRequestHandler<GetTenantByIdQuery, GetTenantResponse>
 {
     private readonly IUnitOfWorkFactory _factory;
     public GetTenantByIdQueryHandler(IUnitOfWorkFactory factory, IIdentityService identityService)
@@ -21,15 +21,15 @@ public class GetTenantByIdQueryHandler : IRequestHandler<GetTenantByIdQuery, Get
         _factory = factory;
     }
 
-    public async Task<Result<GetTenantResponce>> HandleAsync(GetTenantByIdQuery request, CancellationToken cancellationToken)
+    public async Task<Result<GetTenantResponse>> HandleAsync(GetTenantByIdQuery request, CancellationToken cancellationToken)
     {
         using var uow = _factory.Create();
         var entity = await uow.GetAsync<Tenant>(request.Id);
         if (entity is null)
         {
-            return Result<GetTenantResponce>.NotFound($"TenantList with id {request.Id} not found.");
+            return Result<GetTenantResponse>.NotFound($"TenantList with id {request.Id} not found.");
         }
-        var tenant = new GetTenantResponce() { Name = entity.Name, Id = entity.Id, Address = entity.Address };
-        return Result<GetTenantResponce>.Success(tenant);
+        var tenant = new GetTenantResponse() { Name = entity.Name, Id = entity.Id, Address = entity.Address };
+        return Result<GetTenantResponse>.Success(tenant);
     }
 }

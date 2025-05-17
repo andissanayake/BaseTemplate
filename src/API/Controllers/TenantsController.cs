@@ -11,7 +11,7 @@ namespace BaseTemplate.API.Controllers;
 public class TenantsController : ApiControllerBase
 {
     [HttpGet("{id}")]
-    public async Task<ActionResult<Result<GetTenantResponce>>> GetById(int id)
+    public async Task<ActionResult<Result<GetTenantResponse>>> GetById(int id)
     {
         return await SendAsync(new GetTenantByIdQuery(id));
     }
