@@ -20,7 +20,7 @@ public class CreateTenantCommandHandler : IRequestHandler<CreateTenantCommand, i
     public async Task<Result<int>> HandleAsync(CreateTenantCommand request, CancellationToken cancellationToken)
     {
         using var uow = _factory.Create();
-        var exEntity = await uow.QueryFirstOrDefaultAsync<Tenant>("select * from tenant where owner_identifier=@Identifier", new { _user.Identifier });
+        var exEntity = await uow.QueryFirstOrDefaultAsync<Tenant>("select * from tenant where owner_sso_id=@Identifier", new { _user.Identifier });
         if (exEntity != null)
         {
             return Result<int>.Success(exEntity.Id, "already have tenant single user can have only one tenant.");
@@ -31,7 +31,7 @@ public class CreateTenantCommandHandler : IRequestHandler<CreateTenantCommand, i
             {
                 Name = request.Name,
                 Address = request.Address,
-                OwnerIdentifier = _user.Identifier!
+                OwnerSsoId = _user.Identifier!
             };
             var data = await uow.InsertAsync(entity);
             return Result<int>.Success(data);
