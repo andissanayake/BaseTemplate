@@ -13,6 +13,7 @@ import { useTenantStore } from "./tenantStore";
 import { TenantService } from "./tenantService";
 import { handleResult } from "../../common/handleResult";
 import { useAsyncEffect } from "../../common/useAsyncEffect";
+import ItemList from "../Item/ItemList";
 
 export const TenantView: React.FC = () => {
   const { currentTenant, setCurrentTenant, loading, setLoading } =
@@ -51,8 +52,6 @@ export const TenantView: React.FC = () => {
   }
 
   if (!currentTenant) {
-    // This message can be shown if loading is false and tenant is still null
-    // (e.g., after an error or if tenantId was invalid)
     return <Typography.Text>Tenant details are unavailable.</Typography.Text>;
   }
 
@@ -83,12 +82,8 @@ export const TenantView: React.FC = () => {
         <Descriptions.Item label="Address">
           {currentTenant.address || "N/A"}
         </Descriptions.Item>
-        {/* Add other tenant properties here as needed */}
       </Descriptions>
+      <ItemList />
     </>
   );
 };
-
-// Note: Exporting as default if it's the main export, or named if preferred.
-// For consistency with other feature components, using named export.
-// export default TenantView;
