@@ -13,9 +13,11 @@ import { useNavigate, useParams } from "react-router-dom";
 import { ItemService } from "./itemService";
 import { useAsyncEffect } from "../../common/useAsyncEffect";
 import { handleResult } from "../../common/handleResult";
+import { useAuthStore } from "../../auth/authStore";
 
 const ItemEdit: React.FC = () => {
   const { setLoading } = useItemStore();
+  const { tenantId } = useAuthStore();
   const [form] = Form.useForm();
   const navigate = useNavigate();
   const { itemId } = useParams();
@@ -31,7 +33,7 @@ const ItemEdit: React.FC = () => {
           notification.success({
             message: "Item updated successfully!",
           });
-          navigate("/items");
+          navigate(`/tenants/view/${tenantId}`);
         },
         onValidationError: (updateErrors) => {
           const fields = Object.entries(updateErrors).map(([name, errors]) => ({
@@ -94,20 +96,6 @@ const ItemEdit: React.FC = () => {
             step={0.01}
             style={{ width: "100%" }}
             placeholder="Enter item price"
-          />
-        </Form.Item>
-
-        <Form.Item
-          label="Quantity"
-          name="quantity"
-          rules={[
-            { required: true, message: "Please enter the item quantity!" },
-          ]}
-        >
-          <InputNumber
-            min={0}
-            style={{ width: "100%" }}
-            placeholder="Enter item quantity"
           />
         </Form.Item>
 

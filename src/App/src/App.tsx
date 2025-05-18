@@ -13,6 +13,8 @@ import { TodoGroupViewPage } from "./pages/TodoGroupViewPage";
 import { TenantCreatePage } from "./pages/TenantCreatePage";
 import { TenantEditPage } from "./pages/TenantEditPage";
 import { TenantViewPage } from "./pages/TenantViewPage";
+import { ItemCreatePage } from "./pages/ItemCreatePage";
+import { ItemEditPage } from "./pages/ItemEditPage";
 
 export const App = () => {
   return (
@@ -35,6 +37,9 @@ export const App = () => {
           <Route path="/tenants/create" element={<TenantCreatePage />} />
           <Route path="/tenants/edit/:tenantId" element={<TenantEditPage />} />
           <Route path="/tenants/view/:tenantId" element={<TenantViewPage />} />
+
+          <Route path="/items/create" element={<ItemCreatePage />} />
+          <Route path="/items/edit/:itemId" element={<ItemEditPage />} />
 
           <Route
             path="/profile"

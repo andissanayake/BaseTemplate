@@ -6,11 +6,12 @@ import { Item } from "./ItemModel";
 export class ItemService {
   static async fetchItems(
     pageNumber: number,
-    pageSize: number
+    pageSize: number,
+    tenantId: number
   ): Promise<Result<{ items: Item[]; totalCount: number }>> {
     return await handleApi(
       axiosInstance.get(
-        `/api/items?PageNumber=${pageNumber}&PageSize=${pageSize}`
+        `/api/items?PageNumber=${pageNumber}&PageSize=${pageSize}&TenantId=${tenantId}`
       )
     );
   }

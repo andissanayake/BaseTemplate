@@ -7,13 +7,17 @@ import {
   Popconfirm,
   Typography,
 } from "antd";
-import { EditOutlined, DeleteOutlined } from "@ant-design/icons";
+import { EditOutlined, DeleteOutlined, PlusOutlined } from "@ant-design/icons";
 import { useItemStore } from "./itemStore";
 import { Item } from "./ItemModel";
 import { ItemService } from "./itemService";
 import { handleResult } from "../../common/handleResult";
+import { useNavigate } from "react-router-dom";
+import { useAuthStore } from "../../auth/authStore";
 
 const ItemList: React.FC = () => {
+  const navigate = useNavigate();
+  const { tenantId } = useAuthStore();
   const {
     itemList,
     loading,
@@ -28,8 +32,16 @@ const ItemList: React.FC = () => {
   } = useItemStore();
 
   const loadItems = useCallback(async () => {
+    if (!tenantId) {
+      notification.error({ message: "Tenant ID is required to fetch items." });
+      return;
+    }
     setLoading(true);
-    const response = await ItemService.fetchItems(currentPage, pageSize);
+    const response = await ItemService.fetchItems(
+      currentPage,
+      pageSize,
+      parseInt(tenantId)
+    );
     handleResult(response, {
       onSuccess: (data) => {
         setTotalCount(data?.totalCount || 0);
@@ -39,7 +51,7 @@ const ItemList: React.FC = () => {
         setLoading(false);
       },
     });
-  }, [currentPage, pageSize, setLoading, setTotalCount, setItemList]);
+  }, [currentPage, pageSize, setLoading, setTotalCount, setItemList, tenantId]);
 
   useEffect(() => {
     loadItems();
@@ -89,11 +101,6 @@ const ItemList: React.FC = () => {
       render: (price: number) => `$${price.toFixed(2)}`,
     },
     {
-      title: "Quantity",
-      dataIndex: "quantity",
-      key: "quantity",
-    },
-    {
       title: "Category",
       dataIndex: "category",
       key: "category",
@@ -102,7 +109,11 @@ const ItemList: React.FC = () => {
       title: "Actions",
       render: (_: unknown, record: Item) => (
         <Space>
-          <Button type="link" icon={<EditOutlined />} />
+          <Button
+            type="link"
+            icon={<EditOutlined />}
+            onClick={() => navigate(`/items/edit/${record.id}`)}
+          />
           <Popconfirm
             title="Are you sure to delete this item?"
             onConfirm={() => handleDelete(record.id)}
@@ -116,10 +127,18 @@ const ItemList: React.FC = () => {
 
   return (
     <>
-      <Space className="mb-4">
+      <Space
+        className="mb-4"
+        style={{ width: "100%", justifyContent: "space-between" }}
+      >
         <Typography.Title level={3} style={{ margin: 0 }}>
           Item List
         </Typography.Title>
+        <Button
+          type="primary"
+          icon={<PlusOutlined />}
+          onClick={() => navigate("/items/create")}
+        ></Button>
       </Space>
       <Table
         columns={columns}

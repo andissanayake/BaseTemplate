@@ -12,21 +12,30 @@ import { useItemStore } from "./itemStore";
 import { useNavigate } from "react-router-dom";
 import { ItemService } from "./itemService";
 import { handleResult } from "../../common/handleResult";
+import { useAuthStore } from "../../auth/authStore";
 
 const ItemCreate: React.FC = () => {
   const [form] = Form.useForm();
   const navigate = useNavigate();
   const { setLoading } = useItemStore();
+  const { tenantId } = useAuthStore();
 
   const handleSaveItem = () => {
+    if (!tenantId) {
+      notification.error({
+        message: "Tenant ID is required to create an item.",
+      });
+      return;
+    }
+
     form.validateFields().then(async (values) => {
       setLoading(true);
-      const response = await ItemService.createItem(values);
+      const response = await ItemService.createItem({ ...values, tenantId });
       handleResult(response, {
         onSuccess: () => {
           notification.success({ message: "Item created successfully!" });
           form.resetFields();
-          navigate("/items");
+          navigate(`/tenants/view/${tenantId}`);
         },
         onValidationError: (createErrors) => {
           const fields = Object.entries(createErrors).map(([name, errors]) => ({
@@ -75,20 +84,6 @@ const ItemCreate: React.FC = () => {
             step={0.01}
             style={{ width: "100%" }}
             placeholder="Enter item price"
-          />
-        </Form.Item>
-
-        <Form.Item
-          label="Quantity"
-          name="quantity"
-          rules={[
-            { required: true, message: "Please enter the item quantity!" },
-          ]}
-        >
-          <InputNumber
-            min={0}
-            style={{ width: "100%" }}
-            placeholder="Enter item quantity"
           />
         </Form.Item>
 

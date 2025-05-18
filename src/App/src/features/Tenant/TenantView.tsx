@@ -83,7 +83,9 @@ export const TenantView: React.FC = () => {
           {currentTenant.address || "N/A"}
         </Descriptions.Item>
       </Descriptions>
-      <ItemList />
+      <div className="mt-4">
+        <ItemList />
+      </div>
     </>
   );
 };

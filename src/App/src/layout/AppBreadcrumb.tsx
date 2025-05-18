@@ -15,6 +15,8 @@ export const AppBreadcrumb = () => {
       ` Tenant Edit #${params.tenantId}`,
     "/tenants/view/:tenantId": (params: any) =>
       ` Tenant View #${params.tenantId}`,
+    "/items/create": "Create Item",
+    "/items/edit/:itemId": (params: any) => `Edit Item #${params.itemId}`,
   };
 
   const location = useLocation();
