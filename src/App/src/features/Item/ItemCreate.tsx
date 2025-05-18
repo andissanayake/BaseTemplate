@@ -96,7 +96,10 @@ const ItemCreate: React.FC = () => {
             <Button type="primary" htmlType="submit">
               Submit
             </Button>
-            <Button type="default" onClick={() => navigate("/items")}>
+            <Button
+              type="default"
+              onClick={() => navigate(`/tenants/view/${tenantId}`)}
+            >
               Cancel
             </Button>
           </Space>
