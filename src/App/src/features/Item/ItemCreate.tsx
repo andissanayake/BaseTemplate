@@ -7,6 +7,7 @@ import {
   Button,
   Space,
   Typography,
+  Select,
 } from "antd";
 import { useItemStore } from "./itemStore";
 import { useNavigate } from "react-router-dom";
@@ -30,7 +31,11 @@ const ItemCreate: React.FC = () => {
 
     form.validateFields().then(async (values) => {
       setLoading(true);
-      const response = await ItemService.createItem({ ...values, tenantId });
+      const response = await ItemService.createItem({
+        ...values,
+        category: values.category?.join(",") || "",
+        tenantId,
+      });
       handleResult(response, {
         onSuccess: () => {
           notification.success({ message: "Item created successfully!" });
@@ -87,8 +92,13 @@ const ItemCreate: React.FC = () => {
           />
         </Form.Item>
 
-        <Form.Item label="Category" name="category">
-          <Input placeholder="Enter item category" />
+        <Form.Item label="Categories" name="category">
+          <Select
+            mode="tags"
+            style={{ width: "100%" }}
+            placeholder="Enter categories"
+            tokenSeparators={[","]}
+          />
         </Form.Item>
 
         <Form.Item>

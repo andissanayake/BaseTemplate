@@ -6,6 +6,7 @@ import {
   notification,
   Popconfirm,
   Typography,
+  Tag,
 } from "antd";
 import { EditOutlined, DeleteOutlined, PlusOutlined } from "@ant-design/icons";
 import { useItemStore } from "./itemStore";
@@ -101,9 +102,19 @@ const ItemList: React.FC = () => {
       render: (price: number) => `$${price.toFixed(2)}`,
     },
     {
-      title: "Category",
+      title: "Categories",
       dataIndex: "category",
       key: "category",
+      render: (category: string) => (
+        <Space wrap>
+          {category
+            ?.split(",")
+            .filter(Boolean)
+            .map((cat) => (
+              <Tag key={cat}>{cat}</Tag>
+            ))}
+        </Space>
+      ),
     },
     {
       title: "Actions",

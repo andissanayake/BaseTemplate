@@ -7,6 +7,7 @@ import {
   Button,
   Space,
   Typography,
+  Select,
 } from "antd";
 import { useItemStore } from "./itemStore";
 import { useNavigate, useParams } from "react-router-dom";
@@ -21,11 +22,13 @@ const ItemEdit: React.FC = () => {
   const [form] = Form.useForm();
   const navigate = useNavigate();
   const { itemId } = useParams();
+
   if (!itemId) throw new Error("itemId is required");
 
   const handleSaveItem = () => {
     form.validateFields().then(async (values) => {
       values.id = +itemId;
+      values.category = values.category?.join(",") || "";
       setLoading(true);
       const response = await ItemService.updateItem(values);
       return handleResult(response, {
@@ -55,7 +58,14 @@ const ItemEdit: React.FC = () => {
     const response = await ItemService.fetchItemById(itemId);
     handleResult(response, {
       onSuccess: (data) => {
-        form.setFieldsValue(data);
+        if (data) {
+          form.setFieldsValue({
+            ...data,
+            category: data.category
+              ? data.category.split(",").filter(Boolean)
+              : [],
+          });
+        }
       },
       onServerError: () => {
         notification.error({ message: "Failed to fetch item!" });
@@ -99,8 +109,13 @@ const ItemEdit: React.FC = () => {
           />
         </Form.Item>
 
-        <Form.Item label="Category" name="category">
-          <Input placeholder="Enter item category" />
+        <Form.Item label="Categories" name="category">
+          <Select
+            mode="tags"
+            style={{ width: "100%" }}
+            placeholder="Enter categories"
+            tokenSeparators={[","]}
+          />
         </Form.Item>
 
         <Form.Item>
