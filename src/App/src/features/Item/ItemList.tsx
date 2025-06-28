@@ -127,7 +127,9 @@ const ItemList: React.FC = () => {
           <Button
             type="link"
             icon={<EditOutlined />}
-            onClick={() => navigate(`/items/edit/${record.id}`)}
+            onClick={() =>
+              navigate(`/tenants/view/${tenantId}/items/edit/${record.id}`)
+            }
           />
           <Popconfirm
             title="Are you sure to delete this item?"
@@ -152,7 +154,7 @@ const ItemList: React.FC = () => {
         <Button
           type="primary"
           icon={<PlusOutlined />}
-          onClick={() => navigate("/items/create")}
+          onClick={() => navigate(`/tenants/view/${tenantId}/items/create`)}
         ></Button>
       </Space>
       <Table

@@ -11,12 +11,14 @@ export const AppBreadcrumb = () => {
     "/todo-list/view/:listId": (params: any) => `View #${params.listId}`,
     "/profile": "Profile",
     "/tenants/create": "Create Tenant",
-    "/tenants/edit/:tenantId": (params: any) =>
-      ` Tenant Edit #${params.tenantId}`,
     "/tenants/view/:tenantId": (params: any) =>
       ` Tenant View #${params.tenantId}`,
-    "/items/create": "Create Item",
-    "/items/edit/:itemId": (params: any) => `Edit Item #${params.itemId}`,
+    "/tenants/view/:tenantId/edit": (params: any) =>
+      ` Tenant Edit #${params.tenantId}`,
+
+    "/tenants/view/:tenantId/items/create": "Create Item",
+    "/tenants/view/:tenantId/items/edit/:itemId": (params: any) =>
+      `Edit Item #${params.itemId}`,
   };
 
   const location = useLocation();

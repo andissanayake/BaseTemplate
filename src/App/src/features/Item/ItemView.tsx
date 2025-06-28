@@ -1,0 +1,144 @@
+import React from "react";
+import {
+  Card,
+  Descriptions,
+  Space,
+  Tag,
+  Typography,
+  Button,
+  notification,
+} from "antd";
+import { useParams, useNavigate } from "react-router-dom";
+import { useItemStore } from "./itemStore";
+import { ItemService } from "./itemService";
+import { useAsyncEffect } from "../../common/useAsyncEffect";
+import { handleResult } from "../../common/handleResult";
+import { useAuthStore } from "../../auth/authStore";
+import { Item } from "./ItemModel";
+
+const ItemView: React.FC = () => {
+  const { setLoading } = useItemStore();
+  const { tenantId } = useAuthStore();
+  const navigate = useNavigate();
+  const { itemId } = useParams();
+
+  if (!itemId) throw new Error("itemId is required");
+
+  useAsyncEffect(async () => {
+    setLoading(true);
+    const response = await ItemService.fetchItemById(itemId);
+    handleResult(response, {
+      onSuccess: () => {
+        // Data is handled in the component render
+      },
+      onServerError: () => {
+        notification.error({ message: "Failed to fetch item!" });
+      },
+      onFinally: () => {
+        setLoading(false);
+      },
+    });
+  }, [itemId]);
+
+  const [item, setItem] = React.useState<Item | null>(null);
+
+  React.useEffect(() => {
+    const fetchItem = async () => {
+      const response = await ItemService.fetchItemById(itemId);
+      handleResult(response, {
+        onSuccess: (data) => {
+          if (data) {
+            setItem(data);
+          }
+        },
+        onServerError: () => {
+          notification.error({ message: "Failed to fetch item!" });
+        },
+      });
+    };
+    fetchItem();
+  }, [itemId]);
+
+  if (!item) {
+    return (
+      <Card>
+        <Typography.Text>Loading...</Typography.Text>
+      </Card>
+    );
+  }
+
+  const categories = item.category
+    ? item.category.split(",").filter(Boolean)
+    : [];
+
+  return (
+    <Card>
+      <Space
+        className="mb-4"
+        style={{ width: "100%", justifyContent: "space-between" }}
+      >
+        <Typography.Title level={3} style={{ margin: 0 }}>
+          Item Details
+        </Typography.Title>
+        <Space>
+          <Button
+            type="primary"
+            onClick={() => navigate(`/items/edit/${itemId}`)}
+          >
+            Edit
+          </Button>
+          <Button
+            type="default"
+            onClick={() => navigate(`/tenants/view/${tenantId}`)}
+          >
+            Back
+          </Button>
+        </Space>
+      </Space>
+
+      <Descriptions column={1} bordered styles={{ label: { width: 120 } }}>
+        <Descriptions.Item label="ID">{item.id}</Descriptions.Item>
+
+        <Descriptions.Item label="Name">{item.name || "-"}</Descriptions.Item>
+
+        <Descriptions.Item label="Description">
+          {item.description || "-"}
+        </Descriptions.Item>
+
+        <Descriptions.Item label="Price">
+          ${item.price?.toFixed(2) || "0.00"}
+        </Descriptions.Item>
+
+        <Descriptions.Item label="Categories">
+          {categories.length > 0 ? (
+            <Space wrap>
+              {categories.map((category: string) => (
+                <Tag color="blue" key={category}>
+                  {category.trim()}
+                </Tag>
+              ))}
+            </Space>
+          ) : (
+            "No categories assigned"
+          )}
+        </Descriptions.Item>
+
+        <Descriptions.Item label="Status">
+          <Tag color={item.isActive ? "green" : "red"}>
+            {item.isActive ? "Active" : "Inactive"}
+          </Tag>
+        </Descriptions.Item>
+
+        <Descriptions.Item label="Created At">
+          {item.createdAt ? new Date(item.createdAt).toLocaleString() : "-"}
+        </Descriptions.Item>
+
+        <Descriptions.Item label="Updated At">
+          {item.updatedAt ? new Date(item.updatedAt).toLocaleString() : "-"}
+        </Descriptions.Item>
+      </Descriptions>
+    </Card>
+  );
+};
+
+export default ItemView;

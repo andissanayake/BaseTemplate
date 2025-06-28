@@ -43,7 +43,7 @@ export const App = () => {
             }
           />
           <Route
-            path="/tenants/edit/:tenantId"
+            path="/tenants/view/:tenantId/edit"
             element={
               <ProtectedRoute policy={Policies.User}>
                 <TenantEditPage />
@@ -60,7 +60,7 @@ export const App = () => {
           />
 
           <Route
-            path="/items/create"
+            path="/tenants/view/:tenantId/items/create"
             element={
               <ProtectedRoute policy={Policies.User}>
                 <ItemCreatePage />
@@ -68,7 +68,7 @@ export const App = () => {
             }
           />
           <Route
-            path="/items/edit/:itemId"
+            path="/tenants/view/:tenantId/items/edit/:itemId"
             element={
               <ProtectedRoute policy={Policies.User}>
                 <ItemEditPage />

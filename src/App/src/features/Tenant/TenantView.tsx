@@ -81,7 +81,7 @@ export const TenantView: React.FC = () => {
         </Typography.Title>
 
         {currentTenant && (
-          <Link to={`/tenants/edit/${currentTenant.id}`}>
+          <Link to={`/tenants/view/${currentTenant.id}/edit`}>
             <Button type="primary" shape="circle" icon={<EditOutlined />} />
           </Link>
         )}
