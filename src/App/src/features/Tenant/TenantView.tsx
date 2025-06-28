@@ -13,7 +13,6 @@ import { useTenantStore } from "./tenantStore";
 import { TenantService } from "./tenantService";
 import { handleResult } from "../../common/handleResult";
 import { useAsyncEffect } from "../../common/useAsyncEffect";
-import ItemList from "../Item/ItemList";
 
 export const TenantView: React.FC = () => {
   const { currentTenant, setCurrentTenant, loading, setLoading } =
@@ -83,9 +82,6 @@ export const TenantView: React.FC = () => {
           {currentTenant.address || "N/A"}
         </Descriptions.Item>
       </Descriptions>
-      <div className="mt-4">
-        <ItemList />
-      </div>
     </>
   );
 };
