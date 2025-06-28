@@ -58,6 +58,7 @@ const onAuthStateChangedListener = (
     }
   });
 };
+
 const getToken = async () => {
   if (!auth.currentUser) {
     console.warn("No authenticated user.");
@@ -66,6 +67,7 @@ const getToken = async () => {
   const idTokenResult = await auth.currentUser?.getIdTokenResult();
   return idTokenResult?.token;
 };
+
 const initializeFirebase = (): Promise<void> => {
   return new Promise((resolve) => {
     onAuthStateChangedListener(() => {
@@ -74,6 +76,7 @@ const initializeFirebase = (): Promise<void> => {
     }, false);
   });
 };
+
 export {
   auth,
   handleLogin,

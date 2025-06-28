@@ -9,7 +9,7 @@ import {
 } from "../auth/firebase";
 import { useLocation, useNavigate } from "react-router";
 import { useAuthStore } from "../auth/authStore";
-import { UserService } from "../auth/userService";
+import { userService } from "../auth/userService";
 import { handleResult } from "../common/handleResult";
 import { useTenantStore } from "../features/Tenant/tenantStore";
 
@@ -45,7 +45,7 @@ export const AppMenu = () => {
     const unsubscribe = onAuthStateChangedListener(async (user) => {
       if (user) {
         setUser(user);
-        const res = await UserService.details();
+        const res = await userService.details();
         handleResult(res, {
           onSuccess: (data) => {
             setRoles(data?.roles ?? []);

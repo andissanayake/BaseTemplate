@@ -1,7 +1,7 @@
 import { Result } from "../common/result";
 import axiosInstance from "./axiosInstance";
 import { handleApi } from "../common/handleApi";
-export class UserService {
+export class userService {
   static async details(): Promise<
     Result<{
       roles: string[];
