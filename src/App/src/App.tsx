@@ -15,6 +15,7 @@ import { TenantEditPage } from "./pages/TenantEditPage";
 import { TenantViewPage } from "./pages/TenantViewPage";
 import { ItemCreatePage } from "./pages/ItemCreatePage";
 import { ItemEditPage } from "./pages/ItemEditPage";
+import { ItemViewPage } from "./pages/ItemViewPage";
 
 export const App = () => {
   return (
@@ -72,6 +73,14 @@ export const App = () => {
             element={
               <ProtectedRoute policy={Policies.User}>
                 <ItemEditPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/tenants/view/:tenantId/items/view/:itemId"
+            element={
+              <ProtectedRoute policy={Policies.User}>
+                <ItemViewPage />
               </ProtectedRoute>
             }
           />

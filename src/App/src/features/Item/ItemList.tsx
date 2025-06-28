@@ -8,7 +8,12 @@ import {
   Typography,
   Tag,
 } from "antd";
-import { EditOutlined, DeleteOutlined, PlusOutlined } from "@ant-design/icons";
+import {
+  EditOutlined,
+  DeleteOutlined,
+  PlusOutlined,
+  EyeOutlined,
+} from "@ant-design/icons";
 import { useItemStore } from "./itemStore";
 import { Item } from "./ItemModel";
 import { ItemService } from "./itemService";
@@ -124,6 +129,13 @@ const ItemList: React.FC = () => {
       title: "Actions",
       render: (_: unknown, record: Item) => (
         <Space>
+          <Button
+            type="link"
+            icon={<EyeOutlined />}
+            onClick={() =>
+              navigate(`/tenants/view/${tenantId}/items/view/${record.id}`)
+            }
+          />
           <Button
             type="link"
             icon={<EditOutlined />}

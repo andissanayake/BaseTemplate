@@ -83,7 +83,9 @@ const ItemView: React.FC = () => {
         <Space>
           <Button
             type="primary"
-            onClick={() => navigate(`/items/edit/${itemId}`)}
+            onClick={() =>
+              navigate(`/tenants/view/${tenantId}/items/edit/${itemId}`)
+            }
           >
             Edit
           </Button>
@@ -141,4 +143,4 @@ const ItemView: React.FC = () => {
   );
 };
 
-export default ItemView;
+export { ItemView };
