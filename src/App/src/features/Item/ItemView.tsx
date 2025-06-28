@@ -124,14 +124,6 @@ const ItemView: React.FC = () => {
             {item.isActive ? "Active" : "Inactive"}
           </Tag>
         </Descriptions.Item>
-
-        <Descriptions.Item label="Created At">
-          {item.createdAt ? new Date(item.createdAt).toLocaleString() : "-"}
-        </Descriptions.Item>
-
-        <Descriptions.Item label="Updated At">
-          {item.updatedAt ? new Date(item.updatedAt).toLocaleString() : "-"}
-        </Descriptions.Item>
       </Descriptions>
     </Card>
   );

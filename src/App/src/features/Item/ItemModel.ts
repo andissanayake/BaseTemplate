@@ -5,6 +5,4 @@ export interface Item {
   price: number;
   category?: string;
   isActive: boolean;
-  createdAt: Date;
-  updatedAt: Date;
 }
