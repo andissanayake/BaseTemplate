@@ -84,6 +84,8 @@ export const AppMenu = () => {
 
   useEffect(() => {
     const menuItems = [];
+
+    // Left side menu items
     menuItems.push({
       key: "/",
       label: "Home",
@@ -91,6 +93,7 @@ export const AppMenu = () => {
         handleClick(e.key);
       },
     });
+
     if (user) {
       menuItems.push({
         key: "/todo-list",
@@ -99,6 +102,28 @@ export const AppMenu = () => {
           handleClick(e.key);
         },
       });
+
+      if (tenantId) {
+        menuItems.push({
+          key: "/tenants/view/" + tenantId,
+          label: <span>{tenantName}</span>,
+          onClick: (e: any) => {
+            handleClick(e.key);
+          },
+        });
+      }
+
+      if (!tenantId) {
+        menuItems.push({
+          key: "/tenants/create",
+          label: "Become a Tenant",
+          onClick: (e: any) => {
+            handleClick(e.key);
+          },
+        });
+      }
+
+      // Right side menu items with auto margin
       menuItems.push({
         key: "/profile",
         label: (
@@ -110,25 +135,9 @@ export const AppMenu = () => {
         onClick: (e: any) => {
           handleClick(e.key);
         },
+        style: { marginLeft: "auto" },
       });
-      if (tenantId) {
-        menuItems.push({
-          key: "/tenants/view/" + tenantId,
-          label: <span>{tenantName}</span>,
-          onClick: (e: any) => {
-            handleClick(e.key);
-          },
-        });
-      }
-      if (!tenantId) {
-        menuItems.push({
-          key: "/tenants/create",
-          label: "Become a Tenant",
-          onClick: (e: any) => {
-            handleClick(e.key);
-          },
-        });
-      }
+
       menuItems.push({
         key: "/logout",
         label: "Logout",
@@ -144,8 +153,10 @@ export const AppMenu = () => {
         onClick: () => {
           handleLogin();
         },
+        style: { marginLeft: "auto" },
       });
     }
+
     setItems(menuItems);
   }, [
     user,
@@ -164,7 +175,12 @@ export const AppMenu = () => {
       defaultSelectedKeys={["/"]}
       selectedKeys={[current]}
       items={items}
-      style={{ flex: 1, minWidth: 0 }}
+      style={{
+        flex: 1,
+        minWidth: 0,
+        display: "flex",
+        alignItems: "center",
+      }}
     />
   );
 };
