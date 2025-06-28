@@ -48,6 +48,10 @@ const ItemList: React.FC = () => {
         setTotalCount(data?.totalCount || 0);
         setItemList(data?.items || []);
       },
+      onServerError: (error) => {
+        setItemList([]);
+        notification.error({ message: error?.message });
+      },
       onFinally: () => {
         setLoading(false);
       },

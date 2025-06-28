@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useCallback } from "react";
 import { Link, useParams } from "react-router-dom";
 import {
   Descriptions,
@@ -46,13 +46,25 @@ export const TenantView: React.FC = () => {
     });
   }, [tenantId, setCurrentTenant, setLoading]);
 
-  if (loading) {
-    return <Spin style={{ display: "block", marginTop: "20px" }} />;
-  }
-
-  if (!currentTenant) {
-    return <Typography.Text>Tenant details are unavailable.</Typography.Text>;
-  }
+  const tenantViewContent = useCallback(() => {
+    if (loading) {
+      return <Spin style={{ display: "block", marginTop: "20px" }} />;
+    } else if (!currentTenant) {
+      return <Typography.Text>Tenant details are unavailable.</Typography.Text>;
+    } else {
+      return (
+        <Descriptions column={1} bordered>
+          <Descriptions.Item label="ID">{currentTenant.id}</Descriptions.Item>
+          <Descriptions.Item label="Name">
+            {currentTenant.name || "N/A"}
+          </Descriptions.Item>
+          <Descriptions.Item label="Address">
+            {currentTenant.address || "N/A"}
+          </Descriptions.Item>
+        </Descriptions>
+      );
+    }
+  }, [loading, currentTenant]);
 
   return (
     <>
@@ -67,21 +79,14 @@ export const TenantView: React.FC = () => {
         <Typography.Title level={3} style={{ margin: 0 }}>
           Tenant View
         </Typography.Title>
+
         {currentTenant && (
           <Link to={`/tenants/edit/${currentTenant.id}`}>
             <Button type="primary" shape="circle" icon={<EditOutlined />} />
           </Link>
         )}
       </Space>
-      <Descriptions column={1} bordered>
-        <Descriptions.Item label="ID">{currentTenant.id}</Descriptions.Item>
-        <Descriptions.Item label="Name">
-          {currentTenant.name || "N/A"}
-        </Descriptions.Item>
-        <Descriptions.Item label="Address">
-          {currentTenant.address || "N/A"}
-        </Descriptions.Item>
-      </Descriptions>
+      {tenantViewContent()}
     </>
   );
 };
