@@ -89,12 +89,6 @@ const ItemView: React.FC = () => {
           >
             Edit
           </Button>
-          <Button
-            type="default"
-            onClick={() => navigate(`/tenants/view/${tenantId}`)}
-          >
-            Back
-          </Button>
         </Space>
       </Space>
 

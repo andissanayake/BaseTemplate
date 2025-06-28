@@ -18,11 +18,9 @@ import { useItemStore } from "./itemStore";
 import { Item } from "./ItemModel";
 import { ItemService } from "./itemService";
 import { handleResult } from "../../common/handleResult";
-import { useNavigate } from "react-router-dom";
 import { useAuthStore } from "../../auth/authStore";
 
 const ItemList: React.FC = () => {
-  const navigate = useNavigate();
   const { tenantId } = useAuthStore();
   const {
     itemList,
@@ -132,16 +130,12 @@ const ItemList: React.FC = () => {
           <Button
             type="link"
             icon={<EyeOutlined />}
-            onClick={() =>
-              navigate(`/tenants/view/${tenantId}/items/view/${record.id}`)
-            }
+            href={`/tenants/view/${tenantId}/items/view/${record.id}`}
           />
           <Button
             type="link"
             icon={<EditOutlined />}
-            onClick={() =>
-              navigate(`/tenants/view/${tenantId}/items/edit/${record.id}`)
-            }
+            href={`/tenants/view/${tenantId}/items/edit/${record.id}`}
           />
           <Popconfirm
             title="Are you sure to delete this item?"
@@ -166,8 +160,10 @@ const ItemList: React.FC = () => {
         <Button
           type="primary"
           icon={<PlusOutlined />}
-          onClick={() => navigate(`/tenants/view/${tenantId}/items/create`)}
-        ></Button>
+          href={`/tenants/view/${tenantId}/items/create`}
+        >
+          Create
+        </Button>
       </Space>
       <Table
         columns={columns}
