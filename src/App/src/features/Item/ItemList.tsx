@@ -18,6 +18,7 @@ import { useItemStore } from "./itemStore";
 import { Item } from "./ItemModel";
 import { ItemService } from "./itemService";
 import { handleResult } from "../../common/handleResult";
+import { Link } from "react-router-dom";
 import { useAuthStore } from "../../auth/authStore";
 
 const ItemList: React.FC = () => {
@@ -127,16 +128,18 @@ const ItemList: React.FC = () => {
       title: "Actions",
       render: (_: unknown, record: Item) => (
         <Space>
-          <Button
-            type="link"
-            icon={<EyeOutlined />}
-            href={`/tenants/view/${tenantId}/items/view/${record.id}`}
-          />
-          <Button
-            type="link"
-            icon={<EditOutlined />}
-            href={`/tenants/view/${tenantId}/items/edit/${record.id}`}
-          />
+          <Link
+            to={`/tenants/view/${tenantId}/items/view/${record.id}`}
+            rel="noopener noreferrer"
+          >
+            <Button type="link" icon={<EyeOutlined />} />
+          </Link>
+          <Link
+            to={`/tenants/view/${tenantId}/items/edit/${record.id}`}
+            rel="noopener noreferrer"
+          >
+            <Button type="link" icon={<EditOutlined />} />
+          </Link>
           <Popconfirm
             title="Are you sure to delete this item?"
             onConfirm={() => handleDelete(record.id)}
@@ -157,13 +160,14 @@ const ItemList: React.FC = () => {
         <Typography.Title level={3} style={{ margin: 0 }}>
           Item List
         </Typography.Title>
-        <Button
-          type="primary"
-          icon={<PlusOutlined />}
-          href={`/tenants/view/${tenantId}/items/create`}
+        <Link
+          to={`/tenants/view/${tenantId}/items/create`}
+          rel="noopener noreferrer"
         >
-          Create
-        </Button>
+          <Button type="primary" icon={<PlusOutlined />}>
+            Create
+          </Button>
+        </Link>
       </Space>
       <Table
         columns={columns}
