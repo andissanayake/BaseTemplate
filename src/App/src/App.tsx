@@ -34,12 +34,47 @@ export const App = () => {
             element={<TodoGroupViewPage />}
           />
 
-          <Route path="/tenants/create" element={<TenantCreatePage />} />
-          <Route path="/tenants/edit/:tenantId" element={<TenantEditPage />} />
-          <Route path="/tenants/view/:tenantId" element={<TenantViewPage />} />
+          <Route
+            path="/tenants/create"
+            element={
+              <ProtectedRoute policy={Policies.User}>
+                <TenantCreatePage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/tenants/edit/:tenantId"
+            element={
+              <ProtectedRoute policy={Policies.User}>
+                <TenantEditPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/tenants/view/:tenantId"
+            element={
+              <ProtectedRoute policy={Policies.User}>
+                <TenantViewPage />
+              </ProtectedRoute>
+            }
+          />
 
-          <Route path="/items/create" element={<ItemCreatePage />} />
-          <Route path="/items/edit/:itemId" element={<ItemEditPage />} />
+          <Route
+            path="/items/create"
+            element={
+              <ProtectedRoute policy={Policies.User}>
+                <ItemCreatePage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/items/edit/:itemId"
+            element={
+              <ProtectedRoute policy={Policies.User}>
+                <ItemEditPage />
+              </ProtectedRoute>
+            }
+          />
 
           <Route
             path="/profile"

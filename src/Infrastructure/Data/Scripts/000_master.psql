@@ -3,19 +3,19 @@
 -- =============================================
 
 -- Create app_user table (no dependencies)
-\i 001_app_user.psql
+--\i 001_app_user.psql
 
 -- Create user_role table (depends on app_user)
-\i 002_user_role.psql
+--\i 002_user_role.psql
 
 -- Create tenant table (depends on app_user)
-\i 003_tenant.psql
+--\i 003_tenant.psql
 
 -- Create todo_list table (no dependencies)
-\i 004_todo_list.psql
+--\i 004_todo_list.psql
 
 -- Create todo_item table (depends on todo_list)
-\i 005_todo_item.psql
+--\i 005_todo_item.psql
 
 -- Create item table (depends on tenant)
-\i 006_item.psql 
+--\i 006_item.psql 
