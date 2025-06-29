@@ -23,6 +23,8 @@ CREATE INDEX IF NOT EXISTS idx_app_user_tenant_id ON app_user(tenant_id);
 
 -- Step 3: Migrate existing data - set tenant_id for users based on tenant ownership
 DO $$
+DECLARE
+    var_count INTEGER;
 BEGIN
     -- Update users who are tenant owners
     UPDATE app_user 

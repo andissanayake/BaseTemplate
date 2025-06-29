@@ -1,4 +1,6 @@
-﻿namespace BaseTemplate.Application.Tenants.Commands.CreateTenant;
+﻿using BaseTemplate.Domain.Constants;
+
+namespace BaseTemplate.Application.Tenants.Commands.CreateTenant;
 
 [Authorize]
 public record CreateTenantCommand : IRequest<int>
@@ -47,6 +49,14 @@ public class CreateTenantCommandHandler : IRequestHandler<CreateTenantCommand, i
             existingUser.TenantId = tenantId;
             await uow.UpdateAsync(existingUser);
         }
+        
+        // Add TenantOwner role to the user
+        var userRole = new UserRole
+        {
+            UserSsoId = _user.Identifier!,
+            Role = Roles.TenantOwner
+        };
+        await uow.InsertAsync(userRole);
         
         return Result<int>.Success(tenantId);
     }

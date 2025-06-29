@@ -1,0 +1,63 @@
+-- =============================================
+-- Migration Script: Populate Tenant Owner Roles
+-- =============================================
+
+-- Step 1: Add TenantOwner roles for existing tenant owners
+DO $$
+DECLARE
+    tenant_owner_count INTEGER;
+    existing_role_count INTEGER;
+BEGIN
+    -- Insert TenantOwner roles for users who own tenants but don't have the role yet
+    INSERT INTO user_role (user_sso_id, role, created, created_by)
+    SELECT DISTINCT t.owner_sso_id, 'TenantOwner', NOW(), 'SYSTEM'
+    FROM tenant t
+    WHERE NOT EXISTS (
+        SELECT 1 FROM user_role ur 
+        WHERE ur.user_sso_id = t.owner_sso_id 
+        AND ur.role = 'TenantOwner'
+    );
+    
+    -- Log the migration
+    GET DIAGNOSTICS tenant_owner_count = ROW_COUNT;
+    RAISE NOTICE 'Added TenantOwner role to % users', tenant_owner_count;
+END $$;
+
+-- Step 2: Verify the migration
+DO $$
+DECLARE
+    total_tenants INTEGER;
+    users_with_tenant_owner_role INTEGER;
+    users_without_tenant_owner_role INTEGER;
+BEGIN
+    -- Count total tenants
+    SELECT COUNT(*) INTO total_tenants FROM tenant;
+    
+    -- Count users with TenantOwner role
+    SELECT COUNT(DISTINCT user_sso_id) INTO users_with_tenant_owner_role 
+    FROM user_role 
+    WHERE role = 'TenantOwner';
+    
+    -- Count tenant owners without TenantOwner role
+    SELECT COUNT(*) INTO users_without_tenant_owner_role
+    FROM tenant t
+    WHERE NOT EXISTS (
+        SELECT 1 FROM user_role ur 
+        WHERE ur.user_sso_id = t.owner_sso_id 
+        AND ur.role = 'TenantOwner'
+    );
+    
+    RAISE NOTICE 'Tenant Owner Role Migration Summary:';
+    RAISE NOTICE '- Total tenants: %', total_tenants;
+    RAISE NOTICE '- Users with TenantOwner role: %', users_with_tenant_owner_role;
+    RAISE NOTICE '- Tenant owners without TenantOwner role: %', users_without_tenant_owner_role;
+    
+    IF users_without_tenant_owner_role > 0 THEN
+        RAISE WARNING 'Some tenant owners still do not have TenantOwner role assigned!';
+    ELSE
+        RAISE NOTICE 'All tenant owners have been assigned the TenantOwner role successfully.';
+    END IF;
+END $$;
+
+-- Step 3: Create index for better performance on role lookups
+CREATE INDEX IF NOT EXISTS idx_user_role_user_sso_id_role ON user_role(user_sso_id, role); 
