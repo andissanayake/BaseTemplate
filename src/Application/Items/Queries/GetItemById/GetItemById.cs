@@ -1,7 +1,7 @@
 namespace BaseTemplate.Application.Items.Queries.GetItemById;
 
 [Authorize]
-public record GetItemByIdQuery(int Id) : IRequest<ItemDto>;
+public record GetItemByIdQuery(int Id) : BaseTenantRequest<ItemDto>;
 
 public class ItemDto
 {

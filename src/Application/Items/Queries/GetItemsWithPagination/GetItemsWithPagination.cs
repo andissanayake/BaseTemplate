@@ -3,10 +3,8 @@ using System.ComponentModel.DataAnnotations;
 namespace BaseTemplate.Application.Items.Queries.GetItemsWithPagination;
 
 [Authorize]
-public record GetItemsWithPaginationQuery : IRequest<PaginatedList<ItemBriefDto>>
+public record GetItemsWithPaginationQuery : BaseTenantRequest<PaginatedList<ItemBriefDto>>
 {
-    public required int TenantId { get; init; }
-
     [Range(1, int.MaxValue, ErrorMessage = "Page number must be greater than or equal to 1.")]
     public int PageNumber { get; init; } = 1;
 
@@ -38,8 +36,8 @@ public class GetItemsWithPaginationQueryHandler : IRequestHandler<GetItemsWithPa
             AND (@Category IS NULL OR category = @Category)
             AND (@IsActive IS NULL OR is_active = @IsActive)";
 
-        var totalCount = await uow.QueryFirstOrDefaultAsync<int>(countSql, new 
-        { 
+        var totalCount = await uow.QueryFirstOrDefaultAsync<int>(countSql, new
+        {
             request.TenantId,
             request.Category,
             request.IsActive
@@ -66,4 +64,4 @@ public class GetItemsWithPaginationQueryHandler : IRequestHandler<GetItemsWithPa
         return Result<PaginatedList<ItemBriefDto>>.Success(
             new PaginatedList<ItemBriefDto>(items.ToList(), totalCount, request.PageNumber, request.PageSize));
     }
-} 
+}

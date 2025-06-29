@@ -3,9 +3,8 @@ using System.ComponentModel.DataAnnotations;
 namespace BaseTemplate.Application.Items.Commands.CreateItem;
 
 [Authorize]
-public record CreateItemCommand : IRequest<int>
+public record CreateItemCommand : BaseTenantRequest<int>
 {
-    public int TenantId { get; init; }
 
     [Required]
     [MaxLength(200, ErrorMessage = "The name cannot exceed 200 characters.")]

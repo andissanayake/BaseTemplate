@@ -1,7 +1,7 @@
 namespace BaseTemplate.Application.Items.Commands.DeleteItem;
 
 [Authorize]
-public record DeleteItemCommand(int Id) : IRequest<bool>;
+public record DeleteItemCommand(int Id) : BaseTenantRequest<bool>;
 
 public class DeleteItemCommandHandler : IRequestHandler<DeleteItemCommand, bool>
 {
@@ -25,7 +25,7 @@ public class DeleteItemCommandHandler : IRequestHandler<DeleteItemCommand, bool>
         // Soft delete by setting IsActive to false
         entity.IsActive = false;
         await uow.UpdateAsync(entity);
-        
+
         return Result<bool>.Success(true);
     }
-} 
+}
