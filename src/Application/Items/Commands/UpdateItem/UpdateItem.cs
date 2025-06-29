@@ -1,8 +1,9 @@
 using System.ComponentModel.DataAnnotations;
+using BaseTemplate.Domain.Constants;
 
 namespace BaseTemplate.Application.Items.Commands.UpdateItem;
 
-[Authorize]
+[Authorize(Roles = Roles.TenantOwner)]
 public record UpdateItemCommand(int TenantId) : BaseTenantRequest<bool>(TenantId)
 {
     public int Id { get; init; }

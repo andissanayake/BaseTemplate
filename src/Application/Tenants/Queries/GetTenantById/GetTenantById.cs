@@ -1,6 +1,8 @@
-﻿namespace BaseTemplate.Application.TenantLists.Commands.GetTenantById;
+﻿using BaseTemplate.Domain.Constants;
 
-[Authorize]
+namespace BaseTemplate.Application.Tenants.Queries.GetTenantById;
+
+[Authorize(Roles = Roles.TenantOwner)]
 public record GetTenantByIdQuery(int TenantId) : BaseTenantRequest<GetTenantResponse>(TenantId);
 
 public record GetTenantResponse

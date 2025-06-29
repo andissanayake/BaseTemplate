@@ -1,6 +1,8 @@
-﻿namespace BaseTemplate.Application.Tenants.Commands.UpdateTenant;
+﻿using BaseTemplate.Domain.Constants;
 
-[Authorize]
+namespace BaseTemplate.Application.Tenants.Commands.UpdateTenant;
+
+[Authorize(Roles = Roles.TenantOwner)]
 public record UpdateTenantCommand : IRequest<bool>
 {
     public int Id { get; init; }
