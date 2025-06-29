@@ -1,7 +1,7 @@
 ﻿using BaseTemplate.Application.Common.Models;
-using BaseTemplate.Application.TenantLists.Commands.GetTenantById;
 using BaseTemplate.Application.Tenants.Commands.CreateTenant;
 using BaseTemplate.Application.Tenants.Commands.UpdateTenant;
+using BaseTemplate.Application.Tenants.Queries.GetTenantById;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
