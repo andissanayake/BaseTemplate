@@ -75,11 +75,11 @@ public class IdentityService : IIdentityService
 
         using var uow = _factory.Create();
         
-        // Check if tenant exists and user is the owner
-        var tenant = await uow.QueryFirstOrDefaultAsync<Tenant>(
-            "SELECT * FROM tenant WHERE id = @TenantId AND owner_sso_id = @UserSsoId", 
-            new { TenantId = tenantId, UserSsoId = _user.Identifier });
+        // Check if user belongs to the specified tenant
+        var userTenantId = await uow.QueryFirstOrDefaultAsync<int?>(
+            "SELECT tenant_id FROM app_user WHERE sso_id = @UserSsoId", 
+            new { UserSsoId = _user.Identifier });
 
-        return tenant != null;
+        return userTenantId == tenantId;
     }
 }

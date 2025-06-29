@@ -1,0 +1,60 @@
+-- =============================================
+-- Migration Script: Add tenant_id to app_user table
+-- =============================================
+
+-- Step 1: Add tenant_id column to app_user table
+DO $$
+BEGIN
+    -- Check if column doesn't exist
+    IF NOT EXISTS (
+        SELECT 1 FROM information_schema.columns 
+        WHERE table_name = 'app_user' AND column_name = 'tenant_id'
+    ) THEN
+        -- Add the column
+        ALTER TABLE app_user ADD COLUMN tenant_id INT REFERENCES tenant(id);
+        RAISE NOTICE 'Added tenant_id column to app_user table';
+    ELSE
+        RAISE NOTICE 'tenant_id column already exists in app_user table';
+    END IF;
+END $$;
+
+-- Step 2: Create index for tenant_id lookups
+CREATE INDEX IF NOT EXISTS idx_app_user_tenant_id ON app_user(tenant_id);
+
+-- Step 3: Migrate existing data - set tenant_id for users based on tenant ownership
+DO $$
+BEGIN
+    -- Update users who are tenant owners
+    UPDATE app_user 
+    SET tenant_id = t.id
+    FROM tenant t 
+    WHERE app_user.sso_id = t.owner_sso_id 
+    AND app_user.tenant_id IS NULL;
+    
+    -- Log the migration
+    GET DIAGNOSTICS var_count = ROW_COUNT;
+    RAISE NOTICE 'Migrated % users to their tenant ownership', var_count;
+END $$;
+
+-- Step 4: Verify migration
+DO $$
+DECLARE
+    user_count INTEGER;
+    tenant_count INTEGER;
+    migrated_count INTEGER;
+BEGIN
+    -- Count total users
+    SELECT COUNT(*) INTO user_count FROM app_user;
+    
+    -- Count total tenants
+    SELECT COUNT(*) INTO tenant_count FROM tenant;
+    
+    -- Count users with tenant_id
+    SELECT COUNT(*) INTO migrated_count FROM app_user WHERE tenant_id IS NOT NULL;
+    
+    RAISE NOTICE 'Migration Summary:';
+    RAISE NOTICE '- Total users: %', user_count;
+    RAISE NOTICE '- Total tenants: %', tenant_count;
+    RAISE NOTICE '- Users with tenant_id: %', migrated_count;
+    RAISE NOTICE '- Users without tenant_id: %', (user_count - migrated_count);
+END $$; 

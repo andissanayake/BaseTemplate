@@ -6,8 +6,12 @@ CREATE TABLE IF NOT EXISTS app_user (
     sso_id VARCHAR(100) NOT NULL,
     name VARCHAR(255),
     email VARCHAR(255),
+    tenant_id INT REFERENCES tenant(id),
     created TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     created_by VARCHAR(255),
     last_modified TIMESTAMPTZ,
     last_modified_by VARCHAR(255)
-); 
+);
+
+-- Add index for tenant_id lookups
+CREATE INDEX IF NOT EXISTS idx_app_user_tenant_id ON app_user(tenant_id); 
