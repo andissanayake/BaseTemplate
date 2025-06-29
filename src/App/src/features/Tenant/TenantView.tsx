@@ -22,7 +22,6 @@ export const TenantView: React.FC = () => {
   useAsyncEffect(async () => {
     if (!tenantId) {
       notification.error({ message: "Tenant ID is required to view details." });
-      // Consider navigating away or showing a specific error component
       return;
     }
     setLoading(true);

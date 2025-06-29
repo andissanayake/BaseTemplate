@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 namespace BaseTemplate.Application.Items.Commands.UpdateItem;
 
 [Authorize]
-public record UpdateItemCommand : BaseTenantRequest<bool>
+public record UpdateItemCommand(int TenantId) : BaseTenantRequest<bool>(TenantId)
 {
     public int Id { get; init; }
 

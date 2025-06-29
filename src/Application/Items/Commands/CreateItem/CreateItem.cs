@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 namespace BaseTemplate.Application.Items.Commands.CreateItem;
 
 [Authorize]
-public record CreateItemCommand : BaseTenantRequest<int>
+public record CreateItemCommand(int TenantId) : BaseTenantRequest<int>(TenantId)
 {
 
     [Required]
@@ -29,13 +29,6 @@ public class CreateItemCommandHandler : IRequestHandler<CreateItemCommand, int>
     public async Task<Result<int>> HandleAsync(CreateItemCommand request, CancellationToken cancellationToken)
     {
         using var uow = _factory.Create();
-
-        // Verify tenant exists and user has access
-        var tenant = await uow.GetAsync<Tenant>(request.TenantId);
-        if (tenant == null)
-        {
-            return Result<int>.NotFound($"Tenant with id {request.TenantId} not found.");
-        }
 
         var entity = new Item
         {

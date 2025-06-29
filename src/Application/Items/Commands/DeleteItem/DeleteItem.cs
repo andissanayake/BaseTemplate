@@ -1,7 +1,7 @@
 namespace BaseTemplate.Application.Items.Commands.DeleteItem;
 
 [Authorize]
-public record DeleteItemCommand(int Id) : BaseTenantRequest<bool>;
+public record DeleteItemCommand(int TenantId, int Id) : BaseTenantRequest<bool>(TenantId);
 
 public class DeleteItemCommandHandler : IRequestHandler<DeleteItemCommand, bool>
 {

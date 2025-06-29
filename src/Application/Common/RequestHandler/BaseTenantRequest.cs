@@ -1,10 +1,6 @@
-﻿using BaseTemplate.Domain.Constants;
-using BaseTemplate.Application.Common.Security;
-
-namespace BaseTemplate.Application.Common.RequestHandler;
+﻿namespace BaseTemplate.Application.Common.RequestHandler;
 
 [Authorize]
-public record BaseTenantRequest<TResponse> : IRequest<TResponse>
+public record BaseTenantRequest<TResponse>(int TenantId) : IRequest<TResponse>
 {
-    public int TenantId { get; set; }
 }

@@ -18,11 +18,10 @@ import { useItemStore } from "./itemStore";
 import { Item } from "./ItemModel";
 import { ItemService } from "./itemService";
 import { handleResult } from "../../common/handleResult";
-import { Link } from "react-router-dom";
-import { useAuthStore } from "../../auth/authStore";
+import { Link, useParams } from "react-router-dom";
 
 const ItemList: React.FC = () => {
-  const { tenantId } = useAuthStore();
+  const { tenantId } = useParams<{ tenantId: string }>();
   const {
     itemList,
     loading,
@@ -35,6 +34,8 @@ const ItemList: React.FC = () => {
     setItemList,
     setCurrentPage,
   } = useItemStore();
+
+  if (!tenantId) throw new Error("Tenant ID is required");
 
   const loadItems = useCallback(async () => {
     if (!tenantId) {
@@ -68,7 +69,7 @@ const ItemList: React.FC = () => {
 
   const handleDelete = async (id: number) => {
     setLoading(true);
-    const response = await ItemService.deleteItem(id);
+    const response = await ItemService.deleteItem(tenantId, id);
     handleResult(response, {
       onSuccess: () => {
         const newTotalCount = totalCount - 1;

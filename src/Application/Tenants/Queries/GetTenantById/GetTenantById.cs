@@ -1,7 +1,7 @@
 ﻿namespace BaseTemplate.Application.TenantLists.Commands.GetTenantById;
 
 [Authorize]
-public record GetTenantByIdQuery(int Id) : IRequest<GetTenantResponse>;
+public record GetTenantByIdQuery(int TenantId) : BaseTenantRequest<GetTenantResponse>(TenantId);
 
 public record GetTenantResponse
 {
@@ -22,10 +22,10 @@ public class GetTenantByIdQueryHandler : IRequestHandler<GetTenantByIdQuery, Get
     public async Task<Result<GetTenantResponse>> HandleAsync(GetTenantByIdQuery request, CancellationToken cancellationToken)
     {
         using var uow = _factory.Create();
-        var entity = await uow.GetAsync<Tenant>(request.Id);
+        var entity = await uow.GetAsync<Tenant>(request.TenantId);
         if (entity is null)
         {
-            return Result<GetTenantResponse>.NotFound($"TenantList with id {request.Id} not found.");
+            return Result<GetTenantResponse>.NotFound($"TenantList with id {request.TenantId} not found.");
         }
         var tenant = new GetTenantResponse() { Name = entity.Name, Id = entity.Id, Address = entity.Address };
         return Result<GetTenantResponse>.Success(tenant);

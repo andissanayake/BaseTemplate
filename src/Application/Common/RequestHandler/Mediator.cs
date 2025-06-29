@@ -39,8 +39,17 @@ public class Mediator : IMediator
         }
 
         var requestType = request.GetType();
+
+        //authorization request
         var authorizeAttributes = requestType.GetCustomAttributes<AuthorizeAttribute>(true);
 
+        if (request is BaseTenantRequest<TResponse> baseTenantRequest)
+        {
+            if (!await _identityService.HasTenantAccessAsync(baseTenantRequest.TenantId))
+            {
+                return Result<TResponse>.Unauthorized("User don't have access to this tenant.");
+            }
+        }
         foreach (var authorizeAttribute in authorizeAttributes)
         {
             if (!_identityService.IsAuthenticated)

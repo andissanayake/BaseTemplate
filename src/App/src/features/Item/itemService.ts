@@ -11,24 +11,44 @@ export class ItemService {
   ): Promise<Result<{ items: Item[]; totalCount: number }>> {
     return await handleApi(
       axiosInstance.get(
-        `/api/items?PageNumber=${pageNumber}&PageSize=${pageSize}&TenantId=${tenantId}`
+        `/api/tenants/${tenantId}/items?PageNumber=${pageNumber}&PageSize=${pageSize}&TenantId=${tenantId}`
       )
     );
   }
 
-  static async fetchItemById(id: string): Promise<Result<Item>> {
-    return await handleApi(axiosInstance.get(`/api/items/${id}`));
+  static async fetchItemById(
+    tenantId: string,
+    id: string
+  ): Promise<Result<Item>> {
+    return await handleApi(
+      axiosInstance.get(`/api/tenants/${tenantId}/items/${id}`)
+    );
   }
 
-  static async createItem(data: Item): Promise<Result<number>> {
-    return await handleApi(axiosInstance.post("/api/items", data));
+  static async createItem(
+    tenantId: string,
+    data: Item
+  ): Promise<Result<number>> {
+    return await handleApi(
+      axiosInstance.post(`/api/tenants/${tenantId}/items`, data)
+    );
   }
 
-  static async updateItem(data: Item): Promise<Result<boolean>> {
-    return await handleApi(axiosInstance.put(`/api/items/${data.id}`, data));
+  static async updateItem(
+    tenantId: string,
+    data: Item
+  ): Promise<Result<boolean>> {
+    return await handleApi(
+      axiosInstance.put(`/api/tenants/${tenantId}/items/${data.id}`, data)
+    );
   }
 
-  static async deleteItem(id: number): Promise<Result<boolean>> {
-    return await handleApi(axiosInstance.delete(`/api/items/${id}`));
+  static async deleteItem(
+    tenantId: string,
+    id: number
+  ): Promise<Result<boolean>> {
+    return await handleApi(
+      axiosInstance.delete(`/api/tenants/${tenantId}/items/${id}`)
+    );
   }
 }

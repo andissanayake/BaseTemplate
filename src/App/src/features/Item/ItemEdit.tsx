@@ -24,13 +24,14 @@ const ItemEdit: React.FC = () => {
   const { itemId } = useParams();
 
   if (!itemId) throw new Error("itemId is required");
+  if (!tenantId) throw new Error("Tenant ID is required");
 
   const handleSaveItem = () => {
     form.validateFields().then(async (values) => {
       values.id = +itemId;
       values.category = values.category?.join(",") || "";
       setLoading(true);
-      const response = await ItemService.updateItem(values);
+      const response = await ItemService.updateItem(tenantId, values);
       return handleResult(response, {
         onSuccess: () => {
           notification.success({
@@ -55,7 +56,7 @@ const ItemEdit: React.FC = () => {
   useAsyncEffect(async () => {
     form.resetFields();
     setLoading(true);
-    const response = await ItemService.fetchItemById(itemId);
+    const response = await ItemService.fetchItemById(tenantId, itemId);
     handleResult(response, {
       onSuccess: (data) => {
         if (data) {

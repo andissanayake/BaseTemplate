@@ -1,5 +1,6 @@
 using System.Security.Claims;
 using BaseTemplate.Application.Common.Interfaces;
+using BaseTemplate.Domain.Entities;
 using Microsoft.AspNetCore.Authorization;
 
 namespace BaseTemplate.Infrastructure.Identity;
@@ -63,5 +64,22 @@ public class IdentityService : IIdentityService
         var principal = new ClaimsPrincipal(identity);
         var result = await _authorizationService.AuthorizeAsync(principal, policyName);
         return result.Succeeded;
+    }
+
+    public async Task<bool> HasTenantAccessAsync(int tenantId)
+    {
+        if (_user == null || _user.Identifier == null)
+        {
+            return false;
+        }
+
+        using var uow = _factory.Create();
+        
+        // Check if tenant exists and user is the owner
+        var tenant = await uow.QueryFirstOrDefaultAsync<Tenant>(
+            "SELECT * FROM tenant WHERE id = @TenantId AND owner_sso_id = @UserSsoId", 
+            new { TenantId = tenantId, UserSsoId = _user.Identifier });
+
+        return tenant != null;
     }
 }

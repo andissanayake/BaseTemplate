@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import {
   Card,
   Descriptions,
@@ -11,7 +11,6 @@ import {
 import { useParams, useNavigate } from "react-router-dom";
 import { useItemStore } from "./itemStore";
 import { ItemService } from "./itemService";
-import { useAsyncEffect } from "../../common/useAsyncEffect";
 import { handleResult } from "../../common/handleResult";
 import { useAuthStore } from "../../auth/authStore";
 import { Item } from "./ItemModel";
@@ -23,28 +22,14 @@ const ItemView: React.FC = () => {
   const { itemId } = useParams();
 
   if (!itemId) throw new Error("itemId is required");
-
-  useAsyncEffect(async () => {
-    setLoading(true);
-    const response = await ItemService.fetchItemById(itemId);
-    handleResult(response, {
-      onSuccess: () => {
-        // Data is handled in the component render
-      },
-      onServerError: () => {
-        notification.error({ message: "Failed to fetch item!" });
-      },
-      onFinally: () => {
-        setLoading(false);
-      },
-    });
-  }, [itemId]);
+  if (!tenantId) throw new Error("Tenant ID is required");
 
   const [item, setItem] = React.useState<Item | null>(null);
 
-  React.useEffect(() => {
+  useEffect(() => {
     const fetchItem = async () => {
-      const response = await ItemService.fetchItemById(itemId);
+      const response = await ItemService.fetchItemById(tenantId, itemId);
+      setLoading(true);
       handleResult(response, {
         onSuccess: (data) => {
           if (data) {
@@ -54,10 +39,13 @@ const ItemView: React.FC = () => {
         onServerError: () => {
           notification.error({ message: "Failed to fetch item!" });
         },
+        onFinally: () => {
+          setLoading(false);
+        },
       });
     };
     fetchItem();
-  }, [itemId]);
+  }, [itemId, tenantId]);
 
   if (!item) {
     return (
