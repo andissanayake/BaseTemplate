@@ -39,11 +39,27 @@ public class IdentityService : IIdentityService
         {
             new Claim(ClaimTypes.NameIdentifier, _user.Identifier)
         };
+        
+        // Add user name if available
+        if (!string.IsNullOrEmpty(_user.Name))
+        {
+            claims.Add(new Claim(ClaimTypes.Name, _user.Name));
+        }
+        
+        // Add user email if available
+        if (!string.IsNullOrEmpty(_user.Email))
+        {
+            claims.Add(new Claim(ClaimTypes.Email, _user.Email));
+        }
+        
+        // Add roles
         foreach (var role in roles)
         {
             claims.Add(new Claim(ClaimTypes.Role, role));
         }
-        var identity = new ClaimsIdentity(claims, "Custom");
+        
+        // Use JWT Bearer authentication type to match the authentication scheme
+        var identity = new ClaimsIdentity(claims, "Bearer");
         var principal = new ClaimsPrincipal(identity);
         var result = await _authorizationService.AuthorizeAsync(principal, policyName);
         return result.Succeeded;

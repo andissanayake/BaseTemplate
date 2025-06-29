@@ -27,7 +27,7 @@ public class GetItemByIdQueryHandler : IRequestHandler<GetItemByIdQuery, ItemDto
     {
         using var uow = _factory.Create();
         var entity = await uow.GetAsync<Item>(request.Id);
-        
+
         if (entity is null)
         {
             return Result<ItemDto>.NotFound($"Item with id {request.Id} not found.");
@@ -46,4 +46,4 @@ public class GetItemByIdQueryHandler : IRequestHandler<GetItemByIdQuery, ItemDto
 
         return Result<ItemDto>.Success(itemDto);
     }
-} 
+}

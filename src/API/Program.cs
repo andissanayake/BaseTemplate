@@ -6,7 +6,7 @@ using Serilog.Events;
 namespace BaseTemplate.API;
 public class Program
 {
-    private const string CLIENT_POLYCY_KEY = "CLIENT_POLYCY_KEY";
+    private const string CLIENT_POLICY_KEY = "CLIENT_POLICY_KEY";
     public static void Main(string[] args)
     {
         Log.Logger = new LoggerConfiguration()
@@ -31,7 +31,7 @@ public class Program
 
         builder.Services.AddCors(options =>
         {
-            options.AddPolicy(name: CLIENT_POLYCY_KEY, builder =>
+            options.AddPolicy(name: CLIENT_POLICY_KEY, builder =>
             {
                 builder.WithOrigins("http://localhost:5000")
                    .AllowAnyMethod()
@@ -52,7 +52,7 @@ public class Program
 
         app.UseHealthChecks("/health");
         //app.UseHttpsRedirection();
-        app.UseCors(CLIENT_POLYCY_KEY);
+        app.UseCors(CLIENT_POLICY_KEY);
         app.UseAuthentication();
         app.UseAuthorization();
         app.UseDefaultFiles();
