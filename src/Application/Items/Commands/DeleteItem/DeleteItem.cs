@@ -15,7 +15,7 @@ public class DeleteItemCommandHandler : IRequestHandler<DeleteItemCommand, bool>
     public async Task<Result<bool>> HandleAsync(DeleteItemCommand request, CancellationToken cancellationToken)
     {
         using var uow = _factory.Create();
-        var entity = await uow.GetAsync<Item>(request.Id);
+        var entity = await uow.QueryFirstOrDefaultAsync<Item>("select * from item where Id = @Id and tenant_id = @TenantId", new { request.Id, request.TenantId });
 
         if (entity is null)
         {

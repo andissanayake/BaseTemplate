@@ -26,7 +26,7 @@ public class GetItemByIdQueryHandler : IRequestHandler<GetItemByIdQuery, ItemDto
     public async Task<Result<ItemDto>> HandleAsync(GetItemByIdQuery request, CancellationToken cancellationToken)
     {
         using var uow = _factory.Create();
-        var entity = await uow.GetAsync<Item>(request.Id);
+        var entity = await uow.QueryFirstOrDefaultAsync<Item>("select * from item where id = @Id and tenant_id = @TenantId", new { request.Id, request.TenantId });
 
         if (entity is null)
         {
