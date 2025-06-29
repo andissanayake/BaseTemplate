@@ -30,14 +30,14 @@ public class ItemsController : ApiControllerBase
     {
         if (command == null)
         {
-            return BadRequest(Result<int>.Validation("Command is required"));
+            return BadRequest(Result<int>.Validation("Command is required", []));
         }
 
         if (tenantId != command.TenantId)
         {
-            return BadRequest(Result<int>.Validation("Tenant ID mismatch"));
+            return BadRequest(Result<int>.Validation("Tenant ID mismatch", []));
         }
-        
+
         return await SendAsync(command);
     }
 
@@ -46,12 +46,12 @@ public class ItemsController : ApiControllerBase
     {
         if (command == null)
         {
-            return BadRequest(Result<bool>.Validation("Command is required"));
+            return BadRequest(Result<bool>.Validation("Command is required", []));
         }
 
         if (id != command.Id || tenantId != command.TenantId)
         {
-            return BadRequest(Result<bool>.Validation("ID or Tenant ID mismatch"));
+            return BadRequest(Result<bool>.Validation("ID or Tenant ID mismatch", []));
         }
 
         return await SendAsync(command);

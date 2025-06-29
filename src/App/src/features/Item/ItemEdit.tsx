@@ -29,6 +29,7 @@ const ItemEdit: React.FC = () => {
   const handleSaveItem = () => {
     form.validateFields().then(async (values) => {
       values.id = +itemId;
+      values.tenantId = +tenantId;
       values.category = values.category?.join(",") || "";
       setLoading(true);
       const response = await ItemService.updateItem(tenantId, values);

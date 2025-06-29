@@ -31,7 +31,7 @@ const ItemCreate: React.FC = () => {
 
     form.validateFields().then(async (values) => {
       setLoading(true);
-      const response = await ItemService.createItem({
+      const response = await ItemService.createItem(tenantId, {
         ...values,
         category: values.category?.join(",") || "",
         tenantId,
