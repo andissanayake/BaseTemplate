@@ -21,15 +21,8 @@ import { useParams } from "react-router-dom";
 
 export const StaffRequestList: React.FC = () => {
   const { tenantId } = useParams<{ tenantId: string }>();
-  const {
-    staffRequests,
-    loading,
-    error,
-    setStaffRequests,
-    setLoading,
-    setError,
-    clearError,
-  } = useStaffRequestStore();
+  const { staffRequests, loading, setStaffRequests, setLoading } =
+    useStaffRequestStore();
   const [createModalVisible, setCreateModalVisible] = useState(false);
   const [rejectModalVisible, setRejectModalVisible] = useState(false);
   const [selectedRequest, setSelectedRequest] =
@@ -41,14 +34,16 @@ export const StaffRequestList: React.FC = () => {
 
   const fetchStaffRequests = async (tenantId: number) => {
     setLoading(true);
-    setError(null);
     const response = await StaffRequestService.getStaffRequests(tenantId);
     handleResult(response, {
       onSuccess: (data) => {
         setStaffRequests(data || []);
       },
-      onServerError: (error) => {
-        setError(error?.message || "Failed to fetch staff requests");
+      onServerError: () => {
+        notification.error({
+          message: "Failed to fetch staff requests",
+          description: "An error occurred while loading staff requests.",
+        });
       },
       onFinally: () => {
         setLoading(false);
@@ -216,17 +211,6 @@ export const StaffRequestList: React.FC = () => {
       ),
     },
   ];
-
-  // Clear error when component mounts or when error is displayed
-  useEffect(() => {
-    if (error) {
-      notification.error({
-        message: "Error loading staff requests",
-        description: error,
-      });
-      clearError();
-    }
-  }, [error, clearError]);
 
   return (
     <>
