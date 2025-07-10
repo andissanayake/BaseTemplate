@@ -18,10 +18,12 @@ import { useItemStore } from "./itemStore";
 import { Item } from "./ItemModel";
 import { ItemService } from "./itemService";
 import { handleResult } from "../../common/handleResult";
-import { Link, useParams } from "react-router-dom";
+import { Link } from "react-router-dom";
+import { useAuthStore } from "../../auth/authStore";
 
 const ItemList: React.FC = () => {
-  const { tenantId } = useParams<{ tenantId: string }>();
+  const { tenantId } = useAuthStore();
+
   const {
     itemList,
     loading,
@@ -34,8 +36,6 @@ const ItemList: React.FC = () => {
     setItemList,
     setCurrentPage,
   } = useItemStore();
-
-  if (!tenantId) throw new Error("Tenant ID is required");
 
   const loadItems = useCallback(async () => {
     if (!tenantId) {
@@ -64,8 +64,19 @@ const ItemList: React.FC = () => {
   }, [currentPage, pageSize, setLoading, setTotalCount, setItemList, tenantId]);
 
   useEffect(() => {
-    loadItems();
-  }, [loadItems]);
+    if (tenantId) {
+      loadItems();
+    }
+  }, [loadItems, tenantId]);
+
+  if (!tenantId) {
+    return (
+      <div style={{ textAlign: "center", padding: "20px" }}>
+        <Typography.Title level={3}>No Tenant Selected</Typography.Title>
+        <Typography.Text>Please select a tenant to view items.</Typography.Text>
+      </div>
+    );
+  }
 
   const handleDelete = async (id: number) => {
     setLoading(true);
@@ -92,6 +103,9 @@ const ItemList: React.FC = () => {
   const handlePaginationChange = (page: number, pageSize: number) => {
     setPagination(page, pageSize);
   };
+
+  // Always use the standalone items path since we're using auth store tenant ID
+  const getBasePath = () => `/items`;
 
   const columns = [
     {
@@ -130,13 +144,13 @@ const ItemList: React.FC = () => {
       render: (_: unknown, record: Item) => (
         <Space>
           <Link
-            to={`/tenants/view/${tenantId}/items/view/${record.id}`}
+            to={`${getBasePath()}/view/${record.id}`}
             rel="noopener noreferrer"
           >
             <Button type="link" icon={<EyeOutlined />} />
           </Link>
           <Link
-            to={`/tenants/view/${tenantId}/items/edit/${record.id}`}
+            to={`${getBasePath()}/edit/${record.id}`}
             rel="noopener noreferrer"
           >
             <Button type="link" icon={<EditOutlined />} />
@@ -161,10 +175,7 @@ const ItemList: React.FC = () => {
         <Typography.Title level={3} style={{ margin: 0 }}>
           Item List
         </Typography.Title>
-        <Link
-          to={`/tenants/view/${tenantId}/items/create`}
-          rel="noopener noreferrer"
-        >
+        <Link to={`${getBasePath()}/create`} rel="noopener noreferrer">
           <Button type="primary" icon={<PlusOutlined />}>
             Create
           </Button>

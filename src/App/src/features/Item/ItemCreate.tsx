@@ -40,7 +40,7 @@ const ItemCreate: React.FC = () => {
         onSuccess: () => {
           notification.success({ message: "Item created successfully!" });
           form.resetFields();
-          navigate(`/tenants/view/${tenantId}`);
+          navigate(`/items`);
         },
         onValidationError: (createErrors) => {
           const fields = Object.entries(createErrors).map(([name, errors]) => ({
@@ -106,10 +106,7 @@ const ItemCreate: React.FC = () => {
             <Button type="primary" htmlType="submit">
               Submit
             </Button>
-            <Button
-              type="default"
-              onClick={() => navigate(`/tenants/view/${tenantId}`)}
-            >
+            <Button type="default" onClick={() => navigate(`/items`)}>
               Cancel
             </Button>
           </Space>

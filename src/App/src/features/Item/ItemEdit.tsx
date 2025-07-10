@@ -38,7 +38,7 @@ const ItemEdit: React.FC = () => {
           notification.success({
             message: "Item updated successfully!",
           });
-          navigate(`/tenants/view/${tenantId}`);
+          navigate(`/items`);
         },
         onValidationError: (updateErrors) => {
           const fields = Object.entries(updateErrors).map(([name, errors]) => ({
@@ -125,10 +125,7 @@ const ItemEdit: React.FC = () => {
             <Button type="primary" htmlType="submit">
               Submit
             </Button>
-            <Button
-              type="default"
-              onClick={() => navigate(`/tenants/view/${tenantId}`)}
-            >
+            <Button type="default" onClick={() => navigate(`/items`)}>
               Cancel
             </Button>
           </Space>

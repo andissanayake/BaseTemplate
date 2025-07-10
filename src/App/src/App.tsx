@@ -17,6 +17,7 @@ import { StaffRequestManagementPage } from "./pages/StaffRequestManagementPage";
 import { ItemCreatePage } from "./pages/ItemCreatePage";
 import { ItemEditPage } from "./pages/ItemEditPage";
 import { ItemViewPage } from "./pages/ItemViewPage";
+import { ItemListPage } from "./pages/ItemListPage";
 
 export const App = () => {
   return (
@@ -34,6 +35,39 @@ export const App = () => {
           <Route
             path="todo-list/view/:listId"
             element={<TodoGroupViewPage />}
+          />
+
+          <Route
+            path="/items"
+            element={
+              <ProtectedRoute policy={Policies.User}>
+                <ItemListPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/items/create"
+            element={
+              <ProtectedRoute policy={Policies.User}>
+                <ItemCreatePage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/items/edit/:itemId"
+            element={
+              <ProtectedRoute policy={Policies.User}>
+                <ItemEditPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/items/view/:itemId"
+            element={
+              <ProtectedRoute policy={Policies.User}>
+                <ItemViewPage />
+              </ProtectedRoute>
+            }
           />
 
           <Route
@@ -65,31 +99,6 @@ export const App = () => {
             element={
               <ProtectedRoute policy={Policies.User}>
                 <StaffRequestManagementPage />
-              </ProtectedRoute>
-            }
-          />
-
-          <Route
-            path="/tenants/view/:tenantId/items/create"
-            element={
-              <ProtectedRoute policy={Policies.User}>
-                <ItemCreatePage />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/tenants/view/:tenantId/items/edit/:itemId"
-            element={
-              <ProtectedRoute policy={Policies.User}>
-                <ItemEditPage />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/tenants/view/:tenantId/items/view/:itemId"
-            element={
-              <ProtectedRoute policy={Policies.User}>
-                <ItemViewPage />
               </ProtectedRoute>
             }
           />

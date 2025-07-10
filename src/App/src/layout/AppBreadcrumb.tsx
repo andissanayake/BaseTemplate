@@ -9,6 +9,10 @@ export const AppBreadcrumb = () => {
     "/todo-list/create": "Create",
     "/todo-list/edit/:listId": (params: any) => `Edit #${params.listId}`,
     "/todo-list/view/:listId": (params: any) => `View #${params.listId}`,
+    "/items": "Items",
+    "/items/create": "Create Item",
+    "/items/edit/:itemId": (params: any) => `Edit Item #${params.itemId}`,
+    "/items/view/:itemId": (params: any) => `View Item #${params.itemId}`,
     "/profile": "Profile",
     "/tenants/create": "Create Tenant",
     "/tenants/view/:tenantId": (params: any) =>
@@ -16,11 +20,6 @@ export const AppBreadcrumb = () => {
     "/tenants/view/:tenantId/edit": (params: any) =>
       ` Tenant Edit #${params.tenantId}`,
 
-    "/tenants/view/:tenantId/items/create": "Create Item",
-    "/tenants/view/:tenantId/items/edit/:itemId": (params: any) =>
-      `Edit Item #${params.itemId}`,
-    "/tenants/view/:tenantId/items/view/:itemId": (params: any) =>
-      `View Item #${params.itemId}`,
     "/tenants/view/:tenantId/staff-requests": "Staff Requests",
   };
 

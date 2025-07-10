@@ -104,6 +104,14 @@ export const AppMenu = () => {
         },
       });
 
+      menuItems.push({
+        key: "/items",
+        label: <span>Items</span>,
+        onClick: (e: any) => {
+          handleClick(e.key);
+        },
+      });
+
       if (tenantId) {
         menuItems.push({
           key: "/tenants/view/" + tenantId,
