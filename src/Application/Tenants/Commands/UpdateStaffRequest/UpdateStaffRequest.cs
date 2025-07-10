@@ -1,7 +1,7 @@
 namespace BaseTemplate.Application.Tenants.Commands.UpdateStaffRequest;
 
 [Authorize(Roles = Domain.Constants.Roles.TenantOwner)]
-public record UpdateStaffRequestCommand : BaseTenantRequest<bool>
+public record UpdateStaffRequestCommand(int TenantId) : BaseTenantRequest<bool>(TenantId)
 {
     public int StaffRequestId { get; set; }
     public bool Accept { get; set; }

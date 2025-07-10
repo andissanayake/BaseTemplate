@@ -46,7 +46,12 @@ export class StaffRequestService {
     return await handleApi(
       axiosInstance.post(
         `${this.baseUrl}/${tenantId}/staff-requests/${request.staffRequestId}/update`,
-        request
+        {
+          TenantId: tenantId,
+          StaffRequestId: request.staffRequestId,
+          Accept: request.accept,
+          RejectionReason: request.rejectionReason,
+        }
       )
     );
   }
