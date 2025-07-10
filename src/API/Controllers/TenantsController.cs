@@ -1,5 +1,6 @@
 ﻿using BaseTemplate.Application.Common.Models;
 using BaseTemplate.Application.Tenants.Commands.CreateTenant;
+using BaseTemplate.Application.Tenants.Commands.RequestStaff;
 using BaseTemplate.Application.Tenants.Commands.UpdateTenant;
 using BaseTemplate.Application.Tenants.Queries.GetTenantById;
 using Microsoft.AspNetCore.Authorization;
@@ -26,6 +27,17 @@ public class TenantsController : ApiControllerBase
     public async Task<ActionResult<Result<bool>>> Update(int id, UpdateTenantCommand command)
     {
         if (id != command.Id)
+        {
+            return BadRequest();
+        }
+
+        return await SendAsync(command);
+    }
+
+    [HttpPost("{tenantId}/request-staff")]
+    public async Task<ActionResult<Result<bool>>> RequestStaff(int tenantId, RequestStaffCommand command)
+    {
+        if (tenantId != command.TenantId)
         {
             return BadRequest();
         }
