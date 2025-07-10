@@ -19,7 +19,6 @@ public interface IMediator
 
 public class Mediator : IMediator
 {
-    private readonly IServiceProvider _provider;
     private readonly IRequestValidator _validator;
     private readonly IRequestAuthorizer _authorizer;
     private readonly IRequestHandlerResolver _handlerResolver;
@@ -30,7 +29,6 @@ public class Mediator : IMediator
         IRequestAuthorizer authorizer,
         IRequestHandlerResolver handlerResolver)
     {
-        _provider = provider;
         _validator = validator;
         _authorizer = authorizer;
         _handlerResolver = handlerResolver;
