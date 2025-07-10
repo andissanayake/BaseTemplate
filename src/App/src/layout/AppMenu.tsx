@@ -128,6 +128,13 @@ export const AppMenu = () => {
               handleClick(e.key);
             },
           });
+          menuItems.push({
+            key: "/tenants/view/" + tenantId + "/staff",
+            label: <span>Staff Management</span>,
+            onClick: (e: any) => {
+              handleClick(e.key);
+            },
+          });
         }
       }
 

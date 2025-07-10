@@ -1,7 +1,11 @@
 ﻿using BaseTemplate.Application.Common.Models;
 using BaseTemplate.Application.Tenants.Commands.CreateTenant;
+using BaseTemplate.Application.Tenants.Commands.GetStaffMember;
+using BaseTemplate.Application.Tenants.Commands.ListStaff;
+using BaseTemplate.Application.Tenants.Commands.RemoveStaff;
 using BaseTemplate.Application.Tenants.Commands.RequestStaff;
 using BaseTemplate.Application.Tenants.Commands.UpdateStaffRequest;
+using BaseTemplate.Application.Tenants.Commands.UpdateStaffRoles;
 using BaseTemplate.Application.Tenants.Commands.UpdateTenant;
 using BaseTemplate.Application.Tenants.Queries.GetStaffRequests;
 using BaseTemplate.Application.Tenants.Queries.GetTenantById;
@@ -57,6 +61,36 @@ public class TenantsController : ApiControllerBase
     public async Task<ActionResult<Result<bool>>> UpdateStaffRequest(int tenantId, int staffRequestId, UpdateStaffRequestCommand command)
     {
         if (tenantId != command.TenantId || staffRequestId != command.StaffRequestId)
+        {
+            return BadRequest();
+        }
+
+        return await SendAsync(command);
+    }
+
+    // Staff Management Endpoints
+    [HttpGet("{tenantId}/staff")]
+    public async Task<ActionResult<Result<List<StaffMemberDto>>>> ListStaff(int tenantId)
+    {
+        return await SendAsync(new ListStaffQuery(tenantId));
+    }
+
+    [HttpGet("{tenantId}/staff/{staffSsoId}")]
+    public async Task<ActionResult<Result<StaffMemberDetailDto>>> GetStaffMember(int tenantId, string staffSsoId)
+    {
+        return await SendAsync(new GetStaffMemberQuery(tenantId, staffSsoId));
+    }
+
+    [HttpDelete("{tenantId}/staff/{staffSsoId}")]
+    public async Task<ActionResult<Result<bool>>> RemoveStaff(int tenantId, string staffSsoId)
+    {
+        return await SendAsync(new RemoveStaffCommand(tenantId, staffSsoId));
+    }
+
+    [HttpPut("{tenantId}/staff/{staffSsoId}/roles")]
+    public async Task<ActionResult<Result<bool>>> UpdateStaffRoles(int tenantId, string staffSsoId, UpdateStaffRolesCommand command)
+    {
+        if (tenantId != command.TenantId || staffSsoId != command.StaffSsoId)
         {
             return BadRequest();
         }
