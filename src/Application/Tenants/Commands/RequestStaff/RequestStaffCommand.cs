@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 namespace BaseTemplate.Application.Tenants.Commands.RequestStaff;
-[Authorize(Roles = Domain.Constants.Roles.TenantOwner)]
+[Authorize(Roles = Domain.Constants.Roles.StaffRequestManager + "," + Domain.Constants.Roles.TenantOwner)]
 public record RequestStaffCommand(int TenantId) : BaseTenantRequest<bool>(TenantId)
 {
     [Required]
