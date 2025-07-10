@@ -21,6 +21,7 @@ export const AppBreadcrumb = () => {
       `Edit Item #${params.itemId}`,
     "/tenants/view/:tenantId/items/view/:itemId": (params: any) =>
       `View Item #${params.itemId}`,
+    "/tenants/view/:tenantId/staff-requests": "Staff Requests",
   };
 
   const location = useLocation();
@@ -55,7 +56,9 @@ export const AppBreadcrumb = () => {
         title: <Link to={path}>{label}</Link>,
       };
     })
-    .filter((item) => item !== null); // Ensure no `null` values are included
+    .filter(
+      (item): item is { key: string; title: JSX.Element } => item !== null
+    ); // Ensure no `null` values are included
 
   return (
     <Breadcrumb

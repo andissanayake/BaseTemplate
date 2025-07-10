@@ -13,6 +13,7 @@ import { TodoGroupViewPage } from "./pages/TodoGroupViewPage";
 import { TenantCreatePage } from "./pages/TenantCreatePage";
 import { TenantEditPage } from "./pages/TenantEditPage";
 import { TenantViewPage } from "./pages/TenantViewPage";
+import { StaffRequestManagementPage } from "./pages/StaffRequestManagementPage";
 import { ItemCreatePage } from "./pages/ItemCreatePage";
 import { ItemEditPage } from "./pages/ItemEditPage";
 import { ItemViewPage } from "./pages/ItemViewPage";
@@ -56,6 +57,14 @@ export const App = () => {
             element={
               <ProtectedRoute policy={Policies.User}>
                 <TenantViewPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/tenants/view/:tenantId/staff-requests"
+            element={
+              <ProtectedRoute policy={Policies.User}>
+                <StaffRequestManagementPage />
               </ProtectedRoute>
             }
           />

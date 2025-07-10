@@ -24,6 +24,7 @@ export const AppMenu = () => {
     setTenantName,
     tenantId,
     tenantName,
+    roles,
   } = useAuthStore((state) => state);
   const { currentTenant } = useTenantStore((state) => state);
   const [current, setCurrent] = useState(
@@ -111,6 +112,17 @@ export const AppMenu = () => {
             handleClick(e.key);
           },
         });
+
+        // Add Staff Requests menu item for tenant owners
+        if (roles.includes("TenantOwner")) {
+          menuItems.push({
+            key: "/tenants/view/" + tenantId + "/staff-requests",
+            label: <span>Staff Requests</span>,
+            onClick: (e: any) => {
+              handleClick(e.key);
+            },
+          });
+        }
       }
 
       if (!tenantId) {

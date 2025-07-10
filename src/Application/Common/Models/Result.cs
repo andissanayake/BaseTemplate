@@ -67,9 +67,10 @@ public class Result<T>
             Details = details ?? new()
         };
 
-    public static Result<T> Validation(string? message, Dictionary<string, string[]> errors) =>
+    public static Result<T> Validation(string message, Dictionary<string, string[]> errors) =>
         Failure(ResultCodeMapper.DefaultValidationErrorCode, message, errors);
-
+    public static Result<T> Validation(string message) =>
+        Failure(ResultCodeMapper.DefaultValidationErrorCode, message);
     public static Result<T> Unauthorized(string? message = null) =>
         Failure(ResultCodeMapper.DefaultUnauthorizedCode, message ?? "Unauthorized");
     public static Result<T> Forbidden(string? message = null) =>
