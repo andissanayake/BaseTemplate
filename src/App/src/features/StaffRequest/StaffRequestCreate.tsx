@@ -29,7 +29,11 @@ const StaffRequestCreate: React.FC<StaffRequestCreateProps> = ({
   const [form] = Form.useForm();
   const { setLoading } = useStaffRequestStore();
 
-  const availableRoles = ["TenantOwner", "Administrator"];
+  const availableRoles = [
+    "ItemManager",
+    "StaffRequestManager",
+    "TenantManager",
+  ];
 
   const handleCreateRequest = async (values: {
     email: string;
