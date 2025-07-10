@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 namespace BaseTemplate.Application.Tenants.Commands.RequestStaff;
-[Authorize(Roles = Domain.Constants.Roles.TenantOwner)]
+[Authorize(Roles = Domain.Constants.Roles.StaffRequestManager + "," + Domain.Constants.Roles.TenantOwner)]
 public record RequestStaffCommand(int TenantId) : BaseTenantRequest<bool>(TenantId)
 {
     [Required]
@@ -31,6 +31,15 @@ public class RequestStaffCommandHandler : IRequestHandler<RequestStaffCommand, b
     public async Task<Result<bool>> HandleAsync(RequestStaffCommand request, CancellationToken cancellationToken)
     {
         using var uow = _factory.Create();
+
+        // Validate that only allowed roles can be requested
+        var allowedRoles = new[] { "ItemManager", "StaffRequestManager", "TenantManager" };
+        var invalidRoles = request.Roles.Except(allowedRoles, StringComparer.OrdinalIgnoreCase).ToList();
+        
+        if (invalidRoles.Any())
+        {
+            return Result<bool>.Validation($"The following roles are not allowed for staff requests: {string.Join(", ", invalidRoles)}. Allowed roles are: {string.Join(", ", allowedRoles)}.");
+        }
 
         // Verify the tenant exists and the current user is the owner
         var tenant = await uow.GetAsync<Tenant>(request.TenantId);

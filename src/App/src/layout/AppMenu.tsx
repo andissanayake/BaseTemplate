@@ -104,14 +104,6 @@ export const AppMenu = () => {
         },
       });
 
-      menuItems.push({
-        key: "/items",
-        label: <span>Items</span>,
-        onClick: (e: any) => {
-          handleClick(e.key);
-        },
-      });
-
       if (tenantId) {
         menuItems.push({
           key: "/tenants/view/" + tenantId,
@@ -120,7 +112,13 @@ export const AppMenu = () => {
             handleClick(e.key);
           },
         });
-
+        menuItems.push({
+          key: "/items",
+          label: <span>Items</span>,
+          onClick: (e: any) => {
+            handleClick(e.key);
+          },
+        });
         // Add Staff Requests menu item for tenant owners
         if (roles.includes("TenantOwner")) {
           menuItems.push({
