@@ -7,7 +7,6 @@ import {
   Modal,
   message,
   Popconfirm,
-  Card,
   Typography,
   Tooltip,
   notification,
@@ -186,45 +185,43 @@ const StaffList: React.FC = () => {
 
   return (
     <div>
-      <Card>
-        <div style={{ marginBottom: "16px" }}>
-          <Title level={3}>Staff Members</Title>
-          <p>Manage your team members and their roles.</p>
-        </div>
+      <div style={{ marginBottom: "16px" }}>
+        <Title level={3}>Staff Members</Title>
+        <p>Manage your team members and their roles.</p>
+      </div>
 
-        <Table
-          columns={columns}
-          dataSource={staffMembers}
-          rowKey="ssoId"
-          loading={loading}
-          pagination={{
-            pageSize: 10,
-            showSizeChanger: true,
-            showQuickJumper: true,
-            showTotal: (total, range) =>
-              `${range[0]}-${range[1]} of ${total} staff members`,
-          }}
-          locale={{
-            emptyText: "No staff members found",
-          }}
-        />
+      <Table
+        columns={columns}
+        dataSource={staffMembers}
+        rowKey="ssoId"
+        loading={loading}
+        pagination={{
+          pageSize: 10,
+          showSizeChanger: true,
+          showQuickJumper: true,
+          showTotal: (total, range) =>
+            `${range[0]}-${range[1]} of ${total} staff members`,
+        }}
+        locale={{
+          emptyText: "No staff members found",
+        }}
+      />
 
-        <Modal
-          title="Edit Staff Roles"
-          open={roleEditVisible}
-          onCancel={() => setRoleEditVisible(false)}
-          footer={null}
-          width={600}
-        >
-          {selectedStaff && (
-            <StaffRoleEdit
-              staffMember={selectedStaff}
-              onSuccess={handleRoleUpdate}
-              onCancel={() => setRoleEditVisible(false)}
-            />
-          )}
-        </Modal>
-      </Card>
+      <Modal
+        title="Edit Staff Roles"
+        open={roleEditVisible}
+        onCancel={() => setRoleEditVisible(false)}
+        footer={null}
+        width={600}
+      >
+        {selectedStaff && (
+          <StaffRoleEdit
+            staffMember={selectedStaff}
+            onSuccess={handleRoleUpdate}
+            onCancel={() => setRoleEditVisible(false)}
+          />
+        )}
+      </Modal>
     </div>
   );
 };
