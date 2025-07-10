@@ -71,9 +71,7 @@ const ItemView: React.FC = () => {
         <Space>
           <Button
             type="primary"
-            onClick={() =>
-              navigate(`/tenants/view/${tenantId}/items/edit/${itemId}`)
-            }
+            onClick={() => navigate(`/items/edit/${itemId}`)}
           >
             Edit
           </Button>
