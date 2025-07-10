@@ -2,7 +2,7 @@ using BaseTemplate.Domain.Constants;
 
 namespace BaseTemplate.Application.Tenants.Commands.GetStaffMember;
 
-[Authorize(Roles = Roles.StaffManager + "," + Roles.TenantOwner + "," + Roles.Administrator)]
+[Authorize(Roles = Roles.StaffManager)]
 public record GetStaffMemberQuery(int TenantId, string StaffSsoId) : BaseTenantRequest<StaffMemberDetailDto>(TenantId);
 
 public class StaffMemberDetailDto
