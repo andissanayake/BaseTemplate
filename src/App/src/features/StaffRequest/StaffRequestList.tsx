@@ -8,7 +8,6 @@ import {
   Modal,
   Form,
   Input,
-  Checkbox,
   notification,
   Popconfirm,
 } from "antd";
@@ -18,6 +17,7 @@ import { useStaffRequestStore } from "./staffRequestStore";
 import { StaffRequestService } from "./staffRequestService";
 import { handleResult } from "../../common/handleResult";
 import { useParams } from "react-router-dom";
+import StaffRequestCreate from "./StaffRequestCreate";
 
 export const StaffRequestList: React.FC = () => {
   const { tenantId } = useParams<{ tenantId: string }>();
@@ -27,7 +27,6 @@ export const StaffRequestList: React.FC = () => {
   const [rejectModalVisible, setRejectModalVisible] = useState(false);
   const [selectedRequest, setSelectedRequest] =
     useState<StaffRequestDto | null>(null);
-  const [createForm] = Form.useForm();
   const [rejectForm] = Form.useForm();
 
   if (!tenantId) throw new Error("Tenant ID is required");
@@ -55,48 +54,6 @@ export const StaffRequestList: React.FC = () => {
     fetchStaffRequests(+tenantId);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tenantId]);
-
-  const handleCreateRequest = async (values: {
-    email: string;
-    name: string;
-    roles: string[];
-  }) => {
-    setLoading(true);
-    const response = await StaffRequestService.createStaffRequest(+tenantId, {
-      staffEmail: values.email,
-      staffName: values.name,
-      roles: values.roles,
-    });
-
-    handleResult(response, {
-      onSuccess: () => {
-        setCreateModalVisible(false);
-        createForm.resetFields();
-        notification.success({
-          message: "Staff request created successfully!",
-        });
-        fetchStaffRequests(+tenantId);
-      },
-      onValidationError: (errors) => {
-        const fields = Object.entries(errors).map(([name, errorMessages]) => ({
-          name: name.toLowerCase(),
-          errors: errorMessages,
-        }));
-        createForm.setFields(fields);
-      },
-      onServerError: (error) => {
-        notification.error({
-          message: "Failed to create staff request!",
-          description:
-            error?.message ||
-            "An error occurred while creating the staff request.",
-        });
-      },
-      onFinally: () => {
-        setLoading(false);
-      },
-    });
-  };
 
   const handleReject = async (values: { rejectionReason?: string }) => {
     if (!selectedRequest) return;
@@ -143,8 +100,6 @@ export const StaffRequestList: React.FC = () => {
         return <Tag color="default">Unknown</Tag>;
     }
   };
-
-  const availableRoles = ["TenantOwner", "Administrator"];
 
   const columns = [
     {
@@ -243,71 +198,15 @@ export const StaffRequestList: React.FC = () => {
         }}
       />
 
-      {/* Create Request Modal */}
-      <Modal
-        title="Create New Staff Request"
-        open={createModalVisible}
-        onCancel={() => {
+      <StaffRequestCreate
+        tenantId={+tenantId}
+        visible={createModalVisible}
+        onCancel={() => setCreateModalVisible(false)}
+        onSuccess={() => {
           setCreateModalVisible(false);
-          createForm.resetFields();
+          fetchStaffRequests(+tenantId);
         }}
-        footer={null}
-        destroyOnClose
-      >
-        <Form
-          form={createForm}
-          layout="vertical"
-          onFinish={handleCreateRequest}
-        >
-          <Form.Item
-            label="Email Address"
-            name="email"
-            rules={[
-              { required: true, message: "Please enter email address!" },
-              { type: "email", message: "Please enter a valid email!" },
-            ]}
-          >
-            <Input placeholder="Enter email address" />
-          </Form.Item>
-
-          <Form.Item
-            label="Full Name"
-            name="name"
-            rules={[
-              { required: true, message: "Please enter full name!" },
-              { min: 2, message: "Name must be at least 2 characters!" },
-            ]}
-          >
-            <Input placeholder="Enter full name" />
-          </Form.Item>
-
-          <Form.Item
-            label="Roles"
-            name="roles"
-            rules={[
-              { required: true, message: "Please select at least one role!" },
-            ]}
-          >
-            <Checkbox.Group options={availableRoles} />
-          </Form.Item>
-
-          <Form.Item>
-            <Space>
-              <Button type="primary" htmlType="submit">
-                Create Request
-              </Button>
-              <Button
-                onClick={() => {
-                  setCreateModalVisible(false);
-                  createForm.resetFields();
-                }}
-              >
-                Cancel
-              </Button>
-            </Space>
-          </Form.Item>
-        </Form>
-      </Modal>
+      />
 
       {/* Reject Request Modal */}
       <Modal
