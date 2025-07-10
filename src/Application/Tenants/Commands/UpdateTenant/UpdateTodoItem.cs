@@ -3,7 +3,7 @@
 namespace BaseTemplate.Application.Tenants.Commands.UpdateTenant;
 
 [Authorize(Roles = Roles.TenantOwner)]
-public record UpdateTenantCommand : IRequest<bool>
+public record UpdateTenantCommand(int TenantId) : BaseTenantRequest<bool>(TenantId)
 {
     public int Id { get; init; }
     public string Name { get; set; } = string.Empty;

@@ -10,10 +10,10 @@ namespace BaseTemplate.API.Controllers;
 [Authorize]
 public class TenantsController : ApiControllerBase
 {
-    [HttpGet("{id}")]
-    public async Task<ActionResult<Result<GetTenantResponse>>> GetById(int id)
+    [HttpGet("{tenantId}")]
+    public async Task<ActionResult<Result<GetTenantResponse>>> GetById(int tenantId)
     {
-        return await SendAsync(new GetTenantByIdQuery(id));
+        return await SendAsync(new GetTenantByIdQuery(tenantId));
     }
 
     [HttpPost]
