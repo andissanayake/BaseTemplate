@@ -119,23 +119,21 @@ export const AppMenu = () => {
             handleClick(e.key);
           },
         });
-        // Add Staff Requests menu item for tenant owners
-        if (roles.includes("TenantOwner")) {
-          menuItems.push({
-            key: "/tenants/view/" + tenantId + "/staff-requests",
-            label: <span>Staff Requests</span>,
-            onClick: (e: any) => {
-              handleClick(e.key);
-            },
-          });
-          menuItems.push({
-            key: "/tenants/view/" + tenantId + "/staff",
-            label: <span>Staff Management</span>,
-            onClick: (e: any) => {
-              handleClick(e.key);
-            },
-          });
-        }
+
+        menuItems.push({
+          key: "/tenants/view/" + tenantId + "/staff-requests",
+          label: <span>Staff Requests</span>,
+          onClick: (e: any) => {
+            handleClick(e.key);
+          },
+        });
+        menuItems.push({
+          key: "/tenants/view/" + tenantId + "/staff",
+          label: <span>Staff Management</span>,
+          onClick: (e: any) => {
+            handleClick(e.key);
+          },
+        });
       }
 
       if (!tenantId) {
