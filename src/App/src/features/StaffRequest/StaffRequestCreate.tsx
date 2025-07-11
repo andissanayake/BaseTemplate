@@ -33,6 +33,7 @@ const StaffRequestCreate: React.FC<StaffRequestCreateProps> = ({
     "ItemManager",
     "StaffRequestManager",
     "TenantManager",
+    "StaffManager",
   ];
 
   const handleCreateRequest = async (values: {
