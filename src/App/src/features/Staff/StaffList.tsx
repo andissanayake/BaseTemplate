@@ -35,18 +35,9 @@ const StaffList: React.FC = () => {
   const [selectedStaff, setSelectedStaff] = useState<StaffMemberDto | null>(
     null
   );
-
+  if (!tenantId) throw new Error("Tenant ID is required");
   const loadStaffMembers = async () => {
-    if (!tenantId) {
-      notification.error({
-        message: "Tenant ID is required",
-        description: "Please ensure you are logged in with a valid tenant.",
-      });
-      return;
-    }
-
     setLoading(true);
-
     const result = await StaffService.getStaffMembers(+tenantId);
     handleResult(result, {
       onSuccess: (data) => {
@@ -65,20 +56,10 @@ const StaffList: React.FC = () => {
   };
 
   useEffect(() => {
-    if (tenantId) {
-      loadStaffMembers();
-    }
+    loadStaffMembers();
   }, [tenantId]);
 
   const handleRemoveStaff = async (staffSsoId: string) => {
-    if (!tenantId) {
-      notification.error({
-        message: "Tenant ID is required",
-        description: "Please ensure you are logged in with a valid tenant.",
-      });
-      return;
-    }
-
     const result = await StaffService.removeStaff(+tenantId, staffSsoId);
     handleResult(result, {
       onSuccess: () => {
@@ -99,7 +80,7 @@ const StaffList: React.FC = () => {
   const handleRoleUpdate = () => {
     setRoleEditVisible(false);
     setSelectedStaff(null);
-    loadStaffMembers(); // Reload to get updated data
+    loadStaffMembers();
   };
 
   const columns = [
