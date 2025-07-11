@@ -33,17 +33,18 @@ const StaffRequestCreate: React.FC<StaffRequestCreateProps> = ({
     "ItemManager",
     "StaffRequestManager",
     "TenantManager",
+    "StaffManager",
   ];
 
   const handleCreateRequest = async (values: {
-    email: string;
-    name: string;
+    staffEmail: string;
+    staffName: string;
     roles: string[];
   }) => {
     setLoading(true);
     const requestData: CreateStaffRequestRequest = {
-      staffEmail: values.email,
-      staffName: values.name,
+      staffEmail: values.staffEmail,
+      staffName: values.staffName,
       roles: values.roles,
     };
 
@@ -61,9 +62,10 @@ const StaffRequestCreate: React.FC<StaffRequestCreateProps> = ({
         onSuccess();
       },
       onValidationError: (errors) => {
-        const fields = Object.entries(errors).map(([name, errorMessages]) => ({
+        // Handle general errors (like tenant not found, access denied)
+        const fields = Object.entries(errors).map(([name, errors]) => ({
           name: name.toLowerCase(),
-          errors: errorMessages,
+          errors,
         }));
         form.setFields(fields);
       },
@@ -97,7 +99,7 @@ const StaffRequestCreate: React.FC<StaffRequestCreateProps> = ({
       <Form form={form} layout="vertical" onFinish={handleCreateRequest}>
         <Form.Item
           label="Email Address"
-          name="email"
+          name="staffEmail"
           rules={[
             { required: true, message: "Please enter email address!" },
             { type: "email", message: "Please enter a valid email!" },
@@ -108,7 +110,7 @@ const StaffRequestCreate: React.FC<StaffRequestCreateProps> = ({
 
         <Form.Item
           label="Full Name"
-          name="name"
+          name="staffName"
           rules={[
             { required: true, message: "Please enter full name!" },
             { min: 2, message: "Name must be at least 2 characters!" },

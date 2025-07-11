@@ -61,10 +61,10 @@ public class Mediator : IMediator
 
         // Resolve and execute handler
         var handlerResult = await _handlerResolver.ResolveAndExecuteAsync<TResponse>(request, requestType, cancellationToken);
-        if (!ResultCodeMapper.IsSuccess(handlerResult.Code))
-        {
-            return Result<TResponse>.NotFound(handlerResult.Message!);
-        }
+        //if (!ResultCodeMapper.IsSuccess(handlerResult.Code))
+        //{
+        //    return Result<TResponse>.NotFound(handlerResult.Message!);
+        //}
 
         return handlerResult;
     }

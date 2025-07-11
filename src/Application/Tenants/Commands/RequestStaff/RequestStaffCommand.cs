@@ -33,24 +33,39 @@ public class RequestStaffCommandHandler : IRequestHandler<RequestStaffCommand, b
         using var uow = _factory.Create();
 
         // Validate that only allowed roles can be requested
-        var allowedRoles = new[] { "ItemManager", "StaffRequestManager", "TenantManager" };
+        var allowedRoles = new[] { "ItemManager", "StaffRequestManager", "TenantManager", "StaffManager" };
         var invalidRoles = request.Roles.Except(allowedRoles, StringComparer.OrdinalIgnoreCase).ToList();
-        
+
         if (invalidRoles.Any())
         {
-            return Result<bool>.Validation($"The following roles are not allowed for staff requests: {string.Join(", ", invalidRoles)}. Allowed roles are: {string.Join(", ", allowedRoles)}.");
+            return Result<bool>.Validation(
+                "Invalid roles selected.",
+                new Dictionary<string, string[]>
+                {
+                    ["Roles"] = new[] { $"The following roles are not allowed for staff requests: {string.Join(", ", invalidRoles)}. Allowed roles are: {string.Join(", ", allowedRoles)}." }
+                });
         }
 
         // Verify the tenant exists and the current user is the owner
         var tenant = await uow.GetAsync<Tenant>(request.TenantId);
         if (tenant == null)
         {
-            return Result<bool>.NotFound($"Tenant with id {request.TenantId} not found.");
+            return Result<bool>.Validation(
+                "Tenant not found.",
+                new Dictionary<string, string[]>
+                {
+                    ["TenantId"] = new[] { $"Tenant with id {request.TenantId} not found." }
+                });
         }
 
         if (tenant.OwnerSsoId != _user.Identifier)
         {
-            return Result<bool>.Forbidden("Only tenant owners can request staff members.");
+            return Result<bool>.Validation(
+                "Access denied.",
+                new Dictionary<string, string[]>
+                {
+                    ["TenantId"] = new[] { "Only tenant owners can request staff members." }
+                });
         }
 
         // Check if the staff member already exists in the system
@@ -63,11 +78,21 @@ public class RequestStaffCommandHandler : IRequestHandler<RequestStaffCommand, b
             // If user exists, check if they're already in this tenant
             if (existingUser.TenantId == request.TenantId)
             {
-                return Result<bool>.Validation($"User with email {request.StaffEmail} is already a member of this tenant.");
+                return Result<bool>.Validation(
+                    "User already exists in this tenant.",
+                    new Dictionary<string, string[]>
+                    {
+                        ["StaffEmail"] = new[] { $"User with email {request.StaffEmail} is already a member of this tenant." }
+                    });
             }
 
             // If user exists but in different tenant, return validation error
-            return Result<bool>.Validation($"User with email {request.StaffEmail} already exists in the system and belongs to another tenant.");
+            return Result<bool>.Validation(
+                "User already exists in another tenant.",
+                new Dictionary<string, string[]>
+                {
+                    ["StaffEmail"] = new[] { $"User with email {request.StaffEmail} already exists in the system and belongs to another tenant." }
+                });
         }
 
         // Check if there's already a pending request for this email in this tenant
@@ -77,7 +102,12 @@ public class RequestStaffCommandHandler : IRequestHandler<RequestStaffCommand, b
 
         if (existingRequest != null)
         {
-            return Result<bool>.Validation($"A pending staff request for {request.StaffEmail} already exists for this tenant.");
+            return Result<bool>.Validation(
+                "Pending request already exists.",
+                new Dictionary<string, string[]>
+                {
+                    ["StaffEmail"] = new[] { $"A pending staff request for {request.StaffEmail} already exists for this tenant." }
+                });
         }
 
         // Create the staff request

@@ -8,8 +8,9 @@ public record CreateTodoItemCommand : IRequest<int>
 {
     public int ListId { get; init; }
 
+    [Required(ErrorMessage = "Title is required.")]
     [MaxLength(200, ErrorMessage = "The title cannot exceed 200 characters.")]
-    [MinLength(50, ErrorMessage = "Title must be at least 50 characters long.")]
+    [MinLength(1, ErrorMessage = "Title must be at least 1 character long.")]
     public string? Title { get; init; }
     public string? Note { get; init; }
     public DateTimeOffset? Reminder { get; set; }
