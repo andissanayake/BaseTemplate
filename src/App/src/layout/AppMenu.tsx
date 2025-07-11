@@ -24,7 +24,6 @@ export const AppMenu = () => {
     setTenantName,
     tenantId,
     tenantName,
-    roles,
   } = useAuthStore((state) => state);
   const { currentTenant } = useTenantStore((state) => state);
   const [current, setCurrent] = useState(
