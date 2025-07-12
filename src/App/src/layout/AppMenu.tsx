@@ -9,7 +9,7 @@ import {
 } from "../auth/firebase";
 import { useLocation, useNavigate } from "react-router";
 import { useAuthStore } from "../auth/authStore";
-import { userService } from "../auth/userService";
+import { UserService } from "../auth/userService";
 import { handleResult } from "../common/handleResult";
 import { handleServerError } from "../common/serverErrorHandler";
 import { useTenantStore } from "../features/Tenant/tenantStore";
@@ -17,15 +17,8 @@ import { useTenantStore } from "../features/Tenant/tenantStore";
 export const AppMenu = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const {
-    user,
-    setUser,
-    setRoles,
-    setTenantId,
-    setTenantName,
-    tenantId,
-    tenantName,
-  } = useAuthStore((state) => state);
+  const { user, setUser, setRoles, tenant, setTenant, setStaffRequest } =
+    useAuthStore((state) => state);
   const { currentTenant } = useTenantStore((state) => state);
   const [current, setCurrent] = useState(
     location.pathname === "/" || location.pathname === ""
@@ -46,12 +39,12 @@ export const AppMenu = () => {
     const unsubscribe = onAuthStateChangedListener(async (user) => {
       if (user) {
         setUser(user);
-        const res = await userService.details();
+        const res = await UserService.details();
         handleResult(res, {
           onSuccess: (data) => {
             setRoles(data?.roles ?? []);
-            setTenantId(data?.tenant?.id ?? null);
-            setTenantName(data?.tenant?.name ?? null);
+            setTenant(data?.tenant ?? null);
+            setStaffRequest(data?.staffRequest ?? null);
           },
           onServerError: (errors) => {
             handleServerError(errors, "Failed to fetch roles!", false);
@@ -68,8 +61,8 @@ export const AppMenu = () => {
     };
   }, [
     setUser,
-    setTenantId,
-    setTenantName,
+    setTenant,
+    setStaffRequest,
     setRoles,
     currentTenant?.id,
     currentTenant?.name,
@@ -104,10 +97,10 @@ export const AppMenu = () => {
         },
       });
 
-      if (tenantId) {
+      if (tenant?.id) {
         menuItems.push({
-          key: "/tenants/view/" + tenantId,
-          label: <span>{tenantName}</span>,
+          key: "/tenants/view/" + tenant.id,
+          label: <span>{tenant.name}</span>,
           onClick: (e: any) => {
             handleClick(e.key);
           },
@@ -121,14 +114,14 @@ export const AppMenu = () => {
         });
 
         menuItems.push({
-          key: "/tenants/view/" + tenantId + "/staff-requests",
+          key: "/tenants/view/" + tenant.id + "/staff-requests",
           label: <span>Staff Requests</span>,
           onClick: (e: any) => {
             handleClick(e.key);
           },
         });
         menuItems.push({
-          key: "/tenants/view/" + tenantId + "/staff",
+          key: "/tenants/view/" + tenant.id + "/staff",
           label: <span>Staff Management</span>,
           onClick: (e: any) => {
             handleClick(e.key);
@@ -136,7 +129,7 @@ export const AppMenu = () => {
         });
       }
 
-      if (!tenantId) {
+      if (!tenant?.id) {
         menuItems.push({
           key: "/tenants/create",
           label: "Become a Tenant",
@@ -187,8 +180,8 @@ export const AppMenu = () => {
     current,
     location.pathname,
     handleClick,
-    tenantId,
-    tenantName,
+    tenant?.id,
+    tenant?.name,
   ]);
 
   return (

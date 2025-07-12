@@ -1,6 +1,7 @@
 // stores/authStore.ts
 import { create } from "zustand";
 import { persist, devtools } from "zustand/middleware";
+import { StaffRequestDetails, TenantDetails } from "./UserModel";
 
 export interface AppUser {
   uid: string;
@@ -13,12 +14,12 @@ export interface AppUser {
 interface AuthState {
   user: AppUser | null;
   roles: string[];
-  tenantId: string | null;
-  tenantName: string | null;
+  tenant: TenantDetails | null;
+  staffRequest: StaffRequestDetails | null;
   setUser: (user: AppUser | null) => void;
   setRoles: (roles: string[]) => void;
-  setTenantId: (tenantId: string | null) => void;
-  setTenantName: (tenantName: string | null) => void;
+  setTenant: (tenant: TenantDetails | null) => void;
+  setStaffRequest: (staffRequest: StaffRequestDetails | null) => void;
 }
 
 export const useAuthStore = create<AuthState>()(
@@ -27,14 +28,14 @@ export const useAuthStore = create<AuthState>()(
       (set) => ({
         user: null,
         roles: [],
-        tenantId: null,
-        tenantName: null,
+        tenant: null,
+        staffRequest: null,
         setUser: async (user) => {
           set({ user });
         },
         setRoles: (roles) => set({ roles }),
-        setTenantId: (tenantId) => set({ tenantId }),
-        setTenantName: (tenantName) => set({ tenantName }),
+        setTenant: (tenant) => set({ tenant }),
+        setStaffRequest: (staffRequest) => set({ staffRequest }),
       }),
       {
         name: "auth",

@@ -4,7 +4,6 @@ import { Result } from "../../common/result";
 import {
   StaffRequestDto,
   CreateStaffRequestRequest,
-  RespondToStaffRequestRequest,
 } from "./StaffRequestModel";
 
 export class StaffRequestService {
@@ -37,20 +36,31 @@ export class StaffRequestService {
   }
 
   /**
-   * Reject a staff request
+   * Respond to a staff request (accept or reject)
    */
-  static async rejectStaffRequest(
+  static async respondToStaffRequest(
     tenantId: number,
-    request: RespondToStaffRequestRequest
+    staffRequestId: number,
+    isAccepted: boolean,
+    rejectionReason?: string
   ): Promise<Result<boolean>> {
+    const payload: {
+      StaffRequestId: number;
+      IsAccepted: boolean;
+      RejectionReason?: string;
+    } = {
+      StaffRequestId: staffRequestId,
+      IsAccepted: isAccepted,
+    };
+
+    if (!isAccepted && rejectionReason) {
+      payload.RejectionReason = rejectionReason;
+    }
+
     return await handleApi(
       axiosInstance.post(
-        `${this.baseUrl}/${tenantId}/staff-requests/${request.staffRequestId}/update`,
-        {
-          TenantId: tenantId,
-          StaffRequestId: request.staffRequestId,
-          RejectionReason: request.rejectionReason,
-        }
+        `${this.baseUrl}/${tenantId}/staff-requests/${staffRequestId}/respond`,
+        payload
       )
     );
   }
