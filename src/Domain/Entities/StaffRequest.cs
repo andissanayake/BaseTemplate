@@ -21,5 +21,6 @@ public enum StaffRequestStatus
 {
     Pending,
     Accepted,
-    Rejected
+    Rejected,
+    Revoked
 } 

@@ -9,7 +9,7 @@ import {
 } from "../auth/firebase";
 import { useLocation, useNavigate } from "react-router";
 import { useAuthStore } from "../auth/authStore";
-import { userService } from "../auth/userService";
+import { UserService } from "../auth/userService";
 import { handleResult } from "../common/handleResult";
 import { handleServerError } from "../common/serverErrorHandler";
 import { useTenantStore } from "../features/Tenant/tenantStore";
@@ -21,10 +21,10 @@ export const AppMenu = () => {
     user,
     setUser,
     setRoles,
-    setTenantId,
-    setTenantName,
-    tenantId,
-    tenantName,
+    tenant,
+    setTenant,
+    setStaffRequest,
+    staffRequest,
   } = useAuthStore((state) => state);
   const { currentTenant } = useTenantStore((state) => state);
   const [current, setCurrent] = useState(
@@ -46,12 +46,12 @@ export const AppMenu = () => {
     const unsubscribe = onAuthStateChangedListener(async (user) => {
       if (user) {
         setUser(user);
-        const res = await userService.details();
+        const res = await UserService.details();
         handleResult(res, {
           onSuccess: (data) => {
             setRoles(data?.roles ?? []);
-            setTenantId(data?.tenantId ?? null);
-            setTenantName(data?.tenantName ?? null);
+            setTenant(data?.tenant ?? null);
+            setStaffRequest(data?.staffRequest ?? null);
           },
           onServerError: (errors) => {
             handleServerError(errors, "Failed to fetch roles!", false);
@@ -68,8 +68,8 @@ export const AppMenu = () => {
     };
   }, [
     setUser,
-    setTenantId,
-    setTenantName,
+    setTenant,
+    setStaffRequest,
     setRoles,
     currentTenant?.id,
     currentTenant?.name,
@@ -96,18 +96,10 @@ export const AppMenu = () => {
     });
 
     if (user) {
-      menuItems.push({
-        key: "/todo-list",
-        label: <span>Todo List</span>,
-        onClick: (e: any) => {
-          handleClick(e.key);
-        },
-      });
-
-      if (tenantId) {
+      if (tenant?.id) {
         menuItems.push({
-          key: "/tenants/view/" + tenantId,
-          label: <span>{tenantName}</span>,
+          key: "/tenants/view/" + tenant.id,
+          label: <span>{tenant.name}</span>,
           onClick: (e: any) => {
             handleClick(e.key);
           },
@@ -121,14 +113,14 @@ export const AppMenu = () => {
         });
 
         menuItems.push({
-          key: "/tenants/view/" + tenantId + "/staff-requests",
+          key: "/tenants/view/" + tenant.id + "/staff-requests",
           label: <span>Staff Requests</span>,
           onClick: (e: any) => {
             handleClick(e.key);
           },
         });
         menuItems.push({
-          key: "/tenants/view/" + tenantId + "/staff",
+          key: "/tenants/view/" + tenant.id + "/staff",
           label: <span>Staff Management</span>,
           onClick: (e: any) => {
             handleClick(e.key);
@@ -136,7 +128,7 @@ export const AppMenu = () => {
         });
       }
 
-      if (!tenantId) {
+      if (!tenant?.id && !staffRequest?.id) {
         menuItems.push({
           key: "/tenants/create",
           label: "Become a Tenant",
@@ -145,7 +137,15 @@ export const AppMenu = () => {
           },
         });
       }
-
+      if (!tenant?.id && staffRequest?.id) {
+        menuItems.push({
+          key: "/staff-request/respond",
+          label: "Join a Tenant",
+          onClick: (e: any) => {
+            handleClick(e.key);
+          },
+        });
+      }
       // Right side menu items with auto margin
       menuItems.push({
         key: "/profile",
@@ -187,8 +187,9 @@ export const AppMenu = () => {
     current,
     location.pathname,
     handleClick,
-    tenantId,
-    tenantName,
+    tenant?.id,
+    tenant?.name,
+    staffRequest?.id,
   ]);
 
   return (

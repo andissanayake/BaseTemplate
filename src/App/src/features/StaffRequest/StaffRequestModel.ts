@@ -15,6 +15,7 @@ export enum StaffRequestStatus {
   Pending = 0,
   Accepted = 1,
   Rejected = 2,
+  Revoked = 3,
 }
 
 export interface CreateStaffRequestRequest {
@@ -25,8 +26,7 @@ export interface CreateStaffRequestRequest {
 
 export interface RespondToStaffRequestRequest {
   staffRequestId: number;
-  accept: boolean;
-  rejectionReason?: string;
+  rejectionReason: string; // Now required
 }
 
 export interface StaffRequestResponse {

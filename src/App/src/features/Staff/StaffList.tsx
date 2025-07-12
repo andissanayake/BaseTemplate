@@ -22,7 +22,7 @@ import { useAuthStore } from "../../auth/authStore";
 const { Title } = Typography;
 
 const StaffList: React.FC = () => {
-  const { tenantId } = useAuthStore();
+  const { tenant } = useAuthStore();
   const {
     staffMembers,
     loading,
@@ -35,10 +35,10 @@ const StaffList: React.FC = () => {
   const [selectedStaff, setSelectedStaff] = useState<StaffMemberDto | null>(
     null
   );
-  if (!tenantId) throw new Error("Tenant ID is required");
+  if (!tenant?.id) throw new Error("Tenant ID is required");
   const loadStaffMembers = async () => {
     setLoading(true);
-    const result = await StaffService.getStaffMembers(+tenantId);
+    const result = await StaffService.getStaffMembers(+tenant.id);
     handleResult(result, {
       onSuccess: (data) => {
         setStaffMembers(data || []);
@@ -57,10 +57,10 @@ const StaffList: React.FC = () => {
 
   useEffect(() => {
     loadStaffMembers();
-  }, [tenantId]);
+  }, [tenant?.id]);
 
   const handleRemoveStaff = async (staffSsoId: string) => {
-    const result = await StaffService.removeStaff(+tenantId, staffSsoId);
+    const result = await StaffService.removeStaff(+tenant.id, staffSsoId);
     handleResult(result, {
       onSuccess: () => {
         removeStaffMember(staffSsoId);

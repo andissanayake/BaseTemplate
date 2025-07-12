@@ -56,14 +56,14 @@ export const StaffRequestList: React.FC = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tenantId]);
 
-  const handleReject = async (values: { rejectionReason?: string }) => {
+  const handleReject = async (values: { rejectionReason: string }) => {
     if (!selectedRequest) return;
     setLoading(true);
-    const response = await StaffRequestService.updateStaffRequest(+tenantId, {
-      staffRequestId: selectedRequest.id,
-      accept: false,
-      rejectionReason: values.rejectionReason,
-    });
+    const response = await StaffRequestService.updateStaffRequest(
+      +tenantId,
+      selectedRequest.id,
+      values.rejectionReason
+    );
 
     handleResult(response, {
       onSuccess: () => {
@@ -76,7 +76,7 @@ export const StaffRequestList: React.FC = () => {
         fetchStaffRequests(+tenantId);
       },
       onServerError: (errors) => {
-        handleServerError(errors, "Failed to update staff request!");
+        handleServerError(errors, "Failed to reject staff request!");
       },
       onFinally: () => {
         setLoading(false);
@@ -92,6 +92,8 @@ export const StaffRequestList: React.FC = () => {
         return <Tag color="green">Accepted</Tag>;
       case StaffRequestStatus.Rejected:
         return <Tag color="red">Rejected</Tag>;
+      case StaffRequestStatus.Revoked:
+        return <Tag color="red">Revoked</Tag>;
       default:
         return <Tag color="default">Unknown</Tag>;
     }
@@ -129,6 +131,31 @@ export const StaffRequestList: React.FC = () => {
       render: (status: StaffRequestStatus) => getStatusTag(status),
     },
     {
+      title: "Rejection Reason",
+      dataIndex: "rejectionReason",
+      key: "rejectionReason",
+      render: (rejectionReason: string, record: StaffRequestDto) => {
+        if (
+          record.status === StaffRequestStatus.Rejected ||
+          record.status === StaffRequestStatus.Revoked
+        ) {
+          return rejectionReason ? (
+            <Typography.Text
+              type="secondary"
+              style={{ maxWidth: 200, display: "block" }}
+            >
+              {rejectionReason}
+            </Typography.Text>
+          ) : (
+            <Typography.Text type="secondary" italic>
+              No reason provided
+            </Typography.Text>
+          );
+        }
+        return null;
+      },
+    },
+    {
       title: "Created",
       dataIndex: "created",
       key: "created",
@@ -155,8 +182,14 @@ export const StaffRequestList: React.FC = () => {
           {record.status === StaffRequestStatus.Accepted && (
             <Tag color="green">✓ Accepted</Tag>
           )}
-          {record.status === StaffRequestStatus.Rejected && (
-            <Tag color="red">✗ Rejected</Tag>
+          {(record.status === StaffRequestStatus.Rejected ||
+            record.status === StaffRequestStatus.Revoked) && (
+            <Tag color="red">
+              ✗{" "}
+              {record.status === StaffRequestStatus.Revoked
+                ? "Revoked"
+                : "Rejected"}
+            </Tag>
           )}
         </Space>
       ),
@@ -224,8 +257,14 @@ export const StaffRequestList: React.FC = () => {
             </p>
             <Form form={rejectForm} layout="vertical" onFinish={handleReject}>
               <Form.Item
-                label="Rejection Reason (Optional)"
+                label="Rejection Reason"
                 name="rejectionReason"
+                rules={[
+                  {
+                    required: true,
+                    message: "Please provide a rejection reason!",
+                  },
+                ]}
               >
                 <Input.TextArea
                   rows={3}

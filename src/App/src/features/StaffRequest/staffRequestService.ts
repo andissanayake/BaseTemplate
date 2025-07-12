@@ -4,7 +4,6 @@ import { Result } from "../../common/result";
 import {
   StaffRequestDto,
   CreateStaffRequestRequest,
-  RespondToStaffRequestRequest,
 } from "./StaffRequestModel";
 
 export class StaffRequestService {
@@ -25,9 +24,6 @@ export class StaffRequestService {
     );
   }
 
-  /**
-   * Get all staff requests for a tenant
-   */
   static async getStaffRequests(
     tenantId: number
   ): Promise<Result<StaffRequestDto[]>> {
@@ -37,21 +33,47 @@ export class StaffRequestService {
   }
 
   /**
-   * Update a staff request (accept or reject)
+   * Update a staff request (revoke/reject by tenant owner)
    */
   static async updateStaffRequest(
     tenantId: number,
-    request: RespondToStaffRequestRequest
+    staffRequestId: number,
+    rejectionReason: string
   ): Promise<Result<boolean>> {
     return await handleApi(
       axiosInstance.post(
-        `${this.baseUrl}/${tenantId}/staff-requests/${request.staffRequestId}/update`,
+        `${this.baseUrl}/${tenantId}/staff-requests/${staffRequestId}/update`,
         {
-          TenantId: tenantId,
-          StaffRequestId: request.staffRequestId,
-          Accept: request.accept,
-          RejectionReason: request.rejectionReason,
+          tenantId,
+          staffRequestId,
+          rejectionReason,
         }
+      )
+    );
+  }
+
+  static async respondToStaffRequest(
+    staffRequestId: number,
+    isAccepted: boolean,
+    rejectionReason?: string
+  ): Promise<Result<boolean>> {
+    const payload: {
+      StaffRequestId: number;
+      IsAccepted: boolean;
+      RejectionReason?: string;
+    } = {
+      StaffRequestId: staffRequestId,
+      IsAccepted: isAccepted,
+    };
+
+    if (!isAccepted && rejectionReason) {
+      payload.RejectionReason = rejectionReason;
+    }
+
+    return await handleApi(
+      axiosInstance.post(
+        `${this.baseUrl}/staff-requests/${staffRequestId}/respond`,
+        payload
       )
     );
   }

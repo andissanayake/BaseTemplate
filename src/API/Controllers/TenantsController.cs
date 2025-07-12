@@ -4,6 +4,7 @@ using BaseTemplate.Application.Tenants.Commands.GetStaffMember;
 using BaseTemplate.Application.Tenants.Commands.ListStaff;
 using BaseTemplate.Application.Tenants.Commands.RemoveStaff;
 using BaseTemplate.Application.Tenants.Commands.RequestStaff;
+using BaseTemplate.Application.Tenants.Commands.RespondToStaffRequest;
 using BaseTemplate.Application.Tenants.Commands.UpdateStaffRequest;
 using BaseTemplate.Application.Tenants.Commands.UpdateStaffRoles;
 using BaseTemplate.Application.Tenants.Commands.UpdateTenant;
@@ -61,6 +62,17 @@ public class TenantsController : ApiControllerBase
     public async Task<ActionResult<Result<bool>>> UpdateStaffRequest(int tenantId, int staffRequestId, UpdateStaffRequestCommand command)
     {
         if (tenantId != command.TenantId || staffRequestId != command.StaffRequestId)
+        {
+            return BadRequest();
+        }
+
+        return await SendAsync(command);
+    }
+
+    [HttpPost("staff-requests/{staffRequestId}/respond")]
+    public async Task<ActionResult<Result<bool>>> RespondToStaffRequest(int staffRequestId, RespondToStaffRequestCommand command)
+    {
+        if (staffRequestId != command.StaffRequestId)
         {
             return BadRequest();
         }

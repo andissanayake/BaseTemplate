@@ -14,6 +14,7 @@ import { TenantCreatePage } from "./pages/TenantCreatePage";
 import { TenantEditPage } from "./pages/TenantEditPage";
 import { TenantViewPage } from "./pages/TenantViewPage";
 import { StaffRequestManagementPage } from "./pages/StaffRequestManagementPage";
+import { StaffRequestResponsePage } from "./pages/StaffRequestResponsePage";
 import { StaffManagementPage } from "./pages/StaffManagementPage";
 import { ItemCreatePage } from "./pages/ItemCreatePage";
 import { ItemEditPage } from "./pages/ItemEditPage";
@@ -100,6 +101,14 @@ export const App = () => {
             element={
               <ProtectedRoute policy={Policies.User}>
                 <StaffRequestManagementPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/staff-request/respond"
+            element={
+              <ProtectedRoute policy={Policies.User}>
+                <StaffRequestResponsePage />
               </ProtectedRoute>
             }
           />

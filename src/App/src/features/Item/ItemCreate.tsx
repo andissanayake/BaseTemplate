@@ -21,22 +21,17 @@ const ItemCreate: React.FC = () => {
   const [form] = Form.useForm();
   const navigate = useNavigate();
   const { setLoading } = useItemStore();
-  const { tenantId } = useAuthStore();
+  const { tenant } = useAuthStore();
+
+  if (!tenant?.id) throw new Error("Tenant ID is required");
 
   const handleSaveItem = () => {
-    if (!tenantId) {
-      notification.error({
-        message: "Tenant ID is required to create an item.",
-      });
-      return;
-    }
-
     form.validateFields().then(async (values) => {
       setLoading(true);
-      const response = await ItemService.createItem(tenantId, {
+      const response = await ItemService.createItem(tenant.id, {
         ...values,
         category: values.category?.join(",") || "",
-        tenantId,
+        tenantId: tenant.id,
       });
       handleResult(response, {
         onSuccess: () => {
