@@ -6,7 +6,6 @@ import {
   Space,
   message,
   Typography,
-  Card,
   notification,
 } from "antd";
 import { StaffService } from "./staffService";
@@ -35,7 +34,12 @@ const StaffRoleEdit: React.FC<StaffRoleEditProps> = ({
   const [loading, setLoading] = useState(false);
 
   // Available roles - you can customize this based on your application
-  const availableRoles = ["Admin", "Manager", "Editor", "Viewer", "User"];
+  const availableRoles = [
+    "ItemManager",
+    "StaffRequestManager",
+    "TenantManager",
+    "StaffManager",
+  ];
 
   const handleSubmit = async (values: { newRoles: string[] }) => {
     if (!tenantId) {
@@ -80,7 +84,7 @@ const StaffRoleEdit: React.FC<StaffRoleEditProps> = ({
   };
 
   return (
-    <Card>
+    <>
       <div style={{ marginBottom: "16px" }}>
         <Title level={4}>
           Edit Roles for {staffMember.name || staffMember.email}
@@ -127,7 +131,7 @@ const StaffRoleEdit: React.FC<StaffRoleEditProps> = ({
           </Space>
         </Form.Item>
       </Form>
-    </Card>
+    </>
   );
 };
 

@@ -50,8 +50,8 @@ export const AppMenu = () => {
         handleResult(res, {
           onSuccess: (data) => {
             setRoles(data?.roles ?? []);
-            setTenantId(data?.tenantId ?? null);
-            setTenantName(data?.tenantName ?? null);
+            setTenantId(data?.tenant?.id ?? null);
+            setTenantName(data?.tenant?.name ?? null);
           },
           onServerError: (errors) => {
             handleServerError(errors, "Failed to fetch roles!", false);
