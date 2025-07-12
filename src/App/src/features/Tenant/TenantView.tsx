@@ -12,6 +12,7 @@ import { EditOutlined } from "@ant-design/icons";
 import { useTenantStore } from "./tenantStore";
 import { TenantService } from "./tenantService";
 import { handleResult } from "../../common/handleResult";
+import { handleServerError } from "../../common/serverErrorHandler";
 import { useAsyncEffect } from "../../common/useAsyncEffect";
 
 export const TenantView: React.FC = () => {
@@ -35,9 +36,9 @@ export const TenantView: React.FC = () => {
           notification.error({ message: "Tenant not found." });
         }
       },
-      onServerError: () => {
+      onServerError: (errors) => {
         setCurrentTenant(null);
-        notification.error({ message: "Failed to fetch tenant details." });
+        handleServerError(errors, "Failed to fetch tenant details.");
       },
       onFinally: () => {
         setLoading(false);

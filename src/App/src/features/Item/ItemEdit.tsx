@@ -14,6 +14,8 @@ import { useNavigate, useParams } from "react-router-dom";
 import { ItemService } from "./itemService";
 import { useAsyncEffect } from "../../common/useAsyncEffect";
 import { handleResult } from "../../common/handleResult";
+import { handleFormValidationErrors } from "../../common/formErrorHandler";
+import { handleServerError } from "../../common/serverErrorHandler";
 import { useAuthStore } from "../../auth/authStore";
 
 const ItemEdit: React.FC = () => {
@@ -41,11 +43,13 @@ const ItemEdit: React.FC = () => {
           navigate(`/items`);
         },
         onValidationError: (updateErrors) => {
-          const fields = Object.entries(updateErrors).map(([name, errors]) => ({
-            name: name.toLowerCase(),
-            errors,
-          }));
-          form.setFields(fields);
+          handleFormValidationErrors({
+            form,
+            errors: updateErrors,
+          });
+        },
+        onServerError: (errors) => {
+          handleServerError(errors, "Failed to save item!");
         },
         onFinally: () => {
           setLoading(false);
@@ -69,8 +73,8 @@ const ItemEdit: React.FC = () => {
           });
         }
       },
-      onServerError: () => {
-        notification.error({ message: "Failed to fetch item!" });
+      onServerError: (errors) => {
+        handleServerError(errors, "Failed to fetch item!");
       },
       onFinally: () => {
         setLoading(false);

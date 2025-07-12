@@ -6,6 +6,8 @@ import dayjs from "dayjs";
 import { useParams } from "react-router-dom";
 import { TodoItem } from "./TodoItemModel";
 import { handleResult } from "../../common/handleResult";
+import { handleServerError } from "../../common/serverErrorHandler";
+import { handleFormValidationErrors } from "../../common/formErrorHandler";
 
 interface TodoItemCreateProps {
   visible: boolean;
@@ -37,8 +39,14 @@ const TodoItemCreate: React.FC<TodoItemCreateProps> = ({
           refresh();
           onClose();
         },
-        onServerError: () => {
-          notification.error({ message: "Failed to create todo item!" });
+        onValidationError: (errors) => {
+          handleFormValidationErrors({
+            form,
+            errors,
+          });
+        },
+        onServerError: (errors) => {
+          handleServerError(errors, "Failed to create todo item!");
         },
         onFinally: () => {
           setLoading(false);

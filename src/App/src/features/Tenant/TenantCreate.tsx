@@ -4,6 +4,8 @@ import { useTenantStore } from "./tenantStore";
 import { useNavigate } from "react-router-dom";
 import { TenantService } from "./tenantService";
 import { handleResult } from "../../common/handleResult";
+import { handleFormValidationErrors } from "../../common/formErrorHandler";
+import { handleServerError } from "../../common/serverErrorHandler";
 
 const TenantCreate: React.FC = () => {
   const [form] = Form.useForm();
@@ -28,14 +30,13 @@ const TenantCreate: React.FC = () => {
           }
         },
         onValidationError: (createErrors) => {
-          const fields = Object.entries(createErrors).map(([name, errors]) => ({
-            name: name.toLowerCase(),
-            errors,
-          }));
-          form.setFields(fields);
+          handleFormValidationErrors({
+            form,
+            errors: createErrors,
+          });
         },
-        onServerError: () => {
-          notification.error({ message: "Failed to create tenant!" });
+        onServerError: (errors) => {
+          handleServerError(errors, "Failed to create tenant!");
         },
         onFinally: () => {
           setLoading(false);

@@ -12,6 +12,8 @@ import {
 import { StaffService } from "./staffService";
 import { StaffMemberDto } from "./StaffModel";
 import { handleResult } from "../../common/handleResult";
+import { handleFormValidationErrors } from "../../common/formErrorHandler";
+import { handleServerError } from "../../common/serverErrorHandler";
 import { useAuthStore } from "../../auth/authStore";
 
 const { Title } = Typography;
@@ -60,17 +62,16 @@ const StaffRoleEdit: React.FC<StaffRoleEditProps> = ({
         onSuccess();
       },
       onValidationError: (errors) => {
-        const fields = Object.entries(errors).map(([name, errorMessages]) => ({
-          name: name.toLowerCase(),
-          errors: errorMessages,
-        }));
-        form.setFields(fields);
-      },
-      onServerError: () => {
-        notification.error({
-          message: "Failed to update staff roles",
-          description: "An error occurred while updating staff roles.",
+        handleFormValidationErrors({
+          form,
+          errors,
         });
+      },
+      onServerError: (errors) => {
+        handleServerError(
+          errors,
+          "Failed to update staff roles. An error occurred while updating staff roles."
+        );
       },
       onFinally: () => {
         setLoading(false);

@@ -11,6 +11,7 @@ import { useLocation, useNavigate } from "react-router";
 import { useAuthStore } from "../auth/authStore";
 import { userService } from "../auth/userService";
 import { handleResult } from "../common/handleResult";
+import { handleServerError } from "../common/serverErrorHandler";
 import { useTenantStore } from "../features/Tenant/tenantStore";
 
 export const AppMenu = () => {
@@ -52,8 +53,8 @@ export const AppMenu = () => {
             setTenantId(data?.tenantId ?? null);
             setTenantName(data?.tenantName ?? null);
           },
-          onServerError: () => {
-            console.error("Failed to fetch roles!");
+          onServerError: (errors) => {
+            handleServerError(errors, "Failed to fetch roles!", false);
           },
         });
       } else {

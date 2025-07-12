@@ -11,6 +11,8 @@ import {
 import { useStaffRequestStore } from "./staffRequestStore";
 import { StaffRequestService } from "./staffRequestService";
 import { handleResult } from "../../common/handleResult";
+import { handleFormValidationErrors } from "../../common/formErrorHandler";
+import { handleServerError } from "../../common/serverErrorHandler";
 import { CreateStaffRequestRequest } from "./StaffRequestModel";
 
 interface StaffRequestCreateProps {
@@ -62,20 +64,14 @@ const StaffRequestCreate: React.FC<StaffRequestCreateProps> = ({
         onSuccess();
       },
       onValidationError: (errors) => {
-        // Handle general errors (like tenant not found, access denied)
-        const fields = Object.entries(errors).map(([name, errors]) => ({
-          name: name.toLowerCase(),
+        // Use the utility function to handle validation errors
+        handleFormValidationErrors({
+          form,
           errors,
-        }));
-        form.setFields(fields);
-      },
-      onServerError: (error) => {
-        notification.error({
-          message: "Failed to create staff request!",
-          description:
-            error?.message ||
-            "An error occurred while creating the staff request.",
         });
+      },
+      onServerError: (errors) => {
+        handleServerError(errors, "Failed to create staff request!");
       },
       onFinally: () => {
         setLoading(false);
