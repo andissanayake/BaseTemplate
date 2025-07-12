@@ -1,9 +1,6 @@
-﻿using BaseTemplate.Domain.Enums;
+using BaseTemplate.Domain.Enums;
 
 namespace BaseTemplate.Application.TodoLists.Queries.GetTodos;
-
-[Authorize]
-public record GetTodosQuery : IRequest<TodosVm>;
 
 public class GetTodosQueryHandler : IRequestHandler<GetTodosQuery, TodosVm>
 {
@@ -29,4 +26,4 @@ public class GetTodosQueryHandler : IRequestHandler<GetTodosQuery, TodosVm>
         };
         return Result<TodosVm>.Success(res);
     }
-}
+} 
