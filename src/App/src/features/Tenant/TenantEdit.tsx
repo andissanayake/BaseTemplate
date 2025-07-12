@@ -60,8 +60,8 @@ const TenantEdit: React.FC = () => {
           notification.error({ message: "Tenant not found!" });
         }
       },
-      onServerError: () => {
-        handleServerError(undefined, "Failed to fetch tenant details!");
+      onServerError: (errors) => {
+        handleServerError(errors, "Failed to fetch tenant details!");
       },
       onFinally: () => {
         setLoading(false);

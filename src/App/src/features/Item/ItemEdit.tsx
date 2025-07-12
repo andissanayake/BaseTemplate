@@ -73,8 +73,8 @@ const ItemEdit: React.FC = () => {
           });
         }
       },
-      onServerError: () => {
-        handleServerError(undefined, "Failed to fetch item!");
+      onServerError: (errors) => {
+        handleServerError(errors, "Failed to fetch item!");
       },
       onFinally: () => {
         setLoading(false);

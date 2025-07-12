@@ -70,8 +70,8 @@ const StaffRequestCreate: React.FC<StaffRequestCreateProps> = ({
           errors,
         });
       },
-      onServerError: (error) => {
-        handleServerError(error, "Failed to create staff request!");
+      onServerError: (errors) => {
+        handleServerError(errors, "Failed to create staff request!");
       },
       onFinally: () => {
         setLoading(false);

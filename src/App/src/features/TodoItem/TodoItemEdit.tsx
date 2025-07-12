@@ -59,8 +59,8 @@ const TodoItemEdit: React.FC<TodoItemEditProps> = ({
             errors,
           });
         },
-        onServerError: () => {
-          handleServerError(undefined, "Failed to update todo item!");
+        onServerError: (errors) => {
+          handleServerError(errors, "Failed to update todo item!");
         },
         onFinally: () => {
           setLoading(false);

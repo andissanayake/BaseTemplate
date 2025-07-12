@@ -66,8 +66,8 @@ const StaffList: React.FC = () => {
         removeStaffMember(staffSsoId);
         message.success("Staff member removed successfully");
       },
-      onServerError: () => {
-        handleServerError(undefined, "Failed to remove staff member");
+      onServerError: (errors) => {
+        handleServerError(errors, "Failed to remove staff member");
       },
     });
   };

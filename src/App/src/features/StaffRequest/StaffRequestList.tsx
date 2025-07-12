@@ -75,8 +75,8 @@ export const StaffRequestList: React.FC = () => {
         });
         fetchStaffRequests(+tenantId);
       },
-      onServerError: (error) => {
-        handleServerError(error, null);
+      onServerError: (errors) => {
+        handleServerError(errors, "Failed to update staff request!");
       },
       onFinally: () => {
         setLoading(false);

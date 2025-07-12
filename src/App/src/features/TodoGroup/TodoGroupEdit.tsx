@@ -60,8 +60,8 @@ const TodoGroupEdit: React.FC = () => {
       onSuccess: (data) => {
         form.setFieldsValue(data);
       },
-      onServerError: () => {
-        handleServerError(undefined, "Failed to fetch todo list item!");
+      onServerError: (errors) => {
+        handleServerError(errors, "Failed to fetch todo list item!");
       },
 
       onFinally: () => {

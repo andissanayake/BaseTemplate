@@ -54,9 +54,9 @@ const ItemList: React.FC = () => {
         setTotalCount(data?.totalCount || 0);
         setItemList(data?.items || []);
       },
-      onServerError: (error) => {
+      onServerError: (errors) => {
         setItemList([]);
-        handleServerError(error, "Failed to load items!");
+        handleServerError(errors, "Failed to load items!");
       },
       onFinally: () => {
         setLoading(false);
@@ -92,8 +92,8 @@ const ItemList: React.FC = () => {
         notification.success({ message: "Item deleted successfully!" });
         loadItems();
       },
-      onServerError: () => {
-        handleServerError(undefined, "Failed to delete item!");
+      onServerError: (errors) => {
+        handleServerError(errors, "Failed to delete item!");
       },
       onFinally: () => {
         setLoading(false);
