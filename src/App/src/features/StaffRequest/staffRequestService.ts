@@ -37,9 +37,9 @@ export class StaffRequestService {
   }
 
   /**
-   * Update a staff request (accept or reject)
+   * Reject a staff request
    */
-  static async updateStaffRequest(
+  static async rejectStaffRequest(
     tenantId: number,
     request: RespondToStaffRequestRequest
   ): Promise<Result<boolean>> {
@@ -49,7 +49,6 @@ export class StaffRequestService {
         {
           TenantId: tenantId,
           StaffRequestId: request.staffRequestId,
-          Accept: request.accept,
           RejectionReason: request.rejectionReason,
         }
       )
