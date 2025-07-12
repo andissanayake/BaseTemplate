@@ -24,9 +24,6 @@ export class StaffRequestService {
     );
   }
 
-  /**
-   * Get all staff requests for a tenant
-   */
   static async getStaffRequests(
     tenantId: number
   ): Promise<Result<StaffRequestDto[]>> {
@@ -36,10 +33,26 @@ export class StaffRequestService {
   }
 
   /**
-   * Respond to a staff request (accept or reject)
+   * Update a staff request (revoke/reject by tenant owner)
    */
-  static async respondToStaffRequest(
+  static async updateStaffRequest(
     tenantId: number,
+    staffRequestId: number,
+    rejectionReason: string
+  ): Promise<Result<boolean>> {
+    return await handleApi(
+      axiosInstance.post(
+        `${this.baseUrl}/${tenantId}/staff-requests/${staffRequestId}/update`,
+        {
+          tenantId,
+          staffRequestId,
+          rejectionReason,
+        }
+      )
+    );
+  }
+
+  static async respondToStaffRequest(
     staffRequestId: number,
     isAccepted: boolean,
     rejectionReason?: string
@@ -59,7 +72,7 @@ export class StaffRequestService {
 
     return await handleApi(
       axiosInstance.post(
-        `${this.baseUrl}/${tenantId}/staff-requests/${staffRequestId}/respond`,
+        `${this.baseUrl}/staff-requests/${staffRequestId}/respond`,
         payload
       )
     );

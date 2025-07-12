@@ -10,18 +10,18 @@ import { Item } from "./ItemModel";
 
 const ItemView: React.FC = () => {
   const { setLoading } = useItemStore();
-  const { tenantId } = useAuthStore();
+  const { tenant } = useAuthStore();
   const navigate = useNavigate();
   const { itemId } = useParams();
 
   if (!itemId) throw new Error("itemId is required");
-  if (!tenantId) throw new Error("Tenant ID is required");
+  if (!tenant?.id) throw new Error("Tenant ID is required");
 
   const [item, setItem] = React.useState<Item | null>(null);
 
   useEffect(() => {
     const fetchItem = async () => {
-      const response = await ItemService.fetchItemById(tenantId, itemId);
+      const response = await ItemService.fetchItemById(tenant.id, itemId);
       setLoading(true);
       handleResult(response, {
         onSuccess: (data) => {
@@ -38,7 +38,7 @@ const ItemView: React.FC = () => {
       });
     };
     fetchItem();
-  }, [itemId, tenantId]);
+  }, [itemId, tenant?.id]);
 
   if (!item) {
     return (

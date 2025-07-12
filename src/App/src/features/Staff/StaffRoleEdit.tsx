@@ -1,13 +1,5 @@
 import React, { useState } from "react";
-import {
-  Form,
-  Select,
-  Button,
-  Space,
-  message,
-  Typography,
-  notification,
-} from "antd";
+import { Form, Select, Button, Space, message, Typography } from "antd";
 import { StaffService } from "./staffService";
 import { StaffMemberDto } from "./StaffModel";
 import { handleResult } from "../../common/handleResult";
@@ -29,7 +21,7 @@ const StaffRoleEdit: React.FC<StaffRoleEditProps> = ({
   onSuccess,
   onCancel,
 }) => {
-  const { tenantId } = useAuthStore();
+  const { tenant } = useAuthStore();
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
 
@@ -40,20 +32,13 @@ const StaffRoleEdit: React.FC<StaffRoleEditProps> = ({
     "TenantManager",
     "StaffManager",
   ];
+  if (!tenant?.id) throw new Error("Tenant ID is required");
 
   const handleSubmit = async (values: { newRoles: string[] }) => {
-    if (!tenantId) {
-      notification.error({
-        message: "Tenant ID is required",
-        description: "Please ensure you are logged in with a valid tenant.",
-      });
-      return;
-    }
-
     setLoading(true);
 
     const result = await StaffService.updateStaffRoles(
-      +tenantId,
+      +tenant.id,
       staffMember.ssoId,
       {
         newRoles: values.newRoles,

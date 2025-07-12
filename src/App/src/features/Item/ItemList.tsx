@@ -23,7 +23,7 @@ import { Link } from "react-router-dom";
 import { useAuthStore } from "../../auth/authStore";
 
 const ItemList: React.FC = () => {
-  const { tenantId } = useAuthStore();
+  const { tenant } = useAuthStore();
 
   const {
     itemList,
@@ -38,16 +38,14 @@ const ItemList: React.FC = () => {
     setCurrentPage,
   } = useItemStore();
 
+  if (!tenant?.id) throw new Error("Tenant ID is required");
+
   const loadItems = useCallback(async () => {
-    if (!tenantId) {
-      notification.error({ message: "Tenant ID is required to fetch items." });
-      return;
-    }
     setLoading(true);
     const response = await ItemService.fetchItems(
       currentPage,
       pageSize,
-      parseInt(tenantId)
+      parseInt(tenant.id)
     );
     handleResult(response, {
       onSuccess: (data) => {
@@ -62,26 +60,22 @@ const ItemList: React.FC = () => {
         setLoading(false);
       },
     });
-  }, [currentPage, pageSize, setLoading, setTotalCount, setItemList, tenantId]);
+  }, [
+    currentPage,
+    pageSize,
+    setLoading,
+    setTotalCount,
+    setItemList,
+    tenant?.id,
+  ]);
 
   useEffect(() => {
-    if (tenantId) {
-      loadItems();
-    }
-  }, [loadItems, tenantId]);
-
-  if (!tenantId) {
-    return (
-      <div style={{ textAlign: "center", padding: "20px" }}>
-        <Typography.Title level={3}>No Tenant Selected</Typography.Title>
-        <Typography.Text>Please select a tenant to view items.</Typography.Text>
-      </div>
-    );
-  }
+    loadItems();
+  }, [loadItems]);
 
   const handleDelete = async (id: number) => {
     setLoading(true);
-    const response = await ItemService.deleteItem(tenantId, id);
+    const response = await ItemService.deleteItem(tenant.id, id);
     handleResult(response, {
       onSuccess: () => {
         const newTotalCount = totalCount - 1;

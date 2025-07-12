@@ -59,10 +59,11 @@ export const StaffRequestList: React.FC = () => {
   const handleReject = async (values: { rejectionReason: string }) => {
     if (!selectedRequest) return;
     setLoading(true);
-    const response = await StaffRequestService.rejectStaffRequest(+tenantId, {
-      staffRequestId: selectedRequest.id,
-      rejectionReason: values.rejectionReason,
-    });
+    const response = await StaffRequestService.updateStaffRequest(
+      +tenantId,
+      selectedRequest.id,
+      values.rejectionReason
+    );
 
     handleResult(response, {
       onSuccess: () => {

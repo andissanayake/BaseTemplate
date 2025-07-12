@@ -20,21 +20,21 @@ import { useAuthStore } from "../../auth/authStore";
 
 const ItemEdit: React.FC = () => {
   const { setLoading } = useItemStore();
-  const { tenantId } = useAuthStore();
+  const { tenant } = useAuthStore();
   const [form] = Form.useForm();
   const navigate = useNavigate();
   const { itemId } = useParams();
 
   if (!itemId) throw new Error("itemId is required");
-  if (!tenantId) throw new Error("Tenant ID is required");
+  if (!tenant?.id) throw new Error("Tenant ID is required");
 
   const handleSaveItem = () => {
     form.validateFields().then(async (values) => {
       values.id = +itemId;
-      values.tenantId = +tenantId;
+      values.tenantId = +tenant.id;
       values.category = values.category?.join(",") || "";
       setLoading(true);
-      const response = await ItemService.updateItem(tenantId, values);
+      const response = await ItemService.updateItem(tenant.id, values);
       return handleResult(response, {
         onSuccess: () => {
           notification.success({
@@ -61,7 +61,7 @@ const ItemEdit: React.FC = () => {
   useAsyncEffect(async () => {
     form.resetFields();
     setLoading(true);
-    const response = await ItemService.fetchItemById(tenantId, itemId);
+    const response = await ItemService.fetchItemById(tenant.id, itemId);
     handleResult(response, {
       onSuccess: (data) => {
         if (data) {

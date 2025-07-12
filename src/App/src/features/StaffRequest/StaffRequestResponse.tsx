@@ -18,12 +18,14 @@ import { StaffRequestService } from "./staffRequestService";
 import { handleResult } from "../../common/handleResult";
 import { handleServerError } from "../../common/serverErrorHandler";
 import { useNavigate } from "react-router-dom";
+import { useTenantStore } from "../Tenant/tenantStore";
 
 const { Title, Text } = Typography;
 const { TextArea } = Input;
 
 export const StaffRequestResponse: React.FC = () => {
   const { staffRequest, setStaffRequest } = useAuthStore();
+  const { setCurrentTenant } = useTenantStore();
   const [loading, setLoading] = useState(false);
   const [rejectForm] = Form.useForm();
   const [showRejectForm, setShowRejectForm] = useState(false);
@@ -46,7 +48,6 @@ export const StaffRequestResponse: React.FC = () => {
     setLoading(true);
     const response = await StaffRequestService.respondToStaffRequest(
       staffRequest.id,
-      staffRequest.id,
       true
     );
 
@@ -60,6 +61,10 @@ export const StaffRequestResponse: React.FC = () => {
         setStaffRequest(null);
         // Redirect to home page
         navigate("/");
+        setCurrentTenant({
+          id: -1,
+          name: staffRequest.tenantName,
+        });
       },
       onServerError: (errors) => {
         handleServerError(errors, "Failed to accept staff request!");
@@ -73,7 +78,6 @@ export const StaffRequestResponse: React.FC = () => {
   const handleReject = async (values: { rejectionReason: string }) => {
     setLoading(true);
     const response = await StaffRequestService.respondToStaffRequest(
-      staffRequest.id,
       staffRequest.id,
       false,
       values.rejectionReason
@@ -189,49 +193,49 @@ export const StaffRequestResponse: React.FC = () => {
               </Space>
 
               {showRejectForm && (
-                  <Form
-                    form={rejectForm}
-                    onFinish={handleReject}
-                    layout="vertical"
+                <Form
+                  form={rejectForm}
+                  onFinish={handleReject}
+                  layout="vertical"
+                >
+                  <Form.Item
+                    name="rejectionReason"
+                    label="Rejection Reason"
+                    rules={[
+                      {
+                        required: true,
+                        message:
+                          "Please provide a reason for rejecting this request.",
+                      },
+                    ]}
                   >
-                    <Form.Item
-                      name="rejectionReason"
-                      label="Rejection Reason"
-                      rules={[
-                        {
-                          required: true,
-                          message:
-                            "Please provide a reason for rejecting this request.",
-                        },
-                      ]}
-                    >
-                      <TextArea
-                        rows={4}
-                        placeholder="Please provide a reason for rejecting this staff request..."
-                      />
-                    </Form.Item>
+                    <TextArea
+                      rows={4}
+                      placeholder="Please provide a reason for rejecting this staff request..."
+                    />
+                  </Form.Item>
 
-                    <Form.Item>
-                      <Space>
-                        <Button
-                          type="primary"
-                          danger
-                          htmlType="submit"
-                          loading={loading}
-                        >
-                          Confirm Rejection
-                        </Button>
-                        <Button
-                          onClick={() => {
-                            setShowRejectForm(false);
-                            rejectForm.resetFields();
-                          }}
-                        >
-                          Cancel
-                        </Button>
-                      </Space>
-                    </Form.Item>
-                  </Form>
+                  <Form.Item>
+                    <Space>
+                      <Button
+                        type="primary"
+                        danger
+                        htmlType="submit"
+                        loading={loading}
+                      >
+                        Confirm Rejection
+                      </Button>
+                      <Button
+                        onClick={() => {
+                          setShowRejectForm(false);
+                          rejectForm.resetFields();
+                        }}
+                      >
+                        Cancel
+                      </Button>
+                    </Space>
+                  </Form.Item>
+                </Form>
               )}
             </Space>
           </Card>

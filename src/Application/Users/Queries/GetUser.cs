@@ -62,9 +62,9 @@ public class GetUserQueryHandler : IRequestHandler<GetUserQuery, GetUserResponse
         var uow = _factory.Create();
         //Ensure the user exists in the database
         var userInfo = await uow.QueryFirstOrDefaultAsync<UserWithTenantInfo>(@"
-            SELECT u.Id, u.sso_id, u.Name, u.Email, t.Id as TenantId, t.Name as TenantName
+            SELECT u.Id, u.sso_id, u.Name, u.Email, t.Id as Tenant_Id, t.Name as TenantName
             FROM app_user u
-            LEFT JOIN Tenant t ON u.sso_id = t.owner_sso_id
+            LEFT JOIN Tenant t ON u.Tenant_Id = t.Id
             WHERE u.sso_id = @Identifier", new { _user.Identifier });
 
         if (userInfo == null)
@@ -110,7 +110,7 @@ public class GetUserQueryHandler : IRequestHandler<GetUserQuery, GetUserResponse
         }
         else
         {
-                        // If user doesn't have a tenant, check for staff requests
+            // If user doesn't have a tenant, check for staff requests
             var staffRequestBasic = await uow.QueryFirstOrDefaultAsync<StaffRequestBasicInfo>(@"
                 SELECT sr.id, sr.requested_by_sso_id, 
                        sr.status, sr.created, t.name as tenant_name
@@ -119,14 +119,14 @@ public class GetUserQueryHandler : IRequestHandler<GetUserQuery, GetUserResponse
                 WHERE sr.requested_email = @Email AND sr.status = 0
                 ORDER BY sr.created DESC
                 LIMIT 1", new { Email = _user.Email });
-                
+
             if (staffRequestBasic != null)
             {
                 // Get requester's name and email
                 var requesterInfo = await uow.QueryFirstOrDefaultAsync<dynamic>(
                     "SELECT name, email FROM app_user WHERE sso_id = @SsoId",
                     new { SsoId = staffRequestBasic.RequestedBySsoId });
-                
+
                 var staffRequest = new StaffRequestDetails
                 {
                     Id = staffRequestBasic.Id,
@@ -136,12 +136,12 @@ public class GetUserQueryHandler : IRequestHandler<GetUserQuery, GetUserResponse
                     Created = staffRequestBasic.Created,
                     TenantName = staffRequestBasic.TenantName
                 };
-                
+
                 // Get roles for the staff request
                 var staffRequestRoles = await uow.QueryAsync<string>(
-                    "SELECT role FROM staff_request_role WHERE staff_request_id = @StaffRequestId", 
+                    "SELECT role FROM staff_request_role WHERE staff_request_id = @StaffRequestId",
                     new { StaffRequestId = staffRequest.Id });
-                    
+
                 staffRequest.Roles = staffRequestRoles.ToList();
                 response.StaffRequest = staffRequest;
             }

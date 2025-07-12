@@ -73,7 +73,7 @@ public class RequestStaffCommandHandler : IRequestHandler<RequestStaffCommand, b
             "SELECT * FROM app_user WHERE email = @Email",
             new { Email = request.StaffEmail });
 
-        if (existingUser != null)
+        if (existingUser != null && existingUser.TenantId != null)
         {
             // If user exists, check if they're already in this tenant
             if (existingUser.TenantId == request.TenantId)

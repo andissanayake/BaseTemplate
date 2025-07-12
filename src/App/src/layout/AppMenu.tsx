@@ -17,8 +17,15 @@ import { useTenantStore } from "../features/Tenant/tenantStore";
 export const AppMenu = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { user, setUser, setRoles, tenant, setTenant, setStaffRequest } =
-    useAuthStore((state) => state);
+  const {
+    user,
+    setUser,
+    setRoles,
+    tenant,
+    setTenant,
+    setStaffRequest,
+    staffRequest,
+  } = useAuthStore((state) => state);
   const { currentTenant } = useTenantStore((state) => state);
   const [current, setCurrent] = useState(
     location.pathname === "/" || location.pathname === ""
@@ -89,14 +96,6 @@ export const AppMenu = () => {
     });
 
     if (user) {
-      menuItems.push({
-        key: "/todo-list",
-        label: <span>Todo List</span>,
-        onClick: (e: any) => {
-          handleClick(e.key);
-        },
-      });
-
       if (tenant?.id) {
         menuItems.push({
           key: "/tenants/view/" + tenant.id,
@@ -129,7 +128,7 @@ export const AppMenu = () => {
         });
       }
 
-      if (!tenant?.id) {
+      if (!tenant?.id && !staffRequest?.id) {
         menuItems.push({
           key: "/tenants/create",
           label: "Become a Tenant",
@@ -138,7 +137,15 @@ export const AppMenu = () => {
           },
         });
       }
-
+      if (!tenant?.id && staffRequest?.id) {
+        menuItems.push({
+          key: "/staff-request/respond",
+          label: "Join a Tenant",
+          onClick: (e: any) => {
+            handleClick(e.key);
+          },
+        });
+      }
       // Right side menu items with auto margin
       menuItems.push({
         key: "/profile",
@@ -182,6 +189,7 @@ export const AppMenu = () => {
     handleClick,
     tenant?.id,
     tenant?.name,
+    staffRequest?.id,
   ]);
 
   return (
