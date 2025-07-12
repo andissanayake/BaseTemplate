@@ -1,5 +1,5 @@
 using System.ComponentModel.DataAnnotations;
-namespace BaseTemplate.Application.Tenants.Commands.RequestStaff;
+namespace BaseTemplate.Application.Staff.Commands.RequestStaff;
 [Authorize(Roles = Domain.Constants.Roles.StaffRequestManager + "," + Domain.Constants.Roles.TenantOwner)]
 public record RequestStaffCommand(int TenantId) : BaseTenantRequest<bool>(TenantId)
 {
@@ -98,7 +98,7 @@ public class RequestStaffCommandHandler : IRequestHandler<RequestStaffCommand, b
         // Check if there's already a pending request for this email in this tenant
         var existingRequest = await uow.QueryFirstOrDefaultAsync<StaffRequest>(
             "SELECT * FROM staff_request WHERE tenant_id = @TenantId AND requested_email = @Email AND status = 0",
-            new { TenantId = request.TenantId, Email = request.StaffEmail });
+            new { request.TenantId, Email = request.StaffEmail });
 
         if (existingRequest != null)
         {

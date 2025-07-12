@@ -1,4 +1,4 @@
-namespace BaseTemplate.Application.Tenants.Queries.GetStaffRequests;
+namespace BaseTemplate.Application.Staff.Queries.GetStaffRequests;
 
 [Authorize]
 public record GetStaffRequestsQuery(int TenantId) : BaseTenantRequest<List<StaffRequestDto>>(TenantId);

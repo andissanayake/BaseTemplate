@@ -1,4 +1,4 @@
-namespace BaseTemplate.Application.Tenants.Commands.UpdateStaffRequest;
+namespace BaseTemplate.Application.Staff.Commands.UpdateStaffRequest;
 
 [Authorize(Roles = Domain.Constants.Roles.StaffRequestManager + "," + Domain.Constants.Roles.TenantOwner)]
 public record UpdateStaffRequestCommand(int TenantId) : BaseTenantRequest<bool>(TenantId)
@@ -37,7 +37,7 @@ public class UpdateStaffRequestCommandHandler : IRequestHandler<UpdateStaffReque
         // Get the staff request and verify it belongs to this tenant
         var staffRequest = await uow.QueryFirstOrDefaultAsync<StaffRequest>(
             "SELECT * FROM staff_request WHERE id = @Id AND tenant_id = @TenantId",
-            new { Id = request.StaffRequestId, TenantId = request.TenantId });
+            new { Id = request.StaffRequestId, request.TenantId });
 
         if (staffRequest == null)
         {

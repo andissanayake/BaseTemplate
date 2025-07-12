@@ -1,4 +1,4 @@
-namespace BaseTemplate.Application.Tenants.Commands.RespondToStaffRequest;
+namespace BaseTemplate.Application.Staff.Commands.RespondToStaffRequest;
 
 [Authorize]
 public record RespondToStaffRequestCommand : IRequest<bool>
@@ -26,7 +26,7 @@ public class RespondToStaffRequestCommandHandler : IRequestHandler<RespondToStaf
         // Get the staff request and verify it belongs to the current user
         var staffRequest = await uow.QueryFirstOrDefaultAsync<StaffRequest>(
             "SELECT * FROM staff_request WHERE id = @Id AND requested_email = @Email",
-            new { Id = request.StaffRequestId, Email = _user.Email });
+            new { Id = request.StaffRequestId, _user.Email });
 
         if (staffRequest == null)
         {
@@ -67,7 +67,7 @@ public class RespondToStaffRequestCommandHandler : IRequestHandler<RespondToStaf
             // Get the roles for this staff request and add them to the user
             var staffRequestRoles = await uow.QueryAsync<StaffRequestRole>(
                 "SELECT * FROM staff_request_role WHERE staff_request_id = @StaffRequestId",
-                new { StaffRequestId = request.StaffRequestId });
+                new { request.StaffRequestId });
 
             foreach (var role in staffRequestRoles)
             {
