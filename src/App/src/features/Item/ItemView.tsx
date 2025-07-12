@@ -1,17 +1,10 @@
 import React, { useEffect } from "react";
-import {
-  Card,
-  Descriptions,
-  Space,
-  Tag,
-  Typography,
-  Button,
-  notification,
-} from "antd";
+import { Card, Descriptions, Space, Tag, Typography, Button } from "antd";
 import { useParams, useNavigate } from "react-router-dom";
 import { useItemStore } from "./itemStore";
 import { ItemService } from "./itemService";
 import { handleResult } from "../../common/handleResult";
+import { handleServerError } from "../../common/serverErrorHandler";
 import { useAuthStore } from "../../auth/authStore";
 import { Item } from "./ItemModel";
 
@@ -37,7 +30,7 @@ const ItemView: React.FC = () => {
           }
         },
         onServerError: () => {
-          notification.error({ message: "Failed to fetch item!" });
+          handleServerError(undefined, "Failed to fetch item!");
         },
         onFinally: () => {
           setLoading(false);

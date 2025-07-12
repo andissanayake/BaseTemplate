@@ -12,6 +12,8 @@ import { useTodoGroupStore } from "./todoGroupStore";
 import { useNavigate } from "react-router-dom";
 import { TodoGroupService } from "./todoGroupService";
 import { handleResult } from "../../common/handleResult";
+import { handleFormValidationErrors } from "../../common/formErrorHandler";
+import { handleServerError } from "../../common/serverErrorHandler";
 
 const TodoGroupCreate: React.FC = () => {
   const [form] = Form.useForm();
@@ -29,14 +31,13 @@ const TodoGroupCreate: React.FC = () => {
           navigate("/todo-list");
         },
         onValidationError: (createErrors) => {
-          const fields = Object.entries(createErrors).map(([name, errors]) => ({
-            name: name.toLowerCase(),
-            errors,
-          }));
-          form.setFields(fields);
+          handleFormValidationErrors({
+            form,
+            errors: createErrors,
+          });
         },
-        onServerError: () => {
-          notification.error({ message: "Failed to create todo list!" });
+        onServerError: (errors) => {
+          handleServerError(errors, "Failed to create todo list!");
         },
         onFinally: () => {
           setLoading(false);

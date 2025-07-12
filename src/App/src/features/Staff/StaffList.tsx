@@ -9,7 +9,6 @@ import {
   Popconfirm,
   Typography,
   Tooltip,
-  notification,
 } from "antd";
 import { DeleteOutlined, EditOutlined, UserOutlined } from "@ant-design/icons";
 import { StaffService } from "./staffService";
@@ -17,6 +16,7 @@ import { useStaffStore } from "./staffStore";
 import { StaffMemberDto } from "./StaffModel";
 import StaffRoleEdit from "./StaffRoleEdit";
 import { handleResult } from "../../common/handleResult";
+import { handleServerError } from "../../common/serverErrorHandler";
 import { useAuthStore } from "../../auth/authStore";
 
 const { Title } = Typography;
@@ -43,11 +43,11 @@ const StaffList: React.FC = () => {
       onSuccess: (data) => {
         setStaffMembers(data || []);
       },
-      onServerError: () => {
-        notification.error({
-          message: "Failed to load staff members",
-          description: "An error occurred while loading staff members.",
-        });
+      onServerError: (errors) => {
+        handleServerError(
+          errors,
+          "Failed to load staff members. An error occurred while loading staff members."
+        );
       },
       onFinally: () => {
         setLoading(false);
@@ -67,7 +67,7 @@ const StaffList: React.FC = () => {
         message.success("Staff member removed successfully");
       },
       onServerError: () => {
-        message.error("Failed to remove staff member");
+        handleServerError(undefined, "Failed to remove staff member");
       },
     });
   };

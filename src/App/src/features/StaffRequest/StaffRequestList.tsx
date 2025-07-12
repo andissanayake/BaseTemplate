@@ -16,6 +16,7 @@ import { StaffRequestDto, StaffRequestStatus } from "./StaffRequestModel";
 import { useStaffRequestStore } from "./staffRequestStore";
 import { StaffRequestService } from "./staffRequestService";
 import { handleResult } from "../../common/handleResult";
+import { handleServerError } from "../../common/serverErrorHandler";
 import { useParams } from "react-router-dom";
 import StaffRequestCreate from "./StaffRequestCreate";
 
@@ -38,11 +39,11 @@ export const StaffRequestList: React.FC = () => {
       onSuccess: (data) => {
         setStaffRequests(data || []);
       },
-      onServerError: () => {
-        notification.error({
-          message: "Failed to fetch staff requests",
-          description: "An error occurred while loading staff requests.",
-        });
+      onServerError: (errors) => {
+        handleServerError(
+          errors,
+          "Failed to fetch staff requests. An error occurred while loading staff requests."
+        );
       },
       onFinally: () => {
         setLoading(false);
@@ -75,12 +76,7 @@ export const StaffRequestList: React.FC = () => {
         fetchStaffRequests(+tenantId);
       },
       onServerError: (error) => {
-        notification.error({
-          message: "Failed to reject staff request!",
-          description:
-            error?.message ||
-            "An error occurred while rejecting the staff request.",
-        });
+        handleServerError(error, null);
       },
       onFinally: () => {
         setLoading(false);

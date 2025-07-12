@@ -5,6 +5,8 @@ import { useParams, useNavigate } from "react-router-dom";
 import { TenantService } from "./tenantService";
 import { useAsyncEffect } from "../../common/useAsyncEffect";
 import { handleResult } from "../../common/handleResult";
+import { handleFormValidationErrors } from "../../common/formErrorHandler";
+import { handleServerError } from "../../common/serverErrorHandler";
 import { Tenant } from "./TenantModel";
 
 const TenantEdit: React.FC = () => {
@@ -29,14 +31,13 @@ const TenantEdit: React.FC = () => {
           navigate(`/tenants/view/${tenantId}`);
         },
         onValidationError: (updateErrors) => {
-          const fields = Object.entries(updateErrors).map(([name, errors]) => ({
-            name: name.toLowerCase(),
-            errors,
-          }));
-          form.setFields(fields);
+          handleFormValidationErrors({
+            form,
+            errors: updateErrors,
+          });
         },
-        onServerError: () => {
-          notification.error({ message: "Failed to update tenant!" });
+        onServerError: (errors) => {
+          handleServerError(errors, "Failed to update tenant!");
         },
         onFinally: () => {
           setLoading(false);
@@ -60,7 +61,7 @@ const TenantEdit: React.FC = () => {
         }
       },
       onServerError: () => {
-        notification.error({ message: "Failed to fetch tenant details!" });
+        handleServerError(undefined, "Failed to fetch tenant details!");
       },
       onFinally: () => {
         setLoading(false);

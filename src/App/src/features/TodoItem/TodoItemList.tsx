@@ -17,6 +17,7 @@ import TodoItemEdit from "./TodoItemEdit";
 import { PriorityLevel, TodoItem } from "./TodoItemModel";
 import { TodoItemService } from "./todoItemService";
 import { handleResult } from "../../common/handleResult";
+import { handleServerError } from "../../common/serverErrorHandler";
 
 const TodoItemList: React.FC = () => {
   const {
@@ -89,8 +90,8 @@ const TodoItemList: React.FC = () => {
         notification.success({ message: "Todo Item deleted successfully!" });
         loadTodoItems();
       },
-      onServerError: () => {
-        notification.error({ message: "Failed to delete todo item!" });
+      onServerError: (errors) => {
+        handleServerError(errors, "Failed to delete todo item!");
       },
       onFinally: () => {
         setLoading(false);

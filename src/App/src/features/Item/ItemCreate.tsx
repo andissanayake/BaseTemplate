@@ -13,6 +13,8 @@ import { useItemStore } from "./itemStore";
 import { useNavigate } from "react-router-dom";
 import { ItemService } from "./itemService";
 import { handleResult } from "../../common/handleResult";
+import { handleFormValidationErrors } from "../../common/formErrorHandler";
+import { handleServerError } from "../../common/serverErrorHandler";
 import { useAuthStore } from "../../auth/authStore";
 
 const ItemCreate: React.FC = () => {
@@ -42,15 +44,14 @@ const ItemCreate: React.FC = () => {
           form.resetFields();
           navigate(`/items`);
         },
-        onValidationError: (createErrors) => {
-          const fields = Object.entries(createErrors).map(([name, errors]) => ({
-            name: name.toLowerCase(),
-            errors,
-          }));
-          form.setFields(fields);
+        onValidationError: (errors) => {
+          handleFormValidationErrors({
+            form,
+            errors: errors,
+          });
         },
-        onServerError: () => {
-          notification.error({ message: "Failed to create item!" });
+        onServerError: (errors) => {
+          handleServerError(errors, "Failed to create item!");
         },
         onFinally: () => {
           setLoading(false);

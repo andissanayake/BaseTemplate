@@ -13,6 +13,8 @@ import { useNavigate, useParams } from "react-router-dom";
 import { TodoGroupService } from "./todoGroupService";
 import { useAsyncEffect } from "../../common/useAsyncEffect";
 import { handleResult } from "../../common/handleResult";
+import { handleFormValidationErrors } from "../../common/formErrorHandler";
+import { handleServerError } from "../../common/serverErrorHandler";
 
 const TodoGroupEdit: React.FC = () => {
   const { setLoading } = useTodoGroupStore();
@@ -35,11 +37,13 @@ const TodoGroupEdit: React.FC = () => {
           navigate("/todo-list");
         },
         onValidationError: (updateErrors) => {
-          const fields = Object.entries(updateErrors).map(([name, errors]) => ({
-            name: name.toLowerCase(),
-            errors,
-          }));
-          form.setFields(fields);
+          handleFormValidationErrors({
+            form,
+            errors: updateErrors,
+          });
+        },
+        onServerError: (errors) => {
+          handleServerError(errors, "Failed to update todo list!");
         },
         onFinally: () => {
           setLoading(false);
@@ -57,7 +61,7 @@ const TodoGroupEdit: React.FC = () => {
         form.setFieldsValue(data);
       },
       onServerError: () => {
-        notification.error({ message: "Failed to fetch todo list item!" });
+        handleServerError(undefined, "Failed to fetch todo list item!");
       },
 
       onFinally: () => {

@@ -21,6 +21,7 @@ import {
 import { useAsyncEffect } from "../../common/useAsyncEffect";
 import { TodoGroupService } from "./todoGroupService";
 import { handleResult } from "../../common/handleResult";
+import { handleServerError } from "../../common/serverErrorHandler";
 
 const TodoGroupList: React.FC = () => {
   const { todoGroupList, loading, setLoading, setTodoGroupList } =
@@ -56,8 +57,8 @@ const TodoGroupList: React.FC = () => {
         loadTodoGroupList();
         notification.success({ message: "Todo list deleted successfully!" });
       },
-      onServerError: () => {
-        notification.error({ message: "Failed to delete todo list!" });
+      onServerError: (errors) => {
+        handleServerError(errors, "Failed to delete todo list!");
       },
       onFinally: () => {
         setLoading(false);

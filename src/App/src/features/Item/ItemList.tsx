@@ -18,6 +18,7 @@ import { useItemStore } from "./itemStore";
 import { Item } from "./ItemModel";
 import { ItemService } from "./itemService";
 import { handleResult } from "../../common/handleResult";
+import { handleServerError } from "../../common/serverErrorHandler";
 import { Link } from "react-router-dom";
 import { useAuthStore } from "../../auth/authStore";
 
@@ -55,7 +56,7 @@ const ItemList: React.FC = () => {
       },
       onServerError: (error) => {
         setItemList([]);
-        notification.error({ message: error?.message });
+        handleServerError(error, "Failed to load items!");
       },
       onFinally: () => {
         setLoading(false);
@@ -92,7 +93,7 @@ const ItemList: React.FC = () => {
         loadItems();
       },
       onServerError: () => {
-        notification.error({ message: "Failed to delete item!" });
+        handleServerError(undefined, "Failed to delete item!");
       },
       onFinally: () => {
         setLoading(false);

@@ -6,6 +6,8 @@ import dayjs from "dayjs";
 import { useParams } from "react-router-dom";
 import { TodoItem } from "./TodoItemModel";
 import { handleResult } from "../../common/handleResult";
+import { handleServerError } from "../../common/serverErrorHandler";
+import { handleFormValidationErrors } from "../../common/formErrorHandler";
 
 interface TodoItemEditProps {
   visible: boolean;
@@ -51,8 +53,14 @@ const TodoItemEdit: React.FC<TodoItemEditProps> = ({
           refresh();
           onClose();
         },
+        onValidationError: (errors) => {
+          handleFormValidationErrors({
+            form,
+            errors,
+          });
+        },
         onServerError: () => {
-          notification.error({ message: "Failed to update todo item!" });
+          handleServerError(undefined, "Failed to update todo item!");
         },
         onFinally: () => {
           setLoading(false);
