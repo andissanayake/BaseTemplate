@@ -1,12 +1,5 @@
 namespace BaseTemplate.Application.Staff.Commands.UpdateStaffRequest;
 
-[Authorize(Roles = Domain.Constants.Roles.StaffRequestManager + "," + Domain.Constants.Roles.TenantOwner)]
-public record UpdateStaffRequestCommand(int TenantId) : BaseTenantRequest<bool>(TenantId)
-{
-    public int StaffRequestId { get; set; }
-    public required string RejectionReason { get; set; }
-}
-
 public class UpdateStaffRequestCommandHandler : IRequestHandler<UpdateStaffRequestCommand, bool>
 {
     private readonly IUnitOfWorkFactory _factory;
@@ -57,4 +50,4 @@ public class UpdateStaffRequestCommandHandler : IRequestHandler<UpdateStaffReque
         return Result<bool>.Success(true, $"Staff request for {staffRequest.RequestedEmail} has been rejected.");
 
     }
-}
+} 

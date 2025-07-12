@@ -1,9 +1,4 @@
-using BaseTemplate.Domain.Constants;
-
 namespace BaseTemplate.Application.Staff.Commands.RemoveStaff;
-
-[Authorize(Roles = Roles.StaffManager + "," + Roles.TenantOwner)]
-public record RemoveStaffCommand(int TenantId, string StaffSsoId) : BaseTenantRequest<bool>(TenantId);
 
 public class RemoveStaffCommandHandler : IRequestHandler<RemoveStaffCommand, bool>
 {
@@ -41,4 +36,4 @@ public class RemoveStaffCommandHandler : IRequestHandler<RemoveStaffCommand, boo
 
         return Result<bool>.Success(true);
     }
-}
+} 
