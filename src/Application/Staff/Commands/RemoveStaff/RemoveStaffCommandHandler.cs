@@ -33,6 +33,15 @@ public class RemoveStaffCommandHandler : IRequestHandler<RemoveStaffCommand, boo
             "UPDATE app_user SET tenant_id = NULL, last_modified = @LastModified WHERE id = @StaffId",
             new { request.StaffId, LastModified = DateTimeOffset.UtcNow });
 
+        // Set related staff requests to Expired
+        await uow.ExecuteAsync(
+            "UPDATE staff_request SET status = @ExpiredStatus WHERE requested_email = @Email AND tenant_id = @TenantId AND status = @AcceptedStatus",
+            new { 
+                ExpiredStatus = (int)BaseTemplate.Domain.Entities.StaffRequestStatus.Expired,
+                AcceptedStatus = (int)BaseTemplate.Domain.Entities.StaffRequestStatus.Accepted,
+                Email = user.Email,
+                request.TenantId
+            });
 
         return Result<bool>.Success(true);
     }

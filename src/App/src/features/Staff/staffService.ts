@@ -38,10 +38,10 @@ export class StaffService {
    */
   static async removeStaff(
     tenantId: number,
-    staffSsoId: string
+    staffId: number
   ): Promise<Result<boolean>> {
     return await handleApi(
-      axiosInstance.delete(`${this.baseUrl}/${tenantId}/staff/${staffSsoId}`)
+      axiosInstance.delete(`${this.baseUrl}/${tenantId}/staff/${staffId}`)
     );
   }
 

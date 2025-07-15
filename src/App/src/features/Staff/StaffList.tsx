@@ -59,12 +59,13 @@ const StaffList: React.FC = () => {
     loadStaffMembers();
   }, [tenant?.id]);
 
-  const handleRemoveStaff = async (staffSsoId: string) => {
-    const result = await StaffService.removeStaff(+tenant.id, staffSsoId);
+  const handleRemoveStaff = async (staffId: number) => {
+    const result = await StaffService.removeStaff(+tenant.id, staffId);
     handleResult(result, {
       onSuccess: () => {
-        removeStaffMember(staffSsoId);
+        removeStaffMember(staffId.toString());
         message.success("Staff member removed successfully");
+        loadStaffMembers();
       },
       onServerError: (errors) => {
         handleServerError(errors, "Failed to remove staff member");
@@ -143,7 +144,7 @@ const StaffList: React.FC = () => {
           <Popconfirm
             title="Remove Staff Member"
             description="Are you sure you want to remove this staff member? This action cannot be undone."
-            onConfirm={() => handleRemoveStaff(record.ssoId)}
+            onConfirm={() => handleRemoveStaff(record.id)}
             okText="Yes"
             cancelText="No"
             placement="topRight"
@@ -174,7 +175,7 @@ const StaffList: React.FC = () => {
       <Table
         columns={columns}
         dataSource={staffMembers}
-        rowKey="ssoId"
+        rowKey={(record) => record.id.toString()}
         loading={loading}
         pagination={{
           pageSize: 10,
