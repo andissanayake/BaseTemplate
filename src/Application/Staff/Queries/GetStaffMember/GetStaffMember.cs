@@ -3,11 +3,11 @@ using BaseTemplate.Domain.Constants;
 namespace BaseTemplate.Application.Staff.Queries.GetStaffMember;
 
 [Authorize(Roles = Roles.StaffManager)]
-public record GetStaffMemberQuery(int TenantId, string StaffSsoId) : BaseTenantRequest<StaffMemberDetailDto>(TenantId);
+public record GetStaffMemberQuery(int TenantId, int StaffId) : BaseTenantRequest<StaffMemberDetailDto>(TenantId);
 
 public class StaffMemberDetailDto
 {
-    public string SsoId { get; set; } = string.Empty;
+    public int Id { get; set; }
     public string? Name { get; set; }
     public string? Email { get; set; }
     public List<string> Roles { get; set; } = new();
@@ -31,8 +31,8 @@ public class GetStaffMemberQueryHandler : IRequestHandler<GetStaffMemberQuery, S
 
         // Get the user
         var user = await uow.QueryFirstOrDefaultAsync<AppUser>(
-            "SELECT * FROM app_user WHERE sso_id = @StaffSsoId AND tenant_id = @TenantId",
-            new { request.StaffSsoId, request.TenantId });
+            "SELECT * FROM app_user WHERE id = @StaffId AND tenant_id = @TenantId",
+            new { StaffId = request.StaffId, request.TenantId });
 
         if (user == null)
         {
@@ -41,12 +41,12 @@ public class GetStaffMemberQueryHandler : IRequestHandler<GetStaffMemberQuery, S
 
         // Get roles for the user
         var roles = await uow.QueryAsync<UserRole>(
-            "SELECT * FROM user_role WHERE user_sso_id = @StaffSsoId",
-            new { request.StaffSsoId });
+            "SELECT * FROM user_role WHERE user_id = @StaffId",
+            new { StaffId = request.StaffId });
 
         var dto = new StaffMemberDetailDto
         {
-            SsoId = user.SsoId,
+            Id = user.Id,
             Name = user.Name,
             Email = user.Email,
             Roles = roles.Select(r => r.Role).ToList(),

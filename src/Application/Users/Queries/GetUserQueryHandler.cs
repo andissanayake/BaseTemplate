@@ -48,7 +48,7 @@ public class GetUserQueryHandler : IRequestHandler<GetUserQuery, GetUserResponse
             }
         }
 
-        var roles = await uow.QueryAsync<string>("select role from user_role where user_sso_id = @Identifier", new { _user.Identifier });
+        var roles = await uow.QueryAsync<string>("select role from user_role where user_id = @UserId", new { UserId = userInfo.Id });
 
         var response = new GetUserResponse { Roles = roles };
 
@@ -102,4 +102,4 @@ public class GetUserQueryHandler : IRequestHandler<GetUserQuery, GetUserResponse
 
         return Result<GetUserResponse>.Success(response);
     }
-} 
+}

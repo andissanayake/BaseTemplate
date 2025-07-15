@@ -19,17 +19,17 @@ public class ListStaffQueryHandler : IRequestHandler<ListStaffQuery, List<StaffM
             new { request.TenantId });
 
         // Get all roles for all users in a single query
-        var userSsoIds = users.Select(u => u.SsoId).ToList();
+        var userIds = users.Select(u => u.Id).ToList();
         var roles = new List<UserRole>();
 
-        if (userSsoIds.Any())
+        if (userIds.Any())
         {
-            var roleQuery = "SELECT * FROM user_role WHERE user_sso_id = ANY(@UserSsoIds)";
-            roles = (await uow.QueryAsync<UserRole>(roleQuery, new { UserSsoIds = userSsoIds })).ToList();
+            var roleQuery = "SELECT * FROM user_role WHERE user_id = ANY(@UserIds)";
+            roles = (await uow.QueryAsync<UserRole>(roleQuery, new { UserIds = userIds })).ToList();
         }
 
-        // Group roles by user SsoId for efficient lookup
-        var rolesByUserSsoId = roles.GroupBy(r => r.UserSsoId).ToDictionary(g => g.Key, g => g.Select(r => r.Role).ToList());
+        // Group roles by user Id for efficient lookup
+        var rolesByUserId = roles.GroupBy(r => r.UserId).ToDictionary(g => g.Key, g => g.Select(r => r.Role).ToList());
 
         var result = new List<StaffMemberDto>();
 
@@ -37,10 +37,10 @@ public class ListStaffQueryHandler : IRequestHandler<ListStaffQuery, List<StaffM
         {
             var dto = new StaffMemberDto
             {
-                SsoId = user.SsoId,
+                Id = user.Id,
                 Name = user.Name,
                 Email = user.Email,
-                Roles = rolesByUserSsoId.GetValueOrDefault(user.SsoId, new List<string>()),
+                Roles = rolesByUserId.GetValueOrDefault(user.Id, new List<string>()),
                 Created = user.Created,
                 LastModified = user.LastModified
             };

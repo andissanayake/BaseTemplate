@@ -15,8 +15,8 @@ public class UpdateStaffRolesCommandHandler : IRequestHandler<UpdateStaffRolesCo
 
         // Verify the user exists and belongs to the tenant
         var user = await uow.QueryFirstOrDefaultAsync<AppUser>(
-            "SELECT * FROM app_user WHERE sso_id = @StaffSsoId AND tenant_id = @TenantId",
-            new { request.StaffSsoId, request.TenantId });
+            "SELECT * FROM app_user WHERE id = @StaffId AND tenant_id = @TenantId",
+            new { request.StaffId, request.TenantId });
 
         if (user == null)
         {
@@ -25,16 +25,16 @@ public class UpdateStaffRolesCommandHandler : IRequestHandler<UpdateStaffRolesCo
 
         // Remove all existing roles for the user
         await uow.ExecuteAsync(
-            "DELETE FROM user_role WHERE user_sso_id = @StaffSsoId",
-            new { request.StaffSsoId });
+            "DELETE FROM user_role WHERE user_id = @StaffId",
+            new { request.StaffId });
 
         // Add new roles
         if (request.NewRoles.Any())
         {
-            var roleValues = request.NewRoles.Select(role => new { UserSsoId = request.StaffSsoId, Role = role });
+            var roleValues = request.NewRoles.Select(role => new { UserId = request.StaffId, Role = role });
             await uow.ExecuteAsync(
-                "INSERT INTO user_role (user_sso_id, role, created, last_modified) VALUES (@UserSsoId, @Role, @Created, @LastModified)",
-                roleValues.Select(r => new { r.UserSsoId, r.Role, Created = DateTimeOffset.UtcNow, LastModified = DateTimeOffset.UtcNow }));
+                "INSERT INTO user_role (user_id, role, created, last_modified) VALUES (@UserId, @Role, @Created, @LastModified)",
+                roleValues.Select(r => new { r.UserId, r.Role, Created = DateTimeOffset.UtcNow, LastModified = DateTimeOffset.UtcNow }));
         }
 
         return Result<bool>.Success(true);
