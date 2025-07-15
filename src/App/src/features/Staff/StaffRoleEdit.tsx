@@ -39,7 +39,7 @@ const StaffRoleEdit: React.FC<StaffRoleEditProps> = ({
 
     const result = await StaffService.updateStaffRoles(
       +tenant.id,
-      staffMember.ssoId,
+      staffMember.id,
       {
         newRoles: values.newRoles,
       }
