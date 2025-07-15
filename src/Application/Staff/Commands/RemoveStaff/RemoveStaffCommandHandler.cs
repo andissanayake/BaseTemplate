@@ -15,8 +15,8 @@ public class RemoveStaffCommandHandler : IRequestHandler<RemoveStaffCommand, boo
 
         // Verify the user exists and belongs to the tenant
         var user = await uow.QueryFirstOrDefaultAsync<AppUser>(
-            "SELECT * FROM app_user WHERE sso_id = @StaffSsoId AND tenant_id = @TenantId",
-            new { request.StaffSsoId, request.TenantId });
+            "SELECT * FROM app_user WHERE id = @StaffId AND tenant_id = @TenantId",
+            new { request.StaffId, request.TenantId });
 
         if (user == null)
         {
@@ -25,14 +25,23 @@ public class RemoveStaffCommandHandler : IRequestHandler<RemoveStaffCommand, boo
 
         // Remove all roles for the user
         await uow.ExecuteAsync(
-            "DELETE FROM user_role WHERE user_sso_id = @StaffSsoId",
-            new { request.StaffSsoId });
+            "DELETE FROM user_role WHERE user_id = @StaffId",
+            new { request.StaffId });
 
         // Remove the user from the tenant (set tenant_id to null)
         await uow.ExecuteAsync(
-            "UPDATE app_user SET tenant_id = NULL, last_modified = @LastModified WHERE sso_id = @StaffSsoId",
-            new { request.StaffSsoId, LastModified = DateTimeOffset.UtcNow });
+            "UPDATE app_user SET tenant_id = NULL, last_modified = @LastModified WHERE id = @StaffId",
+            new { request.StaffId, LastModified = DateTimeOffset.UtcNow });
 
+        // Set related staff requests to Expired
+        await uow.ExecuteAsync(
+            "UPDATE staff_request SET status = @ExpiredStatus WHERE requested_email = @Email AND tenant_id = @TenantId AND status = @AcceptedStatus",
+            new { 
+                ExpiredStatus = (int)BaseTemplate.Domain.Entities.StaffRequestStatus.Expired,
+                AcceptedStatus = (int)BaseTemplate.Domain.Entities.StaffRequestStatus.Accepted,
+                Email = user.Email,
+                request.TenantId
+            });
 
         return Result<bool>.Success(true);
     }

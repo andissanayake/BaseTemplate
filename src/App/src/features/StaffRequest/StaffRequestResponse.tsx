@@ -112,6 +112,8 @@ export const StaffRequestResponse: React.FC = () => {
         return <Tag color="red">Rejected</Tag>;
       case 3:
         return <Tag color="red">Revoked</Tag>;
+      case 4:
+        return <Tag color="default">Expired</Tag>;
       default:
         return <Tag color="default">Unknown</Tag>;
     }

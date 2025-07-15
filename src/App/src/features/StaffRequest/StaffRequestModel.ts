@@ -16,6 +16,7 @@ export enum StaffRequestStatus {
   Accepted = 1,
   Rejected = 2,
   Revoked = 3,
+  Expired = 4,
 }
 
 export interface CreateStaffRequestRequest {

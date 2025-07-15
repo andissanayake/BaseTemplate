@@ -87,22 +87,22 @@ public class TenantsController : ApiControllerBase
         return await SendAsync(new ListStaffQuery(tenantId));
     }
 
-    [HttpGet("{tenantId}/staff/{staffSsoId}")]
-    public async Task<ActionResult<Result<StaffMemberDetailDto>>> GetStaffMember(int tenantId, string staffSsoId)
+    [HttpGet("{tenantId}/staff/{staffId}")]
+    public async Task<ActionResult<Result<StaffMemberDetailDto>>> GetStaffMember(int tenantId, int staffId)
     {
-        return await SendAsync(new GetStaffMemberQuery(tenantId, staffSsoId));
+        return await SendAsync(new GetStaffMemberQuery(tenantId, staffId));
     }
 
-    [HttpDelete("{tenantId}/staff/{staffSsoId}")]
-    public async Task<ActionResult<Result<bool>>> RemoveStaff(int tenantId, string staffSsoId)
+    [HttpDelete("{tenantId}/staff/{staffId}")]
+    public async Task<ActionResult<Result<bool>>> RemoveStaff(int tenantId, int staffId)
     {
-        return await SendAsync(new RemoveStaffCommand(tenantId, staffSsoId));
+        return await SendAsync(new RemoveStaffCommand(tenantId, staffId));
     }
 
-    [HttpPut("{tenantId}/staff/{staffSsoId}/roles")]
-    public async Task<ActionResult<Result<bool>>> UpdateStaffRoles(int tenantId, string staffSsoId, UpdateStaffRolesCommand command)
+    [HttpPut("{tenantId}/staff/{staffId}/roles")]
+    public async Task<ActionResult<Result<bool>>> UpdateStaffRoles(int tenantId, int staffId, UpdateStaffRolesCommand command)
     {
-        if (tenantId != command.TenantId || staffSsoId != command.StaffSsoId)
+        if (tenantId != command.TenantId || staffId != command.StaffId)
         {
             return BadRequest();
         }

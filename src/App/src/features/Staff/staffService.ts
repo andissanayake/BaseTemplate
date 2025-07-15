@@ -38,10 +38,10 @@ export class StaffService {
    */
   static async removeStaff(
     tenantId: number,
-    staffSsoId: string
+    staffId: number
   ): Promise<Result<boolean>> {
     return await handleApi(
-      axiosInstance.delete(`${this.baseUrl}/${tenantId}/staff/${staffSsoId}`)
+      axiosInstance.delete(`${this.baseUrl}/${tenantId}/staff/${staffId}`)
     );
   }
 
@@ -50,18 +50,15 @@ export class StaffService {
    */
   static async updateStaffRoles(
     tenantId: number,
-    staffSsoId: string,
+    staffId: number,
     request: UpdateStaffRolesRequest
   ): Promise<Result<boolean>> {
     return await handleApi(
-      axiosInstance.put(
-        `${this.baseUrl}/${tenantId}/staff/${staffSsoId}/roles`,
-        {
-          tenantId,
-          staffSsoId,
-          newRoles: request.newRoles,
-        }
-      )
+      axiosInstance.put(`${this.baseUrl}/${tenantId}/staff/${staffId}/roles`, {
+        tenantId,
+        staffId,
+        newRoles: request.newRoles,
+      })
     );
   }
 }

@@ -1,4 +1,5 @@
 export interface StaffMemberDto {
+  id: number;
   ssoId: string;
   name?: string;
   email?: string;
@@ -8,6 +9,7 @@ export interface StaffMemberDto {
 }
 
 export interface StaffMemberDetailDto {
+  id: number;
   ssoId: string;
   name?: string;
   email?: string;

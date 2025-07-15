@@ -73,7 +73,7 @@ public class RespondToStaffRequestCommandHandler : IRequestHandler<RespondToStaf
             {
                 var userRole = new UserRole
                 {
-                    UserSsoId = _user.Identifier,
+                    UserId = user!.Id,
                     Role = role.Role
                 };
                 await uow.InsertAsync(userRole);

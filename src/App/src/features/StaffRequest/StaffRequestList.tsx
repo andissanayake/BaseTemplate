@@ -94,6 +94,8 @@ export const StaffRequestList: React.FC = () => {
         return <Tag color="red">Rejected</Tag>;
       case StaffRequestStatus.Revoked:
         return <Tag color="red">Revoked</Tag>;
+      case StaffRequestStatus.Expired:
+        return <Tag color="default">Expired</Tag>;
       default:
         return <Tag color="default">Unknown</Tag>;
     }
@@ -137,7 +139,8 @@ export const StaffRequestList: React.FC = () => {
       render: (rejectionReason: string, record: StaffRequestDto) => {
         if (
           record.status === StaffRequestStatus.Rejected ||
-          record.status === StaffRequestStatus.Revoked
+          record.status === StaffRequestStatus.Revoked ||
+          record.status === StaffRequestStatus.Expired
         ) {
           return rejectionReason ? (
             <Typography.Text
@@ -190,6 +193,9 @@ export const StaffRequestList: React.FC = () => {
                 ? "Revoked"
                 : "Rejected"}
             </Tag>
+          )}
+          {record.status === StaffRequestStatus.Expired && (
+            <Tag color="default">Expired</Tag>
           )}
         </Space>
       ),
