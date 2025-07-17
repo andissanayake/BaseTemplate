@@ -1,7 +1,4 @@
-﻿namespace BaseTemplate.Application.TodoItems.Commands.DeleteTodoItem;
-
-[Authorize]
-public record DeleteTodoItemCommand(int Id) : IRequest<bool>;
+namespace BaseTemplate.Application.TodoItems.Commands.DeleteTodoItem;
 
 public class DeleteTodoItemCommandHandler : IRequestHandler<DeleteTodoItemCommand, bool>
 {
@@ -24,5 +21,4 @@ public class DeleteTodoItemCommandHandler : IRequestHandler<DeleteTodoItemComman
         await uow.DeleteAsync(entity);
         return Result<bool>.Success(true);
     }
-
-}
+} 

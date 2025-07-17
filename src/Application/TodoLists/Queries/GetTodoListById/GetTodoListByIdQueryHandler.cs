@@ -1,9 +1,6 @@
-﻿using BaseTemplate.Application.TodoLists.Queries;
+using BaseTemplate.Application.TodoLists.Queries;
 
 namespace BaseTemplate.Application.TodoLists.Commands.GetTodoListById;
-
-[Authorize]
-public record GetTodoListByIdQuery(int Id) : IRequest<TodoListDto>;
 
 public class GetTodoListByIdQueryHandler : IRequestHandler<GetTodoListByIdQuery, TodoListDto>
 {
@@ -24,4 +21,4 @@ public class GetTodoListByIdQueryHandler : IRequestHandler<GetTodoListByIdQuery,
         var todoDto = new TodoListDto() { Colour = entity.Colour, Id = entity.Id, Title = entity.Title };
         return Result<TodoListDto>.Success(todoDto);
     }
-}
+} 
