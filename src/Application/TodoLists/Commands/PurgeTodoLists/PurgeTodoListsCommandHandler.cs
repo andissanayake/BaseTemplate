@@ -1,14 +1,10 @@
-﻿using BaseTemplate.Domain.Constants;
+using BaseTemplate.Domain.Constants;
 
 namespace BaseTemplate.Application.TodoLists.Commands.PurgeTodoLists;
-
-[Authorize(Roles = Roles.Administrator, Policy = Policies.CanPurge)]
-public record PurgeTodoListsCommand : IRequest<bool>;
 
 public class PurgeTodoListsCommandHandler : IRequestHandler<PurgeTodoListsCommand, bool>
 {
     private readonly IUnitOfWorkFactory _factory;
-
 
     public PurgeTodoListsCommandHandler(IUnitOfWorkFactory factory)
     {
@@ -26,4 +22,4 @@ public class PurgeTodoListsCommandHandler : IRequestHandler<PurgeTodoListsComman
         transaction.Commit();
         return Result<bool>.Success(true);
     }
-}
+} 

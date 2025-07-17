@@ -1,7 +1,4 @@
-﻿namespace BaseTemplate.Application.TodoLists.Commands.DeleteTodoList;
-
-[Authorize]
-public record DeleteTodoListCommand(int Id) : IRequest<bool>;
+namespace BaseTemplate.Application.TodoLists.Commands.DeleteTodoList;
 
 public class DeleteTodoListCommandHandler : IRequestHandler<DeleteTodoListCommand, bool>
 {
@@ -24,4 +21,4 @@ public class DeleteTodoListCommandHandler : IRequestHandler<DeleteTodoListComman
         await uow.DeleteAsync(entity);
         return Result<bool>.Success(true);
     }
-}
+} 

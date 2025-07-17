@@ -1,3 +1,5 @@
+using BaseTemplate.Domain.Constants;
+
 namespace BaseTemplate.Application.Staff.Commands.RequestStaff;
 
 public class RequestStaffCommandHandler : IRequestHandler<RequestStaffCommand, bool>
@@ -119,4 +121,4 @@ public class RequestStaffCommandHandler : IRequestHandler<RequestStaffCommand, b
 
         return Result<bool>.Success(true, $"Staff request for {request.StaffEmail} has been created successfully. The user will be notified to accept the invitation.");
     }
-} 
+}
