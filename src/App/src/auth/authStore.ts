@@ -2,6 +2,7 @@
 import { create } from "zustand";
 import { persist, devtools } from "zustand/middleware";
 import { StaffRequestDetails, TenantDetails } from "./UserModel";
+import { Roles } from "./RolesEnum";
 
 export interface AppUser {
   uid: string;
@@ -13,11 +14,11 @@ export interface AppUser {
 
 interface AuthState {
   user: AppUser | null;
-  roles: string[];
+  roles: Roles[];
   tenant: TenantDetails | null;
   staffRequest: StaffRequestDetails | null;
   setUser: (user: AppUser | null) => void;
-  setRoles: (roles: string[]) => void;
+  setRoles: (roles: Roles[]) => void;
   setTenant: (tenant: TenantDetails | null) => void;
   setStaffRequest: (staffRequest: StaffRequestDetails | null) => void;
 }

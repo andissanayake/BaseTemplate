@@ -16,7 +16,7 @@ public class RequestStaffCommandHandler : IRequestHandler<RequestStaffCommand, b
         using var uow = _factory.Create();
 
         // Validate that only allowed roles can be requested
-        var allowedRoles = new[] { "ItemManager", "StaffRequestManager", "TenantManager", "StaffManager" };
+        var allowedRoles = new[] { Roles.ItemManager, Roles.StaffRequestManager, Roles.TenantManager, Roles.StaffManager };
         var invalidRoles = request.Roles.Except(allowedRoles, StringComparer.OrdinalIgnoreCase).ToList();
 
         if (invalidRoles.Any())

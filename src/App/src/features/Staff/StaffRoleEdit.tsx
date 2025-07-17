@@ -6,6 +6,7 @@ import { handleResult } from "../../common/handleResult";
 import { handleFormValidationErrors } from "../../common/formErrorHandler";
 import { handleServerError } from "../../common/serverErrorHandler";
 import { useAuthStore } from "../../auth/authStore";
+import { Roles } from "../../auth/RolesEnum";
 
 const { Title } = Typography;
 const { Option } = Select;
@@ -21,17 +22,19 @@ const StaffRoleEdit: React.FC<StaffRoleEditProps> = ({
   onSuccess,
   onCancel,
 }) => {
-  const { tenant } = useAuthStore();
+  const { tenant, roles } = useAuthStore();
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
 
   // Available roles - you can customize this based on your application
-  const availableRoles = [
-    "ItemManager",
-    "StaffRequestManager",
-    "TenantManager",
-    "StaffManager",
-  ];
+  const availableRoles = React.useMemo(
+    () =>
+      roles.filter(
+        (role) => role !== Roles.Administrator && role !== Roles.TenantOwner
+      ),
+    [roles]
+  );
+
   if (!tenant?.id) throw new Error("Tenant ID is required");
 
   const handleSubmit = async (values: { newRoles: string[] }) => {

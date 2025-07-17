@@ -20,6 +20,7 @@ import { ItemCreatePage } from "./pages/ItemCreatePage";
 import { ItemEditPage } from "./pages/ItemEditPage";
 import { ItemViewPage } from "./pages/ItemViewPage";
 import { ItemListPage } from "./pages/ItemListPage";
+import NoAccessPage from "./pages/NoAccessPage";
 
 export const App = () => {
   return (
@@ -129,6 +130,7 @@ export const App = () => {
               </ProtectedRoute>
             }
           />
+          <Route path="/no-access" element={<NoAccessPage />} />
           <Route path="*" element={<NotFoundPage />} />
         </Route>
       </Routes>

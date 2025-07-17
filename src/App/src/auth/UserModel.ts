@@ -1,3 +1,5 @@
+import { Roles } from "./RolesEnum";
+
 export interface TenantDetails {
   id: string;
   name: string;
@@ -7,14 +9,14 @@ export interface StaffRequestDetails {
   id: number;
   requesterName: string;
   requesterEmail: string;
-  roles: string[];
+  roles: Roles[];
   status: number;
   created: string; // ISO date string
   tenantName: string;
 }
 
 export interface UserDetails {
-  roles: string[];
+  roles: Roles[];
   tenant?: TenantDetails;
   staffRequest?: StaffRequestDetails;
 }
