@@ -6,6 +6,7 @@ import { handleResult } from "../../common/handleResult";
 import { handleFormValidationErrors } from "../../common/formErrorHandler";
 import { handleServerError } from "../../common/serverErrorHandler";
 import { useAuthStore } from "../../auth/authStore";
+import { Roles } from "../../auth/RolesEnum";
 
 const { Title } = Typography;
 const { Option } = Select;
@@ -27,10 +28,10 @@ const StaffRoleEdit: React.FC<StaffRoleEditProps> = ({
 
   // Available roles - you can customize this based on your application
   const availableRoles = [
-    "ItemManager",
-    "StaffRequestManager",
-    "TenantManager",
-    "StaffManager",
+    Roles.ItemManager,
+    Roles.StaffRequestManager,
+    Roles.TenantManager,
+    Roles.StaffManager,
   ];
   if (!tenant?.id) throw new Error("Tenant ID is required");
 

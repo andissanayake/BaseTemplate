@@ -14,6 +14,7 @@ import { handleResult } from "../../common/handleResult";
 import { handleFormValidationErrors } from "../../common/formErrorHandler";
 import { handleServerError } from "../../common/serverErrorHandler";
 import { CreateStaffRequestRequest } from "./StaffRequestModel";
+import { Roles } from "../../auth/RolesEnum";
 
 interface StaffRequestCreateProps {
   tenantId: number;
@@ -32,10 +33,10 @@ const StaffRequestCreate: React.FC<StaffRequestCreateProps> = ({
   const { setLoading } = useStaffRequestStore();
 
   const availableRoles = [
-    "ItemManager",
-    "StaffRequestManager",
-    "TenantManager",
-    "StaffManager",
+    Roles.ItemManager,
+    Roles.StaffRequestManager,
+    Roles.TenantManager,
+    Roles.StaffManager,
   ];
 
   const handleCreateRequest = async (values: {
