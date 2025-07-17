@@ -18,8 +18,7 @@ public class RequestStaffCommandHandler : IRequestHandler<RequestStaffCommand, b
         using var uow = _factory.Create();
 
         // Validate that only allowed roles can be requested
-        var allowedRoles = new[] { Roles.ItemManager, Roles.StaffRequestManager, Roles.TenantManager, Roles.StaffManager };
-        var invalidRoles = request.Roles.Except(allowedRoles, StringComparer.OrdinalIgnoreCase).ToList();
+        var invalidRoles = request.Roles.Except(Roles.TenantBaseRoles, StringComparer.OrdinalIgnoreCase).ToList();
 
         if (invalidRoles.Any())
         {
@@ -27,7 +26,7 @@ public class RequestStaffCommandHandler : IRequestHandler<RequestStaffCommand, b
                 "Invalid roles selected.",
                 new Dictionary<string, string[]>
                 {
-                    ["Roles"] = new[] { $"The following roles are not allowed for staff requests: {string.Join(", ", invalidRoles)}. Allowed roles are: {string.Join(", ", allowedRoles)}." }
+                    ["Roles"] = new[] { $"The following roles are not allowed for staff requests: {string.Join(", ", invalidRoles)}. Allowed roles are: {string.Join(", ", Roles.TenantBaseRoles)}." }
                 });
         }
 

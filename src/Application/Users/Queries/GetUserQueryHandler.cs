@@ -1,3 +1,5 @@
+using BaseTemplate.Domain.Constants;
+
 namespace BaseTemplate.Application.Users.Queries;
 
 public class GetUserQueryHandler : IRequestHandler<GetUserQuery, GetUserResponse>
@@ -49,7 +51,13 @@ public class GetUserQueryHandler : IRequestHandler<GetUserQuery, GetUserResponse
         }
 
         var roles = await uow.QueryAsync<string>("select role from user_role where user_id = @UserId", new { UserId = userInfo.Id });
-
+        if (roles.Any(r => r == Roles.TenantOwner))
+        {
+            //Add all roles for the tenant owner dynamically, excluding Administrator and TenantOwner
+            var rolesList = roles.ToList();
+            rolesList.AddRange(Roles.TenantBaseRoles);
+            roles = rolesList;
+        }
         var response = new GetUserResponse { Roles = roles };
 
         // If user has a tenant, include tenant details
