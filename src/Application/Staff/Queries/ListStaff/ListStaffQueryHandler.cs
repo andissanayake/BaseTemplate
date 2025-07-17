@@ -13,6 +13,13 @@ public class ListStaffQueryHandler : IRequestHandler<ListStaffQuery, List<StaffM
     {
         using var uow = _factory.Create();
 
+        // Get the tenant to identify the owner
+        var tenant = await uow.GetAsync<Tenant>(request.TenantId);
+        if (tenant == null)
+        {
+            return Result<List<StaffMemberDto>>.NotFound($"Tenant with id {request.TenantId} not found.");
+        }
+
         // Get all users for the tenant
         var users = await uow.QueryAsync<AppUser>(
             "SELECT * FROM app_user WHERE tenant_id = @TenantId ORDER BY created DESC",
@@ -35,6 +42,10 @@ public class ListStaffQueryHandler : IRequestHandler<ListStaffQuery, List<StaffM
 
         foreach (var user in users)
         {
+            // Skip the actual tenant owner
+            if (user.SsoId == tenant.OwnerSsoId)
+                continue;
+
             var dto = new StaffMemberDto
             {
                 Id = user.Id,
