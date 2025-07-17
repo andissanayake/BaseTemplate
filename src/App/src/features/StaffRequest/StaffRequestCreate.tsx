@@ -15,6 +15,7 @@ import { handleFormValidationErrors } from "../../common/formErrorHandler";
 import { handleServerError } from "../../common/serverErrorHandler";
 import { CreateStaffRequestRequest } from "./StaffRequestModel";
 import { Roles } from "../../auth/RolesEnum";
+import { useAuthStore } from "../../auth/authStore";
 
 interface StaffRequestCreateProps {
   tenantId: number;
@@ -31,13 +32,15 @@ const StaffRequestCreate: React.FC<StaffRequestCreateProps> = ({
 }) => {
   const [form] = Form.useForm();
   const { setLoading } = useStaffRequestStore();
+  const { roles } = useAuthStore();
 
-  const availableRoles = [
-    Roles.ItemManager,
-    Roles.StaffRequestManager,
-    Roles.TenantManager,
-    Roles.StaffManager,
-  ];
+  const availableRoles = React.useMemo(
+    () =>
+      roles.filter(
+        (role) => role !== Roles.Administrator && role !== Roles.TenantOwner
+      ),
+    [roles]
+  );
 
   const handleCreateRequest = async (values: {
     staffEmail: string;

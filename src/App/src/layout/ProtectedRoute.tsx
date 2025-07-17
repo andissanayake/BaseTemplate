@@ -1,20 +1,36 @@
 import React, { ReactNode } from "react";
 import { Navigate } from "react-router-dom";
-import { authPolicy } from "../auth/authPolicy";
+import { useAuthPolicy } from "../auth/authPolicy";
 import { Policies } from "../auth/PoliciesEnum";
-import { useAuthStore } from "../auth/authStore";
+import { Roles } from "../auth/RolesEnum";
 
 interface ProtectedRouteProps {
   policy: Policies;
+  roles?: Roles[];
   children: ReactNode;
 }
 
 const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   policy,
+  roles,
   children,
 }) => {
-  const user = useAuthStore((state) => state.user);
-  return authPolicy(policy, user) ? <>{children}</> : <Navigate to="/" />;
+  const { isUser, isGuest, hasRole } = useAuthPolicy();
+
+  const hasAccess = () => {
+    switch (policy) {
+      case Policies.User:
+        return isUser();
+      case Policies.Guest:
+        return isGuest();
+      case Policies.Role:
+        return roles ? hasRole(roles) : false;
+      default:
+        return false;
+    }
+  };
+
+  return hasAccess() ? <>{children}</> : <Navigate to="/no-access" />;
 };
 
 export default ProtectedRoute;

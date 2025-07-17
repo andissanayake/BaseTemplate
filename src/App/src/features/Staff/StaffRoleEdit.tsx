@@ -22,17 +22,19 @@ const StaffRoleEdit: React.FC<StaffRoleEditProps> = ({
   onSuccess,
   onCancel,
 }) => {
-  const { tenant } = useAuthStore();
+  const { tenant, roles } = useAuthStore();
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
 
   // Available roles - you can customize this based on your application
-  const availableRoles = [
-    Roles.ItemManager,
-    Roles.StaffRequestManager,
-    Roles.TenantManager,
-    Roles.StaffManager,
-  ];
+  const availableRoles = React.useMemo(
+    () =>
+      roles.filter(
+        (role) => role !== Roles.Administrator && role !== Roles.TenantOwner
+      ),
+    [roles]
+  );
+
   if (!tenant?.id) throw new Error("Tenant ID is required");
 
   const handleSubmit = async (values: { newRoles: string[] }) => {
