@@ -30,7 +30,7 @@ public class TodoItemsController : ApiControllerBase
     {
         if (id != command.Id)
         {
-            return BadRequest();
+            return BadRequest(Result<bool>.Validation("ID mismatch"));
         }
 
         return await SendAsync(command);
@@ -41,7 +41,7 @@ public class TodoItemsController : ApiControllerBase
     {
         if (id != command.Id)
         {
-            return BadRequest();
+            return BadRequest(Result<bool>.Validation("ID mismatch"));
         }
 
         return await SendAsync(command);
