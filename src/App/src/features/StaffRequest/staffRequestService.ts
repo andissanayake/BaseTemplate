@@ -33,15 +33,13 @@ export class StaffRequestService {
    * Update a staff request (revoke/reject by tenant owner)
    */
   static async updateStaffRequest(
-    tenantId: number,
     staffRequestId: number,
     rejectionReason: string
   ): Promise<Result<boolean>> {
     return await handleApi(
       axiosInstance.post(
-        `${this.baseUrl}/${tenantId}/staff-requests/${staffRequestId}/update`,
+        `${this.baseUrl}/staff-requests/${staffRequestId}/update`,
         {
-          tenantId,
           staffRequestId,
           rejectionReason,
         }

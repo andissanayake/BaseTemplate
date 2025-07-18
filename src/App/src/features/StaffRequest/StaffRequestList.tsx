@@ -60,7 +60,6 @@ export const StaffRequestList: React.FC = () => {
     if (!selectedRequest) return;
     setLoading(true);
     const response = await StaffRequestService.updateStaffRequest(
-      +tenantId,
       selectedRequest.id,
       values.rejectionReason
     );

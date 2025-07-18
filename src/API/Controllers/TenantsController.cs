@@ -107,13 +107,9 @@ public class TenantsController : ApiControllerBase
         return await SendAsync(new GetStaffRequestsQuery(tenantId));
     }
 
-    [HttpPost("{tenantId}/staff-requests/{staffRequestId}/update")]
-    public async Task<ActionResult<Result<bool>>> UpdateStaffRequest(int tenantId, int staffRequestId, UpdateStaffRequestCommand command)
+    [HttpPost("staff-requests/{staffRequestId}/update")]
+    public async Task<ActionResult<Result<bool>>> UpdateStaffRequest(int staffRequestId, UpdateStaffRequestCommand command)
     {
-        if (tenantId != command.TenantId || staffRequestId != command.StaffRequestId)
-        {
-            return BadRequest();
-        }
 
         return await SendAsync(command);
     }
