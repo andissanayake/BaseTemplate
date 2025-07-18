@@ -39,7 +39,7 @@ public class TenantsController : ApiControllerBase
     /// <p>This endpoint is typically used during onboarding or when a user needs to establish a new tenant context.</p>
     /// </remarks>
     /// <returns>
-    /// <p>A <see cref="Result{int}"/> containing the new or existing tenant ID.</p>
+    /// <p>A <see cref="Result{T}"/> containing the new or existing tenant ID.</p>
     /// </returns>
     [HttpPost]
     public async Task<ActionResult<Result<int>>> Create(CreateTenantCommand command)
