@@ -2,8 +2,9 @@ namespace BaseTemplate.Application.Common.Interfaces
 {
     public interface IUserProfileService
     {
-        Task<UserProfileDto?> GetUserProfileByIdentifierAsync(string identifier);
-        Task InvalidateUserProfileCacheAsync(string identifier);
+        Task<UserProfileDto?> GetUserProfileAsync(); // Uses current user
+        Task InvalidateUserProfileCacheAsync(); // Uses current user
+        Task InvalidateUserProfileCacheAsync(string identifier); // For admin/system use
     }
 
     public class UserProfileDto

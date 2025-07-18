@@ -7,14 +7,24 @@ namespace BaseTemplate.Infrastructure.Services
     {
         private readonly IUnitOfWorkFactory _factory;
         private readonly IMemoryCache _cache;
+        private readonly IUser _user;
 
-        public UserProfileService(IUnitOfWorkFactory factory, IMemoryCache cache)
+        public UserProfileService(IUnitOfWorkFactory factory, IMemoryCache cache, IUser user)
         {
             _factory = factory;
             _cache = cache;
+            _user = user;
         }
 
-        public async Task<UserProfileDto?> GetUserProfileByIdentifierAsync(string identifier)
+        public async Task<UserProfileDto?> GetUserProfileAsync()
+        {
+            var identifier = _user.Identifier;
+            if (string.IsNullOrEmpty(identifier))
+                return null;
+            return await GetUserProfileByIdentifierInternalAsync(identifier);
+        }
+
+        private async Task<UserProfileDto?> GetUserProfileByIdentifierInternalAsync(string identifier)
         {
             var cacheKey = $"user_profile:{identifier}";
             if (_cache.TryGetValue(cacheKey, out UserProfileDto? cachedProfile))
@@ -41,6 +51,17 @@ namespace BaseTemplate.Infrastructure.Services
             _cache.Set(cacheKey, userInfo, TimeSpan.FromMinutes(10));
 
             return userInfo;
+        }
+
+        public Task InvalidateUserProfileCacheAsync()
+        {
+            var identifier = _user.Identifier;
+            if (!string.IsNullOrEmpty(identifier))
+            {
+                var cacheKey = $"user_profile:{identifier}";
+                _cache.Remove(cacheKey);
+            }
+            return Task.CompletedTask;
         }
 
         public Task InvalidateUserProfileCacheAsync(string identifier)

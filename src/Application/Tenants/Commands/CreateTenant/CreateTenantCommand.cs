@@ -3,20 +3,6 @@ using BaseTemplate.Domain.Constants;
 
 namespace BaseTemplate.Application.Tenants.Commands.CreateTenant;
 
-/// <summary>
-/// Command to create a new tenant for the currently authenticated user.
-/// </summary>
-/// <remarks>
-/// <p>This command creates a new tenant and associates the current user as the owner. The workflow includes:</p>
-/// <ul>
-///   <li><b>Tenant Existence Check:</b> If the user already has a tenant, returns the existing tenant ID and does not create a new tenant.</li>
-///   <li><b>Tenant Creation:</b> If the user does not have a tenant, creates a new tenant with the provided name and address, and sets the current user as the owner.</li>
-///   <li><b>User Update:</b> Updates the user's tenant association in the database.</li>
-///   <li><b>Role Assignment:</b> Adds the <c>TenantOwner</c> role to the user.</li>
-///   <li><b>Cache Invalidation:</b> Invalidates the user profile cache to ensure fresh data on subsequent requests.</li>
-/// </ul>
-/// <p>This command is typically used during onboarding or when a user needs to establish a new tenant context.</p>
-/// </remarks>
 [Authorize]
 public record CreateTenantCommand : IRequest<int>
 {
@@ -29,29 +15,13 @@ public record CreateTenantCommand : IRequest<int>
     public string? Address { get; set; }
 }
 
-/// <summary>
-/// Handles the <see cref="CreateTenantCommand"/> to create a new tenant and assign the current user as the owner.
-/// </summary>
-/// <remarks>
-/// <p>Performs the following steps:</p>
-/// <ul>
-///   <li>Fetches the current user's profile.</li>
-///   <li>If the user already has a tenant, returns the existing tenant ID.</li>
-///   <li>Creates a new tenant and associates it with the user.</li>
-///   <li>Updates the user's tenant ID and assigns the <c>TenantOwner</c> role.</li>
-///   <li>Invalidates the user profile cache to reflect the changes immediately.</li>
-/// </ul>
-/// <p>Returns a <see cref="Result{int}"/> with the tenant ID or an error message.</p>
-/// </remarks>
 public class CreateTenantCommandHandler : IRequestHandler<CreateTenantCommand, int>
 {
     private readonly IUnitOfWorkFactory _factory;
-    private readonly IUser _user;
     private readonly IUserProfileService _userProfileService;
-    public CreateTenantCommandHandler(IUnitOfWorkFactory factory, IUser user, IUserProfileService userProfileService)
+    public CreateTenantCommandHandler(IUnitOfWorkFactory factory, IUserProfileService userProfileService)
     {
         _factory = factory;
-        _user = user;
         _userProfileService = userProfileService;
     }
 
@@ -62,7 +32,7 @@ public class CreateTenantCommandHandler : IRequestHandler<CreateTenantCommand, i
         try
         {
             // Fetch user profile
-            var userProfile = await _userProfileService.GetUserProfileByIdentifierAsync(_user.Identifier!);
+            var userProfile = await _userProfileService.GetUserProfileAsync();
             if (userProfile == null)
             {
                 transaction.Rollback();
@@ -81,7 +51,7 @@ public class CreateTenantCommandHandler : IRequestHandler<CreateTenantCommand, i
             {
                 Name = request.Name,
                 Address = request.Address,
-                OwnerSsoId = _user.Identifier!
+                OwnerSsoId = userProfile.Identifier!
             };
 
             var tenantId = await uow.InsertAsync(tenant);
@@ -106,7 +76,7 @@ public class CreateTenantCommandHandler : IRequestHandler<CreateTenantCommand, i
             await uow.InsertAsync(userRole);
 
             // Invalidate user profile cache
-            await _userProfileService.InvalidateUserProfileCacheAsync(_user.Identifier!);
+            await _userProfileService.InvalidateUserProfileCacheAsync();
 
             transaction.Commit();
             return Result<int>.Success(tenantId);

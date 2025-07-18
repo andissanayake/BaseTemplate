@@ -16,7 +16,7 @@ public class GetUserQueryHandler : IRequestHandler<GetUserQuery, GetUserResponse
     {
         using var uow = _factory.Create();
         // Use IUserProfileService to get user profile and roles
-        var userProfile = await _userProfileService.GetUserProfileByIdentifierAsync(_user.Identifier!);
+        var userProfile = await _userProfileService.GetUserProfileAsync();
         if (userProfile == null)
         {
             // User does not exist, create new user as before

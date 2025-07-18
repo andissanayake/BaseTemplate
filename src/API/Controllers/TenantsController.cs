@@ -24,6 +24,23 @@ public class TenantsController : ApiControllerBase
         return await SendAsync(new GetTenantByIdQuery(tenantId));
     }
 
+    /// <summary>
+    /// Creates a new tenant and assigns the current user as the owner.
+    /// </summary>
+    /// <remarks>
+    /// <p>This endpoint:</p>
+    /// <ul>
+    ///   <li>Checks if the user already has a tenant. If so, returns the existing tenant ID and does not create a new tenant.</li>
+    ///   <li>If not, creates a new tenant with the provided name and address, and sets the current user as the owner.</li>
+    ///   <li>Updates the user's tenant association in the database.</li>
+    ///   <li>Adds the <c>TenantOwner</c> role to the user.</li>
+    ///   <li>Invalidates the user profile cache to ensure fresh data on subsequent requests.</li>
+    /// </ul>
+    /// <p>This endpoint is typically used during onboarding or when a user needs to establish a new tenant context.</p>
+    /// </remarks>
+    /// <returns>
+    /// <p>A <see cref="Result{int}"/> containing the new or existing tenant ID.</p>
+    /// </returns>
     [HttpPost]
     public async Task<ActionResult<Result<int>>> Create(CreateTenantCommand command)
     {
