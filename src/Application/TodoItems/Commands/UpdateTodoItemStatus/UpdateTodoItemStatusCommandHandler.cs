@@ -4,7 +4,7 @@ public class UpdateTodoItemStatusCommandHandler : IRequestHandler<UpdateTodoItem
 {
     private readonly IUnitOfWorkFactory _factory;
 
-    public UpdateTodoItemStatusCommandHandler(IUnitOfWorkFactory factory, IIdentityService identityService)
+    public UpdateTodoItemStatusCommandHandler(IUnitOfWorkFactory factory)
     {
         _factory = factory;
     }
@@ -23,4 +23,4 @@ public class UpdateTodoItemStatusCommandHandler : IRequestHandler<UpdateTodoItem
         await uow.UpdateAsync(entity);
         return Result<bool>.Success(true);
     }
-} 
+}

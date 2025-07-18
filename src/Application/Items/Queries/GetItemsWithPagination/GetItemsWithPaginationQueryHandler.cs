@@ -3,9 +3,9 @@ namespace BaseTemplate.Application.Items.Queries.GetItemsWithPagination;
 public class GetItemsWithPaginationQueryHandler : IRequestHandler<GetItemsWithPaginationQuery, PaginatedList<ItemBriefDto>>
 {
     private readonly IUnitOfWorkFactory _factory;
-    private readonly IUserProfileService _userProfileService;
+    private readonly IUserTenantProfileService _userProfileService;
 
-    public GetItemsWithPaginationQueryHandler(IUnitOfWorkFactory factory, IUserProfileService userProfileService)
+    public GetItemsWithPaginationQueryHandler(IUnitOfWorkFactory factory, IUserTenantProfileService userProfileService)
     {
         _factory = factory;
         _userProfileService = userProfileService;
@@ -26,7 +26,7 @@ public class GetItemsWithPaginationQueryHandler : IRequestHandler<GetItemsWithPa
 
         var totalCount = await uow.QueryFirstOrDefaultAsync<int>(countSql, new
         {
-            userInfo!.TenantId,
+            userInfo.TenantId,
             request.Category,
             request.IsActive
         });
@@ -42,7 +42,7 @@ public class GetItemsWithPaginationQueryHandler : IRequestHandler<GetItemsWithPa
 
         var items = await uow.QueryAsync<ItemBriefDto>(dataSql, new
         {
-            userInfo!.TenantId,
+            userInfo.TenantId,
             request.Category,
             request.IsActive,
             Offset = offset,

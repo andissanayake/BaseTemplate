@@ -1,5 +1,5 @@
 ﻿using BaseTemplate.Application.Common.Models;
-using BaseTemplate.Application.Users.Queries;
+using BaseTemplate.Application.Users.Queries.GetUser;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 

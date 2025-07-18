@@ -3,9 +3,9 @@ namespace BaseTemplate.Application.Staff.Commands.UpdateStaffRoles;
 public class UpdateStaffRolesCommandHandler : IRequestHandler<UpdateStaffRolesCommand, bool>
 {
     private readonly IUnitOfWorkFactory _factory;
-    private readonly IUserProfileService _userProfileService;
+    private readonly IUserTenantProfileService _userProfileService;
 
-    public UpdateStaffRolesCommandHandler(IUnitOfWorkFactory factory, IUserProfileService userProfileService)
+    public UpdateStaffRolesCommandHandler(IUnitOfWorkFactory factory, IUserTenantProfileService userProfileService)
     {
         _factory = factory;
         _userProfileService = userProfileService;
@@ -15,12 +15,8 @@ public class UpdateStaffRolesCommandHandler : IRequestHandler<UpdateStaffRolesCo
     {
         // Get user profile to get tenant ID
         var userProfile = await _userProfileService.GetUserProfileAsync();
-        if (userProfile?.TenantId == null)
-        {
-            return Result<bool>.Forbidden("User is not associated with any tenant.");
-        }
 
-        var tenantId = userProfile.TenantId.Value;
+        var tenantId = userProfile.TenantId;
 
         using var uow = _factory.Create();
 
@@ -50,4 +46,4 @@ public class UpdateStaffRolesCommandHandler : IRequestHandler<UpdateStaffRolesCo
 
         return Result<bool>.Success(true);
     }
-} 
+}

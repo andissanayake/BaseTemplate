@@ -6,7 +6,7 @@ public class CreateTodoListCommandHandler : IRequestHandler<CreateTodoListComman
 {
     private readonly IUnitOfWorkFactory _factory;
 
-    public CreateTodoListCommandHandler(IUnitOfWorkFactory factory, IIdentityService identityService)
+    public CreateTodoListCommandHandler(IUnitOfWorkFactory factory)
     {
         _factory = factory;
     }
@@ -23,4 +23,4 @@ public class CreateTodoListCommandHandler : IRequestHandler<CreateTodoListComman
         await uow.InsertAsync(entity);
         return Result<int>.Success(entity.Id);
     }
-} 
+}

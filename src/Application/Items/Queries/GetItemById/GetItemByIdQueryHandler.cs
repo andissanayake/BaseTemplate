@@ -3,9 +3,9 @@ namespace BaseTemplate.Application.Items.Queries.GetItemById;
 public class GetItemByIdQueryHandler : IRequestHandler<GetItemByIdQuery, ItemDto>
 {
     private readonly IUnitOfWorkFactory _factory;
-    private readonly IUserProfileService _userProfileService;
+    private readonly IUserTenantProfileService _userProfileService;
 
-    public GetItemByIdQueryHandler(IUnitOfWorkFactory factory, IUserProfileService userProfileService)
+    public GetItemByIdQueryHandler(IUnitOfWorkFactory factory, IUserTenantProfileService userProfileService)
     {
         _factory = factory;
         _userProfileService = userProfileService;
@@ -15,12 +15,7 @@ public class GetItemByIdQueryHandler : IRequestHandler<GetItemByIdQuery, ItemDto
     {
         var userInfo = await _userProfileService.GetUserProfileAsync();
         using var uow = _factory.Create();
-        var entity = await uow.QueryFirstOrDefaultAsync<Item>("select * from item where id = @Id and tenant_id = @TenantId", new { request.Id, userInfo!.TenantId });
-
-        if (entity is null)
-        {
-            return Result<ItemDto>.NotFound($"Item with id {request.Id} not found.");
-        }
+        var entity = await uow.QuerySingleAsync<Item>("select * from item where id = @Id and tenant_id = @TenantId", new { request.Id, userInfo.TenantId });
 
         var itemDto = new ItemDto
         {

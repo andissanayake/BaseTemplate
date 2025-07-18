@@ -3,9 +3,9 @@ namespace BaseTemplate.Application.Items.Commands.DeleteItem;
 public class DeleteItemCommandHandler : IRequestHandler<DeleteItemCommand, bool>
 {
     private readonly IUnitOfWorkFactory _factory;
-    private readonly IUserProfileService _userProfileService;
+    private readonly IUserTenantProfileService _userProfileService;
 
-    public DeleteItemCommandHandler(IUnitOfWorkFactory factory, IUserProfileService userProfileService)
+    public DeleteItemCommandHandler(IUnitOfWorkFactory factory, IUserTenantProfileService userProfileService)
     {
         _factory = factory;
         _userProfileService = userProfileService;
@@ -17,7 +17,7 @@ public class DeleteItemCommandHandler : IRequestHandler<DeleteItemCommand, bool>
         var userProfile = await _userProfileService.GetUserProfileAsync();
 
         using var uow = _factory.Create();
-        var entity = await uow.QueryFirstOrDefaultAsync<Item>("select * from item where Id = @Id and tenant_id = @TenantId", new { request.Id, TenantId = userProfile!.TenantId });
+        var entity = await uow.QueryFirstOrDefaultAsync<Item>("select * from item where Id = @Id and tenant_id = @TenantId", new { request.Id, TenantId = userProfile.TenantId });
 
         if (entity is null)
         {
@@ -29,4 +29,4 @@ public class DeleteItemCommandHandler : IRequestHandler<DeleteItemCommand, bool>
 
         return Result<bool>.Success(true);
     }
-} 
+}

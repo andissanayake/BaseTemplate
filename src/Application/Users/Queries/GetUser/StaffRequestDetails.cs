@@ -1,4 +1,4 @@
-namespace BaseTemplate.Application.Users.Queries;
+namespace BaseTemplate.Application.Users.Queries.GetUser;
 
 public record StaffRequestDetails
 {

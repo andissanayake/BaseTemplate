@@ -1,5 +1,3 @@
-using BaseTemplate.Domain.Constants;
-
 namespace BaseTemplate.Application.Items.Queries.GetItemById;
 
 [Authorize(Roles = Roles.ItemManager)]

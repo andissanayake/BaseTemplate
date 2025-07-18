@@ -1,5 +1,4 @@
 using System.ComponentModel.DataAnnotations;
-using BaseTemplate.Domain.Constants;
 
 namespace BaseTemplate.Application.Items.Commands.CreateItem;
 

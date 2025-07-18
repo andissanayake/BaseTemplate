@@ -5,7 +5,7 @@ namespace BaseTemplate.Application.TodoLists.Commands.GetTodoListById;
 public class GetTodoListByIdQueryHandler : IRequestHandler<GetTodoListByIdQuery, TodoListDto>
 {
     private readonly IUnitOfWorkFactory _factory;
-    public GetTodoListByIdQueryHandler(IUnitOfWorkFactory factory, IIdentityService identityService)
+    public GetTodoListByIdQueryHandler(IUnitOfWorkFactory factory)
     {
         _factory = factory;
     }
@@ -21,4 +21,4 @@ public class GetTodoListByIdQueryHandler : IRequestHandler<GetTodoListByIdQuery,
         var todoDto = new TodoListDto() { Colour = entity.Colour, Id = entity.Id, Title = entity.Title };
         return Result<TodoListDto>.Success(todoDto);
     }
-} 
+}

@@ -8,7 +8,7 @@ public class AuthorizationBehavior : IMediatorBehavior
 {
     public async Task<Result> HandleAsync<TResponse>(MediatorContext<TResponse> context)
     {
-        var userProfileService = context.ServiceProvider.GetRequiredService<IUserProfileService>();
+        var userProfileService = context.ServiceProvider.GetRequiredService<IUserTenantProfileService>();
         var authorizeAttributes = context.RequestType.GetCustomAttributes<AuthorizeAttribute>(true);
 
         foreach (var authorizeAttribute in authorizeAttributes)
@@ -23,17 +23,16 @@ public class AuthorizationBehavior : IMediatorBehavior
         return Result.Success();
     }
 
-    private async Task<Result> AuthorizeAttributeAsync(AuthorizeAttribute authorizeAttribute, IUserProfileService userProfileService)
+    private async Task<Result> AuthorizeAttributeAsync(AuthorizeAttribute authorizeAttribute, IUserTenantProfileService userProfileService)
     {
-        var userInfo = await userProfileService.GetUserProfileAsync();
-        if (!userInfo!.Roles.Any())
-        {
-            return Result.Unauthorized("User is not authenticated.");
-        }
-
-        // Check roles
         if (!string.IsNullOrWhiteSpace(authorizeAttribute.Roles))
         {
+            var userInfo = await userProfileService.GetUserProfileAsync();
+            if (!userInfo!.Roles.Any())
+            {
+                return Result.Unauthorized("User is not authenticated.");
+            }
+
             var hasRole = CheckRolesAsync(authorizeAttribute.Roles, userInfo.Roles);
             if (!hasRole)
             {

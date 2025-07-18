@@ -1,5 +1,3 @@
-using BaseTemplate.Domain.Constants;
-
 namespace BaseTemplate.Application.Staff.Queries.GetStaffMember;
 [Authorize(Roles = Roles.StaffManager)]
 public record GetStaffMemberQuery(int StaffId) : IRequest<StaffMemberDetailDto>;
@@ -18,9 +16,9 @@ public class StaffMemberDetailDto
 public class GetStaffMemberQueryHandler : IRequestHandler<GetStaffMemberQuery, StaffMemberDetailDto>
 {
     private readonly IUnitOfWorkFactory _factory;
-    private readonly IUserProfileService _userProfileService;
+    private readonly IUserTenantProfileService _userProfileService;
 
-    public GetStaffMemberQueryHandler(IUnitOfWorkFactory factory, IUserProfileService userProfileService)
+    public GetStaffMemberQueryHandler(IUnitOfWorkFactory factory, IUserTenantProfileService userProfileService)
     {
         _factory = factory;
         _userProfileService = userProfileService;
@@ -30,24 +28,14 @@ public class GetStaffMemberQueryHandler : IRequestHandler<GetStaffMemberQuery, S
     {
         // Get user profile to get tenant ID
         var userProfile = await _userProfileService.GetUserProfileAsync();
-        if (userProfile?.TenantId == null)
-        {
-            return Result<StaffMemberDetailDto>.Forbidden("User is not associated with any tenant.");
-        }
-
-        var tenantId = userProfile.TenantId.Value;
 
         using var uow = _factory.Create();
 
         // Get the user
-        var user = await uow.QueryFirstOrDefaultAsync<AppUser>(
+        var user = await uow.QuerySingleAsync<AppUser>(
             "SELECT * FROM app_user WHERE id = @StaffId AND tenant_id = @TenantId",
-            new { StaffId = request.StaffId, TenantId = tenantId });
+            new { StaffId = request.StaffId, TenantId = userProfile.TenantId });
 
-        if (user == null)
-        {
-            return Result<StaffMemberDetailDto>.Failure("Staff member not found or does not belong to this tenant.");
-        }
 
         // Get roles for the user
         var roles = await uow.QueryAsync<UserRole>(

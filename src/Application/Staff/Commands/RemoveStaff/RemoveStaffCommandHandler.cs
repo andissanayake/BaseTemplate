@@ -3,9 +3,9 @@ namespace BaseTemplate.Application.Staff.Commands.RemoveStaff;
 public class RemoveStaffCommandHandler : IRequestHandler<RemoveStaffCommand, bool>
 {
     private readonly IUnitOfWorkFactory _factory;
-    private readonly IUserProfileService _userProfileService;
+    private readonly IUserTenantProfileService _userProfileService;
 
-    public RemoveStaffCommandHandler(IUnitOfWorkFactory factory, IUserProfileService userProfileService)
+    public RemoveStaffCommandHandler(IUnitOfWorkFactory factory, IUserTenantProfileService userProfileService)
     {
         _factory = factory;
         _userProfileService = userProfileService;
@@ -14,19 +14,14 @@ public class RemoveStaffCommandHandler : IRequestHandler<RemoveStaffCommand, boo
     public async Task<Result<bool>> HandleAsync(RemoveStaffCommand request, CancellationToken cancellationToken)
     {
         // Get user profile to get tenant ID
-        var tenantId = await _userProfileService.GetTenantIdAsync();
+        var userProfile = await _userProfileService.GetUserProfileAsync();
 
         using var uow = _factory.Create();
 
         // Verify the user exists and belongs to the tenant
-        var user = await uow.QueryFirstOrDefaultAsync<AppUser>(
+        var user = await uow.QuerySingleAsync<AppUser>(
             "SELECT * FROM app_user WHERE id = @StaffId AND tenant_id = @TenantId",
-            new { request.StaffId, TenantId = tenantId });
-
-        if (user == null)
-        {
-            return Result<bool>.Failure("Staff member not found or does not belong to this tenant.");
-        }
+            new { request.StaffId, TenantId = userProfile.TenantId });
 
         // Remove all roles for the user
         await uow.ExecuteAsync(
@@ -46,7 +41,7 @@ public class RemoveStaffCommandHandler : IRequestHandler<RemoveStaffCommand, boo
                 ExpiredStatus = (int)StaffRequestStatus.Expired,
                 AcceptedStatus = (int)StaffRequestStatus.Accepted,
                 Email = user.Email,
-                TenantId = tenantId
+                TenantId = userProfile.TenantId
             });
 
         return Result<bool>.Success(true);

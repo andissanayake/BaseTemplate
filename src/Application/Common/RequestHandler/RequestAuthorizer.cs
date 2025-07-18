@@ -5,11 +5,11 @@ using BaseTemplate.Application.Common.Security;
 
 public class RequestAuthorizer : IRequestAuthorizer
 {
-    private readonly IIdentityService _identityService;
+    private readonly IUser _user;
 
-    public RequestAuthorizer(IIdentityService identityService)
+    public RequestAuthorizer(IUser user)
     {
-        _identityService = identityService;
+        _user = user;
     }
 
     public async Task<Result> AuthorizeAsync<TResponse>(IRequest<TResponse> request, Type requestType)
@@ -31,7 +31,7 @@ public class RequestAuthorizer : IRequestAuthorizer
 
     private async Task<Result> AuthorizeAttributeAsync(AuthorizeAttribute authorizeAttribute)
     {
-        if (!_identityService.IsAuthenticated)
+        if (string.IsNullOrEmpty(_user.Email))
         {
             return Result.Unauthorized("User is not authenticated.");
         }
@@ -52,13 +52,7 @@ public class RequestAuthorizer : IRequestAuthorizer
     private async Task<bool> CheckRolesAsync(string roles)
     {
         var roleArray = roles.Split(',');
-        foreach (var role in roleArray)
-        {
-            if (await _identityService.IsInRoleAsync(role.Trim()))
-            {
-                return true;
-            }
-        }
+
         return false;
     }
 }

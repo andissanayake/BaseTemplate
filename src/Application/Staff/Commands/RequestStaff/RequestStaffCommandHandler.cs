@@ -3,9 +3,9 @@ namespace BaseTemplate.Application.Staff.Commands.RequestStaff;
 public class RequestStaffCommandHandler : IRequestHandler<RequestStaffCommand, bool>
 {
     private readonly IUnitOfWorkFactory _factory;
-    private readonly IUserProfileService _userProfileService;
+    private readonly IUserTenantProfileService _userProfileService;
 
-    public RequestStaffCommandHandler(IUnitOfWorkFactory factory, IUserProfileService userProfileService)
+    public RequestStaffCommandHandler(IUnitOfWorkFactory factory, IUserTenantProfileService userProfileService)
     {
         _factory = factory;
         _userProfileService = userProfileService;
@@ -13,10 +13,9 @@ public class RequestStaffCommandHandler : IRequestHandler<RequestStaffCommand, b
 
     public async Task<Result<bool>> HandleAsync(RequestStaffCommand request, CancellationToken cancellationToken)
     {
-        var userProfile = await _userProfileService.GetUserProfileAsync();
-        var tenantId = await _userProfileService.GetTenantIdAsync();
         using var uow = _factory.Create();
 
+        var userProfile = await _userProfileService.GetUserProfileAsync();
 
         // Validate that only allowed roles can be requested
         var invalidRoles = request.Roles.Except(Roles.TenantBaseRoles, StringComparer.OrdinalIgnoreCase).ToList();
@@ -32,14 +31,14 @@ public class RequestStaffCommandHandler : IRequestHandler<RequestStaffCommand, b
         }
 
         // Verify the tenant exists and the current user is the owner
-        var tenant = await uow.GetAsync<Tenant>(tenantId);
+        var tenant = await uow.GetAsync<Tenant>(userProfile.TenantId);
         if (tenant == null)
         {
             return Result<bool>.Validation(
                 "Tenant not found.",
                 new Dictionary<string, string[]>
                 {
-                    ["TenantId"] = new[] { $"Tenant with id {tenantId} not found." }
+                    ["TenantId"] = new[] { $"Tenant with id {userProfile.TenantId} not found." }
                 });
         }
 
@@ -51,7 +50,7 @@ public class RequestStaffCommandHandler : IRequestHandler<RequestStaffCommand, b
         if (existingUser != null && existingUser.TenantId != null)
         {
             // If user exists, check if they're already in this tenant
-            if (existingUser.TenantId == tenantId)
+            if (existingUser.TenantId == userProfile.TenantId)
             {
                 return Result<bool>.Validation(
                     "User already exists in this tenant.",
@@ -73,7 +72,7 @@ public class RequestStaffCommandHandler : IRequestHandler<RequestStaffCommand, b
         // Check if there's already a pending request for this email in this tenant
         var existingRequest = await uow.QueryFirstOrDefaultAsync<StaffRequest>(
             "SELECT * FROM staff_request WHERE tenant_id = @TenantId AND requested_email = @Email AND status = 0",
-            new { TenantId = tenantId, Email = request.StaffEmail });
+            new { TenantId = userProfile.TenantId, Email = request.StaffEmail });
 
         if (existingRequest != null)
         {
@@ -88,7 +87,7 @@ public class RequestStaffCommandHandler : IRequestHandler<RequestStaffCommand, b
         // Create the staff request
         var staffRequest = new StaffRequest
         {
-            TenantId = tenantId,
+            TenantId = userProfile.TenantId,
             RequestedEmail = request.StaffEmail,
             RequestedName = request.StaffName,
             RequestedBySsoId = userProfile.Identifier,
@@ -102,7 +101,7 @@ public class RequestStaffCommandHandler : IRequestHandler<RequestStaffCommand, b
         {
             var staffRequestRole = new StaffRequestRole
             {
-                TenantId = tenantId,
+                TenantId = userProfile.TenantId,
                 StaffRequestId = staffRequestId,
                 Role = role
             };
