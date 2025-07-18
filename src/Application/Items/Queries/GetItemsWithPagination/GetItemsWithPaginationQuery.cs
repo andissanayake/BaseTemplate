@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 namespace BaseTemplate.Application.Items.Queries.GetItemsWithPagination;
 
 [Authorize]
-public record GetItemsWithPaginationQuery(int TenantId) : BaseTenantRequest<PaginatedList<ItemBriefDto>>(TenantId)
+public record GetItemsWithPaginationQuery : IRequest<PaginatedList<ItemBriefDto>>
 {
     [Range(1, int.MaxValue, ErrorMessage = "Page number must be greater than or equal to 1.")]
     public int PageNumber { get; init; } = 1;
@@ -13,4 +13,4 @@ public record GetItemsWithPaginationQuery(int TenantId) : BaseTenantRequest<Pagi
 
     public string? Category { get; init; }
     public bool? IsActive { get; init; }
-} 
+}

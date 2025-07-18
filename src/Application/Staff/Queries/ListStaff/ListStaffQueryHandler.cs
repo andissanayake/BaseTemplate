@@ -3,27 +3,38 @@ namespace BaseTemplate.Application.Staff.Queries.ListStaff;
 public class ListStaffQueryHandler : IRequestHandler<ListStaffQuery, List<StaffMemberDto>>
 {
     private readonly IUnitOfWorkFactory _factory;
+    private readonly IUserProfileService _userProfileService;
 
-    public ListStaffQueryHandler(IUnitOfWorkFactory factory)
+    public ListStaffQueryHandler(IUnitOfWorkFactory factory, IUserProfileService userProfileService)
     {
         _factory = factory;
+        _userProfileService = userProfileService;
     }
 
     public async Task<Result<List<StaffMemberDto>>> HandleAsync(ListStaffQuery request, CancellationToken cancellationToken)
     {
+        // Get user profile to get tenant ID
+        var userProfile = await _userProfileService.GetUserProfileAsync();
+        if (userProfile?.TenantId == null)
+        {
+            return Result<List<StaffMemberDto>>.Forbidden("User is not associated with any tenant.");
+        }
+
+        var tenantId = userProfile.TenantId.Value;
+
         using var uow = _factory.Create();
 
         // Get the tenant to identify the owner
-        var tenant = await uow.GetAsync<Tenant>(request.TenantId);
+        var tenant = await uow.GetAsync<Tenant>(tenantId);
         if (tenant == null)
         {
-            return Result<List<StaffMemberDto>>.NotFound($"Tenant with id {request.TenantId} not found.");
+            return Result<List<StaffMemberDto>>.NotFound($"Tenant with id {tenantId} not found.");
         }
 
         // Get all users for the tenant
         var users = await uow.QueryAsync<AppUser>(
             "SELECT * FROM app_user WHERE tenant_id = @TenantId ORDER BY created DESC",
-            new { request.TenantId });
+            new { TenantId = tenantId });
 
         // Get all roles for all users in a single query
         var userIds = users.Select(u => u.Id).ToList();

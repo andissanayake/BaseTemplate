@@ -3,19 +3,21 @@ namespace BaseTemplate.Application.Items.Commands.CreateItem;
 public class CreateItemCommandHandler : IRequestHandler<CreateItemCommand, int>
 {
     private readonly IUnitOfWorkFactory _factory;
-
-    public CreateItemCommandHandler(IUnitOfWorkFactory factory)
+    private readonly IUserProfileService _userProfileService;
+    public CreateItemCommandHandler(IUnitOfWorkFactory factory, IUserProfileService userProfileService)
     {
         _factory = factory;
+        _userProfileService = userProfileService;
     }
 
     public async Task<Result<int>> HandleAsync(CreateItemCommand request, CancellationToken cancellationToken)
     {
+        var userInfo = await _userProfileService.GetUserProfileAsync();
         using var uow = _factory.Create();
 
         var entity = new Item
         {
-            TenantId = request.TenantId,
+            TenantId = userInfo!.TenantId ?? -1,
             Name = request.Name,
             Description = request.Description,
             Price = request.Price,
@@ -26,4 +28,4 @@ public class CreateItemCommandHandler : IRequestHandler<CreateItemCommand, int>
         await uow.InsertAsync(entity);
         return Result<int>.Success(entity.Id);
     }
-} 
+}

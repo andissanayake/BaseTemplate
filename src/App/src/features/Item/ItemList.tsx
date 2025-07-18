@@ -42,11 +42,7 @@ const ItemList: React.FC = () => {
 
   const loadItems = useCallback(async () => {
     setLoading(true);
-    const response = await ItemService.fetchItems(
-      currentPage,
-      pageSize,
-      parseInt(tenant.id)
-    );
+    const response = await ItemService.fetchItems(currentPage, pageSize);
     handleResult(response, {
       onSuccess: (data) => {
         setTotalCount(data?.totalCount || 0);
@@ -75,7 +71,7 @@ const ItemList: React.FC = () => {
 
   const handleDelete = async (id: number) => {
     setLoading(true);
-    const response = await ItemService.deleteItem(tenant.id, id);
+    const response = await ItemService.deleteItem(id);
     handleResult(response, {
       onSuccess: () => {
         const newTotalCount = totalCount - 1;

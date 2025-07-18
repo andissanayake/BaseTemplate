@@ -3,20 +3,31 @@ namespace BaseTemplate.Application.Staff.Commands.UpdateStaffRoles;
 public class UpdateStaffRolesCommandHandler : IRequestHandler<UpdateStaffRolesCommand, bool>
 {
     private readonly IUnitOfWorkFactory _factory;
+    private readonly IUserProfileService _userProfileService;
 
-    public UpdateStaffRolesCommandHandler(IUnitOfWorkFactory factory)
+    public UpdateStaffRolesCommandHandler(IUnitOfWorkFactory factory, IUserProfileService userProfileService)
     {
         _factory = factory;
+        _userProfileService = userProfileService;
     }
 
     public async Task<Result<bool>> HandleAsync(UpdateStaffRolesCommand request, CancellationToken cancellationToken)
     {
+        // Get user profile to get tenant ID
+        var userProfile = await _userProfileService.GetUserProfileAsync();
+        if (userProfile?.TenantId == null)
+        {
+            return Result<bool>.Forbidden("User is not associated with any tenant.");
+        }
+
+        var tenantId = userProfile.TenantId.Value;
+
         using var uow = _factory.Create();
 
         // Verify the user exists and belongs to the tenant
         var user = await uow.QueryFirstOrDefaultAsync<AppUser>(
             "SELECT * FROM app_user WHERE id = @StaffId AND tenant_id = @TenantId",
-            new { request.StaffId, request.TenantId });
+            new { request.StaffId, TenantId = tenantId });
 
         if (user == null)
         {

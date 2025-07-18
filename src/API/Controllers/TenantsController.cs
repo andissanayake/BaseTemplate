@@ -101,10 +101,10 @@ public class TenantsController : ApiControllerBase
         return await SendAsync(command);
     }
 
-    [HttpGet("{tenantId}/staff-requests")]
-    public async Task<ActionResult<Result<List<StaffRequestDto>>>> GetStaffRequests(int tenantId)
+    [HttpGet("staff-requests")]
+    public async Task<ActionResult<Result<List<StaffRequestDto>>>> GetStaffRequests()
     {
-        return await SendAsync(new GetStaffRequestsQuery(tenantId));
+        return await SendAsync(new GetStaffRequestsQuery());
     }
 
     [HttpPost("staff-requests/{staffRequestId}/update")]
@@ -126,16 +126,16 @@ public class TenantsController : ApiControllerBase
     }
 
     // Staff Management Endpoints
-    [HttpGet("{tenantId}/staff")]
-    public async Task<ActionResult<Result<List<StaffMemberDto>>>> ListStaff(int tenantId)
+    [HttpGet("staff")]
+    public async Task<ActionResult<Result<List<StaffMemberDto>>>> ListStaff()
     {
-        return await SendAsync(new ListStaffQuery(tenantId));
+        return await SendAsync(new ListStaffQuery());
     }
 
-    [HttpGet("{tenantId}/staff/{staffId}")]
-    public async Task<ActionResult<Result<StaffMemberDetailDto>>> GetStaffMember(int tenantId, int staffId)
+    [HttpGet("staff/{staffId}")]
+    public async Task<ActionResult<Result<StaffMemberDetailDto>>> GetStaffMember(int staffId)
     {
-        return await SendAsync(new GetStaffMemberQuery(tenantId, staffId));
+        return await SendAsync(new GetStaffMemberQuery(staffId));
     }
 
     [HttpDelete("staff/{staffId}")]
@@ -144,13 +144,9 @@ public class TenantsController : ApiControllerBase
         return await SendAsync(new RemoveStaffCommand(staffId));
     }
 
-    [HttpPut("{tenantId}/staff/{staffId}/roles")]
-    public async Task<ActionResult<Result<bool>>> UpdateStaffRoles(int tenantId, int staffId, UpdateStaffRolesCommand command)
+    [HttpPut("staff/{staffId}/roles")]
+    public async Task<ActionResult<Result<bool>>> UpdateStaffRoles(int staffId, UpdateStaffRolesCommand command)
     {
-        if (tenantId != command.TenantId || staffId != command.StaffId)
-        {
-            return BadRequest();
-        }
 
         return await SendAsync(command);
     }

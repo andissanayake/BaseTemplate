@@ -4,7 +4,7 @@ using BaseTemplate.Domain.Constants;
 namespace BaseTemplate.Application.Items.Commands.CreateItem;
 
 [Authorize(Roles = Roles.ItemManager + "," + Roles.TenantOwner)]
-public record CreateItemCommand(int TenantId) : BaseTenantRequest<int>(TenantId)
+public record CreateItemCommand() : IRequest<int>
 {
     [Required]
     [MaxLength(200, ErrorMessage = "The name cannot exceed 200 characters.")]
@@ -15,4 +15,4 @@ public record CreateItemCommand(int TenantId) : BaseTenantRequest<int>(TenantId)
     [Range(0, double.MaxValue, ErrorMessage = "Price must be greater than or equal to 0.")]
     public decimal Price { get; init; }
     public string? Category { get; init; }
-} 
+}

@@ -14,15 +14,6 @@ public class RequestAuthorizer : IRequestAuthorizer
 
     public async Task<Result> AuthorizeAsync<TResponse>(IRequest<TResponse> request, Type requestType)
     {
-        // Check tenant access for BaseTenantRequest
-        if (request is BaseTenantRequest<TResponse> baseTenantRequest)
-        {
-            if (!await _identityService.HasTenantAccessAsync(baseTenantRequest.TenantId))
-            {
-                return Result.Unauthorized("User doesn't have access to this tenant.");
-            }
-        }
-
         // Check authorization attributes
         var authorizeAttributes = requestType.GetCustomAttributes<AuthorizeAttribute>(true);
 

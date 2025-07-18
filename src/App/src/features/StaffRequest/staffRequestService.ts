@@ -21,12 +21,8 @@ export class StaffRequestService {
     );
   }
 
-  static async getStaffRequests(
-    tenantId: number
-  ): Promise<Result<StaffRequestDto[]>> {
-    return await handleApi(
-      axiosInstance.get(`${this.baseUrl}/${tenantId}/staff-requests`)
-    );
+  static async getStaffRequests(): Promise<Result<StaffRequestDto[]>> {
+    return await handleApi(axiosInstance.get(`${this.baseUrl}/staff-requests`));
   }
 
   /**

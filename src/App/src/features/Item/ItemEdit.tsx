@@ -34,7 +34,7 @@ const ItemEdit: React.FC = () => {
       values.tenantId = +tenant.id;
       values.category = values.category?.join(",") || "";
       setLoading(true);
-      const response = await ItemService.updateItem(tenant.id, values);
+      const response = await ItemService.updateItem(values);
       return handleResult(response, {
         onSuccess: () => {
           notification.success({
@@ -61,7 +61,7 @@ const ItemEdit: React.FC = () => {
   useAsyncEffect(async () => {
     form.resetFields();
     setLoading(true);
-    const response = await ItemService.fetchItemById(tenant.id, itemId);
+    const response = await ItemService.fetchItemById(itemId);
     handleResult(response, {
       onSuccess: (data) => {
         if (data) {

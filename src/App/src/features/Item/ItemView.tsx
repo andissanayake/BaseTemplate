@@ -21,7 +21,7 @@ const ItemView: React.FC = () => {
 
   useEffect(() => {
     const fetchItem = async () => {
-      const response = await ItemService.fetchItemById(tenant.id, itemId);
+      const response = await ItemService.fetchItemById(itemId);
       setLoading(true);
       handleResult(response, {
         onSuccess: (data) => {

@@ -13,53 +13,48 @@ namespace BaseTemplate.API.Controllers;
 [Route("api")]
 public class ItemsController : ApiControllerBase
 {
-    [HttpGet("tenants/{tenantId}/items")]
+    [HttpGet("items")]
     public async Task<ActionResult<Result<PaginatedList<ItemBriefDto>>>> GetItemsWithPagination([FromQuery] GetItemsWithPaginationQuery query)
     {
         return await SendAsync(query);
     }
 
-    [HttpGet("tenants/{tenantId}/items/{id}")]
-    public async Task<ActionResult<Result<ItemDto>>> GetById(int tenantId, int id)
+    [HttpGet("items/{id}")]
+    public async Task<ActionResult<Result<ItemDto>>> GetById(int id)
     {
-        return await SendAsync(new GetItemByIdQuery(tenantId, id));
+        return await SendAsync(new GetItemByIdQuery(id));
     }
 
-    [HttpPost("tenants/{tenantId}/items")]
-    public async Task<ActionResult<Result<int>>> Create(int tenantId, CreateItemCommand command)
+    [HttpPost("items")]
+    public async Task<ActionResult<Result<int>>> Create(CreateItemCommand command)
     {
         if (command == null)
         {
             return BadRequest(Result<int>.Validation("Command is required", []));
         }
 
-        if (tenantId != command.TenantId)
-        {
-            return BadRequest(Result<int>.Validation("Tenant ID mismatch", []));
-        }
-
         return await SendAsync(command);
     }
 
-    [HttpPut("tenants/{tenantId}/items/{id}")]
-    public async Task<ActionResult<Result<bool>>> Update(int tenantId, int id, UpdateItemCommand command)
+    [HttpPut("items/{id}")]
+    public async Task<ActionResult<Result<bool>>> Update(int id, UpdateItemCommand command)
     {
         if (command == null)
         {
             return BadRequest(Result<bool>.Validation("Command is required", []));
         }
 
-        if (id != command.Id || tenantId != command.TenantId)
+        if (id != command.Id)
         {
-            return BadRequest(Result<bool>.Validation("ID or Tenant ID mismatch", []));
+            return BadRequest(Result<bool>.Validation("ID mismatch", []));
         }
 
         return await SendAsync(command);
     }
 
-    [HttpDelete("tenants/{tenantId}/items/{id}")]
-    public async Task<ActionResult<Result<bool>>> Delete(int tenantId, int id)
+    [HttpDelete("items/{id}")]
+    public async Task<ActionResult<Result<bool>>> Delete(int id)
     {
-        return await SendAsync(new DeleteItemCommand(tenantId, id));
+        return await SendAsync(new DeleteItemCommand(id));
     }
 }
