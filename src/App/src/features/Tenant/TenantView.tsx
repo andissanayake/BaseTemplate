@@ -1,5 +1,5 @@
 import React, { useCallback } from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link } from "react-router-dom";
 import {
   Descriptions,
   notification,
@@ -18,15 +18,10 @@ import { useAsyncEffect } from "../../common/useAsyncEffect";
 export const TenantView: React.FC = () => {
   const { currentTenant, setCurrentTenant, loading, setLoading } =
     useTenantStore();
-  const { tenantId } = useParams<{ tenantId: string }>();
 
   useAsyncEffect(async () => {
-    if (!tenantId) {
-      notification.error({ message: "Tenant ID is required to view details." });
-      return;
-    }
     setLoading(true);
-    const response = await TenantService.fetchTenantById(tenantId);
+    const response = await TenantService.fetchTenant();
     handleResult(response, {
       onSuccess: (data) => {
         if (data) {
@@ -44,7 +39,7 @@ export const TenantView: React.FC = () => {
         setLoading(false);
       },
     });
-  }, [tenantId, setCurrentTenant, setLoading]);
+  }, [setCurrentTenant, setLoading]);
 
   const tenantViewContent = useCallback(() => {
     if (loading) {

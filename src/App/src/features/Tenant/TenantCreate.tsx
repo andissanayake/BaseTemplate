@@ -23,7 +23,7 @@ const TenantCreate: React.FC = () => {
             const newTenantData = { ...values, id: newTenantId };
             setCurrentTenant(newTenantData);
             form.resetFields();
-            navigate(`/tenants/view/${newTenantId}`);
+            navigate(`/tenants/view`);
           } else {
             notification.error({ message: "Failed to get new Tenant ID." });
             navigate("/tenants/create");

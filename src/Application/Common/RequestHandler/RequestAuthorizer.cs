@@ -55,15 +55,6 @@ public class RequestAuthorizer : IRequestAuthorizer
             }
         }
 
-        // Check policy
-        if (!string.IsNullOrWhiteSpace(authorizeAttribute.Policy))
-        {
-            if (!await _identityService.AuthorizeAsync(authorizeAttribute.Policy))
-            {
-                return Result.Forbidden("User does not meet the policy requirements.");
-            }
-        }
-
         return Result.Success();
     }
 
@@ -79,4 +70,4 @@ public class RequestAuthorizer : IRequestAuthorizer
         }
         return false;
     }
-} 
+}

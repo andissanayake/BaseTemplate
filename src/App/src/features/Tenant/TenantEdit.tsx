@@ -1,7 +1,7 @@
 import React from "react";
 import { Form, Input, notification, Button, Space, Typography } from "antd";
 import { useTenantStore } from "./tenantStore";
-import { useParams, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { TenantService } from "./tenantService";
 import { useAsyncEffect } from "../../common/useAsyncEffect";
 import { handleResult } from "../../common/handleResult";
@@ -10,25 +10,21 @@ import { handleServerError } from "../../common/serverErrorHandler";
 import { Tenant } from "./TenantModel";
 
 const TenantEdit: React.FC = () => {
-  const { setLoading, setCurrentTenant } = useTenantStore();
+  const { setLoading, setCurrentTenant, currentTenant } = useTenantStore();
   const [form] = Form.useForm();
   const navigate = useNavigate();
-  const { tenantId } = useParams<{ tenantId: string }>();
-
-  if (!tenantId) throw new Error("tenantId is required for editing.");
 
   const handleSaveTenant = () => {
     form.validateFields().then(async (values) => {
-      const payload: Tenant = { ...values, id: +tenantId };
+      // Only send name and address for update
+      const payload = { name: values.name, address: values.address };
       setLoading(true);
       const response = await TenantService.updateTenant(payload);
       handleResult(response, {
         onSuccess: () => {
-          notification.success({
-            message: "Tenant updated successfully!",
-          });
-          setCurrentTenant(payload);
-          navigate(`/tenants/view/${tenantId}`);
+          notification.success({ message: "Tenant updated successfully!" });
+          setCurrentTenant({ ...currentTenant, ...payload });
+          navigate(`/tenants/view`);
         },
         onValidationError: (updateErrors) => {
           handleFormValidationErrors({
@@ -47,10 +43,9 @@ const TenantEdit: React.FC = () => {
   };
 
   useAsyncEffect(async () => {
-    if (!tenantId) return;
     setLoading(true);
     form.resetFields();
-    const response = await TenantService.fetchTenantById(tenantId);
+    const response = await TenantService.fetchTenant();
     handleResult(response, {
       onSuccess: (data) => {
         if (data) {
@@ -67,13 +62,13 @@ const TenantEdit: React.FC = () => {
         setLoading(false);
       },
     });
-  }, [tenantId, form, setLoading, setCurrentTenant]);
+  }, [form, setLoading, setCurrentTenant]);
 
   return (
     <>
       <Space className="mb-4">
         <Typography.Title level={3} style={{ margin: 0 }}>
-          Edit Tenant #{tenantId}
+          Edit Tenant
         </Typography.Title>
       </Space>
       <Form form={form} layout="vertical" onFinish={handleSaveTenant}>
