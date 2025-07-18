@@ -60,7 +60,7 @@ const StaffList: React.FC = () => {
   }, [tenant?.id]);
 
   const handleRemoveStaff = async (staffId: number) => {
-    const result = await StaffService.removeStaff(+tenant.id, staffId);
+    const result = await StaffService.removeStaff(staffId);
     handleResult(result, {
       onSuccess: () => {
         removeStaffMember(staffId.toString());

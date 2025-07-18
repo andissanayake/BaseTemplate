@@ -138,10 +138,10 @@ public class TenantsController : ApiControllerBase
         return await SendAsync(new GetStaffMemberQuery(tenantId, staffId));
     }
 
-    [HttpDelete("{tenantId}/staff/{staffId}")]
-    public async Task<ActionResult<Result<bool>>> RemoveStaff(int tenantId, int staffId)
+    [HttpDelete("staff/{staffId}")]
+    public async Task<ActionResult<Result<bool>>> RemoveStaff(int staffId)
     {
-        return await SendAsync(new RemoveStaffCommand(tenantId, staffId));
+        return await SendAsync(new RemoveStaffCommand(staffId));
     }
 
     [HttpPut("{tenantId}/staff/{staffId}/roles")]

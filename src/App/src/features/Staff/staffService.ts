@@ -36,12 +36,9 @@ export class StaffService {
   /**
    * Remove a staff member from the tenant
    */
-  static async removeStaff(
-    tenantId: number,
-    staffId: number
-  ): Promise<Result<boolean>> {
+  static async removeStaff(staffId: number): Promise<Result<boolean>> {
     return await handleApi(
-      axiosInstance.delete(`${this.baseUrl}/${tenantId}/staff/${staffId}`)
+      axiosInstance.delete(`${this.baseUrl}/staff/${staffId}`)
     );
   }
 

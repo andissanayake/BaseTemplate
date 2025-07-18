@@ -3,20 +3,31 @@ namespace BaseTemplate.Application.Staff.Commands.RemoveStaff;
 public class RemoveStaffCommandHandler : IRequestHandler<RemoveStaffCommand, bool>
 {
     private readonly IUnitOfWorkFactory _factory;
+    private readonly IUserProfileService _userProfileService;
 
-    public RemoveStaffCommandHandler(IUnitOfWorkFactory factory)
+    public RemoveStaffCommandHandler(IUnitOfWorkFactory factory, IUserProfileService userProfileService)
     {
         _factory = factory;
+        _userProfileService = userProfileService;
     }
 
     public async Task<Result<bool>> HandleAsync(RemoveStaffCommand request, CancellationToken cancellationToken)
     {
+        // Get user profile to get tenant ID
+        var userProfile = await _userProfileService.GetUserProfileAsync();
+        if (userProfile?.TenantId == null)
+        {
+            return Result<bool>.Forbidden("User is not associated with any tenant.");
+        }
+
+        var tenantId = userProfile.TenantId.Value;
+
         using var uow = _factory.Create();
 
         // Verify the user exists and belongs to the tenant
         var user = await uow.QueryFirstOrDefaultAsync<AppUser>(
             "SELECT * FROM app_user WHERE id = @StaffId AND tenant_id = @TenantId",
-            new { request.StaffId, request.TenantId });
+            new { request.StaffId, TenantId = tenantId });
 
         if (user == null)
         {
@@ -40,7 +51,7 @@ public class RemoveStaffCommandHandler : IRequestHandler<RemoveStaffCommand, boo
                 ExpiredStatus = (int)BaseTemplate.Domain.Entities.StaffRequestStatus.Expired,
                 AcceptedStatus = (int)BaseTemplate.Domain.Entities.StaffRequestStatus.Accepted,
                 Email = user.Email,
-                request.TenantId
+                TenantId = tenantId
             });
 
         return Result<bool>.Success(true);
