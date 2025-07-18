@@ -1,4 +1,6 @@
+using BaseTemplate.Domain.Constants;
+
 namespace BaseTemplate.Application.Items.Queries.GetItemById;
 
-[Authorize]
+[Authorize(Roles = Roles.ItemManager)]
 public record GetItemByIdQuery(int Id) : IRequest<ItemDto> { }

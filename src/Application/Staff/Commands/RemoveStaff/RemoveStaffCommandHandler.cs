@@ -14,13 +14,7 @@ public class RemoveStaffCommandHandler : IRequestHandler<RemoveStaffCommand, boo
     public async Task<Result<bool>> HandleAsync(RemoveStaffCommand request, CancellationToken cancellationToken)
     {
         // Get user profile to get tenant ID
-        var userProfile = await _userProfileService.GetUserProfileAsync();
-        if (userProfile?.TenantId == null)
-        {
-            return Result<bool>.Forbidden("User is not associated with any tenant.");
-        }
-
-        var tenantId = userProfile.TenantId.Value;
+        var tenantId = await _userProfileService.GetTenantIdAsync();
 
         using var uow = _factory.Create();
 
@@ -47,13 +41,14 @@ public class RemoveStaffCommandHandler : IRequestHandler<RemoveStaffCommand, boo
         // Set related staff requests to Expired
         await uow.ExecuteAsync(
             "UPDATE staff_request SET status = @ExpiredStatus WHERE requested_email = @Email AND tenant_id = @TenantId AND status = @AcceptedStatus",
-            new { 
-                ExpiredStatus = (int)BaseTemplate.Domain.Entities.StaffRequestStatus.Expired,
-                AcceptedStatus = (int)BaseTemplate.Domain.Entities.StaffRequestStatus.Accepted,
+            new
+            {
+                ExpiredStatus = (int)StaffRequestStatus.Expired,
+                AcceptedStatus = (int)StaffRequestStatus.Accepted,
                 Email = user.Email,
                 TenantId = tenantId
             });
 
         return Result<bool>.Success(true);
     }
-} 
+}

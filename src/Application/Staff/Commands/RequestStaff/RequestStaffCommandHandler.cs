@@ -1,5 +1,3 @@
-using BaseTemplate.Domain.Constants;
-
 namespace BaseTemplate.Application.Staff.Commands.RequestStaff;
 
 public class RequestStaffCommandHandler : IRequestHandler<RequestStaffCommand, bool>
@@ -15,14 +13,10 @@ public class RequestStaffCommandHandler : IRequestHandler<RequestStaffCommand, b
 
     public async Task<Result<bool>> HandleAsync(RequestStaffCommand request, CancellationToken cancellationToken)
     {
+        var userProfile = await _userProfileService.GetUserProfileAsync();
+        var tenantId = await _userProfileService.GetTenantIdAsync();
         using var uow = _factory.Create();
 
-        var userProfile = await _userProfileService.GetUserProfileAsync();
-        if (userProfile == null || userProfile.TenantId == null)
-        {
-            return Result<bool>.Validation("No tenant context found for current user.");
-        }
-        var tenantId = userProfile.TenantId.Value;
 
         // Validate that only allowed roles can be requested
         var invalidRoles = request.Roles.Except(Roles.TenantBaseRoles, StringComparer.OrdinalIgnoreCase).ToList();

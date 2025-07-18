@@ -1,8 +1,9 @@
 using System.ComponentModel.DataAnnotations;
+using BaseTemplate.Domain.Constants;
 
 namespace BaseTemplate.Application.Items.Queries.GetItemsWithPagination;
 
-[Authorize]
+[Authorize(Roles = Roles.ItemManager)]
 public record GetItemsWithPaginationQuery : IRequest<PaginatedList<ItemBriefDto>>
 {
     [Range(1, int.MaxValue, ErrorMessage = "Page number must be greater than or equal to 1.")]

@@ -1,6 +1,6 @@
 namespace BaseTemplate.Application.Staff.Commands.UpdateStaffRequest;
 
-[Authorize(Roles = Domain.Constants.Roles.StaffRequestManager + "," + Domain.Constants.Roles.TenantOwner)]
+[Authorize(Roles = Roles.StaffRequestManager)]
 public record UpdateStaffRequestCommand : IRequest<bool>
 {
     public int StaffRequestId { get; set; }

@@ -3,7 +3,7 @@ using BaseTemplate.Domain.Constants;
 
 namespace BaseTemplate.Application.Items.Commands.UpdateItem;
 
-[Authorize(Roles = Roles.ItemManager + "," + Roles.TenantOwner)]
+[Authorize(Roles = Roles.ItemManager)]
 public record UpdateItemCommand : IRequest<bool>
 {
     public int Id { get; init; }

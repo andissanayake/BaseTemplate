@@ -70,5 +70,11 @@ namespace BaseTemplate.Infrastructure.Services
             _cache.Remove(cacheKey);
             return Task.CompletedTask;
         }
+
+        public async Task<int> GetTenantIdAsync()
+        {
+            var userInfo = await GetUserProfileAsync();
+            return userInfo?.TenantId ?? -1;
+        }
     }
 }

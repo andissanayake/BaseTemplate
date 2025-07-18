@@ -3,7 +3,7 @@ using BaseTemplate.Domain.Constants;
 
 namespace BaseTemplate.Application.Items.Commands.CreateItem;
 
-[Authorize(Roles = Roles.ItemManager + "," + Roles.TenantOwner)]
+[Authorize(Roles = Roles.ItemManager)]
 public record CreateItemCommand() : IRequest<int>
 {
     [Required]
