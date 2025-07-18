@@ -3,6 +3,7 @@ namespace BaseTemplate.Application.Common.Interfaces
     public interface IUserProfileService
     {
         Task<UserProfileDto?> GetUserProfileByIdentifierAsync(string identifier);
+        Task InvalidateUserProfileCacheAsync(string identifier);
     }
 
     public class UserProfileDto

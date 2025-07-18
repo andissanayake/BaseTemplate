@@ -35,12 +35,19 @@ namespace BaseTemplate.Infrastructure.Services
             var roles = (await uow.QueryAsync<string>(
                 "select role from user_role where user_id = @UserId",
                 new { UserId = userInfo.Id })).ToList();
-
+            userInfo.Identifier = identifier;
             userInfo.Roles = roles;
 
             _cache.Set(cacheKey, userInfo, TimeSpan.FromMinutes(10));
 
             return userInfo;
+        }
+
+        public Task InvalidateUserProfileCacheAsync(string identifier)
+        {
+            var cacheKey = $"user_profile:{identifier}";
+            _cache.Remove(cacheKey);
+            return Task.CompletedTask;
         }
     }
 }
