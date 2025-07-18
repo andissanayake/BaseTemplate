@@ -1,6 +1,7 @@
 ﻿using BaseTemplate.Application.Common.Interfaces;
 using BaseTemplate.Infrastructure.Data;
 using BaseTemplate.Infrastructure.Identity;
+using BaseTemplate.Infrastructure.Services;
 using Dapper;
 using Microsoft.Extensions.Configuration;
 
@@ -22,6 +23,8 @@ public static class DependencyInjection
         });
         services.AddSingleton<IUnitOfWorkFactory, UnitOfWorkFactory>();
 
+        services.AddScoped<IUserProfileService, UserProfileService>();
+        services.AddMemoryCache();
         services.AddSingleton(TimeProvider.System);
         services.AddTransient<IIdentityService, IdentityService>();
         services.AddSingleton<DatabaseInitializer>();
