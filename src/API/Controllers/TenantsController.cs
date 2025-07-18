@@ -97,11 +97,7 @@ public class TenantsController : ApiControllerBase
     [HttpPost("{tenantId}/request-staff")]
     public async Task<ActionResult<Result<bool>>> RequestStaff(int tenantId, RequestStaffCommand command)
     {
-        if (tenantId != command.TenantId)
-        {
-            return BadRequest();
-        }
-
+        // No need to check tenantId in body; tenantId is only in the route now
         return await SendAsync(command);
     }
 

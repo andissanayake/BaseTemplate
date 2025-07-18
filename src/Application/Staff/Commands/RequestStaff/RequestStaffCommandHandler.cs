@@ -5,17 +5,24 @@ namespace BaseTemplate.Application.Staff.Commands.RequestStaff;
 public class RequestStaffCommandHandler : IRequestHandler<RequestStaffCommand, bool>
 {
     private readonly IUnitOfWorkFactory _factory;
-    private readonly IUser _user;
+    private readonly IUserProfileService _userProfileService;
 
-    public RequestStaffCommandHandler(IUnitOfWorkFactory factory, IUser user)
+    public RequestStaffCommandHandler(IUnitOfWorkFactory factory, IUserProfileService userProfileService)
     {
         _factory = factory;
-        _user = user;
+        _userProfileService = userProfileService;
     }
 
     public async Task<Result<bool>> HandleAsync(RequestStaffCommand request, CancellationToken cancellationToken)
     {
         using var uow = _factory.Create();
+
+        var userProfile = await _userProfileService.GetUserProfileAsync();
+        if (userProfile == null || userProfile.TenantId == null)
+        {
+            return Result<bool>.Validation("No tenant context found for current user.");
+        }
+        var tenantId = userProfile.TenantId.Value;
 
         // Validate that only allowed roles can be requested
         var invalidRoles = request.Roles.Except(Roles.TenantBaseRoles, StringComparer.OrdinalIgnoreCase).ToList();
@@ -31,24 +38,14 @@ public class RequestStaffCommandHandler : IRequestHandler<RequestStaffCommand, b
         }
 
         // Verify the tenant exists and the current user is the owner
-        var tenant = await uow.GetAsync<Tenant>(request.TenantId);
+        var tenant = await uow.GetAsync<Tenant>(tenantId);
         if (tenant == null)
         {
             return Result<bool>.Validation(
                 "Tenant not found.",
                 new Dictionary<string, string[]>
                 {
-                    ["TenantId"] = new[] { $"Tenant with id {request.TenantId} not found." }
-                });
-        }
-
-        if (tenant.OwnerSsoId != _user.Identifier)
-        {
-            return Result<bool>.Validation(
-                "Access denied.",
-                new Dictionary<string, string[]>
-                {
-                    ["TenantId"] = new[] { "Only tenant owners can request staff members." }
+                    ["TenantId"] = new[] { $"Tenant with id {tenantId} not found." }
                 });
         }
 
@@ -60,7 +57,7 @@ public class RequestStaffCommandHandler : IRequestHandler<RequestStaffCommand, b
         if (existingUser != null && existingUser.TenantId != null)
         {
             // If user exists, check if they're already in this tenant
-            if (existingUser.TenantId == request.TenantId)
+            if (existingUser.TenantId == tenantId)
             {
                 return Result<bool>.Validation(
                     "User already exists in this tenant.",
@@ -82,7 +79,7 @@ public class RequestStaffCommandHandler : IRequestHandler<RequestStaffCommand, b
         // Check if there's already a pending request for this email in this tenant
         var existingRequest = await uow.QueryFirstOrDefaultAsync<StaffRequest>(
             "SELECT * FROM staff_request WHERE tenant_id = @TenantId AND requested_email = @Email AND status = 0",
-            new { request.TenantId, Email = request.StaffEmail });
+            new { TenantId = tenantId, Email = request.StaffEmail });
 
         if (existingRequest != null)
         {
@@ -97,10 +94,10 @@ public class RequestStaffCommandHandler : IRequestHandler<RequestStaffCommand, b
         // Create the staff request
         var staffRequest = new StaffRequest
         {
-            TenantId = request.TenantId,
+            TenantId = tenantId,
             RequestedEmail = request.StaffEmail,
             RequestedName = request.StaffName,
-            RequestedBySsoId = _user.Identifier,
+            RequestedBySsoId = userProfile.Identifier,
             Status = StaffRequestStatus.Pending
         };
 
@@ -111,7 +108,7 @@ public class RequestStaffCommandHandler : IRequestHandler<RequestStaffCommand, b
         {
             var staffRequestRole = new StaffRequestRole
             {
-                TenantId = request.TenantId,
+                TenantId = tenantId,
                 StaffRequestId = staffRequestId,
                 Role = role
             };

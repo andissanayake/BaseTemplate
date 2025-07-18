@@ -18,6 +18,9 @@ import { Roles } from "../../auth/RolesEnum";
 import { useAuthStore } from "../../auth/authStore";
 
 interface StaffRequestCreateProps {
+  /**
+   * The tenantId is only used for the API URL, not sent in the request body.
+   */
   tenantId: number;
   visible: boolean;
   onCancel: () => void;
