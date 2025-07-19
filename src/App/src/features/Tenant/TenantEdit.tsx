@@ -7,7 +7,6 @@ import { useAsyncEffect } from "../../common/useAsyncEffect";
 import { handleResult } from "../../common/handleResult";
 import { handleFormValidationErrors } from "../../common/formErrorHandler";
 import { handleServerError } from "../../common/serverErrorHandler";
-import { Tenant } from "./TenantModel";
 
 const TenantEdit: React.FC = () => {
   const { setLoading, setCurrentTenant, currentTenant } = useTenantStore();
@@ -16,8 +15,16 @@ const TenantEdit: React.FC = () => {
 
   const handleSaveTenant = () => {
     form.validateFields().then(async (values) => {
-      // Only send name and address for update
-      const payload = { name: values.name, address: values.address };
+      if (!currentTenant?.id) {
+        notification.error({ message: "No tenant selected for update!" });
+        return;
+      }
+      // Include id from current tenant for the update
+      const payload = {
+        id: currentTenant.id,
+        name: values.name,
+        address: values.address,
+      };
       setLoading(true);
       const response = await TenantService.updateTenant(payload);
       handleResult(response, {
