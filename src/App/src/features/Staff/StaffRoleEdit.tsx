@@ -1,10 +1,16 @@
 import React, { useState } from "react";
-import { Form, Select, Button, Space, message, Typography } from "antd";
-import { StaffService } from "./staffService";
+import {
+  Form,
+  Select,
+  Button,
+  Space,
+  message,
+  Typography,
+  notification,
+} from "antd";
+import { apiClient } from "../../common/apiClient";
 import { StaffMemberDto } from "./StaffModel";
-import { handleResult } from "../../common/handleResult";
 import { handleFormValidationErrors } from "../../common/formErrorHandler";
-import { handleServerError } from "../../common/serverErrorHandler";
 import { useAuthStore } from "../../auth/authStore";
 import { Roles } from "../../auth/RolesEnum";
 
@@ -40,31 +46,34 @@ const StaffRoleEdit: React.FC<StaffRoleEditProps> = ({
   const handleSubmit = async (values: { newRoles: string[] }) => {
     setLoading(true);
 
-    const result = await StaffService.updateStaffRoles(staffMember.id, {
-      newRoles: values.newRoles,
-    });
-
-    handleResult(result, {
-      onSuccess: () => {
-        message.success("Staff roles updated successfully");
-        onSuccess();
+    apiClient.put<boolean>(
+      `/api/tenants/staff/${staffMember.id}/roles`,
+      {
+        staffId: staffMember.id,
+        newRoles: values.newRoles,
       },
-      onValidationError: (errors) => {
-        handleFormValidationErrors({
-          form,
-          errors,
-        });
-      },
-      onServerError: (errors) => {
-        handleServerError(
-          errors,
-          "Failed to update staff roles. An error occurred while updating staff roles."
-        );
-      },
-      onFinally: () => {
-        setLoading(false);
-      },
-    });
+      {
+        onSuccess: () => {
+          message.success("Staff roles updated successfully");
+          onSuccess();
+        },
+        onValidationError: (errors) => {
+          handleFormValidationErrors({
+            form,
+            errors,
+          });
+        },
+        onServerError: () => {
+          notification.error({
+            message:
+              "Failed to update staff roles. An error occurred while updating staff roles.",
+          });
+        },
+        onFinally: () => {
+          setLoading(false);
+        },
+      }
+    );
   };
 
   return (

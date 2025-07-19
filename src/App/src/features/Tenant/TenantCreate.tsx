@@ -2,10 +2,8 @@ import React from "react";
 import { Form, Input, notification, Button, Space, Typography } from "antd";
 import { useTenantStore } from "./tenantStore";
 import { useNavigate } from "react-router-dom";
-import { TenantService } from "./tenantService";
-import { handleResult } from "../../common/handleResult";
+import { apiClient } from "../../common/apiClient";
 import { handleFormValidationErrors } from "../../common/formErrorHandler";
-import { handleServerError } from "../../common/serverErrorHandler";
 
 const TenantCreate: React.FC = () => {
   const [form] = Form.useForm();
@@ -15,19 +13,13 @@ const TenantCreate: React.FC = () => {
   const handleSaveTenant = () => {
     form.validateFields().then(async (values) => {
       setLoading(true);
-      const response = await TenantService.createTenant(values);
-      handleResult(response, {
+      apiClient.post<number>("/api/tenants", values, {
         onSuccess: (newTenantId) => {
-          if (typeof newTenantId === "number") {
-            notification.success({ message: "Tenant created successfully!" });
-            const newTenantData = { ...values, id: newTenantId };
-            setCurrentTenant(newTenantData);
-            form.resetFields();
-            navigate(`/tenants/view`);
-          } else {
-            notification.error({ message: "Failed to get new Tenant ID." });
-            navigate("/tenants/create");
-          }
+          notification.success({ message: "Tenant created successfully!" });
+          const newTenantData = { ...values, id: newTenantId };
+          setCurrentTenant(newTenantData);
+          form.resetFields();
+          navigate(`/tenants/view`);
         },
         onValidationError: (createErrors) => {
           handleFormValidationErrors({
@@ -35,8 +27,8 @@ const TenantCreate: React.FC = () => {
             errors: createErrors,
           });
         },
-        onServerError: (errors) => {
-          handleServerError(errors, "Failed to create tenant!");
+        onServerError: () => {
+          notification.error({ message: "Failed to create tenant!" });
         },
         onFinally: () => {
           setLoading(false);

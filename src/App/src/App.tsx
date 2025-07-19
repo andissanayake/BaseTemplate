@@ -106,7 +106,7 @@ export const App = () => {
             }
           />
           <Route
-            path="/tenants/view/staff-requests/respond"
+            path="/staff-requests/respond"
             element={
               <ProtectedRoute policy={Policies.User}>
                 <StaffRequestResponsePage />

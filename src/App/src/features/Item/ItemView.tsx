@@ -2,11 +2,10 @@ import React, { useEffect } from "react";
 import { Card, Descriptions, Space, Tag, Typography, Button } from "antd";
 import { useParams, useNavigate } from "react-router-dom";
 import { useItemStore } from "./itemStore";
-import { ItemService } from "./itemService";
-import { handleResult } from "../../common/handleResult";
-import { handleServerError } from "../../common/serverErrorHandler";
+import { apiClient } from "../../common/apiClient";
 import { useAuthStore } from "../../auth/authStore";
 import { Item } from "./ItemModel";
+import { notification } from "antd";
 
 const ItemView: React.FC = () => {
   const { setLoading } = useItemStore();
@@ -21,16 +20,15 @@ const ItemView: React.FC = () => {
 
   useEffect(() => {
     const fetchItem = async () => {
-      const response = await ItemService.fetchItemById(itemId);
       setLoading(true);
-      handleResult(response, {
+      apiClient.get<Item>(`/api/items/${itemId}`, {
         onSuccess: (data) => {
           if (data) {
             setItem(data);
           }
         },
-        onServerError: (errors) => {
-          handleServerError(errors, "Failed to fetch item!");
+        onServerError: () => {
+          notification.error({ message: "Failed to fetch item!" });
         },
         onFinally: () => {
           setLoading(false);

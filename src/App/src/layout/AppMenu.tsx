@@ -9,9 +9,7 @@ import {
 } from "../auth/firebase";
 import { useLocation, useNavigate } from "react-router";
 import { useAuthStore } from "../auth/authStore";
-import { UserService } from "../auth/userService";
-import { handleResult } from "../common/handleResult";
-import { handleServerError } from "../common/serverErrorHandler";
+import { apiClient } from "../common/apiClient";
 import { useTenantStore } from "../features/Tenant/tenantStore";
 
 export const AppMenu = () => {
@@ -46,15 +44,14 @@ export const AppMenu = () => {
     const unsubscribe = onAuthStateChangedListener(async (user) => {
       if (user) {
         setUser(user);
-        const res = await UserService.details();
-        handleResult(res, {
+        apiClient.post<any>("/api/user/userDetails", undefined, {
           onSuccess: (data) => {
             setRoles(data?.roles ?? []);
             setTenant(data?.tenant ?? null);
             setStaffRequest(data?.staffRequest ?? null);
           },
-          onServerError: (errors) => {
-            handleServerError(errors, "Failed to fetch roles!", false);
+          onServerError: () => {
+            // Silently handle server error for user details
           },
         });
       } else {
@@ -139,7 +136,7 @@ export const AppMenu = () => {
       }
       if (!tenant?.id && staffRequest?.id) {
         menuItems.push({
-          key: "/staff-request/respond",
+          key: "/staff-requests/respond",
           label: "Join a Tenant",
           onClick: (e: any) => {
             handleClick(e.key);

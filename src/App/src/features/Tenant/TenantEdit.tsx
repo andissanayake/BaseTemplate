@@ -2,11 +2,10 @@ import React from "react";
 import { Form, Input, notification, Button, Space, Typography } from "antd";
 import { useTenantStore } from "./tenantStore";
 import { useNavigate } from "react-router-dom";
-import { TenantService } from "./tenantService";
+import { apiClient } from "../../common/apiClient";
 import { useAsyncEffect } from "../../common/useAsyncEffect";
-import { handleResult } from "../../common/handleResult";
 import { handleFormValidationErrors } from "../../common/formErrorHandler";
-import { handleServerError } from "../../common/serverErrorHandler";
+import { Tenant } from "./TenantModel";
 
 const TenantEdit: React.FC = () => {
   const { setLoading, setCurrentTenant, currentTenant } = useTenantStore();
@@ -26,8 +25,7 @@ const TenantEdit: React.FC = () => {
         address: values.address,
       };
       setLoading(true);
-      const response = await TenantService.updateTenant(payload);
-      handleResult(response, {
+      apiClient.put<boolean>("/api/tenants", payload, {
         onSuccess: () => {
           notification.success({ message: "Tenant updated successfully!" });
           setCurrentTenant({ ...currentTenant, ...payload });
@@ -39,8 +37,8 @@ const TenantEdit: React.FC = () => {
             errors: updateErrors,
           });
         },
-        onServerError: (errors) => {
-          handleServerError(errors, "Failed to update tenant!");
+        onServerError: () => {
+          notification.error({ message: "Failed to update tenant!" });
         },
         onFinally: () => {
           setLoading(false);
@@ -52,8 +50,7 @@ const TenantEdit: React.FC = () => {
   useAsyncEffect(async () => {
     setLoading(true);
     form.resetFields();
-    const response = await TenantService.fetchTenant();
-    handleResult(response, {
+    apiClient.get<Tenant>("/api/tenants", {
       onSuccess: (data) => {
         if (data) {
           form.setFieldsValue(data);
@@ -62,8 +59,8 @@ const TenantEdit: React.FC = () => {
           notification.error({ message: "Tenant not found!" });
         }
       },
-      onServerError: (errors) => {
-        handleServerError(errors, "Failed to fetch tenant details!");
+      onServerError: () => {
+        notification.error({ message: "Failed to fetch tenant details!" });
       },
       onFinally: () => {
         setLoading(false);

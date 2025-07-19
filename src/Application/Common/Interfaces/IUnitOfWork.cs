@@ -4,7 +4,7 @@ public interface IUnitOfWork : IDisposable
     Task<int> InsertAsync<T>(T entity) where T : class;
     Task UpdateAsync<T>(T entity) where T : class;
     Task DeleteAsync<T>(T entity) where T : class;
-    Task<T?> GetAsync<T>(object id) where T : class;
+    Task<T> GetAsync<T>(object id) where T : class;
     Task<IEnumerable<T>> GetAllAsync<T>() where T : class;
     Task<IEnumerable<T>> QueryAsync<T>(string sql, object? param = null);
     Task<T?> QueryFirstOrDefaultAsync<T>(string sql, object? param = null);
@@ -12,7 +12,7 @@ public interface IUnitOfWork : IDisposable
     Task<int> ExecuteAsync(string sql, object? param = null);
     ITransaction BeginTransaction();
 }
-public interface ITransaction
+public interface ITransaction : IDisposable
 {
     public void Commit();
     public void Rollback();

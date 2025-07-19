@@ -15,9 +15,7 @@ import { useParams } from "react-router-dom";
 import TodoItemCreate from "./TodoItemCreate";
 import TodoItemEdit from "./TodoItemEdit";
 import { PriorityLevel, TodoItem } from "./TodoItemModel";
-import { TodoItemService } from "./todoItemService";
-import { handleResult } from "../../common/handleResult";
-import { handleServerError } from "../../common/serverErrorHandler";
+import { apiClient } from "../../common/apiClient";
 
 const TodoItemList: React.FC = () => {
   const {
@@ -41,20 +39,18 @@ const TodoItemList: React.FC = () => {
 
   const loadTodoItems = useCallback(async () => {
     setLoading(true);
-    const response = await TodoItemService.fetchTodoItems(
-      +listId,
-      currentPage,
-      pageSize
+    apiClient.get<{ items: TodoItem[]; totalCount: number }>(
+      `/api/todoItems?ListId=${+listId}&PageNumber=${currentPage}&PageSize=${pageSize}`,
+      {
+        onSuccess: (data) => {
+          setTotalCount(data?.totalCount || 0);
+          setTodoItemList(data?.items || []);
+        },
+        onFinally: () => {
+          setLoading(false);
+        },
+      }
     );
-    handleResult(response, {
-      onSuccess: (data) => {
-        setTotalCount(data?.totalCount || 0);
-        setTodoItemList(data?.items || []);
-      },
-      onFinally: () => {
-        setLoading(false);
-      },
-    });
   }, [
     listId,
     currentPage,
@@ -79,8 +75,7 @@ const TodoItemList: React.FC = () => {
 
   const handleDelete = async (id: number) => {
     setLoading(true);
-    const response = await TodoItemService.deleteTodoItem(id);
-    handleResult(response, {
+    apiClient.delete<boolean>(`/api/todoItems/${id}`, undefined, {
       onSuccess: () => {
         const newTotalCount = totalCount - 1;
         const lastPage = Math.ceil(newTotalCount / pageSize);
@@ -90,8 +85,8 @@ const TodoItemList: React.FC = () => {
         notification.success({ message: "Todo Item deleted successfully!" });
         loadTodoItems();
       },
-      onServerError: (errors) => {
-        handleServerError(errors, "Failed to delete todo item!");
+      onServerError: () => {
+        notification.error({ message: "Failed to delete todo item!" });
       },
       onFinally: () => {
         setLoading(false);
@@ -105,18 +100,21 @@ const TodoItemList: React.FC = () => {
 
   const updateItemStatus = async (id: number, done: boolean) => {
     setLoading(true);
-    const response = await TodoItemService.updateTodoItemStatus({ id, done });
-    handleResult(response, {
-      onSuccess: () => {
-        notification.success({
-          message: "Todo Item status updated successfully!",
-        });
-        loadTodoItems();
-      },
-      onFinally: () => {
-        setLoading(false);
-      },
-    });
+    apiClient.put<boolean>(
+      `/api/todoItems/updateItemStatus?id=${id}`,
+      { id, done },
+      {
+        onSuccess: () => {
+          notification.success({
+            message: "Todo Item status updated successfully!",
+          });
+          loadTodoItems();
+        },
+        onFinally: () => {
+          setLoading(false);
+        },
+      }
+    );
   };
   const columns = [
     {

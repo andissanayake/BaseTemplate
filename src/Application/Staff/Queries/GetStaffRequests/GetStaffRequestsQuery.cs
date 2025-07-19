@@ -1,3 +1,3 @@
 namespace BaseTemplate.Application.Staff.Queries.GetStaffRequests;
-[Authorize]
+[Authorize(Roles = Roles.StaffRequestManager)]
 public record GetStaffRequestsQuery() : IRequest<List<StaffRequestDto>>;

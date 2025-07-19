@@ -10,11 +10,10 @@ import {
 } from "antd";
 import { useTodoGroupStore } from "./todoGroupStore";
 import { useNavigate, useParams } from "react-router-dom";
-import { TodoGroupService } from "./todoGroupService";
+import { apiClient } from "../../common/apiClient";
 import { useAsyncEffect } from "../../common/useAsyncEffect";
-import { handleResult } from "../../common/handleResult";
 import { handleFormValidationErrors } from "../../common/formErrorHandler";
-import { handleServerError } from "../../common/serverErrorHandler";
+import { TodoGroup } from "./TodoGroupModel";
 
 const TodoGroupEdit: React.FC = () => {
   const { setLoading } = useTodoGroupStore();
@@ -24,12 +23,25 @@ const TodoGroupEdit: React.FC = () => {
   const { listId } = useParams();
   if (!listId) throw new Error("listId is required");
 
+  const getColours = () => {
+    const predefinedColours = [
+      { label: "White", value: "#FFFFFF" },
+      { label: "Red", value: "#FF5733" },
+      { label: "Orange", value: "#FFC300" },
+      { label: "Yellow", value: "#FFFF66" },
+      { label: "Green", value: "#CCFF99" },
+      { label: "Blue", value: "#6666FF" },
+      { label: "Purple", value: "#9966CC" },
+      { label: "Grey", value: "#999999" },
+    ];
+    return predefinedColours;
+  };
+
   const handleSaveTodoGroup = () => {
     form.validateFields().then(async (values) => {
       values.id = +listId;
       setLoading(true);
-      const response = await TodoGroupService.updateTodoGroup(values);
-      return handleResult(response, {
+      apiClient.put<boolean>(`/api/todoLists/${values.id}`, values, {
         onSuccess: () => {
           notification.success({
             message: "Todo list updated successfully!",
@@ -42,8 +54,8 @@ const TodoGroupEdit: React.FC = () => {
             errors: updateErrors,
           });
         },
-        onServerError: (errors) => {
-          handleServerError(errors, "Failed to update todo list!");
+        onServerError: () => {
+          notification.error({ message: "Failed to update todo list!" });
         },
         onFinally: () => {
           setLoading(false);
@@ -55,15 +67,13 @@ const TodoGroupEdit: React.FC = () => {
   useAsyncEffect(async () => {
     form.resetFields();
     setLoading(true);
-    const response = await TodoGroupService.fetchTodoGroupById(listId);
-    handleResult(response, {
+    apiClient.get<TodoGroup>(`/api/todoLists/${listId}`, {
       onSuccess: (data) => {
         form.setFieldsValue(data);
       },
-      onServerError: (errors) => {
-        handleServerError(errors, "Failed to fetch todo list item!");
+      onServerError: () => {
+        notification.error({ message: "Failed to fetch todo list item!" });
       },
-
       onFinally: () => {
         setLoading(false);
       },
@@ -93,7 +103,7 @@ const TodoGroupEdit: React.FC = () => {
           rules={[{ required: true, message: "Please select a colour!" }]}
         >
           <Select optionLabelProp="label">
-            {TodoGroupService.getColours().map((colour) => (
+            {getColours().map((colour) => (
               <Select.Option
                 key={colour.value}
                 value={colour.value}

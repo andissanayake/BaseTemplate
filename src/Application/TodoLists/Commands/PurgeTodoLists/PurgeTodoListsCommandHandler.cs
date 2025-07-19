@@ -13,7 +13,8 @@ public class PurgeTodoListsCommandHandler : IRequestHandler<PurgeTodoListsComman
     public async Task<Result<bool>> HandleAsync(PurgeTodoListsCommand request, CancellationToken cancellationToken)
     {
         using var uow = _factory.Create();
-        var transaction = uow.BeginTransaction();
+        using var transaction = uow.BeginTransaction();
+        
         var items = await uow.GetAllAsync<TodoList>();
         var items2 = await uow.GetAllAsync<TodoItem>();
 

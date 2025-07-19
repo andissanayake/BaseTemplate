@@ -10,21 +10,32 @@ import {
 } from "antd";
 import { useTodoGroupStore } from "./todoGroupStore";
 import { useNavigate } from "react-router-dom";
-import { TodoGroupService } from "./todoGroupService";
-import { handleResult } from "../../common/handleResult";
+import { apiClient } from "../../common/apiClient";
 import { handleFormValidationErrors } from "../../common/formErrorHandler";
-import { handleServerError } from "../../common/serverErrorHandler";
 
 const TodoGroupCreate: React.FC = () => {
   const [form] = Form.useForm();
   const navigate = useNavigate();
   const { setLoading } = useTodoGroupStore();
 
+  const getColours = () => {
+    const predefinedColours = [
+      { label: "White", value: "#FFFFFF" },
+      { label: "Red", value: "#FF5733" },
+      { label: "Orange", value: "#FFC300" },
+      { label: "Yellow", value: "#FFFF66" },
+      { label: "Green", value: "#CCFF99" },
+      { label: "Blue", value: "#6666FF" },
+      { label: "Purple", value: "#9966CC" },
+      { label: "Grey", value: "#999999" },
+    ];
+    return predefinedColours;
+  };
+
   const handleSaveTodoGroup = () => {
     form.validateFields().then(async (values) => {
       setLoading(true);
-      const response = await TodoGroupService.createTodoGroup(values);
-      handleResult(response, {
+      apiClient.post<number>("/api/todoLists", values, {
         onSuccess: () => {
           notification.success({ message: "Todo list created successfully!" });
           form.resetFields();
@@ -36,8 +47,8 @@ const TodoGroupCreate: React.FC = () => {
             errors: createErrors,
           });
         },
-        onServerError: (errors) => {
-          handleServerError(errors, "Failed to create todo list!");
+        onServerError: () => {
+          notification.error({ message: "Failed to create todo list!" });
         },
         onFinally: () => {
           setLoading(false);
@@ -69,7 +80,7 @@ const TodoGroupCreate: React.FC = () => {
           rules={[{ required: true, message: "Please select a colour!" }]}
         >
           <Select optionLabelProp="label">
-            {TodoGroupService.getColours().map((colour) => (
+            {getColours().map((colour) => (
               <Select.Option
                 key={colour.value}
                 value={colour.value}

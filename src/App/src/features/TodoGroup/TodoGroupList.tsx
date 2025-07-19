@@ -19,9 +19,7 @@ import {
   PlusOutlined,
 } from "@ant-design/icons";
 import { useAsyncEffect } from "../../common/useAsyncEffect";
-import { TodoGroupService } from "./todoGroupService";
-import { handleResult } from "../../common/handleResult";
-import { handleServerError } from "../../common/serverErrorHandler";
+import { apiClient } from "../../common/apiClient";
 
 const TodoGroupList: React.FC = () => {
   const { todoGroupList, loading, setLoading, setTodoGroupList } =
@@ -30,8 +28,7 @@ const TodoGroupList: React.FC = () => {
 
   const loadTodoGroupList = async () => {
     setLoading(true);
-    const response = await TodoGroupService.fetchTodoGroups();
-    handleResult(response, {
+    apiClient.get<{ lists: TodoGroup[] }>("/api/todoLists", {
       onSuccess: (data) => {
         setTodoGroupList(data?.lists ?? []);
       },
@@ -51,14 +48,13 @@ const TodoGroupList: React.FC = () => {
 
   const handleDelete = async (record: TodoGroup) => {
     setLoading(true);
-    const response = await TodoGroupService.deleteTodoGroup(record);
-    return handleResult(response, {
+    apiClient.delete<boolean>(`/api/todoLists/${record.id}`, undefined, {
       onSuccess: () => {
         loadTodoGroupList();
         notification.success({ message: "Todo list deleted successfully!" });
       },
-      onServerError: (errors) => {
-        handleServerError(errors, "Failed to delete todo list!");
+      onServerError: () => {
+        notification.error({ message: "Failed to delete todo list!" });
       },
       onFinally: () => {
         setLoading(false);

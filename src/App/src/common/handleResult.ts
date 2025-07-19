@@ -2,7 +2,7 @@ import { Result } from "./result";
 import { ResultCodeMapper } from "./resultCodeMapper";
 
 export interface ResultHandlers<T> {
-  onSuccess?: (data?: T) => void;
+  onSuccess?: (data: T) => void;
   onValidationError?: (details: Record<string, string[]>) => void;
   onUnauthorized?: (details?: Record<string, string[]>) => void;
   onForbidden?: (details?: Record<string, string[]>) => void;
@@ -28,7 +28,7 @@ export function handleResult<T>(
   try {
     switch (result.code) {
       case ResultCodeMapper.DefaultSuccessCode:
-        onSuccess(result.data);
+        onSuccess(result.data as T);
         success = true;
         break;
 

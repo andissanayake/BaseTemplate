@@ -1,12 +1,10 @@
 import { useParams } from "react-router-dom";
 import { useTodoGroupStore } from "./todoGroupStore";
-import { Descriptions, Space, Typography } from "antd";
+import { Descriptions, Space, Typography, notification } from "antd";
 import TodoItemList from "../TodoItem/TodoItemList";
 import { useAsyncEffect } from "../../common/useAsyncEffect";
 import { TodoGroup } from "./TodoGroupModel";
-import { TodoGroupService } from "./todoGroupService";
-import { handleResult } from "../../common/handleResult";
-import { handleServerError } from "../../common/serverErrorHandler";
+import { apiClient } from "../../common/apiClient";
 import { useState } from "react";
 
 export const TodoGroupView = () => {
@@ -20,15 +18,13 @@ export const TodoGroupView = () => {
 
   useAsyncEffect(async () => {
     setLoading(true);
-    const response = await TodoGroupService.fetchTodoGroupById(listId);
-    handleResult(response, {
+    apiClient.get<TodoGroup>(`/api/todoLists/${listId}`, {
       onSuccess: (data) => {
         setCurrentTodoGroup(data ? data : null);
       },
-      onServerError: (errors) => {
-        handleServerError(errors, "Failed to fetch todo list item!");
+      onServerError: () => {
+        notification.error({ message: "Failed to fetch todo list item!" });
       },
-
       onFinally: () => {
         setLoading(false);
       },

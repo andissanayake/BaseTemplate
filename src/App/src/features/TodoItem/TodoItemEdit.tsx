@@ -1,12 +1,10 @@
 import React, { useEffect } from "react";
 import { Modal, Form, Input, DatePicker, Select, notification } from "antd";
 import { useTodoItemStore } from "./todoItemStore";
-import { TodoItemService } from "./todoItemService";
+import { apiClient } from "../../common/apiClient";
 import dayjs from "dayjs";
 import { useParams } from "react-router-dom";
-import { TodoItem } from "./TodoItemModel";
-import { handleResult } from "../../common/handleResult";
-import { handleServerError } from "../../common/serverErrorHandler";
+import { TodoItem, PriorityLevel } from "./TodoItemModel";
 import { handleFormValidationErrors } from "../../common/formErrorHandler";
 
 interface TodoItemEditProps {
@@ -26,6 +24,16 @@ const TodoItemEdit: React.FC<TodoItemEditProps> = ({
   const { setLoading } = useTodoItemStore();
   const { listId } = useParams();
 
+  const getPriorityLevels = () => {
+    const priorityOptions = [
+      { label: "None", value: PriorityLevel.None },
+      { label: "Low", value: PriorityLevel.Low },
+      { label: "Medium", value: PriorityLevel.Medium },
+      { label: "High", value: PriorityLevel.High },
+    ];
+    return priorityOptions;
+  };
+
   useEffect(() => {
     if (todoItem) {
       form.setFieldsValue({
@@ -44,8 +52,7 @@ const TodoItemEdit: React.FC<TodoItemEditProps> = ({
         listId: +listId!,
       };
       setLoading(true);
-      const response = await TodoItemService.updateTodoItem(payload);
-      handleResult(response, {
+      apiClient.put<boolean>(`/api/todoItems/${payload.id}`, payload, {
         onSuccess: () => {
           notification.success({
             message: "Todo item updated successfully!",
@@ -59,8 +66,8 @@ const TodoItemEdit: React.FC<TodoItemEditProps> = ({
             errors,
           });
         },
-        onServerError: (errors) => {
-          handleServerError(errors, "Failed to update todo item!");
+        onServerError: () => {
+          notification.error({ message: "Failed to update todo item!" });
         },
         onFinally: () => {
           setLoading(false);
@@ -91,7 +98,7 @@ const TodoItemEdit: React.FC<TodoItemEditProps> = ({
           />
         </Form.Item>
         <Form.Item label="Priority" name="priority">
-          <Select options={TodoItemService.getPriorityLevels()} />
+          <Select options={getPriorityLevels()} />
         </Form.Item>
       </Form>
     </Modal>

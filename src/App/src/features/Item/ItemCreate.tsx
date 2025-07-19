@@ -11,10 +11,8 @@ import {
 } from "antd";
 import { useItemStore } from "./itemStore";
 import { useNavigate } from "react-router-dom";
-import { ItemService } from "./itemService";
-import { handleResult } from "../../common/handleResult";
+import { apiClient } from "../../common/apiClient";
 import { handleFormValidationErrors } from "../../common/formErrorHandler";
-import { handleServerError } from "../../common/serverErrorHandler";
 import { useAuthStore } from "../../auth/authStore";
 
 const ItemCreate: React.FC = () => {
@@ -28,30 +26,33 @@ const ItemCreate: React.FC = () => {
   const handleSaveItem = () => {
     form.validateFields().then(async (values) => {
       setLoading(true);
-      const response = await ItemService.createItem({
-        ...values,
-        category: values.category?.join(",") || "",
-        tenantId: tenant.id,
-      });
-      handleResult(response, {
-        onSuccess: () => {
-          notification.success({ message: "Item created successfully!" });
-          form.resetFields();
-          navigate(`/items`);
+      apiClient.post<number>(
+        `/api/items`,
+        {
+          ...values,
+          category: values.category?.join(",") || "",
+          tenantId: tenant.id,
         },
-        onValidationError: (errors) => {
-          handleFormValidationErrors({
-            form,
-            errors: errors,
-          });
-        },
-        onServerError: (errors) => {
-          handleServerError(errors, "Failed to create item!");
-        },
-        onFinally: () => {
-          setLoading(false);
-        },
-      });
+        {
+          onSuccess: () => {
+            notification.success({ message: "Item created successfully!" });
+            form.resetFields();
+            navigate(`/items`);
+          },
+          onValidationError: (errors) => {
+            handleFormValidationErrors({
+              form,
+              errors: errors,
+            });
+          },
+          onServerError: () => {
+            notification.error({ message: "Failed to create item!" });
+          },
+          onFinally: () => {
+            setLoading(false);
+          },
+        }
+      );
     });
   };
 

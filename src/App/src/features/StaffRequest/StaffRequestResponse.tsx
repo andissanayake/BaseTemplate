@@ -14,9 +14,7 @@ import {
 } from "antd";
 import { CheckOutlined, CloseOutlined } from "@ant-design/icons";
 import { useAuthStore } from "../../auth/authStore";
-import { StaffRequestService } from "./staffRequestService";
-import { handleResult } from "../../common/handleResult";
-import { handleServerError } from "../../common/serverErrorHandler";
+import { apiClient } from "../../common/apiClient";
 import { useNavigate } from "react-router-dom";
 import { useTenantStore } from "../Tenant/tenantStore";
 
@@ -46,60 +44,68 @@ export const StaffRequestResponse: React.FC = () => {
 
   const handleAccept = async () => {
     setLoading(true);
-    const response = await StaffRequestService.respondToStaffRequest(
-      staffRequest.id,
-      true
-    );
+    const payload = {
+      StaffRequestId: staffRequest.id,
+      IsAccepted: true,
+    };
 
-    handleResult(response, {
-      onSuccess: () => {
-        notification.success({
-          message: "Staff request accepted successfully!",
-          description: "You have been added to the tenant.",
-        });
-        // Clear the staff request from auth store
-        setStaffRequest(null);
-        // Redirect to home page
-        navigate("/");
-        setCurrentTenant({
-          id: -1,
-          name: staffRequest.tenantName,
-        });
-      },
-      onServerError: (errors) => {
-        handleServerError(errors, "Failed to accept staff request!");
-      },
-      onFinally: () => {
-        setLoading(false);
-      },
-    });
+    apiClient.post<boolean>(
+      `/api/tenants/staff-requests/${staffRequest.id}/respond`,
+      payload,
+      {
+        onSuccess: () => {
+          notification.success({
+            message: "Staff request accepted successfully!",
+            description: "You have been added to the tenant.",
+          });
+          // Clear the staff request from auth store
+          setStaffRequest(null);
+          // Redirect to home page
+          navigate("/");
+          setCurrentTenant({
+            id: -1,
+            name: staffRequest.tenantName,
+          });
+        },
+        onServerError: () => {
+          notification.error({ message: "Failed to accept staff request!" });
+        },
+        onFinally: () => {
+          setLoading(false);
+        },
+      }
+    );
   };
 
   const handleReject = async (values: { rejectionReason: string }) => {
     setLoading(true);
-    const response = await StaffRequestService.respondToStaffRequest(
-      staffRequest.id,
-      false,
-      values.rejectionReason
-    );
+    const payload = {
+      StaffRequestId: staffRequest.id,
+      IsAccepted: false,
+      RejectionReason: values.rejectionReason,
+    };
 
-    handleResult(response, {
-      onSuccess: () => {
-        notification.success({
-          message: "Staff request rejected successfully!",
-        });
-        // Clear the staff request from auth store
-        setStaffRequest(null);
-        // Redirect to home page
-        navigate("/");
-      },
-      onServerError: (errors) => {
-        handleServerError(errors, "Failed to reject staff request!");
-      },
-      onFinally: () => {
-        setLoading(false);
-      },
-    });
+    apiClient.post<boolean>(
+      `/api/tenants/staff-requests/${staffRequest.id}/respond`,
+      payload,
+      {
+        onSuccess: () => {
+          notification.success({
+            message: "Staff request rejected successfully!",
+          });
+          // Clear the staff request from auth store
+          setStaffRequest(null);
+          // Redirect to home page
+          navigate("/");
+        },
+        onServerError: () => {
+          notification.error({ message: "Failed to reject staff request!" });
+        },
+        onFinally: () => {
+          setLoading(false);
+        },
+      }
+    );
   };
 
   const getStatusTag = (status: number) => {

@@ -14,9 +14,7 @@ import {
 import { PlusOutlined } from "@ant-design/icons";
 import { StaffRequestDto, StaffRequestStatus } from "./StaffRequestModel";
 import { useStaffRequestStore } from "./staffRequestStore";
-import { StaffRequestService } from "./staffRequestService";
-import { handleResult } from "../../common/handleResult";
-import { handleServerError } from "../../common/serverErrorHandler";
+import { apiClient } from "../../common/apiClient";
 import StaffRequestCreate from "./StaffRequestCreate";
 
 export const StaffRequestList: React.FC = () => {
@@ -30,16 +28,15 @@ export const StaffRequestList: React.FC = () => {
 
   const fetchStaffRequests = async () => {
     setLoading(true);
-    const response = await StaffRequestService.getStaffRequests();
-    handleResult(response, {
+    apiClient.get<StaffRequestDto[]>("/api/tenants/staff-requests", {
       onSuccess: (data) => {
         setStaffRequests(data || []);
       },
-      onServerError: (errors) => {
-        handleServerError(
-          errors,
-          "Failed to fetch staff requests. An error occurred while loading staff requests."
-        );
+      onServerError: () => {
+        notification.error({
+          message:
+            "Failed to fetch staff requests. An error occurred while loading staff requests.",
+        });
       },
       onFinally: () => {
         setLoading(false);
@@ -55,28 +52,30 @@ export const StaffRequestList: React.FC = () => {
   const handleReject = async (values: { rejectionReason: string }) => {
     if (!selectedRequest) return;
     setLoading(true);
-    const response = await StaffRequestService.updateStaffRequest(
-      selectedRequest.id,
-      values.rejectionReason
+    apiClient.post<boolean>(
+      `/api/tenants/staff-requests/${selectedRequest.id}/update`,
+      {
+        staffRequestId: selectedRequest.id,
+        rejectionReason: values.rejectionReason,
+      },
+      {
+        onSuccess: () => {
+          setRejectModalVisible(false);
+          setSelectedRequest(null);
+          rejectForm.resetFields();
+          notification.success({
+            message: "Staff request rejected successfully!",
+          });
+          fetchStaffRequests();
+        },
+        onServerError: () => {
+          notification.error({ message: "Failed to reject staff request!" });
+        },
+        onFinally: () => {
+          setLoading(false);
+        },
+      }
     );
-
-    handleResult(response, {
-      onSuccess: () => {
-        setRejectModalVisible(false);
-        setSelectedRequest(null);
-        rejectForm.resetFields();
-        notification.success({
-          message: "Staff request rejected successfully!",
-        });
-        fetchStaffRequests();
-      },
-      onServerError: (errors) => {
-        handleServerError(errors, "Failed to reject staff request!");
-      },
-      onFinally: () => {
-        setLoading(false);
-      },
-    });
   };
 
   const getStatusTag = (status: StaffRequestStatus) => {
