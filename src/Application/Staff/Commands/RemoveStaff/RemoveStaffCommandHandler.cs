@@ -17,7 +17,7 @@ public class RemoveStaffCommandHandler : IRequestHandler<RemoveStaffCommand, boo
         var userProfile = await _userProfileService.GetUserProfileAsync();
 
         using var uow = _factory.Create();
-
+        using var transaction = uow.BeginTransaction();
         // Verify the user exists and belongs to the tenant
         var user = await uow.QuerySingleAsync<AppUser>(
             "SELECT * FROM app_user WHERE id = @StaffId AND tenant_id = @TenantId",
@@ -43,7 +43,8 @@ public class RemoveStaffCommandHandler : IRequestHandler<RemoveStaffCommand, boo
                 Email = user.Email,
                 TenantId = userProfile.TenantId
             });
-
+        await _userProfileService.InvalidateUserProfileCacheAsync(user.SsoId);
+        transaction.Commit();
         return Result<bool>.Success(true);
     }
 }
