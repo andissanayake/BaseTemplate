@@ -36,8 +36,6 @@ public class CreateTenantCommandHandler : IRequestHandler<CreateTenantCommand, i
                 "SELECT * FROM app_user WHERE sso_id = @SsoId",
                 new { SsoId = _user.Identifier });
 
-            int userId = existingUser.Id;
-
             // Create new tenant
             var tenant = new Tenant
             {
@@ -45,18 +43,17 @@ public class CreateTenantCommandHandler : IRequestHandler<CreateTenantCommand, i
                 Address = request.Address,
                 OwnerSsoId = _user.Identifier
             };
-
             var tenantId = await uow.InsertAsync(tenant);
 
             // Update user's tenant_id
             await uow.ExecuteAsync(
                 "UPDATE app_user SET tenant_id = @TenantId, last_modified = @LastModified WHERE id = @UserId",
-                new { TenantId = tenantId, LastModified = DateTimeOffset.UtcNow, UserId = userId });
+                new { TenantId = tenantId, LastModified = DateTimeOffset.UtcNow, UserId = existingUser.Id });
 
             // Add TenantOwner role to the user
             var userRole = new UserRole
             {
-                UserId = userId,
+                UserId = existingUser.Id,
                 Role = Roles.TenantOwner
             };
             await uow.InsertAsync(userRole);
