@@ -32,9 +32,9 @@ export const StaffRequestList: React.FC = () => {
 
   if (!tenantId) throw new Error("Tenant ID is required");
 
-  const fetchStaffRequests = async (tenantId: number) => {
+  const fetchStaffRequests = async () => {
     setLoading(true);
-    const response = await StaffRequestService.getStaffRequests(tenantId);
+    const response = await StaffRequestService.getStaffRequests();
     handleResult(response, {
       onSuccess: (data) => {
         setStaffRequests(data || []);
@@ -52,15 +52,14 @@ export const StaffRequestList: React.FC = () => {
   };
 
   useEffect(() => {
-    fetchStaffRequests(+tenantId);
+    fetchStaffRequests();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [tenantId]);
+  }, []);
 
   const handleReject = async (values: { rejectionReason: string }) => {
     if (!selectedRequest) return;
     setLoading(true);
     const response = await StaffRequestService.updateStaffRequest(
-      +tenantId,
       selectedRequest.id,
       values.rejectionReason
     );
@@ -73,7 +72,7 @@ export const StaffRequestList: React.FC = () => {
         notification.success({
           message: "Staff request rejected successfully!",
         });
-        fetchStaffRequests(+tenantId);
+        fetchStaffRequests();
       },
       onServerError: (errors) => {
         handleServerError(errors, "Failed to reject staff request!");
@@ -239,7 +238,7 @@ export const StaffRequestList: React.FC = () => {
         onCancel={() => setCreateModalVisible(false)}
         onSuccess={() => {
           setCreateModalVisible(false);
-          fetchStaffRequests(+tenantId);
+          fetchStaffRequests();
         }}
       />
 

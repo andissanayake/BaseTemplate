@@ -1,6 +1,4 @@
-using BaseTemplate.Domain.Constants;
-
 namespace BaseTemplate.Application.Items.Commands.DeleteItem;
 
-[Authorize(Roles = Roles.TenantOwner)]
-public record DeleteItemCommand(int TenantId, int Id) : BaseTenantRequest<bool>(TenantId); 
+[Authorize(Roles = Roles.ItemManager)]
+public record DeleteItemCommand(int Id) : IRequest<bool>;

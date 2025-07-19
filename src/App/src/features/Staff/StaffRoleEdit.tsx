@@ -40,13 +40,9 @@ const StaffRoleEdit: React.FC<StaffRoleEditProps> = ({
   const handleSubmit = async (values: { newRoles: string[] }) => {
     setLoading(true);
 
-    const result = await StaffService.updateStaffRoles(
-      +tenant.id,
-      staffMember.id,
-      {
-        newRoles: values.newRoles,
-      }
-    );
+    const result = await StaffService.updateStaffRoles(staffMember.id, {
+      newRoles: values.newRoles,
+    });
 
     handleResult(result, {
       onSuccess: () => {

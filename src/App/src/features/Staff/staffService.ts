@@ -13,35 +13,27 @@ export class StaffService {
   /**
    * Get all staff members for a tenant
    */
-  static async getStaffMembers(
-    tenantId: number
-  ): Promise<Result<StaffMemberDto[]>> {
-    return await handleApi(
-      axiosInstance.get(`${this.baseUrl}/${tenantId}/staff`)
-    );
+  static async getStaffMembers(): Promise<Result<StaffMemberDto[]>> {
+    return await handleApi(axiosInstance.get(`${this.baseUrl}/staff`));
   }
 
   /**
    * Get details of a specific staff member
    */
   static async getStaffMember(
-    tenantId: number,
-    staffSsoId: string
+    staffId: number
   ): Promise<Result<StaffMemberDetailDto>> {
     return await handleApi(
-      axiosInstance.get(`${this.baseUrl}/${tenantId}/staff/${staffSsoId}`)
+      axiosInstance.get(`${this.baseUrl}/staff/${staffId}`)
     );
   }
 
   /**
    * Remove a staff member from the tenant
    */
-  static async removeStaff(
-    tenantId: number,
-    staffId: number
-  ): Promise<Result<boolean>> {
+  static async removeStaff(staffId: number): Promise<Result<boolean>> {
     return await handleApi(
-      axiosInstance.delete(`${this.baseUrl}/${tenantId}/staff/${staffId}`)
+      axiosInstance.delete(`${this.baseUrl}/staff/${staffId}`)
     );
   }
 
@@ -49,13 +41,11 @@ export class StaffService {
    * Update roles for a staff member
    */
   static async updateStaffRoles(
-    tenantId: number,
     staffId: number,
     request: UpdateStaffRolesRequest
   ): Promise<Result<boolean>> {
     return await handleApi(
-      axiosInstance.put(`${this.baseUrl}/${tenantId}/staff/${staffId}/roles`, {
-        tenantId,
+      axiosInstance.put(`${this.baseUrl}/staff/${staffId}/roles`, {
         staffId,
         newRoles: request.newRoles,
       })

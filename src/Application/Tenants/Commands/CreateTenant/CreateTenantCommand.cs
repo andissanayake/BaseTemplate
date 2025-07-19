@@ -1,5 +1,4 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using BaseTemplate.Domain.Constants;
 
 namespace BaseTemplate.Application.Tenants.Commands.CreateTenant;
 
@@ -19,6 +18,7 @@ public class CreateTenantCommandHandler : IRequestHandler<CreateTenantCommand, i
 {
     private readonly IUnitOfWorkFactory _factory;
     private readonly IUser _user;
+
     public CreateTenantCommandHandler(IUnitOfWorkFactory factory, IUser user)
     {
         _factory = factory;
@@ -31,38 +31,32 @@ public class CreateTenantCommandHandler : IRequestHandler<CreateTenantCommand, i
         var transaction = uow.BeginTransaction();
         try
         {
-            // Check if user already has a tenant
-            var existingUser = await uow.QueryFirstOrDefaultAsync<AppUser>(
-                "SELECT * FROM app_user WHERE sso_id = @Identifier",
-                new { _user.Identifier });
+            // Load existing user - user should already exist at this point
+            var existingUser = await uow.QuerySingleAsync<AppUser>(
+                "SELECT * FROM app_user WHERE sso_id = @SsoId",
+                new { SsoId = _user.Identifier });
 
-            if (existingUser?.TenantId != null)
-            {
-                transaction.Rollback();
-                return Result<int>.Success(existingUser.TenantId.Value, "User already has a tenant.");
-            }
+            int userId = existingUser.Id;
 
             // Create new tenant
             var tenant = new Tenant
             {
                 Name = request.Name,
                 Address = request.Address,
-                OwnerSsoId = _user.Identifier!
+                OwnerSsoId = _user.Identifier
             };
 
             var tenantId = await uow.InsertAsync(tenant);
 
-            // Update existing user's tenant_id
-            if (existingUser != null)
-            {
-                existingUser.TenantId = tenantId;
-                await uow.UpdateAsync(existingUser);
-            }
+            // Update user's tenant_id
+            await uow.ExecuteAsync(
+                "UPDATE app_user SET tenant_id = @TenantId, last_modified = @LastModified WHERE id = @UserId",
+                new { TenantId = tenantId, LastModified = DateTimeOffset.UtcNow, UserId = userId });
 
             // Add TenantOwner role to the user
             var userRole = new UserRole
             {
-                UserId = existingUser!.Id,
+                UserId = userId,
                 Role = Roles.TenantOwner
             };
             await uow.InsertAsync(userRole);

@@ -3,25 +3,25 @@ namespace BaseTemplate.Application.Staff.Commands.RemoveStaff;
 public class RemoveStaffCommandHandler : IRequestHandler<RemoveStaffCommand, bool>
 {
     private readonly IUnitOfWorkFactory _factory;
+    private readonly IUserTenantProfileService _userProfileService;
 
-    public RemoveStaffCommandHandler(IUnitOfWorkFactory factory)
+    public RemoveStaffCommandHandler(IUnitOfWorkFactory factory, IUserTenantProfileService userProfileService)
     {
         _factory = factory;
+        _userProfileService = userProfileService;
     }
 
     public async Task<Result<bool>> HandleAsync(RemoveStaffCommand request, CancellationToken cancellationToken)
     {
+        // Get user profile to get tenant ID
+        var userProfile = await _userProfileService.GetUserProfileAsync();
+
         using var uow = _factory.Create();
 
         // Verify the user exists and belongs to the tenant
-        var user = await uow.QueryFirstOrDefaultAsync<AppUser>(
+        var user = await uow.QuerySingleAsync<AppUser>(
             "SELECT * FROM app_user WHERE id = @StaffId AND tenant_id = @TenantId",
-            new { request.StaffId, request.TenantId });
-
-        if (user == null)
-        {
-            return Result<bool>.Failure("Staff member not found or does not belong to this tenant.");
-        }
+            new { request.StaffId, TenantId = userProfile.TenantId });
 
         // Remove all roles for the user
         await uow.ExecuteAsync(
@@ -36,13 +36,14 @@ public class RemoveStaffCommandHandler : IRequestHandler<RemoveStaffCommand, boo
         // Set related staff requests to Expired
         await uow.ExecuteAsync(
             "UPDATE staff_request SET status = @ExpiredStatus WHERE requested_email = @Email AND tenant_id = @TenantId AND status = @AcceptedStatus",
-            new { 
-                ExpiredStatus = (int)BaseTemplate.Domain.Entities.StaffRequestStatus.Expired,
-                AcceptedStatus = (int)BaseTemplate.Domain.Entities.StaffRequestStatus.Accepted,
+            new
+            {
+                ExpiredStatus = (int)StaffRequestStatus.Expired,
+                AcceptedStatus = (int)StaffRequestStatus.Accepted,
                 Email = user.Email,
-                request.TenantId
+                TenantId = userProfile.TenantId
             });
 
         return Result<bool>.Success(true);
     }
-} 
+}

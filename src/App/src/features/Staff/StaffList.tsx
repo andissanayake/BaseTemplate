@@ -38,7 +38,7 @@ const StaffList: React.FC = () => {
   if (!tenant?.id) throw new Error("Tenant ID is required");
   const loadStaffMembers = async () => {
     setLoading(true);
-    const result = await StaffService.getStaffMembers(+tenant.id);
+    const result = await StaffService.getStaffMembers();
     handleResult(result, {
       onSuccess: (data) => {
         setStaffMembers(data || []);
@@ -60,7 +60,7 @@ const StaffList: React.FC = () => {
   }, [tenant?.id]);
 
   const handleRemoveStaff = async (staffId: number) => {
-    const result = await StaffService.removeStaff(+tenant.id, staffId);
+    const result = await StaffService.removeStaff(staffId);
     handleResult(result, {
       onSuccess: () => {
         removeStaffMember(staffId.toString());

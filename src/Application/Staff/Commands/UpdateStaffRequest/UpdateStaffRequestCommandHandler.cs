@@ -3,39 +3,28 @@ namespace BaseTemplate.Application.Staff.Commands.UpdateStaffRequest;
 public class UpdateStaffRequestCommandHandler : IRequestHandler<UpdateStaffRequestCommand, bool>
 {
     private readonly IUnitOfWorkFactory _factory;
-    private readonly IUser _user;
+    private readonly IUserTenantProfileService _userTenantProfileService;
 
-    public UpdateStaffRequestCommandHandler(IUnitOfWorkFactory factory, IUser user)
+    public UpdateStaffRequestCommandHandler(IUnitOfWorkFactory factory, IUserTenantProfileService userTenantProfileService)
     {
         _factory = factory;
-        _user = user;
+        _userTenantProfileService = userTenantProfileService;
     }
 
     public async Task<Result<bool>> HandleAsync(UpdateStaffRequestCommand request, CancellationToken cancellationToken)
     {
+        // Get user profile to get tenant ID
+        var userProfile = await _userTenantProfileService.GetUserProfileAsync();
+
         using var uow = _factory.Create();
 
         // Verify the tenant exists and the current user is the owner
-        var tenant = await uow.GetAsync<Tenant>(request.TenantId);
-        if (tenant == null)
-        {
-            return Result<bool>.NotFound($"Tenant with id {request.TenantId} not found.");
-        }
-
-        if (tenant.OwnerSsoId != _user.Identifier)
-        {
-            return Result<bool>.Forbidden("Only tenant owners can update staff requests.");
-        }
+        var tenant = await uow.GetAsync<Tenant>(userProfile.TenantId);
 
         // Get the staff request and verify it belongs to this tenant
-        var staffRequest = await uow.QueryFirstOrDefaultAsync<StaffRequest>(
+        var staffRequest = await uow.QuerySingleAsync<StaffRequest>(
             "SELECT * FROM staff_request WHERE id = @Id AND tenant_id = @TenantId",
-            new { Id = request.StaffRequestId, request.TenantId });
-
-        if (staffRequest == null)
-        {
-            return Result<bool>.NotFound($"Staff request with id {request.StaffRequestId} not found for this tenant.");
-        }
+            new { Id = request.StaffRequestId, TenantId = userProfile.TenantId });
 
         if (staffRequest.Status != StaffRequestStatus.Pending)
         {
@@ -50,4 +39,4 @@ public class UpdateStaffRequestCommandHandler : IRequestHandler<UpdateStaffReque
         return Result<bool>.Success(true, $"Staff request for {staffRequest.RequestedEmail} has been rejected.");
 
     }
-} 
+}

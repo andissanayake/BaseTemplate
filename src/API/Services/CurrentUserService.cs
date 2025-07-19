@@ -11,8 +11,7 @@ public class CurrentUserService : IUser
     {
         _httpContextAccessor = httpContextAccessor;
     }
-    public string? Identifier => _httpContextAccessor.HttpContext?.User?.FindFirstValue(ClaimTypes.NameIdentifier);
-    public string? Name => _httpContextAccessor.HttpContext?.User?.FindFirstValue("name");
-    public string? Email => _httpContextAccessor.HttpContext?.User?.FindFirstValue(ClaimTypes.Email);
-    public bool? IsAuthenticated => _httpContextAccessor.HttpContext?.User?.Identity?.IsAuthenticated;
+    public string Identifier => _httpContextAccessor.HttpContext?.User?.FindFirstValue(ClaimTypes.NameIdentifier)!;
+    public string Name => _httpContextAccessor.HttpContext?.User?.FindFirstValue("name")!;
+    public string Email => _httpContextAccessor.HttpContext?.User?.FindFirstValue(ClaimTypes.Email)!;
 }

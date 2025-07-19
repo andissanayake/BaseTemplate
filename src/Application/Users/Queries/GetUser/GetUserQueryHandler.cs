@@ -1,4 +1,4 @@
-namespace BaseTemplate.Application.Users.Queries;
+namespace BaseTemplate.Application.Users.Queries.GetUser;
 
 public class GetUserQueryHandler : IRequestHandler<GetUserQuery, GetUserResponse>
 {
@@ -12,58 +12,43 @@ public class GetUserQueryHandler : IRequestHandler<GetUserQuery, GetUserResponse
     }
     public async Task<Result<GetUserResponse>> HandleAsync(GetUserQuery request, CancellationToken cancellationToken)
     {
-        var uow = _factory.Create();
-        //Ensure the user exists in the database
-        var userInfo = await uow.QueryFirstOrDefaultAsync<UserWithTenantInfo>(@"
-            SELECT u.Id, u.sso_id, u.Name, u.Email, t.Id as Tenant_Id, t.Name as TenantName
-            FROM app_user u
-            LEFT JOIN Tenant t ON u.Tenant_Id = t.Id
-            WHERE u.sso_id = @Identifier", new { _user.Identifier });
+        using var uow = _factory.Create();
 
-        if (userInfo == null)
+        // Load user profile from database
+        var userProfile = await uow.QueryFirstOrDefaultAsync<UserWithTenantInfo>(@"
+            SELECT u.Id, u.sso_id as SsoId, u.Name, u.Email, 
+                   t.Id as TenantId, t.Name as TenantName
+            FROM app_user u
+            LEFT JOIN tenant t ON u.tenant_id = t.id
+            WHERE u.sso_id = @SsoId", new { SsoId = _user.Identifier });
+
+        if (userProfile == null)
         {
+            // User does not exist, create new user
             var newAppUser = new AppUser() { SsoId = _user.Identifier!, Name = _user.Name, Email = _user.Email };
             await uow.InsertAsync(newAppUser);
             return Result<GetUserResponse>.Success(new GetUserResponse() { Roles = new List<string>() });
         }
-        else
-        {
-            // Load minimal AppUser for update
-            var existingUser = new AppUser { Id = userInfo.Id, SsoId = userInfo.SsoId };
-            bool changed = false;
-            if (userInfo.Name != _user.Name)
-            {
-                existingUser.Name = _user.Name;
-                changed = true;
-            }
-            if (userInfo.Email != _user.Email)
-            {
-                existingUser.Email = _user.Email;
-                changed = true;
-            }
 
-            if (changed)
-            {
-                await uow.UpdateAsync(existingUser);
-            }
-        }
+        // Get user roles
+        var roles = await uow.QueryAsync<string>(
+            "SELECT role FROM user_role WHERE user_id = @UserId",
+            new { UserId = userProfile.Id });
 
-        var roles = await uow.QueryAsync<string>("select role from user_role where user_id = @UserId", new { UserId = userInfo.Id });
+        var response = new GetUserResponse { Roles = roles.ToList() };
 
-        var response = new GetUserResponse { Roles = roles };
-
-        // If user has a tenant, include tenant details
-        if (!string.IsNullOrEmpty(userInfo?.TenantId))
+        // If user has a tenant, include tenant details from userProfile
+        if (userProfile.TenantId != null && userProfile.TenantId.HasValue)
         {
             response.Tenant = new TenantDetails
             {
-                Id = userInfo.TenantId,
-                Name = userInfo.TenantName ?? string.Empty
+                Id = userProfile.TenantId.Value,
+                Name = userProfile.TenantName ?? string.Empty
             };
         }
         else
         {
-            // If user doesn't have a tenant, check for staff requests
+            // If user doesn't have a tenant, check for staff requests (keep this logic)
             var staffRequestBasic = await uow.QueryFirstOrDefaultAsync<StaffRequestBasicInfo>(@"
                 SELECT sr.id, sr.requested_by_sso_id, 
                        sr.status, sr.created, t.name as tenant_name
@@ -71,20 +56,20 @@ public class GetUserQueryHandler : IRequestHandler<GetUserQuery, GetUserResponse
                 JOIN tenant t ON sr.tenant_id = t.id
                 WHERE sr.requested_email = @Email AND sr.status = 0
                 ORDER BY sr.created DESC
-                LIMIT 1", new { Email = _user.Email });
+                LIMIT 1", new { _user.Email });
 
             if (staffRequestBasic != null)
             {
                 // Get requester's name and email
-                var requesterInfo = await uow.QueryFirstOrDefaultAsync<dynamic>(
+                var requesterInfo = await uow.QuerySingleAsync<dynamic>(
                     "SELECT name, email FROM app_user WHERE sso_id = @SsoId",
                     new { SsoId = staffRequestBasic.RequestedBySsoId });
 
                 var staffRequest = new StaffRequestDetails
                 {
                     Id = staffRequestBasic.Id,
-                    RequesterName = requesterInfo?.name ?? string.Empty,
-                    RequesterEmail = requesterInfo?.email ?? string.Empty,
+                    RequesterName = requesterInfo.name,
+                    RequesterEmail = requesterInfo.email,
                     Status = staffRequestBasic.Status,
                     Created = staffRequestBasic.Created,
                     TenantName = staffRequestBasic.TenantName

@@ -17,34 +17,25 @@ export class StaffRequestService {
     request: CreateStaffRequestRequest
   ): Promise<Result<boolean>> {
     return await handleApi(
-      axiosInstance.post(`${this.baseUrl}/${tenantId}/request-staff`, {
-        tenantId,
-        ...request,
-      })
+      axiosInstance.post(`${this.baseUrl}/${tenantId}/request-staff`, request)
     );
   }
 
-  static async getStaffRequests(
-    tenantId: number
-  ): Promise<Result<StaffRequestDto[]>> {
-    return await handleApi(
-      axiosInstance.get(`${this.baseUrl}/${tenantId}/staff-requests`)
-    );
+  static async getStaffRequests(): Promise<Result<StaffRequestDto[]>> {
+    return await handleApi(axiosInstance.get(`${this.baseUrl}/staff-requests`));
   }
 
   /**
    * Update a staff request (revoke/reject by tenant owner)
    */
   static async updateStaffRequest(
-    tenantId: number,
     staffRequestId: number,
     rejectionReason: string
   ): Promise<Result<boolean>> {
     return await handleApi(
       axiosInstance.post(
-        `${this.baseUrl}/${tenantId}/staff-requests/${staffRequestId}/update`,
+        `${this.baseUrl}/staff-requests/${staffRequestId}/update`,
         {
-          tenantId,
           staffRequestId,
           rejectionReason,
         }

@@ -3,21 +3,19 @@ namespace BaseTemplate.Application.Items.Queries.GetItemById;
 public class GetItemByIdQueryHandler : IRequestHandler<GetItemByIdQuery, ItemDto>
 {
     private readonly IUnitOfWorkFactory _factory;
+    private readonly IUserTenantProfileService _userProfileService;
 
-    public GetItemByIdQueryHandler(IUnitOfWorkFactory factory)
+    public GetItemByIdQueryHandler(IUnitOfWorkFactory factory, IUserTenantProfileService userProfileService)
     {
         _factory = factory;
+        _userProfileService = userProfileService;
     }
 
     public async Task<Result<ItemDto>> HandleAsync(GetItemByIdQuery request, CancellationToken cancellationToken)
     {
+        var userInfo = await _userProfileService.GetUserProfileAsync();
         using var uow = _factory.Create();
-        var entity = await uow.QueryFirstOrDefaultAsync<Item>("select * from item where id = @Id and tenant_id = @TenantId", new { request.Id, request.TenantId });
-
-        if (entity is null)
-        {
-            return Result<ItemDto>.NotFound($"Item with id {request.Id} not found.");
-        }
+        var entity = await uow.QuerySingleAsync<Item>("select * from item where id = @Id and tenant_id = @TenantId", new { request.Id, userInfo.TenantId });
 
         var itemDto = new ItemDto
         {
@@ -32,4 +30,4 @@ public class GetItemByIdQueryHandler : IRequestHandler<GetItemByIdQuery, ItemDto
 
         return Result<ItemDto>.Success(itemDto);
     }
-} 
+}

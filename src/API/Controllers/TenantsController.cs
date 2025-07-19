@@ -18,53 +18,98 @@ namespace BaseTemplate.API.Controllers;
 [Authorize]
 public class TenantsController : ApiControllerBase
 {
-    [HttpGet("{tenantId}")]
-    public async Task<ActionResult<Result<GetTenantResponse>>> GetById(int tenantId)
+    /// <summary>
+    /// Get the current user's tenant details.
+    /// </summary>
+    /// <remarks>
+    /// <b>What this endpoint does:</b>
+    /// <ul>
+    ///   <li>Fetches the tenant associated with the current authenticated user.</li>
+    ///   <li>If the user does not have a tenant, returns NotFound.</li>
+    /// </ul>
+    /// <b>Response:</b>
+    /// <ul>
+    ///   <li><c>Id</c> (int): Tenant ID</li>
+    ///   <li><c>Name</c> (string): Tenant name</li>
+    ///   <li><c>Address</c> (string, optional): Tenant address</li>
+    /// </ul>
+    /// </remarks>
+    [HttpGet]
+    public async Task<ActionResult<Result<GetTenantResponse>>> GetById()
     {
-        return await SendAsync(new GetTenantByIdQuery(tenantId));
+        return await SendAsync(new GetTenantByIdQuery());
     }
 
+    /// <summary>
+    /// Create a new tenant and assign the current user as the owner.
+    /// </summary>
+    /// <remarks>
+    /// <b>What this endpoint does:</b>
+    /// <ul>
+    ///   <li>Checks if the user already has a tenant. If so, returns the existing tenant ID and does not create a new tenant.</li>
+    ///   <li>If not, creates a new tenant with the provided name and address, and sets the current user as the owner.</li>
+    ///   <li>Updates the user's tenant association in the database.</li>
+    ///   <li>Adds the <c>TenantOwner</c> role to the user.</li>
+    ///   <li>Invalidates the user profile cache to ensure fresh data on subsequent requests.</li>
+    /// </ul>
+    /// <b>Request body:</b>
+    /// <ul>
+    ///   <li><c>Name</c> (string, required): Tenant name (2-100 characters)</li>
+    ///   <li><c>Address</c> (string, optional): Tenant address (max 500 characters)</li>
+    /// </ul>
+    /// <b>Response:</b>
+    /// <ul>
+    ///   <li><c>int</c>: The new or existing tenant ID</li>
+    /// </ul>
+    /// </remarks>
     [HttpPost]
     public async Task<ActionResult<Result<int>>> Create(CreateTenantCommand command)
     {
         return await SendAsync(command);
     }
 
-    [HttpPut("{id}")]
-    public async Task<ActionResult<Result<bool>>> Update(int id, UpdateTenantCommand command)
+    /// <summary>
+    /// Update the details of the current user's tenant.
+    /// </summary>
+    /// <remarks>
+    /// <b>What this endpoint does:</b>
+    /// <ul>
+    ///   <li>Updates the name and address of the tenant associated with the current user.</li>
+    ///   <li>Only users with the <c>TenantManager</c> or <c>TenantOwner</c> role can perform this action.</li>
+    ///   <li>Fails with NotFound if the tenant does not exist for the user.</li>
+    /// </ul>
+    /// <b>Request body:</b>
+    /// <ul>
+    ///   <li><c>Name</c> (string, required): New tenant name (2-100 characters)</li>
+    ///   <li><c>Address</c> (string, optional): New tenant address (max 500 characters)</li>
+    /// </ul>
+    /// <b>Response:</b>
+    /// <ul>
+    ///   <li><c>bool</c>: Indicates success or failure</li>
+    /// </ul>
+    /// </remarks>
+    [HttpPut]
+    public async Task<ActionResult<Result<bool>>> Update(UpdateTenantCommand command)
     {
-        if (id != command.Id)
-        {
-            return BadRequest();
-        }
-
         return await SendAsync(command);
     }
 
     [HttpPost("{tenantId}/request-staff")]
     public async Task<ActionResult<Result<bool>>> RequestStaff(int tenantId, RequestStaffCommand command)
     {
-        if (tenantId != command.TenantId)
-        {
-            return BadRequest();
-        }
-
+        // No need to check tenantId in body; tenantId is only in the route now
         return await SendAsync(command);
     }
 
-    [HttpGet("{tenantId}/staff-requests")]
-    public async Task<ActionResult<Result<List<StaffRequestDto>>>> GetStaffRequests(int tenantId)
+    [HttpGet("staff-requests")]
+    public async Task<ActionResult<Result<List<StaffRequestDto>>>> GetStaffRequests()
     {
-        return await SendAsync(new GetStaffRequestsQuery(tenantId));
+        return await SendAsync(new GetStaffRequestsQuery());
     }
 
-    [HttpPost("{tenantId}/staff-requests/{staffRequestId}/update")]
-    public async Task<ActionResult<Result<bool>>> UpdateStaffRequest(int tenantId, int staffRequestId, UpdateStaffRequestCommand command)
+    [HttpPost("staff-requests/{staffRequestId}/update")]
+    public async Task<ActionResult<Result<bool>>> UpdateStaffRequest(int staffRequestId, UpdateStaffRequestCommand command)
     {
-        if (tenantId != command.TenantId || staffRequestId != command.StaffRequestId)
-        {
-            return BadRequest();
-        }
 
         return await SendAsync(command);
     }
@@ -81,31 +126,27 @@ public class TenantsController : ApiControllerBase
     }
 
     // Staff Management Endpoints
-    [HttpGet("{tenantId}/staff")]
-    public async Task<ActionResult<Result<List<StaffMemberDto>>>> ListStaff(int tenantId)
+    [HttpGet("staff")]
+    public async Task<ActionResult<Result<List<StaffMemberDto>>>> ListStaff()
     {
-        return await SendAsync(new ListStaffQuery(tenantId));
+        return await SendAsync(new ListStaffQuery());
     }
 
-    [HttpGet("{tenantId}/staff/{staffId}")]
-    public async Task<ActionResult<Result<StaffMemberDetailDto>>> GetStaffMember(int tenantId, int staffId)
+    [HttpGet("staff/{staffId}")]
+    public async Task<ActionResult<Result<StaffMemberDetailDto>>> GetStaffMember(int staffId)
     {
-        return await SendAsync(new GetStaffMemberQuery(tenantId, staffId));
+        return await SendAsync(new GetStaffMemberQuery(staffId));
     }
 
-    [HttpDelete("{tenantId}/staff/{staffId}")]
-    public async Task<ActionResult<Result<bool>>> RemoveStaff(int tenantId, int staffId)
+    [HttpDelete("staff/{staffId}")]
+    public async Task<ActionResult<Result<bool>>> RemoveStaff(int staffId)
     {
-        return await SendAsync(new RemoveStaffCommand(tenantId, staffId));
+        return await SendAsync(new RemoveStaffCommand(staffId));
     }
 
-    [HttpPut("{tenantId}/staff/{staffId}/roles")]
-    public async Task<ActionResult<Result<bool>>> UpdateStaffRoles(int tenantId, int staffId, UpdateStaffRolesCommand command)
+    [HttpPut("staff/{staffId}/roles")]
+    public async Task<ActionResult<Result<bool>>> UpdateStaffRoles(int staffId, UpdateStaffRolesCommand command)
     {
-        if (tenantId != command.TenantId || staffId != command.StaffId)
-        {
-            return BadRequest();
-        }
 
         return await SendAsync(command);
     }

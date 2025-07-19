@@ -1,8 +1,9 @@
 using System.ComponentModel.DataAnnotations;
+
 namespace BaseTemplate.Application.Staff.Commands.RequestStaff;
 
-[Authorize(Roles = Domain.Constants.Roles.StaffRequestManager + "," + Domain.Constants.Roles.TenantOwner)]
-public record RequestStaffCommand(int TenantId) : BaseTenantRequest<bool>(TenantId)
+[Authorize(Roles = Domain.Constants.Roles.StaffManager)]
+public record RequestStaffCommand : IRequest<bool>
 {
     [Required]
     [EmailAddress(ErrorMessage = "Please provide a valid email address.")]

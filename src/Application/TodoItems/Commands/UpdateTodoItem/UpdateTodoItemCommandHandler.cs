@@ -5,7 +5,7 @@ namespace BaseTemplate.Application.TodoItems.Commands.UpdateTodoItem;
 public class UpdateTodoItemCommandHandler : IRequestHandler<UpdateTodoItemCommand, bool>
 {
     private readonly IUnitOfWorkFactory _factory;
-    public UpdateTodoItemCommandHandler(IUnitOfWorkFactory factory, IIdentityService identityService)
+    public UpdateTodoItemCommandHandler(IUnitOfWorkFactory factory)
     {
         _factory = factory;
     }
@@ -26,4 +26,4 @@ public class UpdateTodoItemCommandHandler : IRequestHandler<UpdateTodoItemComman
         await uow.UpdateAsync(entity);
         return Result<bool>.Success(true);
     }
-} 
+}

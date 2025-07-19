@@ -24,14 +24,9 @@ public class RespondToStaffRequestCommandHandler : IRequestHandler<RespondToStaf
         using var uow = _factory.Create();
 
         // Get the staff request and verify it belongs to the current user
-        var staffRequest = await uow.QueryFirstOrDefaultAsync<StaffRequest>(
+        var staffRequest = await uow.QuerySingleAsync<StaffRequest>(
             "SELECT * FROM staff_request WHERE id = @Id AND requested_email = @Email",
             new { Id = request.StaffRequestId, _user.Email });
-
-        if (staffRequest == null)
-        {
-            return Result<bool>.Validation($"Staff request with id {request.StaffRequestId} not found for your email.");
-        }
 
         if (staffRequest.Status != StaffRequestStatus.Pending)
         {
@@ -54,15 +49,12 @@ public class RespondToStaffRequestCommandHandler : IRequestHandler<RespondToStaf
             }
 
             // Update the user's tenant information
-            var user = await uow.QueryFirstOrDefaultAsync<AppUser>(
+            var user = await uow.QuerySingleAsync<AppUser>(
                 "SELECT * FROM app_user WHERE sso_id = @SsoId",
                 new { SsoId = _user.Identifier });
 
-            if (user != null)
-            {
-                user.TenantId = staffRequest.TenantId;
-                await uow.UpdateAsync(user);
-            }
+            user.TenantId = staffRequest.TenantId;
+            await uow.UpdateAsync(user);
 
             // Get the roles for this staff request and add them to the user
             var staffRequestRoles = await uow.QueryAsync<StaffRequestRole>(
@@ -73,7 +65,7 @@ public class RespondToStaffRequestCommandHandler : IRequestHandler<RespondToStaf
             {
                 var userRole = new UserRole
                 {
-                    UserId = user!.Id,
+                    UserId = user.Id,
                     Role = role.Role
                 };
                 await uow.InsertAsync(userRole);

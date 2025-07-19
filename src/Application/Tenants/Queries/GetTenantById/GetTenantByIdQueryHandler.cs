@@ -3,20 +3,23 @@ namespace BaseTemplate.Application.Tenants.Queries.GetTenantById;
 public class GetTenantByIdQueryHandler : IRequestHandler<GetTenantByIdQuery, GetTenantResponse>
 {
     private readonly IUnitOfWorkFactory _factory;
-    public GetTenantByIdQueryHandler(IUnitOfWorkFactory factory, IIdentityService identityService)
+    private readonly IUserTenantProfileService _userProfileService;
+    public GetTenantByIdQueryHandler(IUnitOfWorkFactory factory, IUserTenantProfileService userProfileService)
     {
         _factory = factory;
+        _userProfileService = userProfileService;
     }
 
     public async Task<Result<GetTenantResponse>> HandleAsync(GetTenantByIdQuery request, CancellationToken cancellationToken)
     {
+        var userProfile = await _userProfileService.GetUserProfileAsync();
         using var uow = _factory.Create();
-        var entity = await uow.GetAsync<Tenant>(request.TenantId);
+        var entity = await uow.GetAsync<Tenant>(userProfile.TenantId);
         if (entity is null)
         {
-            return Result<GetTenantResponse>.NotFound($"TenantList with id {request.TenantId} not found.");
+            return Result<GetTenantResponse>.NotFound($"Tenant with id {userProfile.TenantId} not found.");
         }
         var tenant = new GetTenantResponse() { Name = entity.Name, Id = entity.Id, Address = entity.Address };
         return Result<GetTenantResponse>.Success(tenant);
     }
-} 
+}

@@ -5,24 +5,17 @@ using BaseTemplate.Application.Common.Security;
 
 public class RequestAuthorizer : IRequestAuthorizer
 {
-    private readonly IIdentityService _identityService;
+    private readonly IUser _user;
+    private readonly IUserTenantProfileService _tenantProfileService;
 
-    public RequestAuthorizer(IIdentityService identityService)
+    public RequestAuthorizer(IUser user, IUserTenantProfileService userTenantProfileService)
     {
-        _identityService = identityService;
+        _user = user;
+        _tenantProfileService = userTenantProfileService;
     }
 
     public async Task<Result> AuthorizeAsync<TResponse>(IRequest<TResponse> request, Type requestType)
     {
-        // Check tenant access for BaseTenantRequest
-        if (request is BaseTenantRequest<TResponse> baseTenantRequest)
-        {
-            if (!await _identityService.HasTenantAccessAsync(baseTenantRequest.TenantId))
-            {
-                return Result.Unauthorized("User doesn't have access to this tenant.");
-            }
-        }
-
         // Check authorization attributes
         var authorizeAttributes = requestType.GetCustomAttributes<AuthorizeAttribute>(true);
 
@@ -40,7 +33,7 @@ public class RequestAuthorizer : IRequestAuthorizer
 
     private async Task<Result> AuthorizeAttributeAsync(AuthorizeAttribute authorizeAttribute)
     {
-        if (!_identityService.IsAuthenticated)
+        if (string.IsNullOrEmpty(_user.Email))
         {
             return Result.Unauthorized("User is not authenticated.");
         }
@@ -48,35 +41,27 @@ public class RequestAuthorizer : IRequestAuthorizer
         // Check roles
         if (!string.IsNullOrWhiteSpace(authorizeAttribute.Roles))
         {
-            var hasRole = await CheckRolesAsync(authorizeAttribute.Roles);
+            var userInfo = await _tenantProfileService.GetUserProfileAsync();
+            var hasRole = CheckRoles(authorizeAttribute.Roles, userInfo.Roles);
             if (!hasRole)
             {
                 return Result.Forbidden("User is not in the required role(s).");
             }
         }
 
-        // Check policy
-        if (!string.IsNullOrWhiteSpace(authorizeAttribute.Policy))
-        {
-            if (!await _identityService.AuthorizeAsync(authorizeAttribute.Policy))
-            {
-                return Result.Forbidden("User does not meet the policy requirements.");
-            }
-        }
-
         return Result.Success();
     }
 
-    private async Task<bool> CheckRolesAsync(string roles)
+    private bool CheckRoles(string roles, List<string> currentRoles)
     {
-        var roleArray = roles.Split(',');
-        foreach (var role in roleArray)
-        {
-            if (await _identityService.IsInRoleAsync(role.Trim()))
-            {
-                return true;
-            }
-        }
-        return false;
+        var roleArray = roles.Split(',', StringSplitOptions.RemoveEmptyEntries)
+            .Select(r => r.Trim())
+            .Where(r => !string.IsNullOrEmpty(r))
+            .ToList();
+
+        // Check if user has any of the required roles
+        return roleArray.Any(requiredRole => 
+            currentRoles.Any(userRole => 
+                string.Equals(userRole, requiredRole, StringComparison.OrdinalIgnoreCase)));
     }
-} 
+}
