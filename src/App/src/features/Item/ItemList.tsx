@@ -16,9 +16,7 @@ import {
 } from "@ant-design/icons";
 import { useItemStore } from "./itemStore";
 import { Item } from "./ItemModel";
-import { ItemService } from "./itemService";
-import { handleResult } from "../../common/handleResult";
-import { handleServerError } from "../../common/serverErrorHandler";
+import { apiClient } from "../../common/apiClient";
 import { Link } from "react-router-dom";
 import { useAuthStore } from "../../auth/authStore";
 
@@ -42,20 +40,22 @@ const ItemList: React.FC = () => {
 
   const loadItems = useCallback(async () => {
     setLoading(true);
-    const response = await ItemService.fetchItems(currentPage, pageSize);
-    handleResult(response, {
-      onSuccess: (data) => {
-        setTotalCount(data?.totalCount || 0);
-        setItemList(data?.items || []);
-      },
-      onServerError: (errors) => {
-        setItemList([]);
-        handleServerError(errors, "Failed to load items!");
-      },
-      onFinally: () => {
-        setLoading(false);
-      },
-    });
+    apiClient.get<{ items: Item[]; totalCount: number }>(
+      `/api/items?PageNumber=${currentPage}&PageSize=${pageSize}`,
+      {
+        onSuccess: (data) => {
+          setTotalCount(data?.totalCount || 0);
+          setItemList(data?.items || []);
+        },
+        onServerError: () => {
+          setItemList([]);
+          notification.error({ message: "Failed to load items!" });
+        },
+        onFinally: () => {
+          setLoading(false);
+        },
+      }
+    );
   }, [
     currentPage,
     pageSize,
@@ -71,8 +71,7 @@ const ItemList: React.FC = () => {
 
   const handleDelete = async (id: number) => {
     setLoading(true);
-    const response = await ItemService.deleteItem(id);
-    handleResult(response, {
+    apiClient.delete<boolean>(`/api/items/${id}`, undefined, {
       onSuccess: () => {
         const newTotalCount = totalCount - 1;
         const lastPage = Math.ceil(newTotalCount / pageSize);
@@ -82,8 +81,8 @@ const ItemList: React.FC = () => {
         notification.success({ message: "Item deleted successfully!" });
         loadItems();
       },
-      onServerError: (errors) => {
-        handleServerError(errors, "Failed to delete item!");
+      onServerError: () => {
+        notification.error({ message: "Failed to delete item!" });
       },
       onFinally: () => {
         setLoading(false);

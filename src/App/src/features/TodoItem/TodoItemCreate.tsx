@@ -1,12 +1,10 @@
 import React, { useEffect } from "react";
 import { Modal, Form, Input, DatePicker, Select, notification } from "antd";
 import { useTodoItemStore } from "./todoItemStore";
-import { TodoItemService } from "./todoItemService";
+import { apiClient } from "../../common/apiClient";
 import dayjs from "dayjs";
 import { useParams } from "react-router-dom";
-import { TodoItem } from "./TodoItemModel";
-import { handleResult } from "../../common/handleResult";
-import { handleServerError } from "../../common/serverErrorHandler";
+import { TodoItem, PriorityLevel } from "./TodoItemModel";
 import { handleFormValidationErrors } from "../../common/formErrorHandler";
 
 interface TodoItemCreateProps {
@@ -24,6 +22,16 @@ const TodoItemCreate: React.FC<TodoItemCreateProps> = ({
   const { setLoading } = useTodoItemStore();
   const { listId } = useParams();
 
+  const getPriorityLevels = () => {
+    const priorityOptions = [
+      { label: "None", value: PriorityLevel.None },
+      { label: "Low", value: PriorityLevel.Low },
+      { label: "Medium", value: PriorityLevel.Medium },
+      { label: "High", value: PriorityLevel.High },
+    ];
+    return priorityOptions;
+  };
+
   const handleSave = async () => {
     form.validateFields().then(async (values) => {
       const payload: TodoItem = {
@@ -32,8 +40,7 @@ const TodoItemCreate: React.FC<TodoItemCreateProps> = ({
         listId: +listId!,
       };
       setLoading(true);
-      const response = await TodoItemService.createTodoItem(payload);
-      handleResult(response, {
+      apiClient.post<number>("/api/todoItems", payload, {
         onSuccess: () => {
           notification.success({ message: "Todo item created successfully!" });
           refresh();
@@ -45,8 +52,8 @@ const TodoItemCreate: React.FC<TodoItemCreateProps> = ({
             errors,
           });
         },
-        onServerError: (errors) => {
-          handleServerError(errors, "Failed to create todo item!");
+        onServerError: () => {
+          notification.error({ message: "Failed to create todo item!" });
         },
         onFinally: () => {
           setLoading(false);
@@ -82,7 +89,7 @@ const TodoItemCreate: React.FC<TodoItemCreateProps> = ({
           />
         </Form.Item>
         <Form.Item label="Priority" name="priority">
-          <Select options={TodoItemService.getPriorityLevels()} />
+          <Select options={getPriorityLevels()} />
         </Form.Item>
       </Form>
     </Modal>

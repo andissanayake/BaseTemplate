@@ -9,10 +9,8 @@ import {
   Modal,
 } from "antd";
 import { useStaffRequestStore } from "./staffRequestStore";
-import { StaffRequestService } from "./staffRequestService";
-import { handleResult } from "../../common/handleResult";
+import { apiClient } from "../../common/apiClient";
 import { handleFormValidationErrors } from "../../common/formErrorHandler";
-import { handleServerError } from "../../common/serverErrorHandler";
 import { CreateStaffRequestRequest } from "./StaffRequestModel";
 import { Roles } from "../../auth/RolesEnum";
 import { useAuthStore } from "../../auth/authStore";
@@ -52,9 +50,7 @@ const StaffRequestCreate: React.FC<StaffRequestCreateProps> = ({
       roles: values.roles,
     };
 
-    const response = await StaffRequestService.createStaffRequest(requestData);
-
-    handleResult(response, {
+    apiClient.post<boolean>("/api/tenants/request-staff", requestData, {
       onSuccess: () => {
         notification.success({
           message: "Staff request created successfully!",
@@ -69,8 +65,8 @@ const StaffRequestCreate: React.FC<StaffRequestCreateProps> = ({
           errors,
         });
       },
-      onServerError: (errors) => {
-        handleServerError(errors, "Failed to create staff request!");
+      onServerError: () => {
+        notification.error({ message: "Failed to create staff request!" });
       },
       onFinally: () => {
         setLoading(false);

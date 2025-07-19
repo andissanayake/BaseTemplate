@@ -9,14 +9,13 @@ import {
   Popconfirm,
   Typography,
   Tooltip,
+  notification,
 } from "antd";
 import { DeleteOutlined, EditOutlined, UserOutlined } from "@ant-design/icons";
-import { StaffService } from "./staffService";
+import { apiClient } from "../../common/apiClient";
 import { useStaffStore } from "./staffStore";
 import { StaffMemberDto } from "./StaffModel";
 import StaffRoleEdit from "./StaffRoleEdit";
-import { handleResult } from "../../common/handleResult";
-import { handleServerError } from "../../common/serverErrorHandler";
 import { useAuthStore } from "../../auth/authStore";
 
 const { Title } = Typography;
@@ -38,16 +37,15 @@ const StaffList: React.FC = () => {
   if (!tenant?.id) throw new Error("Tenant ID is required");
   const loadStaffMembers = async () => {
     setLoading(true);
-    const result = await StaffService.getStaffMembers();
-    handleResult(result, {
+    apiClient.get<StaffMemberDto[]>("/api/tenants/staff", {
       onSuccess: (data) => {
         setStaffMembers(data || []);
       },
-      onServerError: (errors) => {
-        handleServerError(
-          errors,
-          "Failed to load staff members. An error occurred while loading staff members."
-        );
+      onServerError: () => {
+        notification.error({
+          message:
+            "Failed to load staff members. An error occurred while loading staff members.",
+        });
       },
       onFinally: () => {
         setLoading(false);
@@ -60,15 +58,14 @@ const StaffList: React.FC = () => {
   }, [tenant?.id]);
 
   const handleRemoveStaff = async (staffId: number) => {
-    const result = await StaffService.removeStaff(staffId);
-    handleResult(result, {
+    apiClient.delete<boolean>(`/api/tenants/staff/${staffId}`, undefined, {
       onSuccess: () => {
         removeStaffMember(staffId.toString());
         message.success("Staff member removed successfully");
         loadStaffMembers();
       },
-      onServerError: (errors) => {
-        handleServerError(errors, "Failed to remove staff member");
+      onServerError: () => {
+        notification.error({ message: "Failed to remove staff member" });
       },
     });
   };

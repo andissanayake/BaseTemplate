@@ -11,12 +11,11 @@ import {
 } from "antd";
 import { useItemStore } from "./itemStore";
 import { useNavigate, useParams } from "react-router-dom";
-import { ItemService } from "./itemService";
+import { apiClient } from "../../common/apiClient";
 import { useAsyncEffect } from "../../common/useAsyncEffect";
-import { handleResult } from "../../common/handleResult";
 import { handleFormValidationErrors } from "../../common/formErrorHandler";
-import { handleServerError } from "../../common/serverErrorHandler";
 import { useAuthStore } from "../../auth/authStore";
+import { Item } from "./ItemModel";
 
 const ItemEdit: React.FC = () => {
   const { setLoading } = useItemStore();
@@ -34,8 +33,7 @@ const ItemEdit: React.FC = () => {
       values.tenantId = +tenant.id;
       values.category = values.category?.join(",") || "";
       setLoading(true);
-      const response = await ItemService.updateItem(values);
-      return handleResult(response, {
+      apiClient.put<boolean>(`/api/items/${values.id}`, values, {
         onSuccess: () => {
           notification.success({
             message: "Item updated successfully!",
@@ -48,8 +46,8 @@ const ItemEdit: React.FC = () => {
             errors: updateErrors,
           });
         },
-        onServerError: (errors) => {
-          handleServerError(errors, "Failed to save item!");
+        onServerError: () => {
+          notification.error({ message: "Failed to save item!" });
         },
         onFinally: () => {
           setLoading(false);
@@ -61,8 +59,7 @@ const ItemEdit: React.FC = () => {
   useAsyncEffect(async () => {
     form.resetFields();
     setLoading(true);
-    const response = await ItemService.fetchItemById(itemId);
-    handleResult(response, {
+    apiClient.get<Item>(`/api/items/${itemId}`, {
       onSuccess: (data) => {
         if (data) {
           form.setFieldsValue({
@@ -73,8 +70,8 @@ const ItemEdit: React.FC = () => {
           });
         }
       },
-      onServerError: (errors) => {
-        handleServerError(errors, "Failed to fetch item!");
+      onServerError: () => {
+        notification.error({ message: "Failed to fetch item!" });
       },
       onFinally: () => {
         setLoading(false);

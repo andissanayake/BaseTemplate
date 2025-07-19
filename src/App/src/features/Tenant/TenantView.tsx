@@ -10,10 +10,9 @@ import {
 } from "antd";
 import { EditOutlined } from "@ant-design/icons";
 import { useTenantStore } from "./tenantStore";
-import { TenantService } from "./tenantService";
-import { handleResult } from "../../common/handleResult";
-import { handleServerError } from "../../common/serverErrorHandler";
+import { apiClient } from "../../common/apiClient";
 import { useAsyncEffect } from "../../common/useAsyncEffect";
+import { Tenant } from "./TenantModel";
 
 export const TenantView: React.FC = () => {
   const {
@@ -26,19 +25,13 @@ export const TenantView: React.FC = () => {
 
   useAsyncEffect(async () => {
     setLoading(true);
-    const response = await TenantService.fetchTenant();
-    handleResult(response, {
+    apiClient.get<Tenant>("/api/tenants", {
       onSuccess: (data) => {
-        if (data) {
-          setCurrentTenant(data);
-        } else {
-          cleanCurrentTenant();
-          notification.error({ message: "Tenant not found." });
-        }
+        setCurrentTenant(data);
       },
-      onServerError: (errors) => {
+      onServerError: () => {
         cleanCurrentTenant();
-        handleServerError(errors, "Failed to fetch tenant details.");
+        notification.error({ message: "Failed to fetch tenant details." });
       },
       onFinally: () => {
         setLoading(false);
