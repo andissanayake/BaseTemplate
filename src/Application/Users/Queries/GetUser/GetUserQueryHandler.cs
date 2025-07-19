@@ -71,9 +71,16 @@ public class GetUserQueryHandler : IRequestHandler<GetUserQuery, GetUserResponse
 
     private async Task<IEnumerable<string>> GetUserRolesAsync(IUnitOfWork uow, int userId)
     {
-        return await uow.QueryAsync<string>(
+        var roles = await uow.QueryAsync<string>(
             "SELECT role FROM user_role WHERE user_id = @UserId",
             new { UserId = userId });
+        if (roles.Any(r => r == Roles.TenantOwner))
+        {
+            var rolesList = roles.ToList();
+            rolesList.AddRange(Roles.TenantBaseRoles);
+            roles = rolesList;
+        }
+        return roles;
     }
 
     private async Task<StaffRequestDetails?> GetStaffRequestAsync(IUnitOfWork uow, string email)

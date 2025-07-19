@@ -94,8 +94,8 @@ public class TenantsController : ApiControllerBase
         return await SendAsync(command);
     }
 
-    [HttpPost("{tenantId}/request-staff")]
-    public async Task<ActionResult<Result<bool>>> RequestStaff(int tenantId, RequestStaffCommand command)
+    [HttpPost("request-staff")]
+    public async Task<ActionResult<Result<bool>>> RequestStaff(RequestStaffCommand command)
     {
         // No need to check tenantId in body; tenantId is only in the route now
         return await SendAsync(command);

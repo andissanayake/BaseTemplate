@@ -58,10 +58,13 @@ public class RequestAuthorizer : IRequestAuthorizer
             .Select(r => r.Trim())
             .Where(r => !string.IsNullOrEmpty(r))
             .ToList();
-
+        if (currentRoles.Any(r => r == Roles.TenantOwner))
+        {
+            return true;
+        }
         // Check if user has any of the required roles
-        return roleArray.Any(requiredRole => 
-            currentRoles.Any(userRole => 
+        return roleArray.Any(requiredRole =>
+            currentRoles.Any(userRole =>
                 string.Equals(userRole, requiredRole, StringComparison.OrdinalIgnoreCase)));
     }
 }
