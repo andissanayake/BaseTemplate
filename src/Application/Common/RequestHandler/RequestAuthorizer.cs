@@ -6,10 +6,12 @@ using BaseTemplate.Application.Common.Security;
 public class RequestAuthorizer : IRequestAuthorizer
 {
     private readonly IUser _user;
+    private readonly IUserTenantProfileService _tenantProfileService;
 
-    public RequestAuthorizer(IUser user)
+    public RequestAuthorizer(IUser user, IUserTenantProfileService userTenantProfileService)
     {
         _user = user;
+        _tenantProfileService = userTenantProfileService;
     }
 
     public async Task<Result> AuthorizeAsync<TResponse>(IRequest<TResponse> request, Type requestType)
@@ -39,7 +41,8 @@ public class RequestAuthorizer : IRequestAuthorizer
         // Check roles
         if (!string.IsNullOrWhiteSpace(authorizeAttribute.Roles))
         {
-            var hasRole = await CheckRolesAsync(authorizeAttribute.Roles);
+            var userInfo = await _tenantProfileService.GetUserProfileAsync();
+            var hasRole = CheckRoles(authorizeAttribute.Roles, userInfo.Roles);
             if (!hasRole)
             {
                 return Result.Forbidden("User is not in the required role(s).");
@@ -49,10 +52,16 @@ public class RequestAuthorizer : IRequestAuthorizer
         return Result.Success();
     }
 
-    private async Task<bool> CheckRolesAsync(string roles)
+    private bool CheckRoles(string roles, List<string> currentRoles)
     {
-        var roleArray = roles.Split(',');
+        var roleArray = roles.Split(',', StringSplitOptions.RemoveEmptyEntries)
+            .Select(r => r.Trim())
+            .Where(r => !string.IsNullOrEmpty(r))
+            .ToList();
 
-        return false;
+        // Check if user has any of the required roles
+        return roleArray.Any(requiredRole => 
+            currentRoles.Any(userRole => 
+                string.Equals(userRole, requiredRole, StringComparison.OrdinalIgnoreCase)));
     }
 }
