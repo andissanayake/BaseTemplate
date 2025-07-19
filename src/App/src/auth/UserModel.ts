@@ -1,7 +1,7 @@
 import { Roles } from "./RolesEnum";
 
 export interface TenantDetails {
-  id: string;
+  id: number;
   name: string;
 }
 

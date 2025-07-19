@@ -17,11 +17,9 @@ import { useStaffRequestStore } from "./staffRequestStore";
 import { StaffRequestService } from "./staffRequestService";
 import { handleResult } from "../../common/handleResult";
 import { handleServerError } from "../../common/serverErrorHandler";
-import { useParams } from "react-router-dom";
 import StaffRequestCreate from "./StaffRequestCreate";
 
 export const StaffRequestList: React.FC = () => {
-  const { tenantId } = useParams<{ tenantId: string }>();
   const { staffRequests, loading, setStaffRequests, setLoading } =
     useStaffRequestStore();
   const [createModalVisible, setCreateModalVisible] = useState(false);
@@ -29,8 +27,6 @@ export const StaffRequestList: React.FC = () => {
   const [selectedRequest, setSelectedRequest] =
     useState<StaffRequestDto | null>(null);
   const [rejectForm] = Form.useForm();
-
-  if (!tenantId) throw new Error("Tenant ID is required");
 
   const fetchStaffRequests = async () => {
     setLoading(true);
@@ -233,7 +229,6 @@ export const StaffRequestList: React.FC = () => {
       />
 
       <StaffRequestCreate
-        tenantId={+tenantId}
         visible={createModalVisible}
         onCancel={() => setCreateModalVisible(false)}
         onSuccess={() => {

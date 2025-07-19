@@ -18,17 +18,12 @@ import { Roles } from "../../auth/RolesEnum";
 import { useAuthStore } from "../../auth/authStore";
 
 interface StaffRequestCreateProps {
-  /**
-   * The tenantId is only used for the API URL, not sent in the request body.
-   */
-  tenantId: number;
   visible: boolean;
   onCancel: () => void;
   onSuccess: () => void;
 }
 
 const StaffRequestCreate: React.FC<StaffRequestCreateProps> = ({
-  tenantId,
   visible,
   onCancel,
   onSuccess,
@@ -57,10 +52,7 @@ const StaffRequestCreate: React.FC<StaffRequestCreateProps> = ({
       roles: values.roles,
     };
 
-    const response = await StaffRequestService.createStaffRequest(
-      tenantId,
-      requestData
-    );
+    const response = await StaffRequestService.createStaffRequest(requestData);
 
     handleResult(response, {
       onSuccess: () => {

@@ -13,11 +13,10 @@ export class StaffRequestService {
    * Create a new staff request for a tenant
    */
   static async createStaffRequest(
-    tenantId: number,
     request: CreateStaffRequestRequest
   ): Promise<Result<boolean>> {
     return await handleApi(
-      axiosInstance.post(`${this.baseUrl}/${tenantId}/request-staff`, request)
+      axiosInstance.post(`${this.baseUrl}/request-staff`, request)
     );
   }
 

@@ -13,13 +13,14 @@ export const AppBreadcrumb = () => {
     "/tenants/create": "Create Tenant",
     "/tenants/view": "Tenant View",
     "/tenants/edit": "Tenant Edit",
+    "/tenants/view/staff-requests": "Staff Requests",
 
     "/items": "Items",
     "/items/create": "Create Item",
     "/items/edit/:itemId": (params: any) => `Edit Item #${params.itemId}`,
     "/items/view/:itemId": (params: any) => `View Item #${params.itemId}`,
     "/profile": "Profile",
-    "/tenants/view/:tenantId/staff-requests": "Staff Requests",
+
     "/tenants/view/:tenantId/staff": "Staff Management",
   };
 
