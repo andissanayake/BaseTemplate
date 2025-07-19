@@ -139,7 +139,7 @@ export const AppMenu = () => {
       }
       if (!tenant?.id && staffRequest?.id) {
         menuItems.push({
-          key: "/staff-request/respond",
+          key: "/staff-requests/respond",
           label: "Join a Tenant",
           onClick: (e: any) => {
             handleClick(e.key);

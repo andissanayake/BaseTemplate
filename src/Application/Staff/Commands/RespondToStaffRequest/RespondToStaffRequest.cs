@@ -12,11 +12,13 @@ public class RespondToStaffRequestCommandHandler : IRequestHandler<RespondToStaf
 {
     private readonly IUnitOfWorkFactory _factory;
     private readonly IUser _user;
+    private readonly IUserTenantProfileService _userTenantProfileService;
 
-    public RespondToStaffRequestCommandHandler(IUnitOfWorkFactory factory, IUser user)
+    public RespondToStaffRequestCommandHandler(IUnitOfWorkFactory factory, IUser user, IUserTenantProfileService userTenantProfileService)
     {
         _factory = factory;
         _user = user;
+        _userTenantProfileService = userTenantProfileService;
     }
 
     public async Task<Result<bool>> HandleAsync(RespondToStaffRequestCommand request, CancellationToken cancellationToken)
@@ -66,7 +68,7 @@ public class RespondToStaffRequestCommandHandler : IRequestHandler<RespondToStaf
                 };
                 await uow.InsertAsync(userRole);
             }
-
+            await _userTenantProfileService.InvalidateUserProfileCacheAsync();
             transaction.Commit();
             return Result<bool>.Success(true, $"You have successfully accepted the staff request.");
         }

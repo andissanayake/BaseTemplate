@@ -18,18 +18,20 @@ public class CreateTenantCommandHandler : IRequestHandler<CreateTenantCommand, i
 {
     private readonly IUnitOfWorkFactory _factory;
     private readonly IUser _user;
+    private readonly IUserTenantProfileService _userTenantProfileService;
 
-    public CreateTenantCommandHandler(IUnitOfWorkFactory factory, IUser user)
+    public CreateTenantCommandHandler(IUnitOfWorkFactory factory, IUser user, IUserTenantProfileService userTenantProfileService)
     {
         _factory = factory;
         _user = user;
+        _userTenantProfileService = userTenantProfileService;
     }
 
     public async Task<Result<int>> HandleAsync(CreateTenantCommand request, CancellationToken cancellationToken)
     {
         using var uow = _factory.Create();
         using var transaction = uow.BeginTransaction();
-        
+
         // Load existing user - user should already exist at this point
         var existingUser = await uow.QuerySingleAsync<AppUser>(
             "SELECT * FROM app_user WHERE sso_id = @SsoId",
@@ -55,8 +57,8 @@ public class CreateTenantCommandHandler : IRequestHandler<CreateTenantCommand, i
             UserId = existingUser.Id,
             Role = Roles.TenantOwner
         };
+        await _userTenantProfileService.InvalidateUserProfileCacheAsync();
         await uow.InsertAsync(userRole);
-
         transaction.Commit();
         return Result<int>.Success(tenantId);
     }
