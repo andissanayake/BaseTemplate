@@ -1,4 +1,4 @@
 namespace BaseTemplate.Application.Tenants.Queries.GetTenantById;
 
-[Authorize]
-public record GetTenantByIdQuery : IRequest<GetTenantResponse>; 
+[Authorize(Roles = Roles.TenantManager)]
+public record GetTenantByIdQuery : IRequest<GetTenantResponse>;
