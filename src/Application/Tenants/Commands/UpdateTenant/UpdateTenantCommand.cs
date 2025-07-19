@@ -35,6 +35,7 @@ public class UpdateTenantCommandHandler : IRequestHandler<UpdateTenantCommand, b
         }
         entity.Name = request.Name;
         entity.Address = request.Address;
+        await _userProfileService.InvalidateUserProfileCacheAsync();
         await uow.UpdateAsync(entity);
         return Result<bool>.Success(true);
     }
