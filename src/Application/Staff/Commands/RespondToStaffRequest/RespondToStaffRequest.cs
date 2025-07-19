@@ -35,18 +35,14 @@ public class RespondToStaffRequestCommandHandler : IRequestHandler<RespondToStaf
 
         if (request.IsAccepted)
         {
+            // Use transaction for accepting the request
+            using var transaction = uow.BeginTransaction();
+
             // Accept the request
             staffRequest.Status = StaffRequestStatus.Accepted;
             staffRequest.AcceptedAt = DateTimeOffset.UtcNow;
             staffRequest.AcceptedBySsoId = _user.Identifier;
             await uow.UpdateAsync(staffRequest);
-
-            // Get the tenant information
-            var tenant = await uow.GetAsync<Tenant>(staffRequest.TenantId);
-            if (tenant == null)
-            {
-                return Result<bool>.NotFound($"Tenant not found for staff request {request.StaffRequestId}.");
-            }
 
             // Update the user's tenant information
             var user = await uow.QuerySingleAsync<AppUser>(
@@ -71,7 +67,8 @@ public class RespondToStaffRequestCommandHandler : IRequestHandler<RespondToStaf
                 await uow.InsertAsync(userRole);
             }
 
-            return Result<bool>.Success(true, $"You have successfully accepted the staff request to join {tenant.Name}.");
+            transaction.Commit();
+            return Result<bool>.Success(true, $"You have successfully accepted the staff request.");
         }
         else
         {
@@ -86,10 +83,14 @@ public class RespondToStaffRequestCommandHandler : IRequestHandler<RespondToStaf
                     });
             }
 
+            // Use transaction for rejecting the request
+            using var transaction = uow.BeginTransaction();
+
             staffRequest.Status = StaffRequestStatus.Rejected;
             staffRequest.RejectionReason = request.RejectionReason;
             await uow.UpdateAsync(staffRequest);
 
+            transaction.Commit();
             return Result<bool>.Success(true, "Staff request has been rejected successfully.");
         }
     }

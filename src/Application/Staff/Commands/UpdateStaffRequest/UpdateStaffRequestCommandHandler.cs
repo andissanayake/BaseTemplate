@@ -18,9 +18,6 @@ public class UpdateStaffRequestCommandHandler : IRequestHandler<UpdateStaffReque
 
         using var uow = _factory.Create();
 
-        // Verify the tenant exists and the current user is the owner
-        var tenant = await uow.GetAsync<Tenant>(userProfile.TenantId);
-
         // Get the staff request and verify it belongs to this tenant
         var staffRequest = await uow.QuerySingleAsync<StaffRequest>(
             "SELECT * FROM staff_request WHERE id = @Id AND tenant_id = @TenantId",

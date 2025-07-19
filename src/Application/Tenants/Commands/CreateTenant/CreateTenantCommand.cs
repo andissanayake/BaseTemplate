@@ -28,43 +28,36 @@ public class CreateTenantCommandHandler : IRequestHandler<CreateTenantCommand, i
     public async Task<Result<int>> HandleAsync(CreateTenantCommand request, CancellationToken cancellationToken)
     {
         using var uow = _factory.Create();
-        var transaction = uow.BeginTransaction();
-        try
+        using var transaction = uow.BeginTransaction();
+        
+        // Load existing user - user should already exist at this point
+        var existingUser = await uow.QuerySingleAsync<AppUser>(
+            "SELECT * FROM app_user WHERE sso_id = @SsoId",
+            new { SsoId = _user.Identifier });
+
+        // Create new tenant
+        var tenant = new Tenant
         {
-            // Load existing user - user should already exist at this point
-            var existingUser = await uow.QuerySingleAsync<AppUser>(
-                "SELECT * FROM app_user WHERE sso_id = @SsoId",
-                new { SsoId = _user.Identifier });
+            Name = request.Name,
+            Address = request.Address,
+            OwnerSsoId = _user.Identifier
+        };
+        var tenantId = await uow.InsertAsync(tenant);
 
-            // Create new tenant
-            var tenant = new Tenant
-            {
-                Name = request.Name,
-                Address = request.Address,
-                OwnerSsoId = _user.Identifier
-            };
-            var tenantId = await uow.InsertAsync(tenant);
+        // Update user's tenant_id
+        await uow.ExecuteAsync(
+            "UPDATE app_user SET tenant_id = @TenantId, last_modified = @LastModified WHERE id = @UserId",
+            new { TenantId = tenantId, LastModified = DateTimeOffset.UtcNow, UserId = existingUser.Id });
 
-            // Update user's tenant_id
-            await uow.ExecuteAsync(
-                "UPDATE app_user SET tenant_id = @TenantId, last_modified = @LastModified WHERE id = @UserId",
-                new { TenantId = tenantId, LastModified = DateTimeOffset.UtcNow, UserId = existingUser.Id });
-
-            // Add TenantOwner role to the user
-            var userRole = new UserRole
-            {
-                UserId = existingUser.Id,
-                Role = Roles.TenantOwner
-            };
-            await uow.InsertAsync(userRole);
-
-            transaction.Commit();
-            return Result<int>.Success(tenantId);
-        }
-        catch (Exception ex)
+        // Add TenantOwner role to the user
+        var userRole = new UserRole
         {
-            transaction.Rollback();
-            return Result<int>.Failure($"Failed to create tenant: {ex.Message}");
-        }
+            UserId = existingUser.Id,
+            Role = Roles.TenantOwner
+        };
+        await uow.InsertAsync(userRole);
+
+        transaction.Commit();
+        return Result<int>.Success(tenantId);
     }
 }

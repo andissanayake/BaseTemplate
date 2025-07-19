@@ -44,7 +44,7 @@ public class UnitOfWork : IUnitOfWork
     }
     public ITransaction BeginTransaction()
     {
-        _connection.Open();
+        if (_connection.State == ConnectionState.Closed) { _connection.Open(); }
         _transaction = _connection.BeginTransaction();
         return new UOWTransaction(_transaction);
     }
@@ -74,7 +74,7 @@ public class UnitOfWork : IUnitOfWork
     public async Task DeleteAsync<T>(T entity) where T : class =>
         await _connection.DeleteAsync(entity, _transaction);
 
-    public async Task<T?> GetAsync<T>(object id) where T : class =>
+    public async Task<T> GetAsync<T>(object id) where T : class =>
         await _connection.GetAsync<T>(id, _transaction);
 
     public async Task<IEnumerable<T>> GetAllAsync<T>() where T : class =>

@@ -5,7 +5,9 @@ public class RequestStaffCommandHandler : IRequestHandler<RequestStaffCommand, b
     private readonly IUnitOfWorkFactory _factory;
     private readonly IUserTenantProfileService _userProfileService;
 
-    public RequestStaffCommandHandler(IUnitOfWorkFactory factory, IUserTenantProfileService userProfileService)
+    public RequestStaffCommandHandler(
+        IUnitOfWorkFactory factory, 
+        IUserTenantProfileService userProfileService)
     {
         _factory = factory;
         _userProfileService = userProfileService;
@@ -14,6 +16,7 @@ public class RequestStaffCommandHandler : IRequestHandler<RequestStaffCommand, b
     public async Task<Result<bool>> HandleAsync(RequestStaffCommand request, CancellationToken cancellationToken)
     {
         using var uow = _factory.Create();
+        using var transaction = uow.BeginTransaction();
 
         var userProfile = await _userProfileService.GetUserProfileAsync();
 
@@ -27,18 +30,6 @@ public class RequestStaffCommandHandler : IRequestHandler<RequestStaffCommand, b
                 new Dictionary<string, string[]>
                 {
                     ["Roles"] = new[] { $"The following roles are not allowed for staff requests: {string.Join(", ", invalidRoles)}. Allowed roles are: {string.Join(", ", Roles.TenantBaseRoles)}." }
-                });
-        }
-
-        // Verify the tenant exists and the current user is the owner
-        var tenant = await uow.GetAsync<Tenant>(userProfile.TenantId);
-        if (tenant == null)
-        {
-            return Result<bool>.Validation(
-                "Tenant not found.",
-                new Dictionary<string, string[]>
-                {
-                    ["TenantId"] = new[] { $"Tenant with id {userProfile.TenantId} not found." }
                 });
         }
 
@@ -108,6 +99,8 @@ public class RequestStaffCommandHandler : IRequestHandler<RequestStaffCommand, b
             await uow.InsertAsync(staffRequestRole);
         }
 
+        transaction.Commit();
+        
         return Result<bool>.Success(true, $"Staff request for {request.StaffEmail} has been created successfully. The user will be notified to accept the invitation.");
     }
 }
