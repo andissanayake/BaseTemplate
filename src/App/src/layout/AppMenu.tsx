@@ -98,7 +98,7 @@ export const AppMenu = () => {
     if (user) {
       if (tenant?.id) {
         menuItems.push({
-          key: "/tenants/view/" + tenant.id,
+          key: "/tenants/view",
           label: <span>{tenant.name}</span>,
           onClick: (e: any) => {
             handleClick(e.key);
@@ -113,14 +113,14 @@ export const AppMenu = () => {
         });
 
         menuItems.push({
-          key: "/tenants/view/" + tenant.id + "/staff-requests",
+          key: "/tenants/view/staff-requests",
           label: <span>Staff Requests</span>,
           onClick: (e: any) => {
             handleClick(e.key);
           },
         });
         menuItems.push({
-          key: "/tenants/view/" + tenant.id + "/staff",
+          key: "/tenants/view/staff",
           label: <span>Staff Management</span>,
           onClick: (e: any) => {
             handleClick(e.key);

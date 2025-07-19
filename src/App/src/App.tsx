@@ -82,7 +82,7 @@ export const App = () => {
             }
           />
           <Route
-            path="/tenants/view/:tenantId/edit"
+            path="/tenants/edit"
             element={
               <ProtectedRoute policy={Policies.User}>
                 <TenantEditPage />
@@ -90,7 +90,7 @@ export const App = () => {
             }
           />
           <Route
-            path="/tenants/view/:tenantId"
+            path="/tenants/view"
             element={
               <ProtectedRoute policy={Policies.User}>
                 <TenantViewPage />
@@ -98,7 +98,7 @@ export const App = () => {
             }
           />
           <Route
-            path="/tenants/view/:tenantId/staff-requests"
+            path="/tenants/view/staff-requests"
             element={
               <ProtectedRoute policy={Policies.User}>
                 <StaffRequestManagementPage />
@@ -106,7 +106,7 @@ export const App = () => {
             }
           />
           <Route
-            path="/staff-request/respond"
+            path="/tenants/view/staff-requests/respond"
             element={
               <ProtectedRoute policy={Policies.User}>
                 <StaffRequestResponsePage />
@@ -114,7 +114,7 @@ export const App = () => {
             }
           />
           <Route
-            path="/tenants/view/:tenantId/staff"
+            path="/tenants/view/staff"
             element={
               <ProtectedRoute policy={Policies.User}>
                 <StaffManagementPage />

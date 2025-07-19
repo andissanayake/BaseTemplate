@@ -36,7 +36,7 @@ namespace BaseTemplate.Infrastructure.Services
                 LEFT JOIN Tenant t ON u.Tenant_Id = t.Id
                 WHERE u.sso_id = @Identifier", new { Identifier = identifier });
 
-            if (userInfo != null)
+            if (userInfo == null)
             {
                 throw new Exception("Tenant cannot be null here!");
             }

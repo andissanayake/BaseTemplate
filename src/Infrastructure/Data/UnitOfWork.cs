@@ -44,6 +44,7 @@ public class UnitOfWork : IUnitOfWork
     }
     public ITransaction BeginTransaction()
     {
+        _connection.Open();
         _transaction = _connection.BeginTransaction();
         return new UOWTransaction(_transaction);
     }

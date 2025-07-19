@@ -16,8 +16,13 @@ import { handleServerError } from "../../common/serverErrorHandler";
 import { useAsyncEffect } from "../../common/useAsyncEffect";
 
 export const TenantView: React.FC = () => {
-  const { currentTenant, setCurrentTenant, loading, setLoading } =
-    useTenantStore();
+  const {
+    currentTenant,
+    setCurrentTenant,
+    loading,
+    setLoading,
+    cleanCurrentTenant,
+  } = useTenantStore();
 
   useAsyncEffect(async () => {
     setLoading(true);
@@ -27,12 +32,12 @@ export const TenantView: React.FC = () => {
         if (data) {
           setCurrentTenant(data);
         } else {
-          setCurrentTenant(null);
+          cleanCurrentTenant();
           notification.error({ message: "Tenant not found." });
         }
       },
       onServerError: (errors) => {
-        setCurrentTenant(null);
+        cleanCurrentTenant();
         handleServerError(errors, "Failed to fetch tenant details.");
       },
       onFinally: () => {
@@ -44,8 +49,6 @@ export const TenantView: React.FC = () => {
   const tenantViewContent = useCallback(() => {
     if (loading) {
       return <Spin style={{ display: "block", marginTop: "20px" }} />;
-    } else if (!currentTenant) {
-      return <Typography.Text>Tenant details are unavailable.</Typography.Text>;
     } else {
       return (
         <Descriptions column={1} bordered>
@@ -75,11 +78,9 @@ export const TenantView: React.FC = () => {
           Tenant View
         </Typography.Title>
 
-        {currentTenant && (
-          <Link to={`/tenants/view/${currentTenant.id}/edit`}>
-            <Button type="primary" shape="circle" icon={<EditOutlined />} />
-          </Link>
-        )}
+        <Link to={`/tenants/edit`}>
+          <Button type="primary" shape="circle" icon={<EditOutlined />} />
+        </Link>
       </Space>
       {tenantViewContent()}
     </>

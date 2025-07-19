@@ -2,15 +2,22 @@ import { create } from "zustand";
 import { Tenant } from "./TenantModel";
 
 interface TenantState {
-  currentTenant: Tenant | null;
+  currentTenant: Tenant;
   loading: boolean;
   setLoading: (loading: boolean) => void;
-  setCurrentTenant: (tenant: Tenant | null) => void;
+  setCurrentTenant: (tenant: Tenant) => void;
+  cleanCurrentTenant: () => void;
 }
 
+const defaultTenant: Tenant = {
+  id: -1,
+  name: "",
+  address: "",
+};
 export const useTenantStore = create<TenantState>((set) => ({
-  currentTenant: null,
+  currentTenant: defaultTenant,
   loading: false,
   setLoading: (loading: boolean) => set({ loading }),
-  setCurrentTenant: (tenant: Tenant | null) => set({ currentTenant: tenant }),
+  setCurrentTenant: (tenant: Tenant) => set({ currentTenant: tenant }),
+  cleanCurrentTenant: () => set({ currentTenant: defaultTenant }),
 }));

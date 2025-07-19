@@ -4,8 +4,8 @@ import { Content, Header } from "antd/es/layout/layout";
 import { Outlet } from "react-router";
 import { AppFooter } from "./AppFooter";
 import { AppLogo } from "./AppLogo";
-import { AppMenu } from "./AppMenu";
 import { AppBreadcrumb } from "./AppBreadcrumb";
+import { AppMenu } from "./AppMenu";
 
 export const DefaultLayout = () => {
   return (

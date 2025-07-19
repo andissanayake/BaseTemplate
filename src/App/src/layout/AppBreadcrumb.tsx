@@ -15,10 +15,8 @@ export const AppBreadcrumb = () => {
     "/items/view/:itemId": (params: any) => `View Item #${params.itemId}`,
     "/profile": "Profile",
     "/tenants/create": "Create Tenant",
-    "/tenants/view/:tenantId": (params: any) =>
-      ` Tenant View #${params.tenantId}`,
-    "/tenants/view/:tenantId/edit": (params: any) =>
-      ` Tenant Edit #${params.tenantId}`,
+    "/tenants/view": () => ` Tenant View`,
+    "/tenants/edit": () => ` Tenant Edit`,
     "/tenants/view/:tenantId/staff-requests": "Staff Requests",
     "/tenants/view/:tenantId/staff": "Staff Management",
   };
