@@ -19,7 +19,7 @@ public class UpdateStaffRolesCommandHandler : IRequestHandler<UpdateStaffRolesCo
         var tenantId = userProfile.TenantId;
 
         using var uow = _factory.Create();
-
+        using var transaction = uow.BeginTransaction();
         // Verify the user exists and belongs to the tenant
         var user = await uow.QueryFirstOrDefaultAsync<AppUser>(
             "SELECT * FROM app_user WHERE id = @StaffId AND tenant_id = @TenantId",
@@ -43,7 +43,8 @@ public class UpdateStaffRolesCommandHandler : IRequestHandler<UpdateStaffRolesCo
                 "INSERT INTO user_role (user_id, role, created, last_modified) VALUES (@UserId, @Role, @Created, @LastModified)",
                 roleValues.Select(r => new { r.UserId, r.Role, Created = DateTimeOffset.UtcNow, LastModified = DateTimeOffset.UtcNow }));
         }
-
+        await _userProfileService.InvalidateUserProfileCacheAsync(user.SsoId);
+        transaction.Commit();
         return Result<bool>.Success(true);
     }
 }
