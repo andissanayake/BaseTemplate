@@ -110,17 +110,6 @@ const ItemAttributeTypeList: React.FC = () => {
       ),
     },
     {
-      title: "Created",
-      dataIndex: "created",
-      key: "created",
-      render: (created: string) => new Date(created).toLocaleDateString(),
-    },
-    {
-      title: "Created By",
-      dataIndex: "createdBy",
-      key: "createdBy",
-    },
-    {
       title: "Actions",
       render: (_: unknown, record: ItemAttributeType) => (
         <Space>

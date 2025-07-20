@@ -25,7 +25,7 @@ public class ItemAttributeTypesController : ApiControllerBase
     /// </ul>
     /// <b>Response:</b>
     /// <ul>
-    ///   <li><c>List&lt;ItemAttributeTypeBriefDto&gt;</c>: List of item attribute types with basic information including Id, Name, Description, IsActive, Created, CreatedBy</li>
+    ///   <li><c>List&lt;ItemAttributeTypeBriefDto&gt;</c>: List of item attribute types with basic information including Id, Name, Description, IsActive</li>
     /// </ul>
     /// </remarks>
     [HttpGet]
@@ -49,7 +49,7 @@ public class ItemAttributeTypesController : ApiControllerBase
     /// </ul>
     /// <b>Response:</b>
     /// <ul>
-    ///   <li><c>ItemAttributeTypeDto</c>: Detailed item attribute type information including Id, Name, Description, IsActive, Created, CreatedBy, LastModified, LastModifiedBy</li>
+    ///   <li><c>ItemAttributeTypeDto</c>: Detailed item attribute type information including Id, Name, Description, IsActive</li>
     /// </ul>
     /// </remarks>
     [HttpGet("{id}")]
@@ -68,7 +68,6 @@ public class ItemAttributeTypesController : ApiControllerBase
     ///   <li>Creates a new item attribute type for the current tenant</li>
     ///   <li>Validates that the name is unique within the tenant (case-sensitive)</li>
     ///   <li>Automatically sets IsActive to true and associates with current tenant</li>
-    ///   <li>Records audit information (created timestamp and user)</li>
     ///   <li>Requires AttributeManager role permission</li>
     /// </ul>
     /// <b>Validation Rules:</b>
@@ -107,7 +106,6 @@ public class ItemAttributeTypesController : ApiControllerBase
     ///   <li>Updates an existing item attribute type for the current tenant</li>
     ///   <li>Validates that the attribute type exists and belongs to the current tenant</li>
     ///   <li>Validates that the new name is unique within the tenant (if name is being changed)</li>
-    ///   <li>Records audit information (updated timestamp and user)</li>
     ///   <li>Requires AttributeManager role permission</li>
     /// </ul>
     /// <b>Validation Rules:</b>
@@ -153,7 +151,6 @@ public class ItemAttributeTypesController : ApiControllerBase
     ///   <li>Performs a soft delete by setting IsActive to false</li>
     ///   <li>Validates that the attribute type exists and belongs to the current tenant</li>
     ///   <li>Does not physically delete the record (preserves data integrity)</li>
-    ///   <li>Records audit information (updated timestamp and user)</li>
     ///   <li>Requires AttributeManager role permission</li>
     /// </ul>
     /// <b>Important Notes:</b>

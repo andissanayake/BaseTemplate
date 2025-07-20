@@ -25,11 +25,7 @@ public class GetItemAttributeTypeByIdQueryHandler : IRequestHandler<GetItemAttri
             Id = itemAttributeType.Id,
             Name = itemAttributeType.Name,
             Description = itemAttributeType.Description,
-            IsActive = itemAttributeType.IsActive,
-            Created = itemAttributeType.Created,
-            CreatedBy = itemAttributeType.CreatedBy,
-            LastModified = itemAttributeType.LastModified,
-            LastModifiedBy = itemAttributeType.LastModifiedBy
+            IsActive = itemAttributeType.IsActive
         };
 
         return Result<ItemAttributeTypeDto>.Success(dto);

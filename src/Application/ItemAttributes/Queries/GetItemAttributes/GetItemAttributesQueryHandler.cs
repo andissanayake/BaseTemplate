@@ -40,9 +40,7 @@ public class GetItemAttributesQueryHandler : IRequestHandler<GetItemAttributesQu
             Value = a.value,
             IsActive = a.is_active,
             ItemAttributeTypeId = a.item_attribute_type_id,
-            ItemAttributeTypeName = a.item_attribute_type_name,
-            Created = a.created,
-            CreatedBy = a.created_by
+            ItemAttributeTypeName = a.item_attribute_type_name
         }).ToList();
 
         return Result<List<ItemAttributeBriefDto>>.Success(dtos);

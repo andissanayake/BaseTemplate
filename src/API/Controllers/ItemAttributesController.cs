@@ -22,7 +22,6 @@ public class ItemAttributesController : ApiControllerBase
     ///   <li>Validates that the item attribute type exists and belongs to the current tenant</li>
     ///   <li>Validates that the name and code are unique within the item attribute type</li>
     ///   <li>Automatically sets IsActive to true and associates with current tenant</li>
-    ///   <li>Records audit information (created timestamp and user)</li>
     ///   <li>Requires AttributeManager role permission</li>
     /// </ul>
     /// <b>Validation Rules:</b>
@@ -62,7 +61,6 @@ public class ItemAttributesController : ApiControllerBase
     ///   <li>Updates an existing item attribute for the current tenant</li>
     ///   <li>Validates that the attribute exists and belongs to the current tenant</li>
     ///   <li>Validates that the new name and code are unique within the attribute type (if being changed)</li>
-    ///   <li>Records audit information (updated timestamp and user)</li>
     ///   <li>Requires AttributeManager role permission</li>
     /// </ul>
     /// <b>Validation Rules:</b>
@@ -103,7 +101,6 @@ public class ItemAttributesController : ApiControllerBase
     ///   <li>Performs a soft delete by setting IsActive to false</li>
     ///   <li>Validates that the attribute exists and belongs to the current tenant</li>
     ///   <li>Does not physically delete the record (preserves data integrity)</li>
-    ///   <li>Records audit information (updated timestamp and user)</li>
     ///   <li>Requires AttributeManager role permission</li>
     /// </ul>
     /// <b>Important Notes:</b>
@@ -136,7 +133,7 @@ public class ItemAttributesController : ApiControllerBase
     /// </ul>
     /// <b>Response:</b>
     /// <ul>
-    ///   <li><c>ItemAttributeDto</c>: Detailed item attribute information including Id, Name, Code, Value, IsActive, ItemAttributeTypeId, ItemAttributeTypeName, Created, CreatedBy, LastModified, LastModifiedBy</li>
+    ///   <li><c>ItemAttributeDto</c>: Detailed item attribute information including Id, Name, Code, Value, IsActive, ItemAttributeTypeId, ItemAttributeTypeName</li>
     /// </ul>
     /// </remarks>
     [HttpGet("{id}")]
@@ -159,7 +156,7 @@ public class ItemAttributesController : ApiControllerBase
     /// </ul>
     /// <b>Response:</b>
     /// <ul>
-    ///   <li><c>List&lt;ItemAttributeBriefDto&gt;</c>: List of item attributes with basic information including Id, Name, Code, Value, IsActive, ItemAttributeTypeId, ItemAttributeTypeName, Created, CreatedBy</li>
+    ///   <li><c>List&lt;ItemAttributeBriefDto&gt;</c>: List of item attributes with basic information including Id, Name, Code, Value, IsActive, ItemAttributeTypeId, ItemAttributeTypeName</li>
     /// </ul>
     /// </remarks>
     [HttpGet("/api/itemAttributeType/{itemAttributeTypeId}/ItemAttribute")]

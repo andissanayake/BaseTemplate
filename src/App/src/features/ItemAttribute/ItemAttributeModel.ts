@@ -6,10 +6,6 @@ export interface ItemAttribute {
   isActive: boolean;
   itemAttributeTypeId: number;
   itemAttributeTypeName: string;
-  created: string;
-  createdBy?: string;
-  lastModified?: string;
-  lastModifiedBy?: string;
 }
 
 export interface CreateItemAttributeRequest {

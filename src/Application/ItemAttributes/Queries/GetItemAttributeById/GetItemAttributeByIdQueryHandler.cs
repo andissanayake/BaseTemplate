@@ -32,11 +32,7 @@ public class GetItemAttributeByIdQueryHandler : IRequestHandler<GetItemAttribute
             Value = itemAttribute.value,
             IsActive = itemAttribute.is_active,
             ItemAttributeTypeId = itemAttribute.item_attribute_type_id,
-            ItemAttributeTypeName = itemAttribute.item_attribute_type_name,
-            Created = itemAttribute.created,
-            CreatedBy = itemAttribute.created_by,
-            LastModified = itemAttribute.last_modified,
-            LastModifiedBy = itemAttribute.last_modified_by
+            ItemAttributeTypeName = itemAttribute.item_attribute_type_name
         };
 
         return Result<ItemAttributeDto>.Success(dto);

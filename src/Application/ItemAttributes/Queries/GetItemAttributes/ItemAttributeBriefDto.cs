@@ -9,6 +9,4 @@ public class ItemAttributeBriefDto
     public bool IsActive { get; set; }
     public int ItemAttributeTypeId { get; set; }
     public string ItemAttributeTypeName { get; set; } = string.Empty;
-    public DateTimeOffset Created { get; set; }
-    public string? CreatedBy { get; set; }
 } 

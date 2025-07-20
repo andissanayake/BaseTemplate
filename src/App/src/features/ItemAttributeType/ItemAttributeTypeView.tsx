@@ -90,26 +90,6 @@ const ItemAttributeTypeView: React.FC = () => {
             {itemAttributeType.isActive ? "Active" : "Inactive"}
           </Tag>
         </Descriptions.Item>
-
-        <Descriptions.Item label="Created">
-          {itemAttributeType.created
-            ? new Date(itemAttributeType.created).toLocaleString()
-            : "-"}
-        </Descriptions.Item>
-
-        <Descriptions.Item label="Created By">
-          {itemAttributeType.createdBy || "-"}
-        </Descriptions.Item>
-
-        <Descriptions.Item label="Last Modified">
-          {itemAttributeType.lastModified
-            ? new Date(itemAttributeType.lastModified).toLocaleString()
-            : "-"}
-        </Descriptions.Item>
-
-        <Descriptions.Item label="Last Modified By">
-          {itemAttributeType.lastModifiedBy || "-"}
-        </Descriptions.Item>
       </Descriptions>
 
       {/* Item Attributes Dashboard */}
