@@ -16,6 +16,8 @@ import { ItemCreatePage } from "./pages/ItemCreatePage";
 import { ItemEditPage } from "./pages/ItemEditPage";
 import { ItemViewPage } from "./pages/ItemViewPage";
 import { ItemListPage } from "./pages/ItemListPage";
+import { LoginPage } from "./pages/LoginPage";
+import { LogoutPage } from "./pages/LogoutPage";
 import NoAccessPage from "./pages/NoAccessPage";
 
 export const App = () => {
@@ -24,6 +26,9 @@ export const App = () => {
       <Routes>
         <Route path="/" element={<DefaultLayout />}>
           <Route index element={<HomePage />} />
+
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/logout" element={<LogoutPage />} />
 
           <Route
             path="/items"

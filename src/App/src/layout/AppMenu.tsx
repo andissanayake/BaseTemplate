@@ -2,11 +2,7 @@
 import { Avatar, Menu } from "antd";
 import { ItemType, MenuItemType } from "antd/es/menu/interface";
 import { useCallback, useEffect, useState } from "react";
-import {
-  onAuthStateChangedListener,
-  handleLogout,
-  handleLogin,
-} from "../auth/firebase";
+import { onAuthStateChangedListener } from "../auth/firebase";
 import { useLocation, useNavigate } from "react-router";
 import { useAuthStore } from "../auth/authStore";
 import { apiClient } from "../common/apiClient";
@@ -161,17 +157,16 @@ export const AppMenu = () => {
       menuItems.push({
         key: "/logout",
         label: "Logout",
-        onClick: () => {
-          handleLogout();
-          navigate("/");
+        onClick: (e: any) => {
+          handleClick(e.key);
         },
       });
     } else {
       menuItems.push({
         key: "/login",
         label: "Login",
-        onClick: () => {
-          handleLogin();
+        onClick: (e: any) => {
+          handleClick(e.key);
         },
         style: { marginLeft: "auto" },
       });
