@@ -53,14 +53,10 @@ public class ItemAttributesController : ApiControllerBase
 
     [HttpGet("item-attributes")]
     public async Task<ActionResult<Result<List<ItemAttributeBriefDto>>>> GetAll(
-        [FromQuery] string? searchTerm = null,
-        [FromQuery] bool? isActive = null,
         [FromQuery] int? itemAttributeTypeId = null)
     {
         var query = new GetItemAttributesQuery
         {
-            SearchTerm = searchTerm,
-            IsActive = isActive,
             ItemAttributeTypeId = itemAttributeTypeId
         };
 

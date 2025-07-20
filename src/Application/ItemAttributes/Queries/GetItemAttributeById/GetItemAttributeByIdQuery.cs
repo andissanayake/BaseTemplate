@@ -1,6 +1,4 @@
-using BaseTemplate.Domain.Constants;
-
 namespace BaseTemplate.Application.ItemAttributes.Queries.GetItemAttributeById;
- 
+
 [Authorize(Roles = Roles.AttributeManager)]
-public record GetItemAttributeByIdQuery(int Id) : IRequest<ItemAttributeDto>; 
+public record GetItemAttributeByIdQuery(int Id) : IRequest<ItemAttributeDto>;

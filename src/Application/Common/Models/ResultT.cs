@@ -15,7 +15,7 @@ public class Result<T>
             Message = message
         };
 
-    public static Result<T> Failure(string code, string? message = null, Dictionary<string, string[]>? details = null) =>
+    private static Result<T> Failure(string code, string? message = null, Dictionary<string, string[]>? details = null) =>
         new()
         {
             Code = code,
@@ -36,4 +36,4 @@ public class Result<T>
 
     public static Result<T> ServerError(string? message = null) =>
         Failure(ResultCodeMapper.DefaultServerErrorCode, message ?? "Unexpected error occurred");
-} 
+}

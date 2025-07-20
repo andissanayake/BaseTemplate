@@ -13,19 +13,12 @@ namespace BaseTemplate.API.Controllers;
 public class ItemAttributeTypesController : ApiControllerBase
 {
     /// <summary>
-    /// Get all item attribute types with optional filtering.
+    /// Get all item attribute types.
     /// </summary>
     /// <remarks>
     /// <b>What this endpoint does:</b>
     /// <ul>
-    ///   <li>Retrieves all item attribute types with optional search and filtering.</li>
-    ///   <li>Supports searching by name using the searchTerm parameter.</li>
-    ///   <li>Supports filtering by active status using the isActive parameter.</li>
-    /// </ul>
-    /// <b>Query Parameters:</b>
-    /// <ul>
-    ///   <li><c>searchTerm</c> (string, optional): Search term to filter by name</li>
-    ///   <li><c>isActive</c> (bool, optional): Filter by active status</li>
+    ///   <li>Retrieves all item attribute types for the current tenant.</li>
     /// </ul>
     /// <b>Response:</b>
     /// <ul>
@@ -33,15 +26,9 @@ public class ItemAttributeTypesController : ApiControllerBase
     /// </ul>
     /// </remarks>
     [HttpGet("item-attribute-types")]
-    public async Task<ActionResult<Result<List<ItemAttributeTypeBriefDto>>>> GetAll(
-        [FromQuery] string? searchTerm = null,
-        [FromQuery] bool? isActive = null)
+    public async Task<ActionResult<Result<List<ItemAttributeTypeBriefDto>>>> GetAll()
     {
-        var query = new GetItemAttributeTypesQuery
-        {
-            SearchTerm = searchTerm,
-            IsActive = isActive
-        };
+        var query = new GetItemAttributeTypesQuery();
 
         return await SendAsync(query);
     }
@@ -80,7 +67,6 @@ public class ItemAttributeTypesController : ApiControllerBase
     /// <ul>
     ///   <li><c>Name</c> (string, required): Name of the attribute type</li>
     ///   <li><c>Description</c> (string, optional): Description of the attribute type</li>
-    ///   <li><c>IsActive</c> (bool, optional): Whether the attribute type is active</li>
     /// </ul>
     /// <b>Response:</b>
     /// <ul>
@@ -112,7 +98,6 @@ public class ItemAttributeTypesController : ApiControllerBase
     ///   <li><c>Id</c> (int, required): ID of the attribute type to update</li>
     ///   <li><c>Name</c> (string, required): Updated name of the attribute type</li>
     ///   <li><c>Description</c> (string, optional): Updated description of the attribute type</li>
-    ///   <li><c>IsActive</c> (bool, optional): Updated active status</li>
     /// </ul>
     /// <b>Response:</b>
     /// <ul>

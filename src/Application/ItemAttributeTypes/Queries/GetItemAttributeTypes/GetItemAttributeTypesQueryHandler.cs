@@ -19,15 +19,11 @@ public class GetItemAttributeTypesQueryHandler : IRequestHandler<GetItemAttribut
         var sql = @"
             SELECT * FROM item_attribute_type 
             WHERE tenant_id = @TenantId
-            AND (@SearchTerm IS NULL OR name ILIKE @SearchTerm OR description ILIKE @SearchTerm)
-            AND (@IsActive IS NULL OR is_active = @IsActive)
             ORDER BY created DESC";
 
         var parameters = new 
         { 
-            TenantId = userInfo.TenantId,
-            SearchTerm = string.IsNullOrWhiteSpace(request.SearchTerm) ? null : $"%{request.SearchTerm}%",
-            IsActive = request.IsActive
+            TenantId = userInfo.TenantId
         };
 
         var items = await uow.QueryAsync<ItemAttributeType>(sql, parameters);

@@ -16,6 +16,16 @@ public class CreateItemAttributeCommandHandler : IRequestHandler<CreateItemAttri
         var userInfo = await _userProfileService.GetUserProfileAsync();
         using var uow = _factory.Create();
 
+        // Check if code already exists for this tenant
+        var existingAttribute = await uow.QueryFirstOrDefaultAsync<ItemAttribute>(
+            "SELECT * FROM item_attribute WHERE code = @Code AND tenant_id = @TenantId",
+            new { request.Code, TenantId = userInfo.TenantId });
+
+        if (existingAttribute != null)
+        {
+            return Result<int>.Validation("Code must be unique within the tenant", []);
+        }
+
         var itemAttribute = new ItemAttribute
         {
             Name = request.Name,

@@ -21,16 +21,12 @@ public class GetItemAttributesQueryHandler : IRequestHandler<GetItemAttributesQu
             FROM item_attribute ia 
             LEFT JOIN item_attribute_type iat ON ia.item_attribute_type_id = iat.id 
             WHERE ia.tenant_id = @TenantId
-            AND (@SearchTerm IS NULL OR ia.name ILIKE @SearchTerm OR ia.code ILIKE @SearchTerm OR ia.value ILIKE @SearchTerm)
-            AND (@IsActive IS NULL OR ia.is_active = @IsActive)
             AND (@ItemAttributeTypeId IS NULL OR ia.item_attribute_type_id = @ItemAttributeTypeId)
             ORDER BY ia.created DESC";
 
         var parameters = new
         {
             TenantId = userInfo.TenantId,
-            SearchTerm = string.IsNullOrWhiteSpace(request.SearchTerm) ? null : $"%{request.SearchTerm}%",
-            IsActive = request.IsActive,
             ItemAttributeTypeId = request.ItemAttributeTypeId
         };
 
