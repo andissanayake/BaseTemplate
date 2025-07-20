@@ -1,0 +1,19 @@
+-- Create attribute_type table
+CREATE TABLE attribute_type (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    description TEXT,
+    is_active BOOLEAN NOT NULL DEFAULT true,
+    tenant_id INTEGER NOT NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    created_by VARCHAR(255),
+    updated_at TIMESTAMP,
+    updated_by VARCHAR(255),
+    
+    CONSTRAINT fk_attribute_type_tenant FOREIGN KEY (tenant_id) REFERENCES tenant(id) ON DELETE CASCADE,
+    CONSTRAINT uk_attribute_type_name_tenant UNIQUE (name, tenant_id)
+);
+
+-- Create index for better performance
+CREATE INDEX idx_attribute_type_tenant_id ON attribute_type(tenant_id);
+CREATE INDEX idx_attribute_type_is_active ON attribute_type(is_active); 
