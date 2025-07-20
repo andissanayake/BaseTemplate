@@ -6,6 +6,7 @@ import { apiClient } from "../../common/apiClient";
 import { useAuthStore } from "../../auth/authStore";
 import { ItemAttributeType } from "./ItemAttributeTypeModel";
 import { notification } from "antd";
+import ItemAttributeDashboard from "../ItemAttribute/ItemAttributeDashboard";
 
 const ItemAttributeTypeView: React.FC = () => {
   const { setLoading } = useItemAttributeTypeStore();
@@ -110,6 +111,11 @@ const ItemAttributeTypeView: React.FC = () => {
           {itemAttributeType.lastModifiedBy || "-"}
         </Descriptions.Item>
       </Descriptions>
+
+      {/* Item Attributes Dashboard */}
+      <ItemAttributeDashboard
+        itemAttributeTypeId={parseInt(itemAttributeTypeId)}
+      />
     </Card>
   );
 };
