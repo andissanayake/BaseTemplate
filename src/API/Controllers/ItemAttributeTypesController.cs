@@ -23,12 +23,6 @@ public class ItemAttributeTypesController : ApiControllerBase
     ///   <li>Results are ordered by creation date (newest first)</li>
     ///   <li>Requires AttributeManager role permission</li>
     /// </ul>
-    /// <b>Business Context:</b>
-    /// <ul>
-    ///   <li>Item attribute types define categories for item attributes (e.g., "Color", "Size", "Material")</li>
-    ///   <li>These types are used to organize and categorize item attributes within a tenant</li>
-    ///   <li>Each tenant has their own set of attribute types</li>
-    /// </ul>
     /// <b>Response:</b>
     /// <ul>
     ///   <li><c>List&lt;ItemAttributeTypeBriefDto&gt;</c>: List of item attribute types with basic information including Id, Name, Description, IsActive, Created, CreatedBy</li>
@@ -53,12 +47,6 @@ public class ItemAttributeTypesController : ApiControllerBase
     ///   <li>Returns NotFound if the item attribute type does not exist or doesn't belong to the tenant</li>
     ///   <li>Requires AttributeManager role permission</li>
     /// </ul>
-    /// <b>Business Context:</b>
-    /// <ul>
-    ///   <li>Used to get detailed information about a specific attribute type</li>
-    ///   <li>Includes audit information (created/modified timestamps and users)</li>
-    ///   <li>Tenant isolation ensures users can only access their own attribute types</li>
-    /// </ul>
     /// <b>Response:</b>
     /// <ul>
     ///   <li><c>ItemAttributeTypeDto</c>: Detailed item attribute type information including Id, Name, Description, IsActive, Created, CreatedBy, LastModified, LastModifiedBy</li>
@@ -82,13 +70,6 @@ public class ItemAttributeTypesController : ApiControllerBase
     ///   <li>Automatically sets IsActive to true and associates with current tenant</li>
     ///   <li>Records audit information (created timestamp and user)</li>
     ///   <li>Requires AttributeManager role permission</li>
-    /// </ul>
-    /// <b>Business Context:</b>
-    /// <ul>
-    ///   <li>Attribute types define categories for organizing item attributes</li>
-    ///   <li>Examples: "Color", "Size", "Material", "Brand", "Category"</li>
-    ///   <li>Each tenant can have their own set of attribute types</li>
-    ///   <li>Names must be unique within a tenant to avoid confusion</li>
     /// </ul>
     /// <b>Validation Rules:</b>
     /// <ul>
@@ -128,12 +109,6 @@ public class ItemAttributeTypesController : ApiControllerBase
     ///   <li>Validates that the new name is unique within the tenant (if name is being changed)</li>
     ///   <li>Records audit information (updated timestamp and user)</li>
     ///   <li>Requires AttributeManager role permission</li>
-    /// </ul>
-    /// <b>Business Context:</b>
-    /// <ul>
-    ///   <li>Allows modification of attribute type names and descriptions</li>
-    ///   <li>Changes to attribute types affect all associated item attributes</li>
-    ///   <li>Name changes should be done carefully as they may impact existing data</li>
     /// </ul>
     /// <b>Validation Rules:</b>
     /// <ul>
@@ -180,13 +155,6 @@ public class ItemAttributeTypesController : ApiControllerBase
     ///   <li>Does not physically delete the record (preserves data integrity)</li>
     ///   <li>Records audit information (updated timestamp and user)</li>
     ///   <li>Requires AttributeManager role permission</li>
-    /// </ul>
-    /// <b>Business Context:</b>
-    /// <ul>
-    ///   <li>Soft delete prevents data loss while removing from active use</li>
-    ///   <li>Associated item attributes remain intact but may become orphaned</li>
-    ///   <li>Can be reactivated by updating IsActive back to true</li>
-    ///   <li>Deleted attribute types won't appear in standard queries</li>
     /// </ul>
     /// <b>Important Notes:</b>
     /// <ul>

@@ -88,8 +88,6 @@ const ItemAttributeTypeList: React.FC = () => {
     setPagination(page, pageSize);
   };
 
-  const getBasePath = () => `/item-attribute-types`;
-
   const columns = [
     {
       title: "Name",
@@ -127,13 +125,13 @@ const ItemAttributeTypeList: React.FC = () => {
       render: (_: unknown, record: ItemAttributeType) => (
         <Space>
           <Link
-            to={`${getBasePath()}/view/${record.id}`}
+            to={`/item-attribute-types/view/${record.id}`}
             rel="noopener noreferrer"
           >
             <Button type="link" icon={<EyeOutlined />} />
           </Link>
           <Link
-            to={`${getBasePath()}/edit/${record.id}`}
+            to={`/item-attribute-types/edit/${record.id}`}
             rel="noopener noreferrer"
           >
             <Button type="link" icon={<EditOutlined />} />
@@ -158,7 +156,7 @@ const ItemAttributeTypeList: React.FC = () => {
         <Typography.Title level={3} style={{ margin: 0 }}>
           Item Attribute Types
         </Typography.Title>
-        <Link to={`${getBasePath()}/create`} rel="noopener noreferrer">
+        <Link to={`/item-attribute-types/create`} rel="noopener noreferrer">
           <Button type="primary" icon={<PlusOutlined />}>
             Create
           </Button>

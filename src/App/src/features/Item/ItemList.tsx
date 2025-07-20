@@ -94,9 +94,6 @@ const ItemList: React.FC = () => {
     setPagination(page, pageSize);
   };
 
-  // Always use the standalone items path since we're using auth store tenant ID
-  const getBasePath = () => `/items`;
-
   const columns = [
     {
       title: "Name",
@@ -133,16 +130,10 @@ const ItemList: React.FC = () => {
       title: "Actions",
       render: (_: unknown, record: Item) => (
         <Space>
-          <Link
-            to={`${getBasePath()}/view/${record.id}`}
-            rel="noopener noreferrer"
-          >
+          <Link to={`/items/view/${record.id}`} rel="noopener noreferrer">
             <Button type="link" icon={<EyeOutlined />} />
           </Link>
-          <Link
-            to={`${getBasePath()}/edit/${record.id}`}
-            rel="noopener noreferrer"
-          >
+          <Link to={`/items/edit/${record.id}`} rel="noopener noreferrer">
             <Button type="link" icon={<EditOutlined />} />
           </Link>
           <Popconfirm
@@ -165,7 +156,7 @@ const ItemList: React.FC = () => {
         <Typography.Title level={3} style={{ margin: 0 }}>
           Item List
         </Typography.Title>
-        <Link to={`${getBasePath()}/create`} rel="noopener noreferrer">
+        <Link to={`/items/create`} rel="noopener noreferrer">
           <Button type="primary" icon={<PlusOutlined />}>
             Create
           </Button>
