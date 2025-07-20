@@ -34,7 +34,7 @@ public class ItemAttributeTypesController : ApiControllerBase
     ///   <li><c>List&lt;ItemAttributeTypeBriefDto&gt;</c>: List of item attribute types with basic information including Id, Name, Description, IsActive, Created, CreatedBy</li>
     /// </ul>
     /// </remarks>
-    [HttpGet("item-attribute-types")]
+    [HttpGet]
     public async Task<ActionResult<Result<List<ItemAttributeTypeBriefDto>>>> GetAll()
     {
         var query = new GetItemAttributeTypesQuery();
@@ -64,7 +64,7 @@ public class ItemAttributeTypesController : ApiControllerBase
     ///   <li><c>ItemAttributeTypeDto</c>: Detailed item attribute type information including Id, Name, Description, IsActive, Created, CreatedBy, LastModified, LastModifiedBy</li>
     /// </ul>
     /// </remarks>
-    [HttpGet("item-attribute-types/{id}")]
+    [HttpGet("{id}")]
     public async Task<ActionResult<Result<ItemAttributeTypeDto>>> GetById(int id)
     {
         var query = new GetItemAttributeTypeByIdQuery { Id = id };
@@ -106,7 +106,7 @@ public class ItemAttributeTypesController : ApiControllerBase
     ///   <li><c>int</c>: The ID of the newly created item attribute type</li>
     /// </ul>
     /// </remarks>
-    [HttpPost("item-attribute-types")]
+    [HttpPost]
     public async Task<ActionResult<Result<int>>> Create(CreateItemAttributeTypeCommand command)
     {
         if (command == null)
@@ -153,7 +153,7 @@ public class ItemAttributeTypesController : ApiControllerBase
     ///   <li><c>bool</c>: Indicates success or failure</li>
     /// </ul>
     /// </remarks>
-    [HttpPut("item-attribute-types/{id}")]
+    [HttpPut("{id}")]
     public async Task<ActionResult<Result<bool>>> Update(int id, UpdateItemAttributeTypeCommand command)
     {
         if (command == null)
@@ -199,7 +199,7 @@ public class ItemAttributeTypesController : ApiControllerBase
     ///   <li><c>bool</c>: Indicates success or failure</li>
     /// </ul>
     /// </remarks>
-    [HttpDelete("item-attribute-types/{id}")]
+    [HttpDelete("{id}")]
     public async Task<ActionResult<Result<bool>>> Delete(int id)
     {
         var command = new DeleteItemAttributeTypeCommand { Id = id };

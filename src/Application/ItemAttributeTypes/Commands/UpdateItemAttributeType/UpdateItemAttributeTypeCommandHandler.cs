@@ -22,6 +22,7 @@ public class UpdateItemAttributeTypeCommandHandler : IRequestHandler<UpdateItemA
 
         itemAttributeType.Name = request.Name;
         itemAttributeType.Description = request.Description;
+        itemAttributeType.IsActive = true;
 
         await uow.UpdateAsync(itemAttributeType);
         return Result<bool>.Success(true);

@@ -40,7 +40,7 @@ public class ItemAttributesController : ApiControllerBase
         return await SendAsync(new DeleteItemAttributeCommand(id));
     }
 
-    [HttpGet("item-attributes/{id}")]
+    [HttpGet("{id}")]
     public async Task<ActionResult<Result<ItemAttributeDto>>> GetById(int id)
     {
         return await SendAsync(new GetItemAttributeByIdQuery(id));
