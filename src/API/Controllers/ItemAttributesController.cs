@@ -21,16 +21,6 @@ public class ItemAttributesController : ApiControllerBase
     [HttpPut("{id}")]
     public async Task<ActionResult<Result<bool>>> Update(int id, [FromBody] UpdateItemAttributeCommand command)
     {
-        if (command == null)
-        {
-            return BadRequest(Result<bool>.Validation("Command is required", []));
-        }
-
-        if (id != command.Id)
-        {
-            return BadRequest(Result<bool>.Validation("ID mismatch", []));
-        }
-
         return await SendAsync(command);
     }
 
@@ -46,9 +36,9 @@ public class ItemAttributesController : ApiControllerBase
         return await SendAsync(new GetItemAttributeByIdQuery(id));
     }
 
-    [HttpGet]
+    [HttpGet("/api/itemAttributeType/{itemAttributeTypeId}/ItemAttribute")]
     public async Task<ActionResult<Result<List<ItemAttributeBriefDto>>>> GetAll(
-        [FromQuery] int? itemAttributeTypeId = null)
+        [FromQuery] int itemAttributeTypeId)
     {
         var query = new GetItemAttributesQuery
         {

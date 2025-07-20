@@ -21,7 +21,7 @@ public class GetItemAttributesQueryHandler : IRequestHandler<GetItemAttributesQu
             FROM item_attribute ia 
             LEFT JOIN item_attribute_type iat ON ia.item_attribute_type_id = iat.id 
             WHERE ia.tenant_id = @TenantId
-            AND (@ItemAttributeTypeId IS NULL OR ia.item_attribute_type_id = @ItemAttributeTypeId)
+            AND ia.item_attribute_type_id = @ItemAttributeTypeId
             ORDER BY ia.created DESC";
 
         var parameters = new
