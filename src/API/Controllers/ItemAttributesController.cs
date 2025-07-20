@@ -12,18 +12,13 @@ namespace BaseTemplate.API.Controllers;
 [Authorize]
 public class ItemAttributesController : ApiControllerBase
 {
-    [HttpPost("item-attributes")]
+    [HttpPost]
     public async Task<ActionResult<Result<int>>> Create([FromBody] CreateItemAttributeCommand command)
     {
-        if (command == null)
-        {
-            return BadRequest(Result<int>.Validation("Command is required", []));
-        }
-
         return await SendAsync(command);
     }
 
-    [HttpPut("item-attributes/{id}")]
+    [HttpPut("{id}")]
     public async Task<ActionResult<Result<bool>>> Update(int id, [FromBody] UpdateItemAttributeCommand command)
     {
         if (command == null)
@@ -39,7 +34,7 @@ public class ItemAttributesController : ApiControllerBase
         return await SendAsync(command);
     }
 
-    [HttpDelete("item-attributes/{id}")]
+    [HttpDelete("{id}")]
     public async Task<ActionResult<Result<bool>>> Delete(int id)
     {
         return await SendAsync(new DeleteItemAttributeCommand(id));
@@ -51,7 +46,7 @@ public class ItemAttributesController : ApiControllerBase
         return await SendAsync(new GetItemAttributeByIdQuery(id));
     }
 
-    [HttpGet("item-attributes")]
+    [HttpGet]
     public async Task<ActionResult<Result<List<ItemAttributeBriefDto>>>> GetAll(
         [FromQuery] int? itemAttributeTypeId = null)
     {
@@ -62,4 +57,4 @@ public class ItemAttributesController : ApiControllerBase
 
         return await SendAsync(query);
     }
-} 
+}

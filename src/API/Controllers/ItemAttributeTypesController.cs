@@ -13,16 +13,25 @@ namespace BaseTemplate.API.Controllers;
 public class ItemAttributeTypesController : ApiControllerBase
 {
     /// <summary>
-    /// Get all item attribute types.
+    /// Get all item attribute types for the current tenant.
     /// </summary>
     /// <remarks>
     /// <b>What this endpoint does:</b>
     /// <ul>
-    ///   <li>Retrieves all item attribute types for the current tenant.</li>
+    ///   <li>Retrieves all item attribute types belonging to the current user's tenant</li>
+    ///   <li>Returns only active attribute types (where IsActive = true)</li>
+    ///   <li>Results are ordered by creation date (newest first)</li>
+    ///   <li>Requires AttributeManager role permission</li>
+    /// </ul>
+    /// <b>Business Context:</b>
+    /// <ul>
+    ///   <li>Item attribute types define categories for item attributes (e.g., "Color", "Size", "Material")</li>
+    ///   <li>These types are used to organize and categorize item attributes within a tenant</li>
+    ///   <li>Each tenant has their own set of attribute types</li>
     /// </ul>
     /// <b>Response:</b>
     /// <ul>
-    ///   <li><c>List&lt;ItemAttributeTypeBriefDto&gt;</c>: List of item attribute types with basic information</li>
+    ///   <li><c>List&lt;ItemAttributeTypeBriefDto&gt;</c>: List of item attribute types with basic information including Id, Name, Description, IsActive, Created, CreatedBy</li>
     /// </ul>
     /// </remarks>
     [HttpGet("item-attribute-types")]
@@ -39,12 +48,20 @@ public class ItemAttributeTypesController : ApiControllerBase
     /// <remarks>
     /// <b>What this endpoint does:</b>
     /// <ul>
-    ///   <li>Retrieves detailed information about a specific item attribute type.</li>
-    ///   <li>Returns NotFound if the item attribute type does not exist.</li>
+    ///   <li>Retrieves detailed information about a specific item attribute type</li>
+    ///   <li>Validates that the attribute type belongs to the current user's tenant</li>
+    ///   <li>Returns NotFound if the item attribute type does not exist or doesn't belong to the tenant</li>
+    ///   <li>Requires AttributeManager role permission</li>
+    /// </ul>
+    /// <b>Business Context:</b>
+    /// <ul>
+    ///   <li>Used to get detailed information about a specific attribute type</li>
+    ///   <li>Includes audit information (created/modified timestamps and users)</li>
+    ///   <li>Tenant isolation ensures users can only access their own attribute types</li>
     /// </ul>
     /// <b>Response:</b>
     /// <ul>
-    ///   <li><c>ItemAttributeTypeDto</c>: Detailed item attribute type information</li>
+    ///   <li><c>ItemAttributeTypeDto</c>: Detailed item attribute type information including Id, Name, Description, IsActive, Created, CreatedBy, LastModified, LastModifiedBy</li>
     /// </ul>
     /// </remarks>
     [HttpGet("item-attribute-types/{id}")]
@@ -60,12 +77,28 @@ public class ItemAttributeTypesController : ApiControllerBase
     /// <remarks>
     /// <b>What this endpoint does:</b>
     /// <ul>
-    ///   <li>Creates a new item attribute type with the provided information.</li>
-    ///   <li>Validates the input data and ensures uniqueness.</li>
+    ///   <li>Creates a new item attribute type for the current tenant</li>
+    ///   <li>Validates that the name is unique within the tenant (case-sensitive)</li>
+    ///   <li>Automatically sets IsActive to true and associates with current tenant</li>
+    ///   <li>Records audit information (created timestamp and user)</li>
+    ///   <li>Requires AttributeManager role permission</li>
+    /// </ul>
+    /// <b>Business Context:</b>
+    /// <ul>
+    ///   <li>Attribute types define categories for organizing item attributes</li>
+    ///   <li>Examples: "Color", "Size", "Material", "Brand", "Category"</li>
+    ///   <li>Each tenant can have their own set of attribute types</li>
+    ///   <li>Names must be unique within a tenant to avoid confusion</li>
+    /// </ul>
+    /// <b>Validation Rules:</b>
+    /// <ul>
+    ///   <li>Name is required and must be unique within the tenant</li>
+    ///   <li>Description is optional</li>
+    ///   <li>Maximum name length: 255 characters</li>
     /// </ul>
     /// <b>Request body:</b>
     /// <ul>
-    ///   <li><c>Name</c> (string, required): Name of the attribute type</li>
+    ///   <li><c>Name</c> (string, required): Name of the attribute type (must be unique within tenant)</li>
     ///   <li><c>Description</c> (string, optional): Description of the attribute type</li>
     /// </ul>
     /// <b>Response:</b>
@@ -90,13 +123,29 @@ public class ItemAttributeTypesController : ApiControllerBase
     /// <remarks>
     /// <b>What this endpoint does:</b>
     /// <ul>
-    ///   <li>Updates an existing item attribute type with the provided information.</li>
-    ///   <li>Validates the input data and ensures the item attribute type exists.</li>
+    ///   <li>Updates an existing item attribute type for the current tenant</li>
+    ///   <li>Validates that the attribute type exists and belongs to the current tenant</li>
+    ///   <li>Validates that the new name is unique within the tenant (if name is being changed)</li>
+    ///   <li>Records audit information (updated timestamp and user)</li>
+    ///   <li>Requires AttributeManager role permission</li>
+    /// </ul>
+    /// <b>Business Context:</b>
+    /// <ul>
+    ///   <li>Allows modification of attribute type names and descriptions</li>
+    ///   <li>Changes to attribute types affect all associated item attributes</li>
+    ///   <li>Name changes should be done carefully as they may impact existing data</li>
+    /// </ul>
+    /// <b>Validation Rules:</b>
+    /// <ul>
+    ///   <li>Attribute type must exist and belong to current tenant</li>
+    ///   <li>Name is required and must be unique within the tenant</li>
+    ///   <li>Description is optional</li>
+    ///   <li>Maximum name length: 255 characters</li>
     /// </ul>
     /// <b>Request body:</b>
     /// <ul>
     ///   <li><c>Id</c> (int, required): ID of the attribute type to update</li>
-    ///   <li><c>Name</c> (string, required): Updated name of the attribute type</li>
+    ///   <li><c>Name</c> (string, required): Updated name of the attribute type (must be unique within tenant)</li>
     ///   <li><c>Description</c> (string, optional): Updated description of the attribute type</li>
     /// </ul>
     /// <b>Response:</b>
@@ -121,14 +170,29 @@ public class ItemAttributeTypesController : ApiControllerBase
     }
 
     /// <summary>
-    /// Delete an item attribute type.
+    /// Soft delete an item attribute type.
     /// </summary>
     /// <remarks>
     /// <b>What this endpoint does:</b>
     /// <ul>
-    ///   <li>Deletes an item attribute type by ID.</li>
-    ///   <li>Returns NotFound if the item attribute type does not exist.</li>
-    ///   <li>May fail if the attribute type is in use by other entities.</li>
+    ///   <li>Performs a soft delete by setting IsActive to false</li>
+    ///   <li>Validates that the attribute type exists and belongs to the current tenant</li>
+    ///   <li>Does not physically delete the record (preserves data integrity)</li>
+    ///   <li>Records audit information (updated timestamp and user)</li>
+    ///   <li>Requires AttributeManager role permission</li>
+    /// </ul>
+    /// <b>Business Context:</b>
+    /// <ul>
+    ///   <li>Soft delete prevents data loss while removing from active use</li>
+    ///   <li>Associated item attributes remain intact but may become orphaned</li>
+    ///   <li>Can be reactivated by updating IsActive back to true</li>
+    ///   <li>Deleted attribute types won't appear in standard queries</li>
+    /// </ul>
+    /// <b>Important Notes:</b>
+    /// <ul>
+    ///   <li>This is a soft delete - the record is not physically removed</li>
+    ///   <li>Associated item attributes will still reference this type</li>
+    ///   <li>Consider the impact on existing item attributes before deletion</li>
     /// </ul>
     /// <b>Response:</b>
     /// <ul>
