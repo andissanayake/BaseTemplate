@@ -20,8 +20,6 @@ Infrastructure/
 │       ├── 001_app_user.psql    # User table creation
 │       ├── 002_user_role.psql   # User roles table
 │       ├── 003_tenant.psql      # Tenant management
-│       ├── 004_todo_list.psql   # Todo list functionality
-│       ├── 005_todo_item.psql   # Todo items
 │       ├── 006_item.psql        # Generic items
 │       ├── 008_migrate_user_tenant.psql  # User-tenant migration
 │       └── 009_populate_tenant_owner_roles.psql  # Role population
