@@ -4,10 +4,6 @@ import { Link, useLocation, matchPath } from "react-router-dom";
 
 export const AppBreadcrumb = () => {
   const breadcrumbRoutes: Record<string, string | ((params: any) => string)> = {
-    "/todo-list": "Todo List",
-    "/todo-list/create": "Create",
-    "/todo-list/edit/:listId": (params: any) => `Edit #${params.listId}`,
-    "/todo-list/view/:listId": (params: any) => `View #${params.listId}`,
     //application
     "/": "Home",
     "/tenants/create": "Create Tenant",

@@ -6,10 +6,6 @@ import ProtectedRoute from "./layout/ProtectedRoute";
 import { HomePage } from "./pages/HomePage";
 import { NotFoundPage } from "./pages/NotFoundPage";
 import { ProfilePage } from "./pages/ProfilePage";
-import { TodoGroupListPage } from "./pages/TodoGroupListPage";
-import { TodoGroupCreatePage } from "./pages/TodoGroupCreatePage";
-import { TodoGroupEditPage } from "./pages/TodoGroupEditPage";
-import { TodoGroupViewPage } from "./pages/TodoGroupViewPage";
 import { TenantCreatePage } from "./pages/TenantCreatePage";
 import { TenantEditPage } from "./pages/TenantEditPage";
 import { TenantViewPage } from "./pages/TenantViewPage";
@@ -28,17 +24,6 @@ export const App = () => {
       <Routes>
         <Route path="/" element={<DefaultLayout />}>
           <Route index element={<HomePage />} />
-          <Route path="/todo-list" element={<TodoGroupListPage />} />
-
-          <Route path="/todo-list/create" element={<TodoGroupCreatePage />} />
-          <Route
-            path="todo-list/edit/:listId"
-            element={<TodoGroupEditPage />}
-          />
-          <Route
-            path="todo-list/view/:listId"
-            element={<TodoGroupViewPage />}
-          />
 
           <Route
             path="/items"
