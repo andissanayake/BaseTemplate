@@ -1,5 +1,3 @@
-using BaseTemplate.Domain.Constants;
-
 namespace BaseTemplate.Application.ItemAttributes.Commands.UpdateItemAttribute;
 
 [Authorize(Roles = Roles.AttributeManager)]

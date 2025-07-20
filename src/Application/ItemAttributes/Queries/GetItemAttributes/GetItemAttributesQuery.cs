@@ -1,5 +1,3 @@
-using BaseTemplate.Domain.Constants;
-
 namespace BaseTemplate.Application.ItemAttributes.Queries.GetItemAttributes;
 
 [Authorize(Roles = Roles.AttributeManager)]
