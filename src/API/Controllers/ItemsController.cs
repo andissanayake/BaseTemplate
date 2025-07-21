@@ -12,19 +12,19 @@ namespace BaseTemplate.API.Controllers;
 [Authorize]
 public class ItemsController : ApiControllerBase
 {
-    [HttpGet("items")]
+    [HttpGet]
     public async Task<ActionResult<Result<PaginatedList<ItemBriefDto>>>> GetItemsWithPagination([FromQuery] GetItemsWithPaginationQuery query)
     {
         return await SendAsync(query);
     }
 
-    [HttpGet("items/{id}")]
+    [HttpGet("{id}")]
     public async Task<ActionResult<Result<ItemDto>>> GetById(int id)
     {
         return await SendAsync(new GetItemByIdQuery(id));
     }
 
-    [HttpPost("items")]
+    [HttpPost]
     public async Task<ActionResult<Result<int>>> Create(CreateItemCommand command)
     {
         if (command == null)
@@ -35,7 +35,7 @@ public class ItemsController : ApiControllerBase
         return await SendAsync(command);
     }
 
-    [HttpPut("items/{id}")]
+    [HttpPut("{id}")]
     public async Task<ActionResult<Result<bool>>> Update(int id, UpdateItemCommand command)
     {
         if (command == null)
@@ -51,7 +51,7 @@ public class ItemsController : ApiControllerBase
         return await SendAsync(command);
     }
 
-    [HttpDelete("items/{id}")]
+    [HttpDelete("{id}")]
     public async Task<ActionResult<Result<bool>>> Delete(int id)
     {
         return await SendAsync(new DeleteItemCommand(id));
