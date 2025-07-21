@@ -106,6 +106,14 @@ export const AppMenu = () => {
         });
 
         menuItems.push({
+          key: "/item-attribute-types",
+          label: <span>Attribute Types</span>,
+          onClick: (e: any) => {
+            handleClick(e.key);
+          },
+        });
+
+        menuItems.push({
           key: "/tenants/view/staff-requests",
           label: <span>Staff Requests</span>,
           onClick: (e: any) => {

@@ -14,17 +14,17 @@ import {
   PlusOutlined,
   EyeOutlined,
 } from "@ant-design/icons";
-import { useItemStore } from "./itemStore";
-import { Item } from "./ItemModel";
+import { useItemAttributeTypeStore } from "./itemAttributeTypeStore";
+import { ItemAttributeType } from "./ItemAttributeTypeModel";
 import { apiClient } from "../../common/apiClient";
 import { Link } from "react-router-dom";
 import { useAuthStore } from "../../auth/authStore";
 
-const ItemList: React.FC = () => {
+const ItemAttributeTypeList: React.FC = () => {
   const { tenant } = useAuthStore();
 
   const {
-    itemList,
+    itemAttributeTypeList,
     loading,
     totalCount,
     currentPage,
@@ -32,57 +32,51 @@ const ItemList: React.FC = () => {
     setPagination,
     setLoading,
     setTotalCount,
-    setItemList,
+    setItemAttributeTypeList,
     setCurrentPage,
-  } = useItemStore();
+  } = useItemAttributeTypeStore();
 
   if (!tenant?.id) throw new Error("Tenant ID is required");
 
-  const loadItems = useCallback(async () => {
+  const loadItemAttributeTypes = useCallback(async () => {
     setLoading(true);
-    apiClient.get<{ items: Item[]; totalCount: number }>(
-      `/api/items?PageNumber=${currentPage}&PageSize=${pageSize}`,
-      {
-        onSuccess: (data) => {
-          setTotalCount(data?.totalCount || 0);
-          setItemList(data?.items || []);
-        },
-        onServerError: () => {
-          setItemList([]);
-          notification.error({ message: "Failed to load items!" });
-        },
-        onFinally: () => {
-          setLoading(false);
-        },
-      }
-    );
-  }, [
-    currentPage,
-    pageSize,
-    setLoading,
-    setTotalCount,
-    setItemList,
-    tenant?.id,
-  ]);
+    apiClient.get<ItemAttributeType[]>(`/api/itemAttributeTypes`, {
+      onSuccess: (data) => {
+        setTotalCount(data?.length || 0);
+        setItemAttributeTypeList(data || []);
+      },
+      onServerError: () => {
+        setItemAttributeTypeList([]);
+        notification.error({ message: "Failed to load item attribute types!" });
+      },
+      onFinally: () => {
+        setLoading(false);
+      },
+    });
+  }, [setLoading, setTotalCount, setItemAttributeTypeList, tenant?.id]);
 
   useEffect(() => {
-    loadItems();
-  }, [loadItems]);
+    loadItemAttributeTypes();
+  }, [loadItemAttributeTypes]);
 
   const handleDelete = async (id: number) => {
     setLoading(true);
-    apiClient.delete<boolean>(`/api/items/${id}`, undefined, {
+    apiClient.delete<boolean>(`/api/itemAttributeTypes/${id}`, undefined, {
       onSuccess: () => {
         const newTotalCount = totalCount - 1;
         const lastPage = Math.ceil(newTotalCount / pageSize);
         if (currentPage > lastPage && lastPage > 0) {
           setCurrentPage(lastPage);
         }
-        notification.success({ message: "Item deleted successfully!" });
-        loadItems();
+        notification.success({
+          message: "Item attribute type deleted successfully!",
+        });
+        loadItemAttributeTypes();
       },
       onServerError: () => {
-        notification.error({ message: "Failed to delete item!" });
+        notification.error({
+          message: "Failed to delete item attribute type!",
+        });
       },
       onFinally: () => {
         setLoading(false);
@@ -106,38 +100,33 @@ const ItemList: React.FC = () => {
       key: "description",
     },
     {
-      title: "Price",
-      dataIndex: "price",
-      key: "price",
-      render: (price: number) => `$${price.toFixed(2)}`,
-    },
-    {
-      title: "Categories",
-      dataIndex: "category",
-      key: "category",
-      render: (category: string) => (
-        <Space wrap>
-          {category
-            ?.split(",")
-            .filter(Boolean)
-            .map((cat) => (
-              <Tag key={cat}>{cat}</Tag>
-            ))}
-        </Space>
+      title: "Status",
+      dataIndex: "isActive",
+      key: "isActive",
+      render: (isActive: boolean) => (
+        <Tag color={isActive ? "green" : "red"}>
+          {isActive ? "Active" : "Inactive"}
+        </Tag>
       ),
     },
     {
       title: "Actions",
-      render: (_: unknown, record: Item) => (
+      render: (_: unknown, record: ItemAttributeType) => (
         <Space>
-          <Link to={`/items/view/${record.id}`} rel="noopener noreferrer">
+          <Link
+            to={`/item-attribute-types/view/${record.id}`}
+            rel="noopener noreferrer"
+          >
             <Button type="link" icon={<EyeOutlined />} />
           </Link>
-          <Link to={`/items/edit/${record.id}`} rel="noopener noreferrer">
+          <Link
+            to={`/item-attribute-types/edit/${record.id}`}
+            rel="noopener noreferrer"
+          >
             <Button type="link" icon={<EditOutlined />} />
           </Link>
           <Popconfirm
-            title="Are you sure to delete this item?"
+            title="Are you sure to delete this item attribute type?"
             onConfirm={() => handleDelete(record.id)}
           >
             <Button type="link" icon={<DeleteOutlined />} />
@@ -154,9 +143,9 @@ const ItemList: React.FC = () => {
         style={{ width: "100%", justifyContent: "space-between" }}
       >
         <Typography.Title level={3} style={{ margin: 0 }}>
-          Item List
+          Item Attribute Types
         </Typography.Title>
-        <Link to={`/items/create`} rel="noopener noreferrer">
+        <Link to={`/item-attribute-types/create`} rel="noopener noreferrer">
           <Button type="primary" icon={<PlusOutlined />}>
             Create
           </Button>
@@ -164,7 +153,7 @@ const ItemList: React.FC = () => {
       </Space>
       <Table
         columns={columns}
-        dataSource={itemList}
+        dataSource={itemAttributeTypeList}
         loading={loading}
         pagination={{
           current: currentPage,
@@ -178,4 +167,4 @@ const ItemList: React.FC = () => {
   );
 };
 
-export default ItemList;
+export default ItemAttributeTypeList;

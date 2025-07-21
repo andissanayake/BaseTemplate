@@ -21,14 +21,10 @@ public class UpdateStaffRolesCommandHandler : IRequestHandler<UpdateStaffRolesCo
         using var uow = _factory.Create();
         using var transaction = uow.BeginTransaction();
         // Verify the user exists and belongs to the tenant
-        var user = await uow.QueryFirstOrDefaultAsync<AppUser>(
+        var user = await uow.QuerySingleAsync<AppUser>(
             "SELECT * FROM app_user WHERE id = @StaffId AND tenant_id = @TenantId",
             new { request.StaffId, TenantId = tenantId });
 
-        if (user == null)
-        {
-            return Result<bool>.Failure("Staff member not found or does not belong to this tenant.");
-        }
 
         // Remove all existing roles for the user
         await uow.ExecuteAsync(

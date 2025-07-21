@@ -10,7 +10,6 @@ using Microsoft.AspNetCore.Mvc;
 namespace BaseTemplate.API.Controllers;
 
 [Authorize]
-[Route("api")]
 public class ItemsController : ApiControllerBase
 {
     [HttpGet("items")]

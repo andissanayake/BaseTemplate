@@ -1,0 +1,19 @@
+-- Create item_attribute_type table
+CREATE TABLE item_attribute_type (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    description TEXT,
+    is_active BOOLEAN NOT NULL DEFAULT true,
+    tenant_id INTEGER NOT NULL,
+    created TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    created_by VARCHAR(100),
+    last_modified TIMESTAMPTZ,
+    last_modified_by VARCHAR(100),
+    
+    CONSTRAINT fk_item_attribute_type_tenant FOREIGN KEY (tenant_id) REFERENCES tenant(id) ON DELETE CASCADE,
+    CONSTRAINT uk_item_attribute_type_name_tenant UNIQUE (name, tenant_id)
+);
+
+-- Create index for better performance
+CREATE INDEX idx_item_attribute_type_tenant_id ON item_attribute_type(tenant_id);
+CREATE INDEX idx_item_attribute_type_is_active ON item_attribute_type(is_active); 

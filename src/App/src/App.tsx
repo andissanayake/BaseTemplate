@@ -16,6 +16,10 @@ import { ItemCreatePage } from "./pages/ItemCreatePage";
 import { ItemEditPage } from "./pages/ItemEditPage";
 import { ItemViewPage } from "./pages/ItemViewPage";
 import { ItemListPage } from "./pages/ItemListPage";
+import ItemAttributeTypeCreatePage from "./pages/ItemAttributeTypeCreatePage";
+import ItemAttributeTypeEditPage from "./pages/ItemAttributeTypeEditPage";
+import ItemAttributeTypeViewPage from "./pages/ItemAttributeTypeViewPage";
+import ItemAttributeTypeListPage from "./pages/ItemAttributeTypeListPage";
 import { LoginPage } from "./pages/LoginPage";
 import { LogoutPage } from "./pages/LogoutPage";
 import NoAccessPage from "./pages/NoAccessPage";
@@ -59,6 +63,39 @@ export const App = () => {
             element={
               <ProtectedRoute policy={Policies.User}>
                 <ItemViewPage />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/item-attribute-types"
+            element={
+              <ProtectedRoute policy={Policies.User}>
+                <ItemAttributeTypeListPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/item-attribute-types/create"
+            element={
+              <ProtectedRoute policy={Policies.User}>
+                <ItemAttributeTypeCreatePage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/item-attribute-types/edit/:itemAttributeTypeId"
+            element={
+              <ProtectedRoute policy={Policies.User}>
+                <ItemAttributeTypeEditPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/item-attribute-types/view/:itemAttributeTypeId"
+            element={
+              <ProtectedRoute policy={Policies.User}>
+                <ItemAttributeTypeViewPage />
               </ProtectedRoute>
             }
           />
