@@ -15,7 +15,7 @@ public class UpdateTenantCommandHandler : IRequestHandler<UpdateTenantCommand, b
     {
         var userProfile = await _userProfileService.GetUserProfileAsync();
         using var uow = _factory.Create();
-        var entity = await uow.GetAsync<Tenant>(userProfile.TenantId);
+        var entity = await uow.QuerySingleAsync<Tenant>("SELECT * FROM tenant WHERE id = @TenantId AND is_deleted = FALSE", new { TenantId = userProfile.TenantId });
 
         if (entity is null)
         {
