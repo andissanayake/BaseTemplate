@@ -1,20 +1,21 @@
+using Microsoft.EntityFrameworkCore;
+
 namespace BaseTemplate.Application.ItemAttributeTypes.Commands.CreateItemAttributeType;
 
 public class CreateItemAttributeTypeCommandHandler : IRequestHandler<CreateItemAttributeTypeCommand, int>
 {
-    private readonly IUnitOfWorkFactory _factory;
-    private readonly IUserTenantProfileService _userProfileService;
+    private readonly IAppDbContext _context;
+    private readonly IUserProfileService _userProfileService;
 
-    public CreateItemAttributeTypeCommandHandler(IUnitOfWorkFactory factory, IUserTenantProfileService userProfileService)
+    public CreateItemAttributeTypeCommandHandler(IAppDbContext context, IUserProfileService userProfileService)
     {
-        _factory = factory;
+        _context = context;
         _userProfileService = userProfileService;
     }
 
     public async Task<Result<int>> HandleAsync(CreateItemAttributeTypeCommand request, CancellationToken cancellationToken)
     {
         var userInfo = await _userProfileService.GetUserProfileAsync();
-        using var uow = _factory.Create();
 
         var itemAttributeType = new ItemAttributeType
         {
@@ -24,7 +25,8 @@ public class CreateItemAttributeTypeCommandHandler : IRequestHandler<CreateItemA
             TenantId = userInfo.TenantId
         };
 
-        await uow.InsertAsync(itemAttributeType);
+        _context.ItemAttributeType.Add(itemAttributeType);
+        await _context.SaveChangesAsync(cancellationToken);
         return Result<int>.Success(itemAttributeType.Id);
     }
 } 

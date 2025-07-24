@@ -1,13 +1,15 @@
+using Microsoft.EntityFrameworkCore;
+
 namespace BaseTemplate.Application.Staff.Queries.GetStaffRequests;
 
 public class GetStaffRequestsQueryHandler : IRequestHandler<GetStaffRequestsQuery, List<StaffRequestDto>>
 {
-    private readonly IUnitOfWorkFactory _factory;
-    private readonly IUserTenantProfileService _userProfileService;
+    private readonly IAppDbContext _context;
+    private readonly IUserProfileService _userProfileService;
 
-    public GetStaffRequestsQueryHandler(IUnitOfWorkFactory factory, IUserTenantProfileService userProfileService)
+    public GetStaffRequestsQueryHandler(IAppDbContext context, IUserProfileService userProfileService)
     {
-        _factory = factory;
+        _context = context;
         _userProfileService = userProfileService;
     }
 
@@ -16,12 +18,11 @@ public class GetStaffRequestsQueryHandler : IRequestHandler<GetStaffRequestsQuer
         // Get user profile to get tenant ID
         var userProfile = await _userProfileService.GetUserProfileAsync();
 
-        using var uow = _factory.Create();
-
         // Get all staff requests for the tenant (exclude soft deleted)
-        var staffRequests = await uow.QueryAsync<StaffRequest>(
-            "SELECT * FROM staff_request WHERE tenant_id = @TenantId AND is_deleted = FALSE ORDER BY created DESC",
-            new { TenantId = userProfile.TenantId });
+        var staffRequests = await _context.StaffRequest
+            .Where(sr => sr.TenantId == userProfile.TenantId && !sr.IsDeleted)
+            .OrderByDescending(sr => sr.Created)
+            .ToListAsync(cancellationToken);
 
         // Get all roles for all staff requests in a single query (exclude soft deleted)
         var staffRequestIds = staffRequests.Select(sr => sr.Id).ToList();
@@ -29,8 +30,9 @@ public class GetStaffRequestsQueryHandler : IRequestHandler<GetStaffRequestsQuer
 
         if (staffRequestIds.Any())
         {
-            var roleQuery = "SELECT * FROM staff_request_role WHERE tenant_id = @TenantId AND staff_request_id = ANY(@StaffRequestIds) AND is_deleted = FALSE";
-            roles = (await uow.QueryAsync<StaffRequestRole>(roleQuery, new { TenantId = userProfile.TenantId, StaffRequestIds = staffRequestIds })).ToList();
+            roles = await _context.StaffRequestRole
+                .Where(r => r.TenantId == userProfile.TenantId && staffRequestIds.Contains(r.StaffRequestId) && !r.IsDeleted)
+                .ToListAsync(cancellationToken);
         }
 
         // Group roles by staff request ID for efficient lookup

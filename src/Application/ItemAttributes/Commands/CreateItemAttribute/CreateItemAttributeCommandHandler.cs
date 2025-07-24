@@ -1,25 +1,25 @@
+using Microsoft.EntityFrameworkCore;
+
 namespace BaseTemplate.Application.ItemAttributes.Commands.CreateItemAttribute;
 
 public class CreateItemAttributeCommandHandler : IRequestHandler<CreateItemAttributeCommand, int>
 {
-    private readonly IUnitOfWorkFactory _factory;
-    private readonly IUserTenantProfileService _userProfileService;
+    private readonly IAppDbContext _context;
+    private readonly IUserProfileService _userProfileService;
 
-    public CreateItemAttributeCommandHandler(IUnitOfWorkFactory factory, IUserTenantProfileService userProfileService)
+    public CreateItemAttributeCommandHandler(IAppDbContext context, IUserProfileService userProfileService)
     {
-        _factory = factory;
+        _context = context;
         _userProfileService = userProfileService;
     }
 
     public async Task<Result<int>> HandleAsync(CreateItemAttributeCommand request, CancellationToken cancellationToken)
     {
         var userInfo = await _userProfileService.GetUserProfileAsync();
-        using var uow = _factory.Create();
 
         // Check if code already exists for this tenant
-        var existingAttribute = await uow.QueryFirstOrDefaultAsync<ItemAttribute>(
-            "SELECT * FROM item_attribute WHERE code = @Code AND tenant_id = @TenantId",
-            new { request.Code, TenantId = userInfo.TenantId });
+        var existingAttribute = await _context.ItemAttribute
+            .FirstOrDefaultAsync(a => a.Code == request.Code && a.TenantId == userInfo.TenantId, cancellationToken);
 
         if (existingAttribute != null)
         {
@@ -36,7 +36,8 @@ public class CreateItemAttributeCommandHandler : IRequestHandler<CreateItemAttri
             IsActive = true
         };
 
-        await uow.InsertAsync(itemAttribute);
+        _context.ItemAttribute.Add(itemAttribute);
+        await _context.SaveChangesAsync(cancellationToken);
         return Result<int>.Success(itemAttribute.Id);
     }
 }

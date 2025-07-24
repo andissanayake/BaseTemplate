@@ -3,13 +3,13 @@ using Microsoft.Extensions.Caching.Memory;
 
 namespace BaseTemplate.Infrastructure.Services
 {
-    public class UserTenantProfileService : IUserTenantProfileService
+    public class UserProfileService : IUserProfileService
     {
         private readonly IUnitOfWorkFactory _factory;
         private readonly IMemoryCache _cache;
         private readonly IUser _user;
 
-        public UserTenantProfileService(IUnitOfWorkFactory factory, IMemoryCache cache, IUser user)
+        public UserProfileService(IUnitOfWorkFactory factory, IMemoryCache cache, IUser user)
         {
             _factory = factory;
             _cache = cache;

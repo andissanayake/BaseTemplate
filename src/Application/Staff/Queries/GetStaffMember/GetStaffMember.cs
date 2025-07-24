@@ -16,9 +16,9 @@ public class StaffMemberDetailDto
 public class GetStaffMemberQueryHandler : IRequestHandler<GetStaffMemberQuery, StaffMemberDetailDto>
 {
     private readonly IUnitOfWorkFactory _factory;
-    private readonly IUserTenantProfileService _userProfileService;
+    private readonly IUserProfileService _userProfileService;
 
-    public GetStaffMemberQueryHandler(IUnitOfWorkFactory factory, IUserTenantProfileService userProfileService)
+    public GetStaffMemberQueryHandler(IUnitOfWorkFactory factory, IUserProfileService userProfileService)
     {
         _factory = factory;
         _userProfileService = userProfileService;

@@ -6,9 +6,9 @@ using BaseTemplate.Application.Common.Security;
 public class RequestAuthorizer : IRequestAuthorizer
 {
     private readonly IUser _user;
-    private readonly IUserTenantProfileService _tenantProfileService;
+    private readonly IUserProfileService _tenantProfileService;
 
-    public RequestAuthorizer(IUser user, IUserTenantProfileService userTenantProfileService)
+    public RequestAuthorizer(IUser user, IUserProfileService userTenantProfileService)
     {
         _user = user;
         _tenantProfileService = userTenantProfileService;

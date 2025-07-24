@@ -1,135 +1,93 @@
+using Microsoft.EntityFrameworkCore;
+
 namespace BaseTemplate.Application.Users.Queries.GetUser;
 
 public class GetUserQueryHandler : IRequestHandler<GetUserQuery, GetUserResponse>
 {
-    private readonly IUnitOfWorkFactory _factory;
     private readonly IUser _user;
+    private readonly IAppDbContext _context;
 
-    public GetUserQueryHandler(IUnitOfWorkFactory factory, IUser user)
+    public GetUserQueryHandler(IAppDbContext context, IUser user)
     {
-        _factory = factory;
+        _context = context;
         _user = user;
     }
 
     public async Task<Result<GetUserResponse>> HandleAsync(GetUserQuery request, CancellationToken cancellationToken)
     {
-        using var uow = _factory.Create();
+        var response = new GetUserResponse();
+        // Try to load user entity
+        var user = await _context.AppUser
+            .FirstOrDefaultAsync(u => u.SsoId == _user.Identifier && !u.IsDeleted, cancellationToken);
 
-        // Load user profile from database
-        var userProfile = await GetUserProfileAsync(uow);
-
-        if (userProfile == null)
+        // If not found, create user and use the new entity
+        if (user == null)
         {
-            // User does not exist, create new user
-            var id = await CreateNewUserAsync(uow);
-            userProfile = await GetUserProfileAsync(uow);
+            user = new AppUser
+            {
+                SsoId = _user.Identifier,
+                Name = _user.Name,
+                Email = _user.Email
+            };
+            _context.AppUser.Add(user);
+            await _context.SaveChangesAsync(cancellationToken);
         }
 
-        // Get user roles
-        var roles = await GetUserRolesAsync(uow, userProfile!.Id);
-        var response = new GetUserResponse { Roles = roles.ToList() };
+        if (user.TenantId.HasValue)
+        {
+            var tenant = await _context.Tenant
+                .Where(t => t.Id == user.TenantId.Value)
+                .SingleAsync(cancellationToken);
 
-        // If user has a tenant, include tenant details from userProfile
-        if (userProfile.TenantId.HasValue)
-        {
-            response.Tenant = new TenantDetails() { Id = userProfile.TenantId.Value, Name = userProfile.TenantName ?? "" };
+            response.Tenant = new TenantDetails() { Id = tenant.Id, Name = tenant.Name };
         }
-        else
+
+        var roles = await _context.UserRole
+            .Where(r => r.UserId == user.Id && !r.IsDeleted)
+            .Select(r => r.Role)
+            .ToListAsync(cancellationToken);
+        if (roles.Any(r => r == Roles.TenantOwner))
         {
-            // If user doesn't have a tenant, check for staff requests
-            var staffRequest = await GetStaffRequestAsync(uow, _user.Email);
+            roles.AddRange(Roles.TenantBaseRoles);
+        }
+
+        response.Roles = roles;
+
+        if (!user.TenantId.HasValue)
+        {
+            var staffRequest = await _context.StaffRequest
+                .Where(sr => sr.RequestedEmail == _user.Email && sr.Status == StaffRequestStatus.Pending && !sr.IsDeleted)
+                .OrderByDescending(sr => sr.Created)
+                .FirstOrDefaultAsync(cancellationToken);
+
             if (staffRequest != null)
             {
-                response.StaffRequest = staffRequest;
+                var requester = await _context.AppUser
+                    .SingleAsync(u => u.SsoId == staffRequest.RequestedBySsoId, cancellationToken);
+
+                var staffRequestRoles = await _context.StaffRequestRole
+                    .Where(r => r.StaffRequestId == staffRequest.Id && !r.IsDeleted)
+                    .Select(r => r.Role)
+                    .ToListAsync(cancellationToken);
+
+                var staffTenantName = await _context.Tenant
+                    .Where(t => t.Id == staffRequest.TenantId)
+                    .Select(t => t.Name)
+                    .SingleAsync(cancellationToken);
+
+                response.StaffRequest = new StaffRequestDetails
+                {
+                    Id = staffRequest.Id,
+                    RequesterName = requester.Name!,
+                    RequesterEmail = requester.Email!,
+                    Status = staffRequest.Status,
+                    Created = staffRequest.Created,
+                    TenantName = staffTenantName,
+                    Roles = staffRequestRoles
+                };
             }
         }
 
         return Result<GetUserResponse>.Success(response);
-    }
-
-    private async Task<UserWithTenantInfo?> GetUserProfileAsync(IUnitOfWork uow)
-    {
-        return await uow.QueryFirstOrDefaultAsync<UserWithTenantInfo>(@"
-            SELECT u.Id, u.sso_id as SsoId, u.Name, u.Email, 
-                   t.Id as TenantId, t.Name as TenantName
-            FROM app_user u
-            LEFT JOIN tenant t ON u.tenant_id = t.id
-            WHERE u.sso_id = @SsoId AND u.is_deleted = FALSE", new { SsoId = _user.Identifier });
-    }
-
-    private async Task<int> CreateNewUserAsync(IUnitOfWork uow)
-    {
-        var newAppUser = new AppUser()
-        {
-            SsoId = _user.Identifier,
-            Name = _user.Name,
-            Email = _user.Email
-        };
-
-        return await uow.InsertAsync(newAppUser);
-    }
-
-    private async Task<IEnumerable<string>> GetUserRolesAsync(IUnitOfWork uow, int userId)
-    {
-        var roles = await uow.QueryAsync<string>(
-            "SELECT role FROM user_role WHERE user_id = @UserId",
-            new { UserId = userId });
-        if (roles.Any(r => r == Roles.TenantOwner))
-        {
-            var rolesList = roles.ToList();
-            rolesList.AddRange(Roles.TenantBaseRoles);
-            roles = rolesList;
-        }
-        return roles;
-    }
-
-    private async Task<StaffRequestDetails?> GetStaffRequestAsync(IUnitOfWork uow, string email)
-    {
-        var staffRequestBasic = await GetStaffRequestBasicAsync(uow, email);
-
-        if (staffRequestBasic == null)
-        {
-            return null;
-        }
-
-        var requesterInfo = await GetRequesterInfoAsync(uow, staffRequestBasic.RequestedBySsoId);
-        var staffRequestRoles = await GetStaffRequestRolesAsync(uow, staffRequestBasic.Id);
-
-        return new StaffRequestDetails
-        {
-            Id = staffRequestBasic.Id,
-            RequesterName = requesterInfo.name,
-            RequesterEmail = requesterInfo.email,
-            Status = staffRequestBasic.Status,
-            Created = staffRequestBasic.Created,
-            TenantName = staffRequestBasic.TenantName,
-            Roles = staffRequestRoles.ToList()
-        };
-    }
-
-    private async Task<StaffRequestBasicInfo?> GetStaffRequestBasicAsync(IUnitOfWork uow, string email)
-    {
-        return await uow.QueryFirstOrDefaultAsync<StaffRequestBasicInfo>(@"
-            SELECT sr.id, sr.requested_by_sso_id, 
-                   sr.status, sr.created, t.name as tenant_name
-            FROM staff_request sr
-            JOIN tenant t ON sr.tenant_id = t.id
-            WHERE sr.requested_email = @Email AND sr.status = 0 AND sr.is_deleted = FALSE
-            ORDER BY sr.created DESC
-            LIMIT 1", new { Email = email });
-    }
-
-    private async Task<dynamic> GetRequesterInfoAsync(IUnitOfWork uow, string ssoId)
-    {
-        return await uow.QuerySingleAsync<dynamic>(
-            "SELECT name, email FROM app_user WHERE sso_id = @SsoId AND is_deleted = FALSE",
-            new { SsoId = ssoId });
-    }
-
-    private async Task<IEnumerable<string>> GetStaffRequestRolesAsync(IUnitOfWork uow, int staffRequestId)
-    {
-        return await uow.QueryAsync<string>(
-            "SELECT role FROM staff_request_role WHERE staff_request_id = @StaffRequestId AND is_deleted = FALSE",
-            new { StaffRequestId = staffRequestId });
     }
 }

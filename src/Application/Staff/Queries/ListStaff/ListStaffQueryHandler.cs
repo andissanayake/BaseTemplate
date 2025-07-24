@@ -3,9 +3,9 @@ namespace BaseTemplate.Application.Staff.Queries.ListStaff;
 public class ListStaffQueryHandler : IRequestHandler<ListStaffQuery, List<StaffMemberDto>>
 {
     private readonly IUnitOfWorkFactory _factory;
-    private readonly IUserTenantProfileService _userProfileService;
+    private readonly IUserProfileService _userProfileService;
 
-    public ListStaffQueryHandler(IUnitOfWorkFactory factory, IUserTenantProfileService userProfileService)
+    public ListStaffQueryHandler(IUnitOfWorkFactory factory, IUserProfileService userProfileService)
     {
         _factory = factory;
         _userProfileService = userProfileService;

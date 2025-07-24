@@ -1,21 +1,23 @@
+using Microsoft.EntityFrameworkCore;
+
 namespace BaseTemplate.Application.Tenants.Commands.UpdateTenant;
 
 public class UpdateTenantCommandHandler : IRequestHandler<UpdateTenantCommand, bool>
 {
-    private readonly IUnitOfWorkFactory _factory;
-    private readonly IUserTenantProfileService _userProfileService;
+    private readonly IAppDbContext _context;
+    private readonly IUserProfileService _userProfileService;
     
-    public UpdateTenantCommandHandler(IUnitOfWorkFactory factory, IUserTenantProfileService userProfileService)
+    public UpdateTenantCommandHandler(IAppDbContext context, IUserProfileService userProfileService)
     {
-        _factory = factory;
+        _context = context;
         _userProfileService = userProfileService;
     }
     
     public async Task<Result<bool>> HandleAsync(UpdateTenantCommand request, CancellationToken cancellationToken)
     {
         var userProfile = await _userProfileService.GetUserProfileAsync();
-        using var uow = _factory.Create();
-        var entity = await uow.QuerySingleAsync<Tenant>("SELECT * FROM tenant WHERE id = @TenantId AND is_deleted = FALSE", new { TenantId = userProfile.TenantId });
+        var entity = await _context.Tenant
+            .FirstOrDefaultAsync(t => t.Id == userProfile.TenantId && !t.IsDeleted, cancellationToken);
 
         if (entity is null)
         {
@@ -24,7 +26,7 @@ public class UpdateTenantCommandHandler : IRequestHandler<UpdateTenantCommand, b
         entity.Name = request.Name;
         entity.Address = request.Address;
         await _userProfileService.InvalidateUserProfileCacheAsync();
-        await uow.UpdateAsync(entity);
+        await _context.SaveChangesAsync(cancellationToken);
         return Result<bool>.Success(true);
     }
 } 

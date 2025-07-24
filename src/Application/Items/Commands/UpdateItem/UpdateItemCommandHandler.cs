@@ -1,21 +1,28 @@
+using Microsoft.EntityFrameworkCore;
+
 namespace BaseTemplate.Application.Items.Commands.UpdateItem;
 
 public class UpdateItemCommandHandler : IRequestHandler<UpdateItemCommand, bool>
 {
-    private readonly IUnitOfWorkFactory _factory;
-    private readonly IUserTenantProfileService _userProfileService;
+    private readonly IAppDbContext _context;
+    private readonly IUserProfileService _userProfileService;
 
-    public UpdateItemCommandHandler(IUnitOfWorkFactory factory, IUserTenantProfileService userProfileService)
+    public UpdateItemCommandHandler(IAppDbContext context, IUserProfileService userProfileService)
     {
-        _factory = factory;
+        _context = context;
         _userProfileService = userProfileService;
     }
 
     public async Task<Result<bool>> HandleAsync(UpdateItemCommand request, CancellationToken cancellationToken)
     {
         var userInfo = await _userProfileService.GetUserProfileAsync();
-        using var uow = _factory.Create();
-        var entity = await uow.QuerySingleAsync<Item>("select * from item where Id = @Id and tenant_id = @TenantId", new { request.Id, userInfo.TenantId });
+        var entity = await _context.Item
+            .FirstOrDefaultAsync(i => i.Id == request.Id && i.TenantId == userInfo.TenantId, cancellationToken);
+
+        if (entity == null)
+        {
+            return Result<bool>.NotFound($"Item with id {request.Id} not found.");
+        }
 
         entity.Name = request.Name;
         entity.Description = request.Description;
@@ -23,7 +30,7 @@ public class UpdateItemCommandHandler : IRequestHandler<UpdateItemCommand, bool>
         entity.Category = request.Category;
         entity.IsActive = request.IsActive;
 
-        await uow.UpdateAsync(entity);
+        await _context.SaveChangesAsync(cancellationToken);
         return Result<bool>.Success(true);
     }
 }

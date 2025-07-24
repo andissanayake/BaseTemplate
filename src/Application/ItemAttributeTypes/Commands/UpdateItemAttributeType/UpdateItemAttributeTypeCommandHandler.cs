@@ -1,30 +1,35 @@
+using Microsoft.EntityFrameworkCore;
+
 namespace BaseTemplate.Application.ItemAttributeTypes.Commands.UpdateItemAttributeType;
 
 public class UpdateItemAttributeTypeCommandHandler : IRequestHandler<UpdateItemAttributeTypeCommand, bool>
 {
-    private readonly IUnitOfWorkFactory _factory;
-    private readonly IUserTenantProfileService _userProfileService;
+    private readonly IAppDbContext _context;
+    private readonly IUserProfileService _userProfileService;
 
-    public UpdateItemAttributeTypeCommandHandler(IUnitOfWorkFactory factory, IUserTenantProfileService userProfileService)
+    public UpdateItemAttributeTypeCommandHandler(IAppDbContext context, IUserProfileService userProfileService)
     {
-        _factory = factory;
+        _context = context;
         _userProfileService = userProfileService;
     }
 
     public async Task<Result<bool>> HandleAsync(UpdateItemAttributeTypeCommand request, CancellationToken cancellationToken)
     {
         var userInfo = await _userProfileService.GetUserProfileAsync();
-        using var uow = _factory.Create();
 
-        var itemAttributeType = await uow.QuerySingleAsync<ItemAttributeType>(
-            "SELECT * FROM item_attribute_type WHERE id = @Id AND tenant_id = @TenantId",
-            new { request.Id, TenantId = userInfo.TenantId });
+        var itemAttributeType = await _context.ItemAttributeType
+            .FirstOrDefaultAsync(t => t.Id == request.Id && t.TenantId == userInfo.TenantId, cancellationToken);
+
+        if (itemAttributeType == null)
+        {
+            return Result<bool>.NotFound($"ItemAttributeType with id {request.Id} not found.");
+        }
 
         itemAttributeType.Name = request.Name;
         itemAttributeType.Description = request.Description;
         itemAttributeType.IsActive = true;
 
-        await uow.UpdateAsync(itemAttributeType);
+        await _context.SaveChangesAsync(cancellationToken);
         return Result<bool>.Success(true);
     }
 }

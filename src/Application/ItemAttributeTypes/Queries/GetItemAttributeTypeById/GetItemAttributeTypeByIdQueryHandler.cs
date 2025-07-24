@@ -3,9 +3,9 @@ namespace BaseTemplate.Application.ItemAttributeTypes.Queries.GetItemAttributeTy
 public class GetItemAttributeTypeByIdQueryHandler : IRequestHandler<GetItemAttributeTypeByIdQuery, ItemAttributeTypeDto>
 {
     private readonly IUnitOfWorkFactory _factory;
-    private readonly IUserTenantProfileService _userProfileService;
+    private readonly IUserProfileService _userProfileService;
 
-    public GetItemAttributeTypeByIdQueryHandler(IUnitOfWorkFactory factory, IUserTenantProfileService userProfileService)
+    public GetItemAttributeTypeByIdQueryHandler(IUnitOfWorkFactory factory, IUserProfileService userProfileService)
     {
         _factory = factory;
         _userProfileService = userProfileService;

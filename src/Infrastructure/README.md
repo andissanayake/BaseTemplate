@@ -210,3 +210,9 @@ initializer.Migrate(connection, "Data/Scripts");
 ## License
 
 This project is part of the BaseTemplate solution and follows the same licensing terms.
+
+
+
+dotnet ef migrations add "SampleMigration" --project src\Infrastructure --startup-project src\API --output-dir Data\Migrations
+
+dotnet ef database update --project src\Infrastructure --startup-project src\API

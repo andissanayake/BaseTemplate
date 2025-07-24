@@ -1,13 +1,15 @@
+using Microsoft.EntityFrameworkCore;
+
 namespace BaseTemplate.Application.Staff.Commands.UpdateStaffRequest;
 
 public class UpdateStaffRequestCommandHandler : IRequestHandler<UpdateStaffRequestCommand, bool>
 {
-    private readonly IUnitOfWorkFactory _factory;
-    private readonly IUserTenantProfileService _userTenantProfileService;
+    private readonly IAppDbContext _context;
+    private readonly IUserProfileService _userTenantProfileService;
 
-    public UpdateStaffRequestCommandHandler(IUnitOfWorkFactory factory, IUserTenantProfileService userTenantProfileService)
+    public UpdateStaffRequestCommandHandler(IAppDbContext context, IUserProfileService userTenantProfileService)
     {
-        _factory = factory;
+        _context = context;
         _userTenantProfileService = userTenantProfileService;
     }
 
@@ -16,12 +18,14 @@ public class UpdateStaffRequestCommandHandler : IRequestHandler<UpdateStaffReque
         // Get user profile to get tenant ID
         var userProfile = await _userTenantProfileService.GetUserProfileAsync();
 
-        using var uow = _factory.Create();
-
         // Get the staff request and verify it belongs to this tenant
-        var staffRequest = await uow.QuerySingleAsync<StaffRequest>(
-            "SELECT * FROM staff_request WHERE id = @Id AND tenant_id = @TenantId",
-            new { Id = request.StaffRequestId, TenantId = userProfile.TenantId });
+        var staffRequest = await _context.StaffRequest
+            .FirstOrDefaultAsync(sr => sr.Id == request.StaffRequestId && sr.TenantId == userProfile.TenantId, cancellationToken);
+
+        if (staffRequest == null)
+        {
+            return Result<bool>.NotFound($"Staff request with id {request.StaffRequestId} not found.");
+        }
 
         if (staffRequest.Status != StaffRequestStatus.Pending)
         {
@@ -31,9 +35,8 @@ public class UpdateStaffRequestCommandHandler : IRequestHandler<UpdateStaffReque
         // Reject the request
         staffRequest.Status = StaffRequestStatus.Revoked;
         staffRequest.RejectionReason = request.RejectionReason;
-        await uow.UpdateAsync(staffRequest);
+        await _context.SaveChangesAsync(cancellationToken);
 
         return Result<bool>.Success(true, $"Staff request for {staffRequest.RequestedEmail} has been rejected.");
-
     }
 }

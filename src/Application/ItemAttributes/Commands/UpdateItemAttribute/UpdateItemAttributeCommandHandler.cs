@@ -1,29 +1,33 @@
+using Microsoft.EntityFrameworkCore;
+
 namespace BaseTemplate.Application.ItemAttributes.Commands.UpdateItemAttribute;
 
 public class UpdateItemAttributeCommandHandler : IRequestHandler<UpdateItemAttributeCommand, bool>
 {
-    private readonly IUnitOfWorkFactory _factory;
-    private readonly IUserTenantProfileService _userProfileService;
+    private readonly IAppDbContext _context;
+    private readonly IUserProfileService _userProfileService;
 
-    public UpdateItemAttributeCommandHandler(IUnitOfWorkFactory factory, IUserTenantProfileService userProfileService)
+    public UpdateItemAttributeCommandHandler(IAppDbContext context, IUserProfileService userProfileService)
     {
-        _factory = factory;
+        _context = context;
         _userProfileService = userProfileService;
     }
 
     public async Task<Result<bool>> HandleAsync(UpdateItemAttributeCommand request, CancellationToken cancellationToken)
     {
         var userInfo = await _userProfileService.GetUserProfileAsync();
-        using var uow = _factory.Create();
 
-        var itemAttribute = await uow.QuerySingleAsync<ItemAttribute>(
-            "SELECT * FROM item_attribute WHERE id = @Id AND tenant_id = @TenantId",
-            new { request.Id, TenantId = userInfo.TenantId });
+        var itemAttribute = await _context.ItemAttribute
+            .FirstOrDefaultAsync(a => a.Id == request.Id && a.TenantId == userInfo.TenantId, cancellationToken);
+
+        if (itemAttribute == null)
+        {
+            return Result<bool>.NotFound($"ItemAttribute with id {request.Id} not found.");
+        }
 
         // Check if code already exists for this tenant (excluding current item)
-        var existingAttribute = await uow.QueryFirstOrDefaultAsync<ItemAttribute>(
-            "SELECT * FROM item_attribute WHERE code = @Code AND tenant_id = @TenantId AND id != @Id",
-            new { request.Code, TenantId = userInfo.TenantId, request.Id });
+        var existingAttribute = await _context.ItemAttribute
+            .FirstOrDefaultAsync(a => a.Code == request.Code && a.TenantId == userInfo.TenantId && a.Id != request.Id, cancellationToken);
 
         if (existingAttribute != null)
         {
@@ -34,7 +38,7 @@ public class UpdateItemAttributeCommandHandler : IRequestHandler<UpdateItemAttri
         itemAttribute.Code = request.Code;
         itemAttribute.Value = request.Value;
 
-        await uow.UpdateAsync(itemAttribute);
+        await _context.SaveChangesAsync(cancellationToken);
         return Result<bool>.Success(true);
     }
 }

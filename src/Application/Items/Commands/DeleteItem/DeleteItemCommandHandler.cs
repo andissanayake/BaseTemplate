@@ -1,13 +1,15 @@
+using Microsoft.EntityFrameworkCore;
+
 namespace BaseTemplate.Application.Items.Commands.DeleteItem;
 
 public class DeleteItemCommandHandler : IRequestHandler<DeleteItemCommand, bool>
 {
-    private readonly IUnitOfWorkFactory _factory;
-    private readonly IUserTenantProfileService _userProfileService;
+    private readonly IAppDbContext _context;
+    private readonly IUserProfileService _userProfileService;
 
-    public DeleteItemCommandHandler(IUnitOfWorkFactory factory, IUserTenantProfileService userProfileService)
+    public DeleteItemCommandHandler(IAppDbContext context, IUserProfileService userProfileService)
     {
-        _factory = factory;
+        _context = context;
         _userProfileService = userProfileService;
     }
 
@@ -16,8 +18,8 @@ public class DeleteItemCommandHandler : IRequestHandler<DeleteItemCommand, bool>
         // Get user profile to get tenant ID
         var userProfile = await _userProfileService.GetUserProfileAsync();
 
-        using var uow = _factory.Create();
-        var entity = await uow.QueryFirstOrDefaultAsync<Item>("select * from item where Id = @Id and tenant_id = @TenantId", new { request.Id, TenantId = userProfile.TenantId });
+        var entity = await _context.Item
+            .FirstOrDefaultAsync(i => i.Id == request.Id && i.TenantId == userProfile.TenantId, cancellationToken);
 
         if (entity is null)
         {
@@ -25,7 +27,7 @@ public class DeleteItemCommandHandler : IRequestHandler<DeleteItemCommand, bool>
         }
 
         entity.IsDeleted = true;
-        await uow.UpdateAsync(entity);
+        await _context.SaveChangesAsync(cancellationToken);
 
         return Result<bool>.Success(true);
     }

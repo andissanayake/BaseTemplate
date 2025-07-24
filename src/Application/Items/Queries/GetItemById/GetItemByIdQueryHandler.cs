@@ -1,21 +1,28 @@
+using Microsoft.EntityFrameworkCore;
+
 namespace BaseTemplate.Application.Items.Queries.GetItemById;
 
 public class GetItemByIdQueryHandler : IRequestHandler<GetItemByIdQuery, ItemDto>
 {
-    private readonly IUnitOfWorkFactory _factory;
-    private readonly IUserTenantProfileService _userProfileService;
+    private readonly IAppDbContext _context;
+    private readonly IUserProfileService _userProfileService;
 
-    public GetItemByIdQueryHandler(IUnitOfWorkFactory factory, IUserTenantProfileService userProfileService)
+    public GetItemByIdQueryHandler(IAppDbContext context, IUserProfileService userProfileService)
     {
-        _factory = factory;
+        _context = context;
         _userProfileService = userProfileService;
     }
 
     public async Task<Result<ItemDto>> HandleAsync(GetItemByIdQuery request, CancellationToken cancellationToken)
     {
         var userInfo = await _userProfileService.GetUserProfileAsync();
-        using var uow = _factory.Create();
-        var entity = await uow.QuerySingleAsync<Item>("select * from item where id = @Id and tenant_id = @TenantId and is_deleted = FALSE", new { request.Id, userInfo.TenantId });
+        var entity = await _context.Item
+            .FirstOrDefaultAsync(i => i.Id == request.Id && i.TenantId == userInfo.TenantId && !i.IsDeleted, cancellationToken);
+
+        if (entity == null)
+        {
+            return Result<ItemDto>.NotFound($"Item with id {request.Id} not found.");
+        }
 
         var itemDto = new ItemDto
         {

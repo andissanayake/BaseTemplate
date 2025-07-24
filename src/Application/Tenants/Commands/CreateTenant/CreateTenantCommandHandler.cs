@@ -1,27 +1,29 @@
+using Microsoft.EntityFrameworkCore;
+
 namespace BaseTemplate.Application.Tenants.Commands.CreateTenant;
 
 public class CreateTenantCommandHandler : IRequestHandler<CreateTenantCommand, int>
 {
-    private readonly IUnitOfWorkFactory _factory;
+    private readonly IAppDbContext _context;
     private readonly IUser _user;
-    private readonly IUserTenantProfileService _userTenantProfileService;
+    private readonly IUserProfileService _userTenantProfileService;
 
-    public CreateTenantCommandHandler(IUnitOfWorkFactory factory, IUser user, IUserTenantProfileService userTenantProfileService)
+    public CreateTenantCommandHandler(IAppDbContext context, IUser user, IUserProfileService userTenantProfileService)
     {
-        _factory = factory;
+        _context = context;
         _user = user;
         _userTenantProfileService = userTenantProfileService;
     }
 
     public async Task<Result<int>> HandleAsync(CreateTenantCommand request, CancellationToken cancellationToken)
     {
-        using var uow = _factory.Create();
-        using var transaction = uow.BeginTransaction();
-
         // Load existing user - user should already exist at this point
-        var existingUser = await uow.QuerySingleAsync<AppUser>(
-            "SELECT * FROM app_user WHERE sso_id = @SsoId",
-            new { SsoId = _user.Identifier });
+        var existingUser = await _context.AppUser
+            .FirstOrDefaultAsync(u => u.SsoId == _user.Identifier, cancellationToken);
+        if (existingUser == null)
+        {
+            return Result<int>.NotFound($"User with sso_id {_user.Identifier} not found.");
+        }
 
         // Create new tenant
         var tenant = new Tenant
@@ -30,12 +32,13 @@ public class CreateTenantCommandHandler : IRequestHandler<CreateTenantCommand, i
             Address = request.Address,
             OwnerSsoId = _user.Identifier
         };
-        var tenantId = await uow.InsertAsync(tenant);
+        _context.Tenant.Add(tenant);
+        await _context.SaveChangesAsync(cancellationToken);
 
         // Update user's tenant_id
-        await uow.ExecuteAsync(
-            "UPDATE app_user SET tenant_id = @TenantId, last_modified = @LastModified WHERE id = @UserId",
-            new { TenantId = tenantId, LastModified = DateTimeOffset.UtcNow, UserId = existingUser.Id });
+        existingUser.TenantId = tenant.Id;
+        existingUser.LastModified = DateTimeOffset.UtcNow;
+        await _context.SaveChangesAsync(cancellationToken);
 
         // Add TenantOwner role to the user
         var userRole = new UserRole
@@ -43,9 +46,9 @@ public class CreateTenantCommandHandler : IRequestHandler<CreateTenantCommand, i
             UserId = existingUser.Id,
             Role = Roles.TenantOwner
         };
+        _context.UserRole.Add(userRole);
         await _userTenantProfileService.InvalidateUserProfileCacheAsync();
-        await uow.InsertAsync(userRole);
-        transaction.Commit();
-        return Result<int>.Success(tenantId);
+        await _context.SaveChangesAsync(cancellationToken);
+        return Result<int>.Success(tenant.Id);
     }
 } 
