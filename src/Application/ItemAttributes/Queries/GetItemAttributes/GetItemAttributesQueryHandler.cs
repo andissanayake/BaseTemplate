@@ -18,20 +18,17 @@ public class GetItemAttributesQueryHandler : IRequestHandler<GetItemAttributesQu
         var userInfo = await _userProfileService.GetUserProfileAsync();
         var items = await _context.ItemAttribute
             .Where(ia => ia.TenantId == userInfo.TenantId && ia.ItemAttributeTypeId == request.ItemAttributeTypeId && !ia.IsDeleted)
-            .Join(_context.ItemAttributeType,
-                  ia => ia.ItemAttributeTypeId,
-                  iat => iat.Id,
-                  (ia, iat) => new { ia, iat })
-            .OrderByDescending(x => x.ia.Created)
-            .Select(x => new ItemAttributeBriefDto
+            .Include(ia => ia.ItemAttributeType)
+            .OrderByDescending(ia => ia.Created)
+            .Select(ia => new ItemAttributeBriefDto
             {
-                Id = x.ia.Id,
-                Name = x.ia.Name,
-                Code = x.ia.Code,
-                Value = x.ia.Value,
-                IsActive = x.ia.IsActive,
-                ItemAttributeTypeId = x.ia.ItemAttributeTypeId,
-                ItemAttributeTypeName = x.iat.Name
+                Id = ia.Id,
+                Name = ia.Name,
+                Code = ia.Code,
+                Value = ia.Value,
+                IsActive = ia.IsActive,
+                ItemAttributeTypeId = ia.ItemAttributeTypeId,
+                ItemAttributeTypeName = ia.ItemAttributeType.Name
             })
             .ToListAsync(cancellationToken);
 
