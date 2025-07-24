@@ -20,7 +20,7 @@ public class DeleteItemAttributeCommandHandler : IRequestHandler<DeleteItemAttri
             "SELECT * FROM item_attribute WHERE id = @Id AND tenant_id = @TenantId",
             new { request.Id, TenantId = userInfo.TenantId });
 
-        itemAttribute.IsActive = false;
+        itemAttribute.IsDeleted = true;
         await uow.UpdateAsync(itemAttribute);
         return Result<bool>.Success(true);
     }

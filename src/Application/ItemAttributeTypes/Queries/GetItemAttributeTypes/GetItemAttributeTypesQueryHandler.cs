@@ -19,6 +19,7 @@ public class GetItemAttributeTypesQueryHandler : IRequestHandler<GetItemAttribut
         var sql = @"
             SELECT * FROM item_attribute_type 
             WHERE tenant_id = @TenantId
+            AND is_deleted = FALSE
             ORDER BY created DESC";
 
         var parameters = new 

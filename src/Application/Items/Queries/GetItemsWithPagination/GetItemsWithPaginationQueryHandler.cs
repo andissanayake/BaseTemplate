@@ -22,7 +22,9 @@ public class GetItemsWithPaginationQueryHandler : IRequestHandler<GetItemsWithPa
             FROM item 
             WHERE tenant_id = @TenantId 
             AND (@Category IS NULL OR category = @Category)
-            AND (@IsActive IS NULL OR is_active = @IsActive)";
+            AND (@IsActive IS NULL OR is_active = @IsActive)
+            AND is_deleted = FALSE
+        ";
 
         var totalCount = await uow.QueryFirstOrDefaultAsync<int>(countSql, new
         {
@@ -37,6 +39,7 @@ public class GetItemsWithPaginationQueryHandler : IRequestHandler<GetItemsWithPa
             WHERE tenant_id = @TenantId 
             AND (@Category IS NULL OR category = @Category)
             AND (@IsActive IS NULL OR is_active = @IsActive)
+            AND is_deleted = FALSE
             ORDER BY name
             OFFSET @Offset ROWS FETCH NEXT @PageSize ROWS ONLY";
 

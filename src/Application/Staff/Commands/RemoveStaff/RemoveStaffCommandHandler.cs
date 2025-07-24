@@ -20,20 +20,24 @@ public class RemoveStaffCommandHandler : IRequestHandler<RemoveStaffCommand, boo
         using var transaction = uow.BeginTransaction();
         // Verify the user exists and belongs to the tenant
         var user = await uow.QuerySingleAsync<AppUser>(
-            "SELECT * FROM app_user WHERE id = @StaffId AND tenant_id = @TenantId",
+            "SELECT * FROM app_user WHERE id = @StaffId AND tenant_id = @TenantId AND is_deleted = FALSE",
             new { request.StaffId, TenantId = userProfile.TenantId });
 
-        // Remove all roles for the user
-        await uow.ExecuteAsync(
-            "DELETE FROM user_role WHERE user_id = @StaffId",
+        // Soft delete all roles for the user
+        var roles = await uow.QueryAsync<UserRole>(
+            "SELECT * FROM user_role WHERE user_id = @StaffId AND is_deleted = FALSE",
             new { request.StaffId });
+        foreach (var role in roles)
+        {
+            role.IsDeleted = true;
+            await uow.UpdateAsync(role);
+        }
 
-        // Remove the user from the tenant (set tenant_id to null)
-        await uow.ExecuteAsync(
-            "UPDATE app_user SET tenant_id = NULL, last_modified = @LastModified WHERE id = @StaffId",
-            new { request.StaffId, LastModified = DateTimeOffset.UtcNow });
+        // Soft delete the user (set is_deleted = true)
+        user.IsDeleted = true;
+        await uow.UpdateAsync(user);
 
-        // Set related staff requests to Expired
+        // Set related staff requests to Expired (no soft delete for staff_request here, but could be added if needed)
         await uow.ExecuteAsync(
             "UPDATE staff_request SET status = @ExpiredStatus WHERE requested_email = @Email AND tenant_id = @TenantId AND status = @AcceptedStatus",
             new

@@ -31,15 +31,15 @@ public class GetStaffMemberQueryHandler : IRequestHandler<GetStaffMemberQuery, S
 
         using var uow = _factory.Create();
 
-        // Get the user
+        // Get the user (exclude soft deleted)
         var user = await uow.QuerySingleAsync<AppUser>(
-            "SELECT * FROM app_user WHERE id = @StaffId AND tenant_id = @TenantId",
+            "SELECT * FROM app_user WHERE id = @StaffId AND tenant_id = @TenantId AND is_deleted = FALSE",
             new { StaffId = request.StaffId, TenantId = userProfile.TenantId });
 
 
-        // Get roles for the user
+        // Get roles for the user (exclude soft deleted)
         var roles = await uow.QueryAsync<UserRole>(
-            "SELECT * FROM user_role WHERE user_id = @StaffId",
+            "SELECT * FROM user_role WHERE user_id = @StaffId AND is_deleted = FALSE",
             new { StaffId = request.StaffId });
 
         var dto = new StaffMemberDetailDto

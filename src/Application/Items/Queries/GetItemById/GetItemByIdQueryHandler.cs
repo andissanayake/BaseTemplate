@@ -15,7 +15,7 @@ public class GetItemByIdQueryHandler : IRequestHandler<GetItemByIdQuery, ItemDto
     {
         var userInfo = await _userProfileService.GetUserProfileAsync();
         using var uow = _factory.Create();
-        var entity = await uow.QuerySingleAsync<Item>("select * from item where id = @Id and tenant_id = @TenantId", new { request.Id, userInfo.TenantId });
+        var entity = await uow.QuerySingleAsync<Item>("select * from item where id = @Id and tenant_id = @TenantId and is_deleted = FALSE", new { request.Id, userInfo.TenantId });
 
         var itemDto = new ItemDto
         {

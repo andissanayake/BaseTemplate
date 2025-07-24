@@ -24,18 +24,18 @@ public class ListStaffQueryHandler : IRequestHandler<ListStaffQuery, List<StaffM
             return Result<List<StaffMemberDto>>.NotFound($"Tenant with id {userProfile.TenantId} not found.");
         }
 
-        // Get all users for the tenant
+        // Get all users for the tenant (exclude soft deleted)
         var users = await uow.QueryAsync<AppUser>(
-            "SELECT * FROM app_user WHERE tenant_id = @TenantId ORDER BY created DESC",
+            "SELECT * FROM app_user WHERE tenant_id = @TenantId AND is_deleted = FALSE ORDER BY created DESC",
             new { TenantId = userProfile.TenantId });
 
-        // Get all roles for all users in a single query
+        // Get all roles for all users in a single query (exclude soft deleted)
         var userIds = users.Select(u => u.Id).ToList();
         var roles = new List<UserRole>();
 
         if (userIds.Any())
         {
-            var roleQuery = "SELECT * FROM user_role WHERE user_id = ANY(@UserIds)";
+            var roleQuery = "SELECT * FROM user_role WHERE user_id = ANY(@UserIds) AND is_deleted = FALSE";
             roles = (await uow.QueryAsync<UserRole>(roleQuery, new { UserIds = userIds })).ToList();
         }
 

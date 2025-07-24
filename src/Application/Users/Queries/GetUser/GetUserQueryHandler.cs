@@ -54,7 +54,7 @@ public class GetUserQueryHandler : IRequestHandler<GetUserQuery, GetUserResponse
                    t.Id as TenantId, t.Name as TenantName
             FROM app_user u
             LEFT JOIN tenant t ON u.tenant_id = t.id
-            WHERE u.sso_id = @SsoId", new { SsoId = _user.Identifier });
+            WHERE u.sso_id = @SsoId AND u.is_deleted = FALSE", new { SsoId = _user.Identifier });
     }
 
     private async Task<int> CreateNewUserAsync(IUnitOfWork uow)
@@ -114,7 +114,7 @@ public class GetUserQueryHandler : IRequestHandler<GetUserQuery, GetUserResponse
                    sr.status, sr.created, t.name as tenant_name
             FROM staff_request sr
             JOIN tenant t ON sr.tenant_id = t.id
-            WHERE sr.requested_email = @Email AND sr.status = 0
+            WHERE sr.requested_email = @Email AND sr.status = 0 AND sr.is_deleted = FALSE
             ORDER BY sr.created DESC
             LIMIT 1", new { Email = email });
     }
@@ -122,14 +122,14 @@ public class GetUserQueryHandler : IRequestHandler<GetUserQuery, GetUserResponse
     private async Task<dynamic> GetRequesterInfoAsync(IUnitOfWork uow, string ssoId)
     {
         return await uow.QuerySingleAsync<dynamic>(
-            "SELECT name, email FROM app_user WHERE sso_id = @SsoId",
+            "SELECT name, email FROM app_user WHERE sso_id = @SsoId AND is_deleted = FALSE",
             new { SsoId = ssoId });
     }
 
     private async Task<IEnumerable<string>> GetStaffRequestRolesAsync(IUnitOfWork uow, int staffRequestId)
     {
         return await uow.QueryAsync<string>(
-            "SELECT role FROM staff_request_role WHERE staff_request_id = @StaffRequestId",
+            "SELECT role FROM staff_request_role WHERE staff_request_id = @StaffRequestId AND is_deleted = FALSE",
             new { StaffRequestId = staffRequestId });
     }
 }

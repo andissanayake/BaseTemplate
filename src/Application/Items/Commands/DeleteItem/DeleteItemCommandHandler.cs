@@ -24,7 +24,7 @@ public class DeleteItemCommandHandler : IRequestHandler<DeleteItemCommand, bool>
             return Result<bool>.NotFound($"Item with id {request.Id} not found.");
         }
 
-        entity.IsActive = false;
+        entity.IsDeleted = true;
         await uow.UpdateAsync(entity);
 
         return Result<bool>.Success(true);

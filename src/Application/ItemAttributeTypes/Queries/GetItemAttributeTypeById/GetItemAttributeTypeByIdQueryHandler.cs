@@ -17,7 +17,7 @@ public class GetItemAttributeTypeByIdQueryHandler : IRequestHandler<GetItemAttri
         using var uow = _factory.Create();
 
         var itemAttributeType = await uow.QuerySingleAsync<ItemAttributeType>(
-            "SELECT * FROM item_attribute_type WHERE id = @Id AND tenant_id = @TenantId",
+            "SELECT * FROM item_attribute_type WHERE id = @Id AND tenant_id = @TenantId AND is_deleted != 1",
             new { request.Id, TenantId = userInfo.TenantId });
 
         var dto = new ItemAttributeTypeDto

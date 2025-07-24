@@ -18,18 +18,18 @@ public class GetStaffRequestsQueryHandler : IRequestHandler<GetStaffRequestsQuer
 
         using var uow = _factory.Create();
 
-        // Get all staff requests for the tenant
+        // Get all staff requests for the tenant (exclude soft deleted)
         var staffRequests = await uow.QueryAsync<StaffRequest>(
-            "SELECT * FROM staff_request WHERE tenant_id = @TenantId ORDER BY created DESC",
+            "SELECT * FROM staff_request WHERE tenant_id = @TenantId AND is_deleted = FALSE ORDER BY created DESC",
             new { TenantId = userProfile.TenantId });
 
-        // Get all roles for all staff requests in a single query
+        // Get all roles for all staff requests in a single query (exclude soft deleted)
         var staffRequestIds = staffRequests.Select(sr => sr.Id).ToList();
         var roles = new List<StaffRequestRole>();
 
         if (staffRequestIds.Any())
         {
-            var roleQuery = "SELECT * FROM staff_request_role WHERE tenant_id = @TenantId AND staff_request_id = ANY(@StaffRequestIds)";
+            var roleQuery = "SELECT * FROM staff_request_role WHERE tenant_id = @TenantId AND staff_request_id = ANY(@StaffRequestIds) AND is_deleted = FALSE";
             roles = (await uow.QueryAsync<StaffRequestRole>(roleQuery, new { TenantId = userProfile.TenantId, StaffRequestIds = staffRequestIds })).ToList();
         }
 

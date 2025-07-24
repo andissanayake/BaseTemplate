@@ -26,10 +26,15 @@ public class UpdateStaffRolesCommandHandler : IRequestHandler<UpdateStaffRolesCo
             new { request.StaffId, TenantId = tenantId });
 
 
-        // Remove all existing roles for the user
-        await uow.ExecuteAsync(
-            "DELETE FROM user_role WHERE user_id = @StaffId",
+        // Remove all existing roles for the user (soft delete)
+        var existingRoles = await uow.QueryAsync<UserRole>(
+            "SELECT * FROM user_role WHERE user_id = @StaffId AND is_deleted = FALSE",
             new { request.StaffId });
+        foreach (var role in existingRoles)
+        {
+            role.IsDeleted = true;
+            await uow.UpdateAsync(role);
+        }
 
         // Add new roles
         if (request.NewRoles.Any())
