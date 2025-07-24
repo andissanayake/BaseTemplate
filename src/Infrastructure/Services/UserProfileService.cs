@@ -1,17 +1,18 @@
 using BaseTemplate.Application.Common.Interfaces;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
 
 namespace BaseTemplate.Infrastructure.Services
 {
     public class UserProfileService : IUserProfileService
     {
-        private readonly IUnitOfWorkFactory _factory;
+        private readonly IAppDbContext _context;
         private readonly IMemoryCache _cache;
         private readonly IUser _user;
 
-        public UserProfileService(IUnitOfWorkFactory factory, IMemoryCache cache, IUser user)
+        public UserProfileService(IAppDbContext context, IMemoryCache cache, IUser user)
         {
-            _factory = factory;
+            _context = context;
             _cache = cache;
             _user = user;
         }
@@ -29,23 +30,20 @@ namespace BaseTemplate.Infrastructure.Services
                 if (cachedProfile != null) return cachedProfile;
             }
 
-            using var uow = _factory.Create();
-            var userInfo = await uow.QueryFirstOrDefaultAsync<UserProfileDto>(@"
-                SELECT u.Id, u.sso_id, u.Name, u.Email, t.Id as Tenant_Id, t.Name as TenantName
-                FROM app_user u
-                LEFT JOIN Tenant t ON u.Tenant_Id = t.Id
-                WHERE u.sso_id = @Identifier", new { Identifier = identifier });
+            var appUser = await _context.AppUser.SingleAsync(u => u.SsoId == identifier);
+            var tenant = await _context.Tenant.SingleAsync(t => t.Id == appUser.TenantId);
+            var roles = _context.UserRole.Where(r => r.UserId == appUser.Id).ToList();
 
-            if (userInfo == null)
+            var userInfo = new UserProfileDto()
             {
-                throw new Exception("Tenant cannot be null here!");
-            }
-
-            var roles = (await uow.QueryAsync<string>(
-                "select role from user_role where user_id = @UserId",
-                new { UserId = userInfo!.Id })).ToList();
-            userInfo.Identifier = identifier;
-            userInfo.Roles = roles;
+                Email = appUser.Email!,
+                Id = appUser.Id,
+                Identifier = appUser.SsoId,
+                Name = appUser.Name!,
+                Roles = roles.Select(r => r.Role).ToList(),
+                TenantId = tenant.Id,
+                TenantName = tenant.Name
+            };
 
             _cache.Set(cacheKey, userInfo, TimeSpan.FromMinutes(10));
 

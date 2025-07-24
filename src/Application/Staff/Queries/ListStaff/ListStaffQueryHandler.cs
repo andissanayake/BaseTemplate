@@ -1,13 +1,15 @@
+using Microsoft.EntityFrameworkCore;
+
 namespace BaseTemplate.Application.Staff.Queries.ListStaff;
 
 public class ListStaffQueryHandler : IRequestHandler<ListStaffQuery, List<StaffMemberDto>>
 {
-    private readonly IUnitOfWorkFactory _factory;
+    private readonly IAppDbContext _context;
     private readonly IUserProfileService _userProfileService;
 
-    public ListStaffQueryHandler(IUnitOfWorkFactory factory, IUserProfileService userProfileService)
+    public ListStaffQueryHandler(IAppDbContext context, IUserProfileService userProfileService)
     {
-        _factory = factory;
+        _context = context;
         _userProfileService = userProfileService;
     }
 
@@ -15,35 +17,34 @@ public class ListStaffQueryHandler : IRequestHandler<ListStaffQuery, List<StaffM
     {
         // Get user profile to get tenant ID
         var userProfile = await _userProfileService.GetUserProfileAsync();
-        using var uow = _factory.Create();
 
         // Get the tenant to identify the owner
-        var tenant = await uow.GetAsync<Tenant>(userProfile.TenantId);
+        var tenant = await _context.Tenant.FirstOrDefaultAsync(t => t.Id == userProfile.TenantId, cancellationToken);
         if (tenant == null)
         {
             return Result<List<StaffMemberDto>>.NotFound($"Tenant with id {userProfile.TenantId} not found.");
         }
 
         // Get all users for the tenant (exclude soft deleted)
-        var users = await uow.QueryAsync<AppUser>(
-            "SELECT * FROM app_user WHERE tenant_id = @TenantId AND is_deleted = FALSE ORDER BY created DESC",
-            new { TenantId = userProfile.TenantId });
+        var users = await _context.AppUser
+            .Where(u => u.TenantId == userProfile.TenantId && !u.IsDeleted)
+            .OrderByDescending(u => u.Created)
+            .ToListAsync(cancellationToken);
 
         // Get all roles for all users in a single query (exclude soft deleted)
         var userIds = users.Select(u => u.Id).ToList();
         var roles = new List<UserRole>();
-
         if (userIds.Any())
         {
-            var roleQuery = "SELECT * FROM user_role WHERE user_id = ANY(@UserIds) AND is_deleted = FALSE";
-            roles = (await uow.QueryAsync<UserRole>(roleQuery, new { UserIds = userIds })).ToList();
+            roles = await _context.UserRole
+                .Where(r => userIds.Contains(r.UserId) && !r.IsDeleted)
+                .ToListAsync(cancellationToken);
         }
 
         // Group roles by user Id for efficient lookup
         var rolesByUserId = roles.GroupBy(r => r.UserId).ToDictionary(g => g.Key, g => g.Select(r => r.Role).ToList());
 
         var result = new List<StaffMemberDto>();
-
         foreach (var user in users)
         {
             // Skip the actual tenant owner
@@ -59,10 +60,8 @@ public class ListStaffQueryHandler : IRequestHandler<ListStaffQuery, List<StaffM
                 Created = user.Created,
                 LastModified = user.LastModified
             };
-
             result.Add(dto);
         }
-
         return Result<List<StaffMemberDto>>.Success(result);
     }
 }
