@@ -1,58 +1,50 @@
+using Microsoft.EntityFrameworkCore;
+
 namespace BaseTemplate.Application.Items.Queries.GetItemsWithPagination;
 
 public class GetItemsWithPaginationQueryHandler : IRequestHandler<GetItemsWithPaginationQuery, PaginatedList<ItemBriefDto>>
 {
-    private readonly IUnitOfWorkFactory _factory;
-    private readonly IUserTenantProfileService _userProfileService;
+    private readonly IAppDbContext _context;
+    private readonly IUserProfileService _userProfileService;
 
-    public GetItemsWithPaginationQueryHandler(IUnitOfWorkFactory factory, IUserTenantProfileService userProfileService)
+    public GetItemsWithPaginationQueryHandler(IAppDbContext context, IUserProfileService userProfileService)
     {
-        _factory = factory;
+        _context = context;
         _userProfileService = userProfileService;
     }
 
     public async Task<Result<PaginatedList<ItemBriefDto>>> HandleAsync(GetItemsWithPaginationQuery request, CancellationToken cancellationToken)
     {
         var userInfo = await _userProfileService.GetUserProfileAsync();
-        using var uow = _factory.Create();
-        var offset = (request.PageNumber - 1) * request.PageSize;
 
-        const string countSql = @"
-            SELECT COUNT(1) 
-            FROM item 
-            WHERE tenant_id = @TenantId 
-            AND (@Category IS NULL OR category = @Category)
-            AND (@IsActive IS NULL OR is_active = @IsActive)
-            AND is_deleted = FALSE
-        ";
+        var query = _context.Item.AsQueryable();
+        query = query.Where(i => i.TenantId == userInfo.TenantId && !i.IsDeleted);
 
-        var totalCount = await uow.QueryFirstOrDefaultAsync<int>(countSql, new
-        {
-            userInfo.TenantId,
-            request.Category,
-            request.IsActive
-        });
+        if (!string.IsNullOrEmpty(request.Category))
+            query = query.Where(i => i.Category == request.Category);
 
-        const string dataSql = @"
-            SELECT id, tenant_id, name, description, price, is_active, category
-            FROM item
-            WHERE tenant_id = @TenantId 
-            AND (@Category IS NULL OR category = @Category)
-            AND (@IsActive IS NULL OR is_active = @IsActive)
-            AND is_deleted = FALSE
-            ORDER BY name
-            OFFSET @Offset ROWS FETCH NEXT @PageSize ROWS ONLY";
+        if (request.IsActive.HasValue)
+            query = query.Where(i => i.IsActive == request.IsActive.Value);
 
-        var items = await uow.QueryAsync<ItemBriefDto>(dataSql, new
-        {
-            userInfo.TenantId,
-            request.Category,
-            request.IsActive,
-            Offset = offset,
-            request.PageSize
-        });
+        var totalCount = await query.CountAsync(cancellationToken);
+
+        var items = await query
+            .OrderBy(i => i.Name)
+            .Skip((request.PageNumber - 1) * request.PageSize)
+            .Take(request.PageSize)
+            .Select(i => new ItemBriefDto
+            {
+                Id = i.Id,
+                TenantId = i.TenantId,
+                Name = i.Name,
+                Description = i.Description,
+                Price = i.Price,
+                IsActive = i.IsActive,
+                Category = i.Category
+            })
+            .ToListAsync(cancellationToken);
 
         return Result<PaginatedList<ItemBriefDto>>.Success(
-            new PaginatedList<ItemBriefDto>(items.ToList(), totalCount, request.PageNumber, request.PageSize));
+            new PaginatedList<ItemBriefDto>(items, totalCount, request.PageNumber, request.PageSize));
     }
 }

@@ -1,28 +1,24 @@
+using Microsoft.EntityFrameworkCore;
+
 namespace BaseTemplate.Application.Staff.Commands.RequestStaff;
 
 public class RequestStaffCommandHandler : IRequestHandler<RequestStaffCommand, bool>
 {
-    private readonly IUnitOfWorkFactory _factory;
-    private readonly IUserTenantProfileService _userProfileService;
+    private readonly IAppDbContext _context;
+    private readonly IUserProfileService _userProfileService;
 
-    public RequestStaffCommandHandler(
-        IUnitOfWorkFactory factory, 
-        IUserTenantProfileService userProfileService)
+    public RequestStaffCommandHandler(IAppDbContext context, IUserProfileService userProfileService)
     {
-        _factory = factory;
+        _context = context;
         _userProfileService = userProfileService;
     }
 
     public async Task<Result<bool>> HandleAsync(RequestStaffCommand request, CancellationToken cancellationToken)
     {
-        using var uow = _factory.Create();
-        using var transaction = uow.BeginTransaction();
-
         var userProfile = await _userProfileService.GetUserProfileAsync();
 
         // Validate that only allowed roles can be requested
         var invalidRoles = request.Roles.Except(Roles.TenantBaseRoles, StringComparer.OrdinalIgnoreCase).ToList();
-
         if (invalidRoles.Any())
         {
             return Result<bool>.Validation(
@@ -34,13 +30,10 @@ public class RequestStaffCommandHandler : IRequestHandler<RequestStaffCommand, b
         }
 
         // Check if the staff member already exists in the system
-        var existingUser = await uow.QueryFirstOrDefaultAsync<AppUser>(
-            "SELECT * FROM app_user WHERE email = @Email",
-            new { Email = request.StaffEmail });
-
+        var existingUser = await _context.AppUser
+            .FirstOrDefaultAsync(u => u.Email == request.StaffEmail, cancellationToken);
         if (existingUser != null && existingUser.TenantId != null)
         {
-            // If user exists, check if they're already in this tenant
             if (existingUser.TenantId == userProfile.TenantId)
             {
                 return Result<bool>.Validation(
@@ -50,8 +43,6 @@ public class RequestStaffCommandHandler : IRequestHandler<RequestStaffCommand, b
                         ["StaffEmail"] = new[] { $"User with email {request.StaffEmail} is already a member of this tenant." }
                     });
             }
-
-            // If user exists but in different tenant, return validation error
             return Result<bool>.Validation(
                 "User already exists in another tenant.",
                 new Dictionary<string, string[]>
@@ -61,9 +52,8 @@ public class RequestStaffCommandHandler : IRequestHandler<RequestStaffCommand, b
         }
 
         // Check if there's already a pending request for this email in this tenant
-        var existingRequest = await uow.QueryFirstOrDefaultAsync<StaffRequest>(
-            "SELECT * FROM staff_request WHERE tenant_id = @TenantId AND requested_email = @Email AND status = 0",
-            new { TenantId = userProfile.TenantId, Email = request.StaffEmail });
+        var existingRequest = await _context.StaffRequest
+            .FirstOrDefaultAsync(r => r.TenantId == userProfile.TenantId && r.RequestedEmail == request.StaffEmail && r.Status == StaffRequestStatus.Pending, cancellationToken);
 
         if (existingRequest != null)
         {
@@ -75,17 +65,18 @@ public class RequestStaffCommandHandler : IRequestHandler<RequestStaffCommand, b
                 });
         }
 
-        // Create the staff request
         var staffRequest = new StaffRequest
         {
             TenantId = userProfile.TenantId,
             RequestedEmail = request.StaffEmail,
             RequestedName = request.StaffName,
-            RequestedBySsoId = userProfile.Identifier,
+            RequestedByAppUserId = userProfile.Id,
             Status = StaffRequestStatus.Pending
         };
-
-        var staffRequestId = await uow.InsertAsync(staffRequest);
+        _context.StaffRequest.Add(staffRequest);
+        
+        // Save the staff request first to get its ID
+        await _context.SaveChangesAsync(cancellationToken);
 
         // Add roles for the staff request
         foreach (var role in request.Roles)
@@ -93,14 +84,12 @@ public class RequestStaffCommandHandler : IRequestHandler<RequestStaffCommand, b
             var staffRequestRole = new StaffRequestRole
             {
                 TenantId = userProfile.TenantId,
-                StaffRequestId = staffRequestId,
+                StaffRequestId = staffRequest.Id,
                 Role = role
             };
-            await uow.InsertAsync(staffRequestRole);
+            _context.StaffRequestRole.Add(staffRequestRole);
         }
-
-        transaction.Commit();
-        
+        await _context.SaveChangesAsync(cancellationToken);
         return Result<bool>.Success(true, $"Staff request for {request.StaffEmail} has been created successfully. The user will be notified to accept the invitation.");
     }
 }

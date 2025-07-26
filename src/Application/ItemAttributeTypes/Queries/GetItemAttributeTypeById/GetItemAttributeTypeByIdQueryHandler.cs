@@ -1,24 +1,23 @@
+using Microsoft.EntityFrameworkCore;
+
 namespace BaseTemplate.Application.ItemAttributeTypes.Queries.GetItemAttributeTypeById;
 
 public class GetItemAttributeTypeByIdQueryHandler : IRequestHandler<GetItemAttributeTypeByIdQuery, ItemAttributeTypeDto>
 {
-    private readonly IUnitOfWorkFactory _factory;
-    private readonly IUserTenantProfileService _userProfileService;
+    private readonly IAppDbContext _context;
+    private readonly IUserProfileService _userProfileService;
 
-    public GetItemAttributeTypeByIdQueryHandler(IUnitOfWorkFactory factory, IUserTenantProfileService userProfileService)
+    public GetItemAttributeTypeByIdQueryHandler(IAppDbContext context, IUserProfileService userProfileService)
     {
-        _factory = factory;
+        _context = context;
         _userProfileService = userProfileService;
     }
 
     public async Task<Result<ItemAttributeTypeDto>> HandleAsync(GetItemAttributeTypeByIdQuery request, CancellationToken cancellationToken)
     {
         var userInfo = await _userProfileService.GetUserProfileAsync();
-        using var uow = _factory.Create();
-
-        var itemAttributeType = await uow.QuerySingleAsync<ItemAttributeType>(
-            "SELECT * FROM item_attribute_type WHERE id = @Id AND tenant_id = @TenantId AND is_deleted != 1",
-            new { request.Id, TenantId = userInfo.TenantId });
+        var itemAttributeType = await _context.ItemAttributeType
+            .SingleAsync(iat => iat.Id == request.Id && iat.TenantId == userInfo.TenantId && !iat.IsDeleted, cancellationToken);
 
         var dto = new ItemAttributeTypeDto
         {

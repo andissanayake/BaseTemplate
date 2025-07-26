@@ -1,5 +1,3 @@
-using BaseTemplate.Application.Common.Interfaces;
-using BaseTemplate.Infrastructure.Data;
 using Serilog;
 using Serilog.Events;
 
@@ -52,10 +50,6 @@ public class Program
         {
             app.UseSwagger();
             app.UseSwaggerUI();
-            using var scope = app.Services.CreateScope();
-            var databaseInitializer = scope.ServiceProvider.GetRequiredService<DatabaseInitializer>();
-            var dbFactory = scope.ServiceProvider.GetRequiredService<IDbConnectionFactory>();
-            databaseInitializer.Migrate(dbFactory.CreateConnection(), @"C:\Users\Acer\source\test\BaseTemplate\src\Infrastructure\Data\Scripts");
         }
 
         app.UseHealthChecks("/health");

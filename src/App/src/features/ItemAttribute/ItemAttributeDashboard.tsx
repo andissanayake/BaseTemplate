@@ -26,6 +26,7 @@ import {
 } from "./ItemAttributeModel";
 import { apiClient } from "../../common/apiClient";
 import { useAuthStore } from "../../auth/authStore";
+import { handleFormValidationErrors } from "../../common/formErrorHandler";
 
 interface ItemAttributeDashboardProps {
   itemAttributeTypeId: number;
@@ -110,6 +111,12 @@ const ItemAttributeDashboard: React.FC<ItemAttributeDashboardProps> = ({
           setEditingKey(null);
           loadItemAttributes();
         },
+        onValidationError: (errors: Record<string, string[]>) => {
+          handleFormValidationErrors({
+            form,
+            errors,
+          });
+        },
         onServerError: () => {
           notification.error({
             message: "Failed to update item attribute!",
@@ -139,6 +146,12 @@ const ItemAttributeDashboard: React.FC<ItemAttributeDashboardProps> = ({
         setIsCreateModalVisible(false);
         createForm.resetFields();
         loadItemAttributes();
+      },
+      onValidationError: (errors: Record<string, string[]>) => {
+        handleFormValidationErrors({
+          form: createForm,
+          errors,
+        });
       },
       onServerError: () => {
         notification.error({

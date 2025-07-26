@@ -3,11 +3,15 @@ export interface StaffRequestDto {
   requestedEmail: string;
   requestedName: string;
   roles: string[];
-  requestedBySsoId: string;
+  requestedByAppUserId: number;
+  requestedByAppUserName: string;
+  requestedByAppUserEmail: string;
   status: StaffRequestStatus;
   created: string; // ISO date string
   acceptedAt?: string; // ISO date string
-  acceptedBySsoId?: string;
+  acceptedByAppUserId?: number;
+  acceptedByAppUserName?: string;
+  acceptedByAppUserEmail?: string;
   rejectionReason?: string;
 }
 

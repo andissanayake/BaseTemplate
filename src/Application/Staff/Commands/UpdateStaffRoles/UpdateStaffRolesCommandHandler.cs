@@ -1,51 +1,66 @@
+using Microsoft.EntityFrameworkCore;
+
 namespace BaseTemplate.Application.Staff.Commands.UpdateStaffRoles;
 
 public class UpdateStaffRolesCommandHandler : IRequestHandler<UpdateStaffRolesCommand, bool>
 {
-    private readonly IUnitOfWorkFactory _factory;
-    private readonly IUserTenantProfileService _userProfileService;
+    private readonly IAppDbContext _context;
+    private readonly IUserProfileService _userProfileService;
 
-    public UpdateStaffRolesCommandHandler(IUnitOfWorkFactory factory, IUserTenantProfileService userProfileService)
+    public UpdateStaffRolesCommandHandler(IAppDbContext context, IUserProfileService userProfileService)
     {
-        _factory = factory;
+        _context = context;
         _userProfileService = userProfileService;
     }
 
     public async Task<Result<bool>> HandleAsync(UpdateStaffRolesCommand request, CancellationToken cancellationToken)
     {
-        // Get user profile to get tenant ID
         var userProfile = await _userProfileService.GetUserProfileAsync();
 
-        var tenantId = userProfile.TenantId;
+        var user = await _context.AppUser
+            .SingleAsync(u => u.Id == request.StaffId && u.TenantId == userProfile.TenantId, cancellationToken);
 
-        using var uow = _factory.Create();
-        using var transaction = uow.BeginTransaction();
-        // Verify the user exists and belongs to the tenant
-        var user = await uow.QuerySingleAsync<AppUser>(
-            "SELECT * FROM app_user WHERE id = @StaffId AND tenant_id = @TenantId",
-            new { request.StaffId, TenantId = tenantId });
+        // Get all existing roles for the user (including deleted ones)
+        var existingRoles = await _context.UserRole
+            .Where(r => r.UserId == request.StaffId)
+            .ToListAsync(cancellationToken);
 
-
-        // Remove all existing roles for the user (soft delete)
-        var existingRoles = await uow.QueryAsync<UserRole>(
-            "SELECT * FROM user_role WHERE user_id = @StaffId AND is_deleted = FALSE",
-            new { request.StaffId });
+        // Mark all existing roles as deleted
         foreach (var role in existingRoles)
         {
             role.IsDeleted = true;
-            await uow.UpdateAsync(role);
+            _context.UserRole.Update(role);
         }
 
-        // Add new roles
+        // Add new roles or reactivate existing ones
         if (request.NewRoles.Any())
         {
-            var roleValues = request.NewRoles.Select(role => new { UserId = request.StaffId, Role = role });
-            await uow.ExecuteAsync(
-                "INSERT INTO user_role (user_id, role, created, last_modified) VALUES (@UserId, @Role, @Created, @LastModified)",
-                roleValues.Select(r => new { r.UserId, r.Role, Created = DateTimeOffset.UtcNow, LastModified = DateTimeOffset.UtcNow }));
+            foreach (var newRole in request.NewRoles)
+            {
+                // Check if this role already exists (including deleted ones)
+                var existingRole = existingRoles.FirstOrDefault(r => r.Role == newRole);
+                
+                if (existingRole != null)
+                {
+                    // Reactivate the existing role
+                    existingRole.IsDeleted = false;
+                    _context.UserRole.Update(existingRole);
+                }
+                else
+                {
+                    // Create a new role entry
+                    var userRole = new UserRole
+                    {
+                        UserId = request.StaffId,
+                        Role = newRole
+                    };
+                    _context.UserRole.Add(userRole);
+                }
+            }
         }
+        
+        await _context.SaveChangesAsync(cancellationToken);
         await _userProfileService.InvalidateUserProfileCacheAsync(user.SsoId);
-        transaction.Commit();
         return Result<bool>.Success(true);
     }
 }

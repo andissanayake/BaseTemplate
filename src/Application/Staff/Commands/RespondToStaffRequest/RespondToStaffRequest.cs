@@ -1,3 +1,5 @@
+using Microsoft.EntityFrameworkCore;
+
 namespace BaseTemplate.Application.Staff.Commands.RespondToStaffRequest;
 
 [Authorize]
@@ -10,54 +12,38 @@ public record RespondToStaffRequestCommand : IRequest<bool>
 
 public class RespondToStaffRequestCommandHandler : IRequestHandler<RespondToStaffRequestCommand, bool>
 {
-    private readonly IUnitOfWorkFactory _factory;
+    private readonly IAppDbContext _context;
     private readonly IUser _user;
-    private readonly IUserTenantProfileService _userTenantProfileService;
+    private readonly IUserProfileService _userTenantProfileService;
 
-    public RespondToStaffRequestCommandHandler(IUnitOfWorkFactory factory, IUser user, IUserTenantProfileService userTenantProfileService)
+    public RespondToStaffRequestCommandHandler(IAppDbContext context, IUser user, IUserProfileService userTenantProfileService)
     {
-        _factory = factory;
+        _context = context;
         _user = user;
         _userTenantProfileService = userTenantProfileService;
     }
 
     public async Task<Result<bool>> HandleAsync(RespondToStaffRequestCommand request, CancellationToken cancellationToken)
     {
-        using var uow = _factory.Create();
-
         // Get the staff request and verify it belongs to the current user
-        var staffRequest = await uow.QuerySingleAsync<StaffRequest>(
-            "SELECT * FROM staff_request WHERE id = @Id AND requested_email = @Email",
-            new { Id = request.StaffRequestId, _user.Email });
-
-        if (staffRequest.Status != StaffRequestStatus.Pending)
-        {
-            return Result<bool>.Validation("This staff request has already been processed.");
-        }
+        var staffRequest = await _context.StaffRequest
+            .SingleAsync(sr => sr.Id == request.StaffRequestId && sr.RequestedEmail == _user.Email && sr.Status == StaffRequestStatus.Pending && !sr.IsDeleted, cancellationToken);
 
         if (request.IsAccepted)
         {
-            // Use transaction for accepting the request
-            using var transaction = uow.BeginTransaction();
+            // Check if user already has a tenant
+            var user = await _context.AppUser
+                .SingleAsync(u => u.SsoId == _user.Identifier && !u.TenantId.HasValue, cancellationToken);
 
             // Accept the request
             staffRequest.Status = StaffRequestStatus.Accepted;
             staffRequest.AcceptedAt = DateTimeOffset.UtcNow;
-            staffRequest.AcceptedBySsoId = _user.Identifier;
-            await uow.UpdateAsync(staffRequest);
-
-            // Update the user's tenant information
-            var user = await uow.QuerySingleAsync<AppUser>(
-                "SELECT * FROM app_user WHERE sso_id = @SsoId",
-                new { SsoId = _user.Identifier });
-
-            user.TenantId = staffRequest.TenantId;
-            await uow.UpdateAsync(user);
+            staffRequest.AcceptedByAppUserId = user.Id;
 
             // Get the roles for this staff request and add them to the user
-            var staffRequestRoles = await uow.QueryAsync<StaffRequestRole>(
-                "SELECT * FROM staff_request_role WHERE staff_request_id = @StaffRequestId",
-                new { request.StaffRequestId });
+            var staffRequestRoles = await _context.StaffRequestRole
+                .Where(r => r.StaffRequestId == request.StaffRequestId)
+                .ToListAsync(cancellationToken);
 
             foreach (var role in staffRequestRoles)
             {
@@ -66,10 +52,15 @@ public class RespondToStaffRequestCommandHandler : IRequestHandler<RespondToStaf
                     UserId = user.Id,
                     Role = role.Role
                 };
-                await uow.InsertAsync(userRole);
+                _context.UserRole.Add(userRole);
             }
+
+            // Update the user's tenant information
+            user.TenantId = staffRequest.TenantId;
+            _context.AppUser.Update(user);
+
+            await _context.SaveChangesAsync(cancellationToken);
             await _userTenantProfileService.InvalidateUserProfileCacheAsync();
-            transaction.Commit();
             return Result<bool>.Success(true, $"You have successfully accepted the staff request.");
         }
         else
@@ -84,15 +75,10 @@ public class RespondToStaffRequestCommandHandler : IRequestHandler<RespondToStaf
                         ["RejectionReason"] = new[] { "Please provide a reason for rejecting this staff request." }
                     });
             }
-
-            // Use transaction for rejecting the request
-            using var transaction = uow.BeginTransaction();
-
             staffRequest.Status = StaffRequestStatus.Rejected;
             staffRequest.RejectionReason = request.RejectionReason;
-            await uow.UpdateAsync(staffRequest);
+            await _context.SaveChangesAsync(cancellationToken);
 
-            transaction.Commit();
             return Result<bool>.Success(true, "Staff request has been rejected successfully.");
         }
     }

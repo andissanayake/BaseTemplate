@@ -1,27 +1,27 @@
+using Microsoft.EntityFrameworkCore;
+
 namespace BaseTemplate.Application.ItemAttributes.Commands.DeleteItemAttribute;
 
 public class DeleteItemAttributeCommandHandler : IRequestHandler<DeleteItemAttributeCommand, bool>
 {
-    private readonly IUnitOfWorkFactory _factory;
-    private readonly IUserTenantProfileService _userProfileService;
+    private readonly IAppDbContext _context;
+    private readonly IUserProfileService _userProfileService;
 
-    public DeleteItemAttributeCommandHandler(IUnitOfWorkFactory factory, IUserTenantProfileService userProfileService)
+    public DeleteItemAttributeCommandHandler(IAppDbContext context, IUserProfileService userProfileService)
     {
-        _factory = factory;
+        _context = context;
         _userProfileService = userProfileService;
     }
 
     public async Task<Result<bool>> HandleAsync(DeleteItemAttributeCommand request, CancellationToken cancellationToken)
     {
         var userInfo = await _userProfileService.GetUserProfileAsync();
-        using var uow = _factory.Create();
 
-        var itemAttribute = await uow.QuerySingleAsync<ItemAttribute>(
-            "SELECT * FROM item_attribute WHERE id = @Id AND tenant_id = @TenantId",
-            new { request.Id, TenantId = userInfo.TenantId });
+        var itemAttribute = await _context.ItemAttribute
+            .SingleAsync(a => a.Id == request.Id && a.TenantId == userInfo.TenantId, cancellationToken);
 
         itemAttribute.IsDeleted = true;
-        await uow.UpdateAsync(itemAttribute);
+        await _context.SaveChangesAsync(cancellationToken);
         return Result<bool>.Success(true);
     }
 }

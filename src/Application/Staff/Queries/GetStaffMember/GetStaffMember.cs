@@ -1,3 +1,5 @@
+using Microsoft.EntityFrameworkCore;
+
 namespace BaseTemplate.Application.Staff.Queries.GetStaffMember;
 [Authorize(Roles = Roles.StaffManager)]
 public record GetStaffMemberQuery(int StaffId) : IRequest<StaffMemberDetailDto>;
@@ -15,12 +17,12 @@ public class StaffMemberDetailDto
 
 public class GetStaffMemberQueryHandler : IRequestHandler<GetStaffMemberQuery, StaffMemberDetailDto>
 {
-    private readonly IUnitOfWorkFactory _factory;
-    private readonly IUserTenantProfileService _userProfileService;
+    private readonly IAppDbContext _context;
+    private readonly IUserProfileService _userProfileService;
 
-    public GetStaffMemberQueryHandler(IUnitOfWorkFactory factory, IUserTenantProfileService userProfileService)
+    public GetStaffMemberQueryHandler(IAppDbContext context, IUserProfileService userProfileService)
     {
-        _factory = factory;
+        _context = context;
         _userProfileService = userProfileService;
     }
 
@@ -29,25 +31,22 @@ public class GetStaffMemberQueryHandler : IRequestHandler<GetStaffMemberQuery, S
         // Get user profile to get tenant ID
         var userProfile = await _userProfileService.GetUserProfileAsync();
 
-        using var uow = _factory.Create();
-
         // Get the user (exclude soft deleted)
-        var user = await uow.QuerySingleAsync<AppUser>(
-            "SELECT * FROM app_user WHERE id = @StaffId AND tenant_id = @TenantId AND is_deleted = FALSE",
-            new { StaffId = request.StaffId, TenantId = userProfile.TenantId });
-
+        var user = await _context.AppUser
+            .SingleAsync(u => u.Id == request.StaffId && u.TenantId == userProfile.TenantId && !u.IsDeleted, cancellationToken);
 
         // Get roles for the user (exclude soft deleted)
-        var roles = await uow.QueryAsync<UserRole>(
-            "SELECT * FROM user_role WHERE user_id = @StaffId AND is_deleted = FALSE",
-            new { StaffId = request.StaffId });
+        var roles = await _context.UserRole
+            .Where(r => r.UserId == request.StaffId && !r.IsDeleted)
+            .Select(r => r.Role)
+            .ToListAsync(cancellationToken);
 
         var dto = new StaffMemberDetailDto
         {
             Id = user.Id,
             Name = user.Name,
             Email = user.Email,
-            Roles = roles.Select(r => r.Role).ToList(),
+            Roles = roles,
             Created = user.Created,
             LastModified = user.LastModified,
             TenantId = user.TenantId ?? 0

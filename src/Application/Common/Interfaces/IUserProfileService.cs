@@ -1,6 +1,6 @@
 namespace BaseTemplate.Application.Common.Interfaces
 {
-    public interface IUserTenantProfileService
+    public interface IUserProfileService
     {
         Task<UserProfileDto> GetUserProfileAsync();
         Task InvalidateUserProfileCacheAsync();

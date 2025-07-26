@@ -1,19 +1,20 @@
+using Microsoft.EntityFrameworkCore;
+
 namespace BaseTemplate.Application.Items.Commands.CreateItem;
 
 public class CreateItemCommandHandler : IRequestHandler<CreateItemCommand, int>
 {
-    private readonly IUnitOfWorkFactory _factory;
-    private readonly IUserTenantProfileService _userProfileService;
-    public CreateItemCommandHandler(IUnitOfWorkFactory factory, IUserTenantProfileService userProfileService)
+    private readonly IAppDbContext _context;
+    private readonly IUserProfileService _userProfileService;
+    public CreateItemCommandHandler(IAppDbContext context, IUserProfileService userProfileService)
     {
-        _factory = factory;
+        _context = context;
         _userProfileService = userProfileService;
     }
 
     public async Task<Result<int>> HandleAsync(CreateItemCommand request, CancellationToken cancellationToken)
     {
         var userInfo = await _userProfileService.GetUserProfileAsync();
-        using var uow = _factory.Create();
 
         var entity = new Item
         {
@@ -25,7 +26,8 @@ public class CreateItemCommandHandler : IRequestHandler<CreateItemCommand, int>
             IsActive = true
         };
 
-        await uow.InsertAsync(entity);
+        _context.Item.Add(entity);
+        await _context.SaveChangesAsync(cancellationToken);
         return Result<int>.Success(entity.Id);
     }
 }

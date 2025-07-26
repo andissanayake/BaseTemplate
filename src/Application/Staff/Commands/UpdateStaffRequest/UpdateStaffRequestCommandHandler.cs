@@ -1,39 +1,29 @@
+using Microsoft.EntityFrameworkCore;
 namespace BaseTemplate.Application.Staff.Commands.UpdateStaffRequest;
 
 public class UpdateStaffRequestCommandHandler : IRequestHandler<UpdateStaffRequestCommand, bool>
 {
-    private readonly IUnitOfWorkFactory _factory;
-    private readonly IUserTenantProfileService _userTenantProfileService;
+    private readonly IAppDbContext _context;
+    private readonly IUserProfileService _userProfileService;
 
-    public UpdateStaffRequestCommandHandler(IUnitOfWorkFactory factory, IUserTenantProfileService userTenantProfileService)
+    public UpdateStaffRequestCommandHandler(IAppDbContext context, IUserProfileService userProfileService)
     {
-        _factory = factory;
-        _userTenantProfileService = userTenantProfileService;
+        _context = context;
+        _userProfileService = userProfileService;
     }
 
     public async Task<Result<bool>> HandleAsync(UpdateStaffRequestCommand request, CancellationToken cancellationToken)
     {
-        // Get user profile to get tenant ID
-        var userProfile = await _userTenantProfileService.GetUserProfileAsync();
+        var userProfile = await _userProfileService.GetUserProfileAsync();
 
-        using var uow = _factory.Create();
-
-        // Get the staff request and verify it belongs to this tenant
-        var staffRequest = await uow.QuerySingleAsync<StaffRequest>(
-            "SELECT * FROM staff_request WHERE id = @Id AND tenant_id = @TenantId",
-            new { Id = request.StaffRequestId, TenantId = userProfile.TenantId });
-
-        if (staffRequest.Status != StaffRequestStatus.Pending)
-        {
-            return Result<bool>.Validation("This staff request has already been processed.");
-        }
+        var staffRequest = await _context.StaffRequest
+            .SingleAsync(sr => sr.Id == request.StaffRequestId && sr.TenantId == userProfile.TenantId && sr.Status == StaffRequestStatus.Pending, cancellationToken);
 
         // Reject the request
         staffRequest.Status = StaffRequestStatus.Revoked;
         staffRequest.RejectionReason = request.RejectionReason;
-        await uow.UpdateAsync(staffRequest);
+        await _context.SaveChangesAsync(cancellationToken);
 
         return Result<bool>.Success(true, $"Staff request for {staffRequest.RequestedEmail} has been rejected.");
-
     }
 }
