@@ -17,12 +17,7 @@ public class UpdateItemCommandHandler : IRequestHandler<UpdateItemCommand, bool>
     {
         var userInfo = await _userProfileService.GetUserProfileAsync();
         var entity = await _context.Item
-            .FirstOrDefaultAsync(i => i.Id == request.Id && i.TenantId == userInfo.TenantId, cancellationToken);
-
-        if (entity == null)
-        {
-            return Result<bool>.NotFound($"Item with id {request.Id} not found.");
-        }
+            .SingleAsync(i => i.Id == request.Id && i.TenantId == userInfo.TenantId, cancellationToken);
 
         entity.Name = request.Name;
         entity.Description = request.Description;

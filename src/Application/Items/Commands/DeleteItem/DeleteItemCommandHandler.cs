@@ -15,17 +15,10 @@ public class DeleteItemCommandHandler : IRequestHandler<DeleteItemCommand, bool>
 
     public async Task<Result<bool>> HandleAsync(DeleteItemCommand request, CancellationToken cancellationToken)
     {
-        // Get user profile to get tenant ID
         var userProfile = await _userProfileService.GetUserProfileAsync();
 
         var entity = await _context.Item
-            .FirstOrDefaultAsync(i => i.Id == request.Id && i.TenantId == userProfile.TenantId, cancellationToken);
-
-        if (entity is null)
-        {
-            return Result<bool>.NotFound($"Item with id {request.Id} not found.");
-        }
-
+            .SingleAsync(i => i.Id == request.Id && i.TenantId == userProfile.TenantId, cancellationToken);
         entity.IsDeleted = true;
         await _context.SaveChangesAsync(cancellationToken);
 

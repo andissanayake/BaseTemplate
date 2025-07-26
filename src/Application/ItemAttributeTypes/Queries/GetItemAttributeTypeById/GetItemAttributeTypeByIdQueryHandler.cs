@@ -17,12 +17,7 @@ public class GetItemAttributeTypeByIdQueryHandler : IRequestHandler<GetItemAttri
     {
         var userInfo = await _userProfileService.GetUserProfileAsync();
         var itemAttributeType = await _context.ItemAttributeType
-            .FirstOrDefaultAsync(iat => iat.Id == request.Id && iat.TenantId == userInfo.TenantId && !iat.IsDeleted, cancellationToken);
-
-        if (itemAttributeType == null)
-        {
-            return Result<ItemAttributeTypeDto>.NotFound($"ItemAttributeType with id {request.Id} not found.");
-        }
+            .SingleAsync(iat => iat.Id == request.Id && iat.TenantId == userInfo.TenantId && !iat.IsDeleted, cancellationToken);
 
         var dto = new ItemAttributeTypeDto
         {

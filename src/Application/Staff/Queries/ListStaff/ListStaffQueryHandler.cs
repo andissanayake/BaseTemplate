@@ -15,15 +15,10 @@ public class ListStaffQueryHandler : IRequestHandler<ListStaffQuery, List<StaffM
 
     public async Task<Result<List<StaffMemberDto>>> HandleAsync(ListStaffQuery request, CancellationToken cancellationToken)
     {
-        // Get user profile to get tenant ID
         var userProfile = await _userProfileService.GetUserProfileAsync();
 
         // Get the tenant to identify the owner
-        var tenant = await _context.Tenant.FirstOrDefaultAsync(t => t.Id == userProfile.TenantId, cancellationToken);
-        if (tenant == null)
-        {
-            return Result<List<StaffMemberDto>>.NotFound($"Tenant with id {userProfile.TenantId} not found.");
-        }
+        var tenant = await _context.Tenant.SingleAsync(t => t.Id == userProfile.TenantId, cancellationToken);
 
         // Get all users for the tenant (exclude soft deleted)
         var users = await _context.AppUser

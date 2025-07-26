@@ -54,6 +54,7 @@ public class RequestStaffCommandHandler : IRequestHandler<RequestStaffCommand, b
         // Check if there's already a pending request for this email in this tenant
         var existingRequest = await _context.StaffRequest
             .FirstOrDefaultAsync(r => r.TenantId == userProfile.TenantId && r.RequestedEmail == request.StaffEmail && r.Status == StaffRequestStatus.Pending, cancellationToken);
+
         if (existingRequest != null)
         {
             return Result<bool>.Validation(
@@ -64,7 +65,6 @@ public class RequestStaffCommandHandler : IRequestHandler<RequestStaffCommand, b
                 });
         }
 
-        // Create the staff request
         var staffRequest = new StaffRequest
         {
             TenantId = userProfile.TenantId,

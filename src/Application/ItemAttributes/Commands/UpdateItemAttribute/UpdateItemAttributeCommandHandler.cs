@@ -18,12 +18,7 @@ public class UpdateItemAttributeCommandHandler : IRequestHandler<UpdateItemAttri
         var userInfo = await _userProfileService.GetUserProfileAsync();
 
         var itemAttribute = await _context.ItemAttribute
-            .FirstOrDefaultAsync(a => a.Id == request.Id && a.TenantId == userInfo.TenantId, cancellationToken);
-
-        if (itemAttribute == null)
-        {
-            return Result<bool>.NotFound($"ItemAttribute with id {request.Id} not found.");
-        }
+            .SingleAsync(a => a.Id == request.Id && a.TenantId == userInfo.TenantId, cancellationToken);
 
         // Check if code already exists for this tenant (excluding current item)
         var existingAttribute = await _context.ItemAttribute
@@ -31,7 +26,11 @@ public class UpdateItemAttributeCommandHandler : IRequestHandler<UpdateItemAttri
 
         if (existingAttribute != null)
         {
-            return Result<bool>.Validation("Code must be unique within the tenant", []);
+            return Result<bool>.Validation("Code must be unique within the tenant",
+                                                new Dictionary<string, string[]>
+                                                {
+                                                    ["Code"] = new[] { $"Code must be unique within the tenant." }
+                                                });
         }
 
         itemAttribute.Name = request.Name;

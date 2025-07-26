@@ -33,12 +33,7 @@ public class GetStaffMemberQueryHandler : IRequestHandler<GetStaffMemberQuery, S
 
         // Get the user (exclude soft deleted)
         var user = await _context.AppUser
-            .FirstOrDefaultAsync(u => u.Id == request.StaffId && u.TenantId == userProfile.TenantId && !u.IsDeleted, cancellationToken);
-
-        if (user == null)
-        {
-            return Result<StaffMemberDetailDto>.NotFound($"Staff member with id {request.StaffId} not found.");
-        }
+            .SingleAsync(u => u.Id == request.StaffId && u.TenantId == userProfile.TenantId && !u.IsDeleted, cancellationToken);
 
         // Get roles for the user (exclude soft deleted)
         var roles = await _context.UserRole

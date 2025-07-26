@@ -17,12 +17,7 @@ public class GetItemByIdQueryHandler : IRequestHandler<GetItemByIdQuery, ItemDto
     {
         var userInfo = await _userProfileService.GetUserProfileAsync();
         var entity = await _context.Item
-            .FirstOrDefaultAsync(i => i.Id == request.Id && i.TenantId == userInfo.TenantId && !i.IsDeleted, cancellationToken);
-
-        if (entity == null)
-        {
-            return Result<ItemDto>.NotFound($"Item with id {request.Id} not found.");
-        }
+            .SingleAsync(i => i.Id == request.Id && i.TenantId == userInfo.TenantId && !i.IsDeleted, cancellationToken);
 
         var itemDto = new ItemDto
         {

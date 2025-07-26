@@ -6,24 +6,20 @@ public class CreateTenantCommandHandler : IRequestHandler<CreateTenantCommand, i
 {
     private readonly IAppDbContext _context;
     private readonly IUser _user;
-    private readonly IUserProfileService _userTenantProfileService;
+    private readonly IUserProfileService _userProfileService;
 
-    public CreateTenantCommandHandler(IAppDbContext context, IUser user, IUserProfileService userTenantProfileService)
+    public CreateTenantCommandHandler(IAppDbContext context, IUser user, IUserProfileService userProfileService)
     {
         _context = context;
         _user = user;
-        _userTenantProfileService = userTenantProfileService;
+        _userProfileService = userProfileService;
     }
 
     public async Task<Result<int>> HandleAsync(CreateTenantCommand request, CancellationToken cancellationToken)
     {
         // Load existing user - user should already exist at this point
         var existingUser = await _context.AppUser
-            .FirstOrDefaultAsync(u => u.SsoId == _user.Identifier, cancellationToken);
-        if (existingUser == null)
-        {
-            return Result<int>.NotFound($"User with sso_id {_user.Identifier} not found.");
-        }
+            .SingleAsync(u => u.SsoId == _user.Identifier, cancellationToken);
 
         // Create new tenant
         var tenant = new Tenant
@@ -47,8 +43,8 @@ public class CreateTenantCommandHandler : IRequestHandler<CreateTenantCommand, i
             Role = Roles.TenantOwner
         };
         _context.UserRole.Add(userRole);
-        await _userTenantProfileService.InvalidateUserProfileCacheAsync();
+        await _userProfileService.InvalidateUserProfileCacheAsync();
         await _context.SaveChangesAsync(cancellationToken);
         return Result<int>.Success(tenant.Id);
     }
-} 
+}

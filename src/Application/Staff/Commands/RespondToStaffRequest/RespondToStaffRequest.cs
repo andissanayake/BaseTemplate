@@ -27,15 +27,8 @@ public class RespondToStaffRequestCommandHandler : IRequestHandler<RespondToStaf
     {
         // Get the staff request and verify it belongs to the current user
         var staffRequest = await _context.StaffRequest
-            .FirstOrDefaultAsync(sr => sr.Id == request.StaffRequestId && sr.RequestedEmail == _user.Email, cancellationToken);
-        if (staffRequest == null)
-        {
-            return Result<bool>.NotFound($"Staff request with id {request.StaffRequestId} not found for this user.");
-        }
-        if (staffRequest.Status != StaffRequestStatus.Pending)
-        {
-            return Result<bool>.Validation("This staff request has already been processed.");
-        }
+            .SingleAsync(sr => sr.Id == request.StaffRequestId && sr.RequestedEmail == _user.Email && sr.Status == StaffRequestStatus.Pending && !sr.IsDeleted, cancellationToken);
+
         if (request.IsAccepted)
         {
             // Accept the request
@@ -45,17 +38,15 @@ public class RespondToStaffRequestCommandHandler : IRequestHandler<RespondToStaf
 
             // Update the user's tenant information
             var user = await _context.AppUser
-                .FirstOrDefaultAsync(u => u.SsoId == _user.Identifier, cancellationToken);
-            if (user == null)
-            {
-                return Result<bool>.NotFound("User not found.");
-            }
+                .SingleAsync(u => u.SsoId == _user.Identifier, cancellationToken);
             user.TenantId = staffRequest.TenantId;
+            _context.AppUser.Update(user);
 
             // Get the roles for this staff request and add them to the user
             var staffRequestRoles = await _context.StaffRequestRole
                 .Where(r => r.StaffRequestId == request.StaffRequestId)
                 .ToListAsync(cancellationToken);
+
             foreach (var role in staffRequestRoles)
             {
                 var userRole = new UserRole
@@ -65,8 +56,9 @@ public class RespondToStaffRequestCommandHandler : IRequestHandler<RespondToStaf
                 };
                 _context.UserRole.Add(userRole);
             }
-            await _userTenantProfileService.InvalidateUserProfileCacheAsync();
+
             await _context.SaveChangesAsync(cancellationToken);
+            await _userTenantProfileService.InvalidateUserProfileCacheAsync();
             return Result<bool>.Success(true, $"You have successfully accepted the staff request.");
         }
         else
@@ -84,6 +76,7 @@ public class RespondToStaffRequestCommandHandler : IRequestHandler<RespondToStaf
             staffRequest.Status = StaffRequestStatus.Rejected;
             staffRequest.RejectionReason = request.RejectionReason;
             await _context.SaveChangesAsync(cancellationToken);
+
             return Result<bool>.Success(true, "Staff request has been rejected successfully.");
         }
     }

@@ -23,7 +23,11 @@ public class CreateItemAttributeCommandHandler : IRequestHandler<CreateItemAttri
 
         if (existingAttribute != null)
         {
-            return Result<int>.Validation("Code must be unique within the tenant", []);
+            return Result<int>.Validation("Code must be unique within the tenant",
+                                new Dictionary<string, string[]>
+                                {
+                                    ["Code"] = new[] { $"Code must be unique within the tenant." }
+                                });
         }
 
         var itemAttribute = new ItemAttribute
