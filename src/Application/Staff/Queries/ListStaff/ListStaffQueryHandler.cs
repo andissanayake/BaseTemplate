@@ -43,7 +43,7 @@ public class ListStaffQueryHandler : IRequestHandler<ListStaffQuery, List<StaffM
         foreach (var user in users)
         {
             // Skip the actual tenant owner
-            if (user.SsoId == tenant.OwnerSsoId)
+            if (user.Id == tenant.OwnerId)
                 continue;
 
             var dto = new StaffMemberDto

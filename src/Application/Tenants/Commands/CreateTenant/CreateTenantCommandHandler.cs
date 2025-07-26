@@ -26,7 +26,7 @@ public class CreateTenantCommandHandler : IRequestHandler<CreateTenantCommand, i
         {
             Name = request.Name,
             Address = request.Address,
-            OwnerSsoId = _user.Identifier
+            OwnerId = existingUser.Id
         };
         _context.Tenant.Add(tenant);
 

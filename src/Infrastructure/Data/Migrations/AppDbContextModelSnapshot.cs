@@ -60,6 +60,8 @@ namespace BaseTemplate.Infrastructure.Data.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("TenantId");
+
                     b.ToTable("AppUser");
                 });
 
@@ -106,6 +108,8 @@ namespace BaseTemplate.Infrastructure.Data.Migrations
                         .HasColumnType("integer");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("TenantId");
 
                     b.ToTable("Item");
                 });
@@ -156,6 +160,10 @@ namespace BaseTemplate.Infrastructure.Data.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("ItemAttributeTypeId");
+
+                    b.HasIndex("TenantId");
+
                     b.ToTable("ItemAttribute");
                 });
 
@@ -196,6 +204,8 @@ namespace BaseTemplate.Infrastructure.Data.Migrations
                         .HasColumnType("integer");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("TenantId");
 
                     b.ToTable("ItemAttributeType");
                 });
@@ -252,7 +262,49 @@ namespace BaseTemplate.Infrastructure.Data.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("TenantId");
+
                     b.ToTable("StaffRequest");
+                });
+
+            modelBuilder.Entity("BaseTemplate.Domain.Entities.StaffRequestRole", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTimeOffset>("Created")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("text");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<DateTimeOffset?>("LastModified")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("LastModifiedBy")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Role")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<int>("StaffRequestId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("TenantId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TenantId");
+
+                    b.ToTable("StaffRequestRole");
                 });
 
             modelBuilder.Entity("BaseTemplate.Domain.Entities.Tenant", b =>
@@ -285,9 +337,8 @@ namespace BaseTemplate.Infrastructure.Data.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<string>("OwnerSsoId")
-                        .IsRequired()
-                        .HasColumnType("text");
+                    b.Property<int>("OwnerId")
+                        .HasColumnType("integer");
 
                     b.Property<string>("UniqName")
                         .IsRequired()
@@ -330,7 +381,92 @@ namespace BaseTemplate.Infrastructure.Data.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("UserId");
+
                     b.ToTable("UserRole");
+                });
+
+            modelBuilder.Entity("BaseTemplate.Domain.Entities.AppUser", b =>
+                {
+                    b.HasOne("BaseTemplate.Domain.Entities.Tenant", "Tenant")
+                        .WithMany()
+                        .HasForeignKey("TenantId");
+
+                    b.Navigation("Tenant");
+                });
+
+            modelBuilder.Entity("BaseTemplate.Domain.Entities.Item", b =>
+                {
+                    b.HasOne("BaseTemplate.Domain.Entities.Tenant", "Tenant")
+                        .WithMany()
+                        .HasForeignKey("TenantId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Tenant");
+                });
+
+            modelBuilder.Entity("BaseTemplate.Domain.Entities.ItemAttribute", b =>
+                {
+                    b.HasOne("BaseTemplate.Domain.Entities.ItemAttributeType", "ItemAttributeType")
+                        .WithMany()
+                        .HasForeignKey("ItemAttributeTypeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("BaseTemplate.Domain.Entities.Tenant", "Tenant")
+                        .WithMany()
+                        .HasForeignKey("TenantId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("ItemAttributeType");
+
+                    b.Navigation("Tenant");
+                });
+
+            modelBuilder.Entity("BaseTemplate.Domain.Entities.ItemAttributeType", b =>
+                {
+                    b.HasOne("BaseTemplate.Domain.Entities.Tenant", "Tenant")
+                        .WithMany()
+                        .HasForeignKey("TenantId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Tenant");
+                });
+
+            modelBuilder.Entity("BaseTemplate.Domain.Entities.StaffRequest", b =>
+                {
+                    b.HasOne("BaseTemplate.Domain.Entities.Tenant", "Tenant")
+                        .WithMany()
+                        .HasForeignKey("TenantId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Tenant");
+                });
+
+            modelBuilder.Entity("BaseTemplate.Domain.Entities.StaffRequestRole", b =>
+                {
+                    b.HasOne("BaseTemplate.Domain.Entities.Tenant", "Tenant")
+                        .WithMany()
+                        .HasForeignKey("TenantId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Tenant");
+                });
+
+            modelBuilder.Entity("BaseTemplate.Domain.Entities.UserRole", b =>
+                {
+                    b.HasOne("BaseTemplate.Domain.Entities.AppUser", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
                 });
 #pragma warning restore 612, 618
         }
