@@ -19,7 +19,8 @@ public class RemoveStaffCommandHandler : IRequestHandler<RemoveStaffCommand, boo
 
         var user = await _context.AppUser
             .SingleAsync(u => u.Id == request.StaffId && u.TenantId == userProfile.TenantId && !u.IsDeleted, cancellationToken);
-        user.Tenant = null;
+        user.TenantId = null;
+        _context.AppUser.Update(user);
 
         var roles = await _context.UserRole
             .Where(r => r.UserId == request.StaffId && !r.IsDeleted)

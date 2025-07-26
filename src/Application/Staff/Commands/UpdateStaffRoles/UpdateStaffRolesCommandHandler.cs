@@ -29,6 +29,7 @@ public class UpdateStaffRolesCommandHandler : IRequestHandler<UpdateStaffRolesCo
         foreach (var role in existingRoles)
         {
             role.IsDeleted = true;
+            _context.UserRole.Update(role);
         }
 
         // Add new roles or reactivate existing ones
@@ -43,6 +44,7 @@ public class UpdateStaffRolesCommandHandler : IRequestHandler<UpdateStaffRolesCo
                 {
                     // Reactivate the existing role
                     existingRole.IsDeleted = false;
+                    _context.UserRole.Update(existingRole);
                 }
                 else
                 {

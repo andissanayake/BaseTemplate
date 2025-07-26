@@ -30,9 +30,6 @@ public class CreateTenantCommandHandler : IRequestHandler<CreateTenantCommand, i
         };
         _context.Tenant.Add(tenant);
 
-        // Update user's tenant_id
-        existingUser.TenantId = tenant.Id;
-
         // Add TenantOwner role to the user
         var userRole = new UserRole
         {
@@ -41,7 +38,11 @@ public class CreateTenantCommandHandler : IRequestHandler<CreateTenantCommand, i
         };
         _context.UserRole.Add(userRole);
 
-        // Single save operation for all changes
+        await _context.SaveChangesAsync(cancellationToken);
+
+        existingUser.TenantId = tenant.Id;
+        _context.AppUser.Update(existingUser);
+
         await _context.SaveChangesAsync(cancellationToken);
         
         await _userProfileService.InvalidateUserProfileCacheAsync();

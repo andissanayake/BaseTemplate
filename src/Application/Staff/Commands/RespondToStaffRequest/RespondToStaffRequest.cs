@@ -40,9 +40,6 @@ public class RespondToStaffRequestCommandHandler : IRequestHandler<RespondToStaf
             staffRequest.AcceptedAt = DateTimeOffset.UtcNow;
             staffRequest.AcceptedBySsoId = _user.Identifier;
 
-            // Update the user's tenant information
-            user.TenantId = staffRequest.TenantId;
-
             // Get the roles for this staff request and add them to the user
             var staffRequestRoles = await _context.StaffRequestRole
                 .Where(r => r.StaffRequestId == request.StaffRequestId)
@@ -57,6 +54,10 @@ public class RespondToStaffRequestCommandHandler : IRequestHandler<RespondToStaf
                 };
                 _context.UserRole.Add(userRole);
             }
+
+            // Update the user's tenant information
+            user.TenantId = staffRequest.TenantId;
+            _context.AppUser.Update(user);
 
             await _context.SaveChangesAsync(cancellationToken);
             await _userTenantProfileService.InvalidateUserProfileCacheAsync();
