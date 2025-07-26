@@ -34,9 +34,6 @@ public class RemoveStaffCommandHandler : IRequestHandler<RemoveStaffCommand, boo
             .SingleAsync(cancellationToken);
         staffRequest.Status = StaffRequestStatus.Expired;
 
-        _context.AppUser.Update(user);
-        _context.UserRole.UpdateRange(roles);
-        _context.StaffRequest.UpdateRange(staffRequest);
         await _context.SaveChangesAsync(cancellationToken);
 
         await _userProfileService.InvalidateUserProfileCacheAsync(user.SsoId);

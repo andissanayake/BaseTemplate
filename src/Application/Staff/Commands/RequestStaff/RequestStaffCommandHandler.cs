@@ -74,7 +74,6 @@ public class RequestStaffCommandHandler : IRequestHandler<RequestStaffCommand, b
             Status = StaffRequestStatus.Pending
         };
         _context.StaffRequest.Add(staffRequest);
-        await _context.SaveChangesAsync(cancellationToken);
 
         // Add roles for the staff request
         foreach (var role in request.Roles)

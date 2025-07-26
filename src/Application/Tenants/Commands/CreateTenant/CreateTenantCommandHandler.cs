@@ -29,12 +29,9 @@ public class CreateTenantCommandHandler : IRequestHandler<CreateTenantCommand, i
             OwnerSsoId = _user.Identifier
         };
         _context.Tenant.Add(tenant);
-        await _context.SaveChangesAsync(cancellationToken);
 
         // Update user's tenant_id
         existingUser.TenantId = tenant.Id;
-        existingUser.LastModified = DateTimeOffset.UtcNow;
-        await _context.SaveChangesAsync(cancellationToken);
 
         // Add TenantOwner role to the user
         var userRole = new UserRole
@@ -43,8 +40,11 @@ public class CreateTenantCommandHandler : IRequestHandler<CreateTenantCommand, i
             Role = Roles.TenantOwner
         };
         _context.UserRole.Add(userRole);
-        await _userProfileService.InvalidateUserProfileCacheAsync();
+
+        // Single save operation for all changes
         await _context.SaveChangesAsync(cancellationToken);
+        
+        await _userProfileService.InvalidateUserProfileCacheAsync();
         return Result<int>.Success(tenant.Id);
     }
 }

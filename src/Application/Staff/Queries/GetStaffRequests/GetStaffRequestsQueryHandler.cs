@@ -15,10 +15,8 @@ public class GetStaffRequestsQueryHandler : IRequestHandler<GetStaffRequestsQuer
 
     public async Task<Result<List<StaffRequestDto>>> HandleAsync(GetStaffRequestsQuery request, CancellationToken cancellationToken)
     {
-        // Get user profile to get tenant ID
         var userProfile = await _userProfileService.GetUserProfileAsync();
 
-        // Get all staff requests for the tenant (exclude soft deleted)
         var staffRequests = await _context.StaffRequest
             .Where(sr => sr.TenantId == userProfile.TenantId && !sr.IsDeleted)
             .OrderByDescending(sr => sr.Created)

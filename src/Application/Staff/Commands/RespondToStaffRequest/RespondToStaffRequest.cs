@@ -31,16 +31,17 @@ public class RespondToStaffRequestCommandHandler : IRequestHandler<RespondToStaf
 
         if (request.IsAccepted)
         {
+            // Check if user already has a tenant
+            var user = await _context.AppUser
+                .SingleAsync(u => u.SsoId == _user.Identifier && !u.TenantId.HasValue, cancellationToken);
+
             // Accept the request
             staffRequest.Status = StaffRequestStatus.Accepted;
             staffRequest.AcceptedAt = DateTimeOffset.UtcNow;
             staffRequest.AcceptedBySsoId = _user.Identifier;
 
             // Update the user's tenant information
-            var user = await _context.AppUser
-                .SingleAsync(u => u.SsoId == _user.Identifier, cancellationToken);
             user.TenantId = staffRequest.TenantId;
-            _context.AppUser.Update(user);
 
             // Get the roles for this staff request and add them to the user
             var staffRequestRoles = await _context.StaffRequestRole

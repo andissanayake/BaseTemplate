@@ -20,28 +20,43 @@ public class UpdateStaffRolesCommandHandler : IRequestHandler<UpdateStaffRolesCo
         var user = await _context.AppUser
             .SingleAsync(u => u.Id == request.StaffId && u.TenantId == userProfile.TenantId, cancellationToken);
 
+        // Get all existing roles for the user (including deleted ones)
         var existingRoles = await _context.UserRole
-            .Where(r => r.UserId == request.StaffId && !r.IsDeleted)
+            .Where(r => r.UserId == request.StaffId)
             .ToListAsync(cancellationToken);
 
+        // Mark all existing roles as deleted
         foreach (var role in existingRoles)
         {
             role.IsDeleted = true;
         }
 
-        // Add new roles
+        // Add new roles or reactivate existing ones
         if (request.NewRoles.Any())
         {
-            foreach (var role in request.NewRoles)
+            foreach (var newRole in request.NewRoles)
             {
-                var userRole = new UserRole
+                // Check if this role already exists (including deleted ones)
+                var existingRole = existingRoles.FirstOrDefault(r => r.Role == newRole);
+                
+                if (existingRole != null)
                 {
-                    UserId = request.StaffId,
-                    Role = role
-                };
-                _context.UserRole.Add(userRole);
+                    // Reactivate the existing role
+                    existingRole.IsDeleted = false;
+                }
+                else
+                {
+                    // Create a new role entry
+                    var userRole = new UserRole
+                    {
+                        UserId = request.StaffId,
+                        Role = newRole
+                    };
+                    _context.UserRole.Add(userRole);
+                }
             }
         }
+        
         await _context.SaveChangesAsync(cancellationToken);
         await _userProfileService.InvalidateUserProfileCacheAsync(user.SsoId);
         return Result<bool>.Success(true);
