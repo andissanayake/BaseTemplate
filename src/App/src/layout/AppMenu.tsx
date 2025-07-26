@@ -114,6 +114,14 @@ export const AppMenu = () => {
         });
 
         menuItems.push({
+          key: "/specifications",
+          label: <span>Specifications</span>,
+          onClick: (e: any) => {
+            handleClick(e.key);
+          },
+        });
+
+        menuItems.push({
           key: "/tenants/view/staff-requests",
           label: <span>Staff Requests</span>,
           onClick: (e: any) => {

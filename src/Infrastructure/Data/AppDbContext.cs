@@ -16,6 +16,7 @@ internal class AppDbContext : DbContext, IAppDbContext
     public DbSet<ItemAttributeType> ItemAttributeType { get; set; }
     public DbSet<ItemAttribute> ItemAttribute { get; set; }
     public DbSet<Item> Item { get; set; }
+    public DbSet<Specification> Specification { get; set; }
 
     protected override void OnModelCreating(ModelBuilder builder)
     {

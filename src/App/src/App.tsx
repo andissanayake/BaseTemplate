@@ -20,6 +20,9 @@ import ItemAttributeTypeCreatePage from "./pages/ItemAttributeTypeCreatePage";
 import ItemAttributeTypeEditPage from "./pages/ItemAttributeTypeEditPage";
 import ItemAttributeTypeViewPage from "./pages/ItemAttributeTypeViewPage";
 import ItemAttributeTypeListPage from "./pages/ItemAttributeTypeListPage";
+import SpecificationListPage from "./pages/SpecificationListPage";
+import SpecificationCreatePage from "./pages/SpecificationCreatePage";
+import SpecificationEditPage from "./pages/SpecificationEditPage";
 import { LoginPage } from "./pages/LoginPage";
 import { LogoutPage } from "./pages/LogoutPage";
 import NoAccessPage from "./pages/NoAccessPage";
@@ -96,6 +99,31 @@ export const App = () => {
             element={
               <ProtectedRoute policy={Policies.User}>
                 <ItemAttributeTypeViewPage />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/specifications"
+            element={
+              <ProtectedRoute policy={Policies.User}>
+                <SpecificationListPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/specifications/create"
+            element={
+              <ProtectedRoute policy={Policies.User}>
+                <SpecificationCreatePage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/specifications/:specificationId"
+            element={
+              <ProtectedRoute policy={Policies.User}>
+                <SpecificationEditPage />
               </ProtectedRoute>
             }
           />

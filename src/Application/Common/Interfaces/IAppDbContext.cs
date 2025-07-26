@@ -10,5 +10,6 @@ public interface IAppDbContext
     DbSet<ItemAttributeType> ItemAttributeType { get; set; }
     DbSet<ItemAttribute> ItemAttribute { get; set; }
     DbSet<Item> Item { get; set; }
+    DbSet<Specification> Specification { get; set; }
     Task<int> SaveChangesAsync(CancellationToken cancellationToken);
 }
