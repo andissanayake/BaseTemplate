@@ -70,10 +70,13 @@ public class RequestStaffCommandHandler : IRequestHandler<RequestStaffCommand, b
             TenantId = userProfile.TenantId,
             RequestedEmail = request.StaffEmail,
             RequestedName = request.StaffName,
-            RequestedBySsoId = userProfile.Identifier,
+            RequestedByAppUserId = userProfile.Id,
             Status = StaffRequestStatus.Pending
         };
         _context.StaffRequest.Add(staffRequest);
+        
+        // Save the staff request first to get its ID
+        await _context.SaveChangesAsync(cancellationToken);
 
         // Add roles for the staff request
         foreach (var role in request.Roles)

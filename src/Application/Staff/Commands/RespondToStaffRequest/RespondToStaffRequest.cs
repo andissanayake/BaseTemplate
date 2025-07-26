@@ -38,7 +38,7 @@ public class RespondToStaffRequestCommandHandler : IRequestHandler<RespondToStaf
             // Accept the request
             staffRequest.Status = StaffRequestStatus.Accepted;
             staffRequest.AcceptedAt = DateTimeOffset.UtcNow;
-            staffRequest.AcceptedBySsoId = _user.Identifier;
+            staffRequest.AcceptedByAppUserId = user.Id;
 
             // Get the roles for this staff request and add them to the user
             var staffRequestRoles = await _context.StaffRequestRole

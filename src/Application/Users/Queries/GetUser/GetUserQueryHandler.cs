@@ -56,15 +56,13 @@ public class GetUserQueryHandler : IRequestHandler<GetUserQuery, GetUserResponse
         if (!user.TenantId.HasValue)
         {
             var staffRequest = await _context.StaffRequest
+                .Include(sr => sr.RequestedByAppUser)
                 .Where(sr => sr.RequestedEmail == _user.Email && sr.Status == StaffRequestStatus.Pending && !sr.IsDeleted)
                 .OrderByDescending(sr => sr.Created)
                 .FirstOrDefaultAsync(cancellationToken);
 
             if (staffRequest != null)
             {
-                var requester = await _context.AppUser
-                    .SingleAsync(u => u.SsoId == staffRequest.RequestedBySsoId, cancellationToken);
-
                 var staffRequestRoles = await _context.StaffRequestRole
                     .Where(r => r.StaffRequestId == staffRequest.Id && !r.IsDeleted)
                     .Select(r => r.Role)
@@ -78,8 +76,8 @@ public class GetUserQueryHandler : IRequestHandler<GetUserQuery, GetUserResponse
                 response.StaffRequest = new StaffRequestDetails
                 {
                     Id = staffRequest.Id,
-                    RequesterName = requester.Name!,
-                    RequesterEmail = requester.Email!,
+                    RequesterName = staffRequest.RequestedByAppUser.Name!,
+                    RequesterEmail = staffRequest.RequestedByAppUser.Email!,
                     Status = staffRequest.Status,
                     Created = staffRequest.Created,
                     TenantName = staffTenantName,

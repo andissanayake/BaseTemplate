@@ -4,10 +4,12 @@ public class StaffRequest : BaseTenantAuditableEntity
 {
     public string RequestedEmail { get; set; } = string.Empty;
     public string RequestedName { get; set; } = string.Empty;
-    public string RequestedBySsoId { get; set; } = string.Empty;
+    public int RequestedByAppUserId { get; set; }
+    public AppUser RequestedByAppUser { get; set; } = null!;
     public StaffRequestStatus Status { get; set; } = StaffRequestStatus.Pending;
     public DateTimeOffset? AcceptedAt { get; set; }
-    public string? AcceptedBySsoId { get; set; }
+    public int? AcceptedByAppUserId { get; set; }
+    public AppUser? AcceptedByAppUser { get; set; }
     public string? RejectionReason { get; set; }
 }
 

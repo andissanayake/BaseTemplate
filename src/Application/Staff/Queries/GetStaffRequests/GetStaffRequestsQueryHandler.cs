@@ -18,6 +18,8 @@ public class GetStaffRequestsQueryHandler : IRequestHandler<GetStaffRequestsQuer
         var userProfile = await _userProfileService.GetUserProfileAsync();
 
         var staffRequests = await _context.StaffRequest
+            .Include(sr => sr.RequestedByAppUser)
+            .Include(sr => sr.AcceptedByAppUser)
             .Where(sr => sr.TenantId == userProfile.TenantId && !sr.IsDeleted)
             .OrderByDescending(sr => sr.Created)
             .ToListAsync(cancellationToken);
@@ -46,11 +48,15 @@ public class GetStaffRequestsQueryHandler : IRequestHandler<GetStaffRequestsQuer
                 RequestedEmail = staffRequest.RequestedEmail,
                 RequestedName = staffRequest.RequestedName,
                 Roles = rolesByStaffRequestId.GetValueOrDefault(staffRequest.Id, new List<string>()),
-                RequestedBySsoId = staffRequest.RequestedBySsoId,
+                RequestedByAppUserId = staffRequest.RequestedByAppUserId,
+                RequestedByAppUserName = staffRequest.RequestedByAppUser.Name ?? string.Empty,
+                RequestedByAppUserEmail = staffRequest.RequestedByAppUser.Email ?? string.Empty,
                 Status = staffRequest.Status,
                 Created = staffRequest.Created,
                 AcceptedAt = staffRequest.AcceptedAt,
-                AcceptedBySsoId = staffRequest.AcceptedBySsoId,
+                AcceptedByAppUserId = staffRequest.AcceptedByAppUserId,
+                AcceptedByAppUserName = staffRequest.AcceptedByAppUser?.Name,
+                AcceptedByAppUserEmail = staffRequest.AcceptedByAppUser?.Email,
                 RejectionReason = staffRequest.RejectionReason
             };
 
