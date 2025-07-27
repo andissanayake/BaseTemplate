@@ -124,7 +124,7 @@ const SpecificationList: React.FC = () => {
       </div>
 
       <Spin spinning={loading}>
-        <Tree showLine showIcon treeData={treeData} defaultExpandAll />
+        <Tree showLine showIcon treeData={treeData} defaultExpandAll={true} />
       </Spin>
     </Card>
   );

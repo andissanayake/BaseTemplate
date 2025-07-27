@@ -78,9 +78,10 @@ const SpecificationEdit: React.FC = () => {
               label: spec.fullPath || spec.name,
             }));
             setParentOptions(options);
-            console.log(options);
             // Now load the specification data after parent options are ready
             loadSpecification();
+          } else {
+            setInitialLoading(false);
           }
         },
         onServerError: () => {
@@ -114,10 +115,36 @@ const SpecificationEdit: React.FC = () => {
     targetId: number,
     allSpecs: SpecificationModel[]
   ): boolean => {
-    if (spec.id === targetId) return true;
-    return spec.children.some((child) =>
-      isDescendant(child, targetId, allSpecs)
-    );
+    // Check if the current specification is a descendant of the target ID
+    // This means we need to find the target specification and check if current spec is in its children
+    const findTargetSpec = (
+      specs: SpecificationModel[]
+    ): SpecificationModel | null => {
+      for (const s of specs) {
+        if (s.id === targetId) return s;
+        if (s.children && s.children.length > 0) {
+          const found = findTargetSpec(s.children);
+          if (found) return found;
+        }
+      }
+      return null;
+    };
+
+    const targetSpec = findTargetSpec(allSpecs);
+    if (!targetSpec) return false;
+
+    // Check if the current spec is a descendant of the target spec
+    const checkDescendant = (
+      currentSpec: SpecificationModel,
+      target: SpecificationModel
+    ): boolean => {
+      if (currentSpec.id === target.id) return true;
+      return target.children.some((child) =>
+        checkDescendant(currentSpec, child)
+      );
+    };
+
+    return checkDescendant(spec, targetSpec);
   };
 
   const onFinish = (values: SpecificationUpdateModel) => {
