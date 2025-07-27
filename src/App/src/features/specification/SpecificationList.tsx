@@ -13,7 +13,7 @@ import {
   EditOutlined,
   DeleteOutlined,
   PlusOutlined,
-  FolderOutlined,
+  AppstoreOutlined,
 } from "@ant-design/icons";
 import type { DataNode } from "antd/es/tree";
 import { useSpecificationStore } from "./specificationStore";
@@ -73,7 +73,7 @@ const SpecificationList: React.FC = () => {
       key: spec.id.toString(),
       title: (
         <Space>
-          <FolderOutlined />
+          <AppstoreOutlined />
           <span>{spec.name}</span>
           <Space size="small">
             <Link to={`/specifications/${spec.id}`}>
