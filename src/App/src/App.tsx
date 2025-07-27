@@ -23,6 +23,7 @@ import ItemAttributeTypeListPage from "./pages/ItemAttributeTypeListPage";
 import SpecificationListPage from "./pages/SpecificationListPage";
 import SpecificationCreatePage from "./pages/SpecificationCreatePage";
 import SpecificationEditPage from "./pages/SpecificationEditPage";
+import SpecificationViewPage from "./pages/SpecificationViewPage";
 import { LoginPage } from "./pages/LoginPage";
 import { LogoutPage } from "./pages/LogoutPage";
 import NoAccessPage from "./pages/NoAccessPage";
@@ -120,10 +121,18 @@ export const App = () => {
             }
           />
           <Route
-            path="/specifications/:specificationId"
+            path="/specifications/edit/:specificationId"
             element={
               <ProtectedRoute policy={Policies.User}>
                 <SpecificationEditPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/specifications/view/:specificationId"
+            element={
+              <ProtectedRoute policy={Policies.User}>
+                <SpecificationViewPage />
               </ProtectedRoute>
             }
           />

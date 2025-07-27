@@ -14,6 +14,7 @@ import {
   DeleteOutlined,
   PlusOutlined,
   AppstoreOutlined,
+  EyeOutlined,
 } from "@ant-design/icons";
 import type { DataNode } from "antd/es/tree";
 import { useSpecificationStore } from "./specificationStore";
@@ -76,7 +77,10 @@ const SpecificationList: React.FC = () => {
           <AppstoreOutlined />
           <span>{spec.name}</span>
           <Space size="small">
-            <Link to={`/specifications/${spec.id}`}>
+            <Link to={`/specifications/view/${spec.id}`}>
+              <Button type="text" size="small" icon={<EyeOutlined />} />
+            </Link>
+            <Link to={`/specifications/edit/${spec.id}`}>
               <Button type="text" size="small" icon={<EditOutlined />} />
             </Link>
             <Popconfirm

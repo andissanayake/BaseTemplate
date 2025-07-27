@@ -23,8 +23,10 @@ export const AppBreadcrumb = () => {
       `View Attribute Type #${params.itemAttributeTypeId}`,
     "/specifications": "Specifications",
     "/specifications/create": "Create Specification",
-    "/specifications/:specificationId": (params: any) =>
+    "/specifications/edit/:specificationId": (params: any) =>
       `Edit Specification #${params.specificationId}`,
+    "/specifications/view/:specificationId": (params: any) =>
+      `View Specification #${params.specificationId}`,
     "/profile": "Profile",
 
     "/tenants/view/:tenantId/staff": "Staff Management",
