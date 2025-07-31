@@ -10,6 +10,7 @@ public class BaseDbcontext : DbContext, IBaseDbContext
     public BaseDbcontext(DbContextOptions<BaseDbcontext> options) : base(options) { }
     public DbSet<AppUser> AppUser { get; set; }
     public DbSet<UserRole> UserRole { get; set; }
+    public DbSet<Tenant> Tenant { get; set; }
     public DbSet<StaffRequest> StaffRequest { get; set; }
     public DbSet<StaffRequestRole> StaffRequestRole { get; set; }
 }
