@@ -27,7 +27,7 @@ public class GetItemAttributeByIdQueryHandler : IRequestHandler<GetItemAttribute
                 Value = ia.Value,
                 IsActive = ia.IsActive,
                 ItemAttributeTypeId = ia.ItemAttributeTypeId,
-                ItemAttributeTypeName = ia.ItemAttributeType.Name
+                ItemAttributeTypeName = ia.ItemAttributeType!.Name
             })
             .FirstOrDefaultAsync(cancellationToken);
 

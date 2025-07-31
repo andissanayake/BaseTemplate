@@ -6,11 +6,11 @@ namespace BaseTemplate.Infrastructure.Services
 {
     public class UserProfileService : IUserProfileService
     {
-        private readonly IAppDbContext _context;
+        private readonly IBaseDbContext _context;
         private readonly IMemoryCache _cache;
         private readonly IUser _user;
 
-        public UserProfileService(IAppDbContext context, IMemoryCache cache, IUser user)
+        public UserProfileService(IBaseDbContext context, IMemoryCache cache, IUser user)
         {
             _context = context;
             _cache = cache;
@@ -31,7 +31,6 @@ namespace BaseTemplate.Infrastructure.Services
             }
 
             var appUser = await _context.AppUser.SingleAsync(u => u.SsoId == identifier);
-            var tenant = await _context.Tenant.SingleAsync(t => t.Id == appUser.TenantId);
             var roles = _context.UserRole.Where(r => r.UserId == appUser.Id).ToList();
 
             var userInfo = new UserProfileDto()
@@ -41,8 +40,7 @@ namespace BaseTemplate.Infrastructure.Services
                 Identifier = appUser.SsoId,
                 Name = appUser.Name!,
                 Roles = roles.Select(r => r.Role).ToList(),
-                TenantId = tenant.Id,
-                TenantName = tenant.Name
+                TenantId = appUser.TenantId ?? 0,
             };
 
             _cache.Set(cacheKey, userInfo, TimeSpan.FromMinutes(10));

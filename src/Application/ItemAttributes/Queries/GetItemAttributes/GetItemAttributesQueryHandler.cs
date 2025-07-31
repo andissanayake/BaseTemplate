@@ -28,7 +28,7 @@ public class GetItemAttributesQueryHandler : IRequestHandler<GetItemAttributesQu
                 Value = ia.Value,
                 IsActive = ia.IsActive,
                 ItemAttributeTypeId = ia.ItemAttributeTypeId,
-                ItemAttributeTypeName = ia.ItemAttributeType.Name
+                ItemAttributeTypeName = ia.ItemAttributeType!.Name
             })
             .ToListAsync(cancellationToken);
 
