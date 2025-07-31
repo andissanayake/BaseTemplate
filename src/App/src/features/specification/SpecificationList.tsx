@@ -60,6 +60,9 @@ const SpecificationList: React.FC = () => {
         });
         loadSpecifications();
       },
+      onValidationError: (error) => {
+        notification.error({ message: error.message });
+      },
       onServerError: () => {
         notification.error({ message: "Failed to delete specification!" });
       },
