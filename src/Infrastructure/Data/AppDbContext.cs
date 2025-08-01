@@ -78,42 +78,31 @@ public class AppDbContext : DbContext, IAppDbContext
         builder.Entity<Item>().HasQueryFilter(e => !e.IsDeleted);
         builder.Entity<Specification>().HasQueryFilter(e => !e.IsDeleted);
 
-        builder.Entity<AppUser>().HasQueryFilter(e => e.TenantId == GetCurrentTenantId());
-        builder.Entity<StaffInvitation>().HasQueryFilter(e => e.TenantId == GetCurrentTenantId());
-        builder.Entity<StaffInvitationRole>().HasQueryFilter(e => e.TenantId == GetCurrentTenantId());
-        builder.Entity<ItemAttributeType>().HasQueryFilter(e => e.TenantId == GetCurrentTenantId());
-        builder.Entity<ItemAttribute>().HasQueryFilter(e => e.TenantId == GetCurrentTenantId());
-        builder.Entity<Item>().HasQueryFilter(e => e.TenantId == GetCurrentTenantId());
-        builder.Entity<Specification>().HasQueryFilter(e => e.TenantId == GetCurrentTenantId());
+        builder.Entity<AppUser>().HasQueryFilter(e => e.TenantId == _profileService.UserProfile.TenantId);
+        builder.Entity<StaffInvitation>().HasQueryFilter(e => e.TenantId == _profileService.UserProfile.TenantId);
+        builder.Entity<StaffInvitationRole>().HasQueryFilter(e => e.TenantId == _profileService.UserProfile.TenantId);
+        builder.Entity<ItemAttributeType>().HasQueryFilter(e => e.TenantId == _profileService.UserProfile.TenantId);
+        builder.Entity<ItemAttribute>().HasQueryFilter(e => e.TenantId == _profileService.UserProfile.TenantId);
+        builder.Entity<Item>().HasQueryFilter(e => e.TenantId == _profileService.UserProfile.TenantId);
+        builder.Entity<Specification>().HasQueryFilter(e => e.TenantId == _profileService.UserProfile.TenantId);
     }
 
-    private int GetCurrentTenantId()
-    {
-        var userProfile = _profileService.GetUserProfileAsync().GetAwaiter().GetResult();
-        if (userProfile.TenantId < 1)
-        {
-            throw new InvalidOperationException("There should be a tenant id to access application db context.");
-        }
-        return userProfile.TenantId;
-    }
 
     public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = new CancellationToken())
     {
-        var userProfile = await _profileService.GetUserProfileAsync();
-
         foreach (var entry in ChangeTracker.Entries<BaseTenantAuditableEntity>())
         {
             switch (entry.State)
             {
                 case EntityState.Added:
-                    entry.Entity.TenantId = userProfile.TenantId;
-                    entry.Entity.CreatedBy = userProfile.Id;
+                    entry.Entity.TenantId = _profileService.UserProfile.TenantId;
+                    entry.Entity.CreatedBy = _profileService.UserProfile.Id;
                     entry.Entity.Created = DateTimeOffset.UtcNow;
                     break;
 
                 case EntityState.Modified:
-                    entry.Entity.TenantId = userProfile.TenantId;
-                    entry.Entity.LastModifiedBy = userProfile.Id;
+                    entry.Entity.TenantId = _profileService.UserProfile.TenantId;
+                    entry.Entity.LastModifiedBy = _profileService.UserProfile.Id;
                     entry.Entity.LastModified = DateTimeOffset.UtcNow;
                     break;
             }

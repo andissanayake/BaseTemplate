@@ -5,19 +5,16 @@ namespace BaseTemplate.Application.Items.Queries.GetItemById;
 public class GetItemByIdQueryHandler : IRequestHandler<GetItemByIdQuery, ItemDto>
 {
     private readonly IAppDbContext _context;
-    private readonly IUserProfileService _userProfileService;
 
-    public GetItemByIdQueryHandler(IAppDbContext context, IUserProfileService userProfileService)
+    public GetItemByIdQueryHandler(IAppDbContext context)
     {
         _context = context;
-        _userProfileService = userProfileService;
     }
 
     public async Task<Result<ItemDto>> HandleAsync(GetItemByIdQuery request, CancellationToken cancellationToken)
     {
-        var userInfo = await _userProfileService.GetUserProfileAsync();
         var entity = await _context.Item
-            .SingleAsync(i => i.Id == request.Id && i.TenantId == userInfo.TenantId && !i.IsDeleted, cancellationToken);
+            .SingleAsync(i => i.Id == request.Id, cancellationToken);
 
         var itemDto = new ItemDto
         {

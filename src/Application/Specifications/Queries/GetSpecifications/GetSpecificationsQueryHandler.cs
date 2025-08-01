@@ -7,21 +7,16 @@ namespace BaseTemplate.Application.Specifications.Queries.GetSpecifications;
 public class GetSpecificationsQueryHandler : IRequestHandler<GetSpecificationsQuery, GetSpecificationsResponse>
 {
     private readonly IAppDbContext _context;
-    private readonly IUserProfileService _userProfileService;
 
-    public GetSpecificationsQueryHandler(IAppDbContext context, IUserProfileService userProfileService)
+    public GetSpecificationsQueryHandler(IAppDbContext context)
     {
         _context = context;
-        _userProfileService = userProfileService;
     }
 
     public async Task<Result<GetSpecificationsResponse>> HandleAsync(GetSpecificationsQuery request, CancellationToken cancellationToken)
     {
-        var userProfile = await _userProfileService.GetUserProfileAsync();
-        
         // Get all specifications for the tenant
         var allSpecifications = await _context.Specification
-            .Where(s => s.TenantId == userProfile.TenantId)
             .Select(s => new SpecificationBriefDto
             {
                 Id = s.Id,

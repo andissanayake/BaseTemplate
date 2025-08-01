@@ -5,20 +5,16 @@ namespace BaseTemplate.Application.Staff.Commands.UpdateStaffRoles;
 public class UpdateStaffRolesCommandHandler : IRequestHandler<UpdateStaffRolesCommand, bool>
 {
     private readonly IAppDbContext _context;
-    private readonly IUserProfileService _userProfileService;
 
-    public UpdateStaffRolesCommandHandler(IAppDbContext context, IUserProfileService userProfileService)
+    public UpdateStaffRolesCommandHandler(IAppDbContext context)
     {
         _context = context;
-        _userProfileService = userProfileService;
     }
 
     public async Task<Result<bool>> HandleAsync(UpdateStaffRolesCommand request, CancellationToken cancellationToken)
     {
-        var userProfile = await _userProfileService.GetUserProfileAsync();
-
         var user = await _context.AppUser
-            .SingleAsync(u => u.Id == request.StaffId && u.TenantId == userProfile.TenantId, cancellationToken);
+            .SingleAsync(u => u.Id == request.StaffId, cancellationToken);
 
         // Get all existing roles for the user (including deleted ones)
         var existingRoles = await _context.UserRole
@@ -60,7 +56,6 @@ public class UpdateStaffRolesCommandHandler : IRequestHandler<UpdateStaffRolesCo
         }
         
         await _context.SaveChangesAsync(cancellationToken);
-        await _userProfileService.InvalidateUserProfileCacheAsync(user.SsoId);
         return Result<bool>.Success(true);
     }
 }

@@ -5,18 +5,14 @@ namespace BaseTemplate.Application.Staff.Commands.CreateStaffInvitation;
 public class CreateStaffInvitationCommandHandler : IRequestHandler<CreateStaffInvitationCommand, bool>
 {
     private readonly IAppDbContext _context;
-    private readonly IUserProfileService _userProfileService;
 
-    public CreateStaffInvitationCommandHandler(IAppDbContext context, IUserProfileService userProfileService)
+    public CreateStaffInvitationCommandHandler(IAppDbContext context)
     {
         _context = context;
-        _userProfileService = userProfileService;
     }
 
     public async Task<Result<bool>> HandleAsync(CreateStaffInvitationCommand request, CancellationToken cancellationToken)
     {
-        var userProfile = await _userProfileService.GetUserProfileAsync();
-
         // Validate that only allowed roles can be requested
         var invalidRoles = request.Roles.Except(Roles.TenantBaseRoles, StringComparer.OrdinalIgnoreCase).ToList();
         if (invalidRoles.Any())
@@ -34,15 +30,6 @@ public class CreateStaffInvitationCommandHandler : IRequestHandler<CreateStaffIn
             .FirstOrDefaultAsync(u => u.Email == request.StaffEmail, cancellationToken);
         if (existingUser != null && existingUser.TenantId != null)
         {
-            if (existingUser.TenantId == userProfile.TenantId)
-            {
-                return Result<bool>.Validation(
-                    "User already exists in this tenant.",
-                    new Dictionary<string, string[]>
-                    {
-                        ["StaffEmail"] = new[] { $"User with email {request.StaffEmail} is already a member of this tenant." }
-                    });
-            }
             return Result<bool>.Validation(
                 "User already exists in another tenant.",
                 new Dictionary<string, string[]>
@@ -53,7 +40,7 @@ public class CreateStaffInvitationCommandHandler : IRequestHandler<CreateStaffIn
 
         // Check if there's already a pending request for this email in this tenant
         var existingRequest = await _context.StaffInvitation
-            .FirstOrDefaultAsync(r => r.TenantId == userProfile.TenantId && r.RequestedEmail == request.StaffEmail && r.Status == StaffRequestStatus.Pending, cancellationToken);
+            .FirstOrDefaultAsync(r => r.RequestedEmail == request.StaffEmail && r.Status == StaffRequestStatus.Pending, cancellationToken);
 
         if (existingRequest != null)
         {
@@ -67,10 +54,8 @@ public class CreateStaffInvitationCommandHandler : IRequestHandler<CreateStaffIn
 
         var staffRequest = new StaffInvitation
         {
-            TenantId = userProfile.TenantId,
             RequestedEmail = request.StaffEmail,
             RequestedName = request.StaffName,
-            RequestedByAppUserId = userProfile.Id,
             Status = StaffRequestStatus.Pending
         };
         _context.StaffInvitation.Add(staffRequest);
@@ -83,7 +68,6 @@ public class CreateStaffInvitationCommandHandler : IRequestHandler<CreateStaffIn
         {
             var staffRequestRole = new StaffInvitationRole
             {
-                TenantId = userProfile.TenantId,
                 StaffInvitationId = staffRequest.Id,
                 Role = role
             };

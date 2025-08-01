@@ -2,12 +2,12 @@ namespace BaseTemplate.Application.Common.Interfaces
 {
     public interface IUserProfileService
     {
-        Task<UserProfileDto> GetUserProfileAsync();
+        UserProfile UserProfile { get; }
         Task InvalidateUserProfileCacheAsync();
         Task InvalidateUserProfileCacheAsync(string identifier);
     }
 
-    public class UserProfileDto
+    public class UserProfile
     {
         public required int Id { get; set; }
         public required string Identifier { get; set; } = string.Empty;

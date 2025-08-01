@@ -3,22 +3,20 @@
 namespace BaseTemplate.Application.Staff.Commands.RespondToStaffInvitation;
 public class RespondToStaffInvitationCommandHandler : IRequestHandler<RespondToStaffInvitationCommand, bool>
 {
-    private readonly IAppDbContext _context;
+    private readonly IBaseDbContext _context;
     private readonly IUser _user;
-    private readonly IUserProfileService _userTenantProfileService;
 
-    public RespondToStaffInvitationCommandHandler(IAppDbContext context, IUser user, IUserProfileService userTenantProfileService)
+    public RespondToStaffInvitationCommandHandler(IBaseDbContext context, IUser user)
     {
         _context = context;
         _user = user;
-        _userTenantProfileService = userTenantProfileService;
     }
 
     public async Task<Result<bool>> HandleAsync(RespondToStaffInvitationCommand request, CancellationToken cancellationToken)
     {
         // Get the staff request and verify it belongs to the current user
         var staffRequest = await _context.StaffInvitation
-            .SingleAsync(sr => sr.Id == request.StaffRequestId && sr.RequestedEmail == _user.Email && sr.Status == StaffRequestStatus.Pending && !sr.IsDeleted, cancellationToken);
+            .SingleAsync(sr => sr.Id == request.StaffRequestId && sr.RequestedEmail == _user.Email && sr.Status == StaffRequestStatus.Pending, cancellationToken);
 
         if (request.IsAccepted)
         {
@@ -51,7 +49,6 @@ public class RespondToStaffInvitationCommandHandler : IRequestHandler<RespondToS
             _context.AppUser.Update(user);
 
             await _context.SaveChangesAsync(cancellationToken);
-            await _userTenantProfileService.InvalidateUserProfileCacheAsync();
             return Result<bool>.Success(true, $"You have successfully accepted the staff request.");
         }
         else

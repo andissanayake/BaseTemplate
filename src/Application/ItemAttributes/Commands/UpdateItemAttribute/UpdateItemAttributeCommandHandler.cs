@@ -5,24 +5,20 @@ namespace BaseTemplate.Application.ItemAttributes.Commands.UpdateItemAttribute;
 public class UpdateItemAttributeCommandHandler : IRequestHandler<UpdateItemAttributeCommand, bool>
 {
     private readonly IAppDbContext _context;
-    private readonly IUserProfileService _userProfileService;
-
-    public UpdateItemAttributeCommandHandler(IAppDbContext context, IUserProfileService userProfileService)
+    public UpdateItemAttributeCommandHandler(IAppDbContext context)
     {
-        _context = context;
-        _userProfileService = userProfileService;
+        _context = context; ;
     }
 
     public async Task<Result<bool>> HandleAsync(UpdateItemAttributeCommand request, CancellationToken cancellationToken)
     {
-        var userInfo = await _userProfileService.GetUserProfileAsync();
 
         var itemAttribute = await _context.ItemAttribute
-            .SingleAsync(a => a.Id == request.Id && a.TenantId == userInfo.TenantId, cancellationToken);
+            .SingleAsync(a => a.Id == request.Id, cancellationToken);
 
         // Check if code already exists for this tenant (excluding current item)
         var existingAttribute = await _context.ItemAttribute
-            .FirstOrDefaultAsync(a => a.Code == request.Code && a.TenantId == userInfo.TenantId && a.Id != request.Id, cancellationToken);
+            .FirstOrDefaultAsync(a => a.Code == request.Code && a.Id != request.Id, cancellationToken);
 
         if (existingAttribute != null)
         {

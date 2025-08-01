@@ -13,8 +13,8 @@ public class GetTenantByIdQueryHandler : IRequestHandler<GetTenantByIdQuery, Get
 
     public async Task<Result<GetTenantResponse>> HandleAsync(GetTenantByIdQuery request, CancellationToken cancellationToken)
     {
-        var userProfile = await _userProfileService.GetUserProfileAsync();
-        var entity = await _context.Tenant.SingleAsync(t => t.Id == userProfile.TenantId && !t.IsDeleted, cancellationToken);
+        var userProfile = _userProfileService.UserProfile;
+        var entity = await _context.Tenant.SingleAsync(t => t.Id == userProfile.TenantId, cancellationToken);
 
         var tenant = new GetTenantResponse { Name = entity.Name, Id = entity.Id, Address = entity.Address };
         return Result<GetTenantResponse>.Success(tenant);

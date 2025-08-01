@@ -5,24 +5,16 @@ namespace BaseTemplate.Application.Staff.Queries.ListStaff;
 public class ListStaffQueryHandler : IRequestHandler<ListStaffQuery, List<StaffMemberDto>>
 {
     private readonly IAppDbContext _context;
-    private readonly IUserProfileService _userProfileService;
 
-    public ListStaffQueryHandler(IAppDbContext context, IUserProfileService userProfileService)
+    public ListStaffQueryHandler(IAppDbContext context)
     {
         _context = context;
-        _userProfileService = userProfileService;
     }
 
     public async Task<Result<List<StaffMemberDto>>> HandleAsync(ListStaffQuery request, CancellationToken cancellationToken)
     {
-        var userProfile = await _userProfileService.GetUserProfileAsync();
-
-        // Get the tenant to identify the owner
-        var tenant = await _context.Tenant.SingleAsync(t => t.Id == userProfile.TenantId, cancellationToken);
-
         // Get all users for the tenant (exclude soft deleted)
         var users = await _context.AppUser
-            .Where(u => u.TenantId == userProfile.TenantId && !u.IsDeleted)
             .OrderByDescending(u => u.Created)
             .ToListAsync(cancellationToken);
 
@@ -32,7 +24,7 @@ public class ListStaffQueryHandler : IRequestHandler<ListStaffQuery, List<StaffM
         if (userIds.Any())
         {
             roles = await _context.UserRole
-                .Where(r => userIds.Contains(r.UserId) && !r.IsDeleted)
+                .Where(r => userIds.Contains(r.UserId))
                 .ToListAsync(cancellationToken);
         }
 
@@ -42,10 +34,6 @@ public class ListStaffQueryHandler : IRequestHandler<ListStaffQuery, List<StaffM
         var result = new List<StaffMemberDto>();
         foreach (var user in users)
         {
-            // Skip the actual tenant owner
-            if (user.Id == tenant.OwnerId)
-                continue;
-
             var dto = new StaffMemberDto
             {
                 Id = user.Id,

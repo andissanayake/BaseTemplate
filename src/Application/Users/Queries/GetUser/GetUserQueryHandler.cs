@@ -5,9 +5,9 @@ namespace BaseTemplate.Application.Users.Queries.GetUser;
 public class GetUserQueryHandler : IRequestHandler<GetUserQuery, GetUserResponse>
 {
     private readonly IUser _user;
-    private readonly IAppDbContext _context;
+    private readonly IBaseDbContext _context;
 
-    public GetUserQueryHandler(IAppDbContext context, IUser user)
+    public GetUserQueryHandler(IBaseDbContext context, IUser user)
     {
         _context = context;
         _user = user;
@@ -18,7 +18,7 @@ public class GetUserQueryHandler : IRequestHandler<GetUserQuery, GetUserResponse
         var response = new GetUserResponse();
         // Try to load user entity
         var user = await _context.AppUser
-            .FirstOrDefaultAsync(u => u.SsoId == _user.Identifier && !u.IsDeleted, cancellationToken);
+            .FirstOrDefaultAsync(u => u.SsoId == _user.Identifier, cancellationToken);
 
         // If not found, create user and use the new entity
         if (user == null)
@@ -43,7 +43,7 @@ public class GetUserQueryHandler : IRequestHandler<GetUserQuery, GetUserResponse
         }
 
         var roles = await _context.UserRole
-            .Where(r => r.UserId == user.Id && !r.IsDeleted)
+            .Where(r => r.UserId == user.Id)
             .Select(r => r.Role)
             .ToListAsync(cancellationToken);
         if (roles.Any(r => r == Roles.TenantOwner))
@@ -57,14 +57,14 @@ public class GetUserQueryHandler : IRequestHandler<GetUserQuery, GetUserResponse
         {
             var staffRequest = await _context.StaffInvitation
                 .Include(sr => sr.RequestedByAppUser)
-                .Where(sr => sr.RequestedEmail == _user.Email && sr.Status == StaffRequestStatus.Pending && !sr.IsDeleted)
+                .Where(sr => sr.RequestedEmail == _user.Email && sr.Status == StaffRequestStatus.Pending)
                 .OrderByDescending(sr => sr.Created)
                 .FirstOrDefaultAsync(cancellationToken);
 
             if (staffRequest != null)
             {
                 var staffRequestRoles = await _context.StaffInvitationRole
-                    .Where(r => r.StaffInvitationId == staffRequest.Id && !r.IsDeleted)
+                    .Where(r => r.StaffInvitationId == staffRequest.Id)
                     .Select(r => r.Role)
                     .ToListAsync(cancellationToken);
 

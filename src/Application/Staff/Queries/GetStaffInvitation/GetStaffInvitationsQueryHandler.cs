@@ -5,22 +5,17 @@ namespace BaseTemplate.Application.Staff.Queries.GetStaffInvitation;
 public class GetStaffInvitationsQueryHandler : IRequestHandler<GetStaffInvitationsQuery, List<StaffInvitationDto>>
 {
     private readonly IAppDbContext _context;
-    private readonly IUserProfileService _userProfileService;
 
-    public GetStaffInvitationsQueryHandler(IAppDbContext context, IUserProfileService userProfileService)
+    public GetStaffInvitationsQueryHandler(IAppDbContext context)
     {
         _context = context;
-        _userProfileService = userProfileService;
     }
 
     public async Task<Result<List<StaffInvitationDto>>> HandleAsync(GetStaffInvitationsQuery request, CancellationToken cancellationToken)
     {
-        var userProfile = await _userProfileService.GetUserProfileAsync();
-
         var staffRequests = await _context.StaffInvitation
             .Include(sr => sr.RequestedByAppUser)
             .Include(sr => sr.AcceptedByAppUser)
-            .Where(sr => sr.TenantId == userProfile.TenantId && !sr.IsDeleted)
             .OrderByDescending(sr => sr.Created)
             .ToListAsync(cancellationToken);
 
@@ -31,7 +26,7 @@ public class GetStaffInvitationsQueryHandler : IRequestHandler<GetStaffInvitatio
         if (staffRequestIds.Any())
         {
             roles = await _context.StaffInvitationRole
-                .Where(r => r.TenantId == userProfile.TenantId && staffRequestIds.Contains(r.StaffInvitationId) && !r.IsDeleted)
+                .Where(r => staffRequestIds.Contains(r.StaffInvitationId))
                 .ToListAsync(cancellationToken);
         }
 
