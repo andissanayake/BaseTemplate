@@ -1,5 +1,5 @@
 import React from "react";
-import SpecificationList from "../features/Specification_R/SpecificationList";
+import SpecificationList from "../features/Specification/SpecificationList";
 
 const SpecificationListPage: React.FC = () => {
   return <SpecificationList />;
