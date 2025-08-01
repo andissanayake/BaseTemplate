@@ -9,7 +9,7 @@ export const AppBreadcrumb = () => {
     "/tenants/create": "Create Tenant",
     "/tenants/view": "Tenant View",
     "/tenants/edit": "Tenant Edit",
-    "/tenants/view/staff-requests": "Staff Requests",
+    "/tenants/view/staff-invitations": "Staff Invitations",
 
     "/items": "Items",
     "/items/create": "Create Item",

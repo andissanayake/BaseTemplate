@@ -162,7 +162,7 @@ export const App = () => {
             }
           />
           <Route
-            path="/tenants/view/staff-requests"
+            path="/tenants/view/staff-invitations"
             element={
               <ProtectedRoute policy={Policies.User}>
                 <StaffRequestManagementPage />
@@ -170,7 +170,7 @@ export const App = () => {
             }
           />
           <Route
-            path="/staff-requests/respond"
+            path="/staff-invitations/respond"
             element={
               <ProtectedRoute policy={Policies.User}>
                 <StaffRequestResponsePage />

@@ -4,8 +4,8 @@ public interface IBaseDbContext
     DbSet<AppUser> AppUser { get; set; }
     DbSet<UserRole> UserRole { get; set; }
     DbSet<Tenant> Tenant { get; set; }
-    DbSet<StaffRequest> StaffRequest { get; set; }
-    DbSet<StaffRequestRole> StaffRequestRole { get; set; }
+    DbSet<StaffInvitation> StaffRequest { get; set; }
+    DbSet<StaffInvitationRole> StaffRequestRole { get; set; }
     Task<int> SaveChangesAsync(CancellationToken cancellationToken);
 }
 public interface IAppDbContext : IBaseDbContext

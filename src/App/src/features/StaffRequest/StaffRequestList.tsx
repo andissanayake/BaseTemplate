@@ -3,39 +3,42 @@ import {
   Table,
   Button,
   Space,
-  Typography,
   Tag,
   Modal,
   Form,
   Input,
   notification,
+  Typography,
   Popconfirm,
 } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
-import { StaffRequestDto, StaffRequestStatus } from "./StaffRequestModel";
-import { useStaffRequestStore } from "./staffRequestStore";
 import { apiClient } from "../../common/apiClient";
+import { StaffInvitationDto, StaffInvitationStatus } from "./StaffRequestModel";
 import StaffRequestCreate from "./StaffRequestCreate";
 
+const { TextArea } = Input;
+
 export const StaffRequestList: React.FC = () => {
-  const { staffRequests, loading, setStaffRequests, setLoading } =
-    useStaffRequestStore();
+  const [staffInvitations, setStaffInvitations] = useState<
+    StaffInvitationDto[]
+  >([]);
+  const [loading, setLoading] = useState(false);
   const [createModalVisible, setCreateModalVisible] = useState(false);
   const [rejectModalVisible, setRejectModalVisible] = useState(false);
-  const [selectedRequest, setSelectedRequest] =
-    useState<StaffRequestDto | null>(null);
+  const [selectedInvitation, setSelectedInvitation] =
+    useState<StaffInvitationDto | null>(null);
   const [rejectForm] = Form.useForm();
 
-  const fetchStaffRequests = async () => {
+  const fetchStaffInvitations = async () => {
     setLoading(true);
-    apiClient.get<StaffRequestDto[]>("/api/tenants/staff-requests", {
+    apiClient.get<StaffInvitationDto[]>("/api/tenants/staff-invitation", {
       onSuccess: (data) => {
-        setStaffRequests(data || []);
+        setStaffInvitations(data || []);
       },
       onServerError: () => {
         notification.error({
           message:
-            "Failed to fetch staff requests. An error occurred while loading staff requests.",
+            "Failed to fetch staff invitations. An error occurred while loading staff invitations.",
         });
       },
       onFinally: () => {
@@ -45,31 +48,31 @@ export const StaffRequestList: React.FC = () => {
   };
 
   useEffect(() => {
-    fetchStaffRequests();
+    fetchStaffInvitations();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleReject = async (values: { rejectionReason: string }) => {
-    if (!selectedRequest) return;
+    if (!selectedInvitation) return;
     setLoading(true);
     apiClient.post<boolean>(
-      `/api/tenants/staff-requests/${selectedRequest.id}/update`,
+      `/api/tenants/staff-invitations/${selectedInvitation.id}/revoke`,
       {
-        staffRequestId: selectedRequest.id,
+        staffInvitationId: selectedInvitation.id,
         rejectionReason: values.rejectionReason,
       },
       {
         onSuccess: () => {
           setRejectModalVisible(false);
-          setSelectedRequest(null);
+          setSelectedInvitation(null);
           rejectForm.resetFields();
           notification.success({
-            message: "Staff request rejected successfully!",
+            message: "Staff invitation rejected successfully!",
           });
-          fetchStaffRequests();
+          fetchStaffInvitations();
         },
         onServerError: () => {
-          notification.error({ message: "Failed to reject staff request!" });
+          notification.error({ message: "Failed to reject staff invitation!" });
         },
         onFinally: () => {
           setLoading(false);
@@ -78,17 +81,17 @@ export const StaffRequestList: React.FC = () => {
     );
   };
 
-  const getStatusTag = (status: StaffRequestStatus) => {
+  const getStatusTag = (status: StaffInvitationStatus) => {
     switch (status) {
-      case StaffRequestStatus.Pending:
+      case StaffInvitationStatus.Pending:
         return <Tag color="orange">Pending</Tag>;
-      case StaffRequestStatus.Accepted:
+      case StaffInvitationStatus.Accepted:
         return <Tag color="green">Accepted</Tag>;
-      case StaffRequestStatus.Rejected:
+      case StaffInvitationStatus.Rejected:
         return <Tag color="red">Rejected</Tag>;
-      case StaffRequestStatus.Revoked:
+      case StaffInvitationStatus.Revoked:
         return <Tag color="red">Revoked</Tag>;
-      case StaffRequestStatus.Expired:
+      case StaffInvitationStatus.Expired:
         return <Tag color="default">Expired</Tag>;
       default:
         return <Tag color="default">Unknown</Tag>;
@@ -124,17 +127,17 @@ export const StaffRequestList: React.FC = () => {
       title: "Status",
       dataIndex: "status",
       key: "status",
-      render: (status: StaffRequestStatus) => getStatusTag(status),
+      render: (status: StaffInvitationStatus) => getStatusTag(status),
     },
     {
       title: "Rejection Reason",
       dataIndex: "rejectionReason",
       key: "rejectionReason",
-      render: (rejectionReason: string, record: StaffRequestDto) => {
+      render: (rejectionReason: string, record: StaffInvitationDto) => {
         if (
-          record.status === StaffRequestStatus.Rejected ||
-          record.status === StaffRequestStatus.Revoked ||
-          record.status === StaffRequestStatus.Expired
+          record.status === StaffInvitationStatus.Rejected ||
+          record.status === StaffInvitationStatus.Revoked ||
+          record.status === StaffInvitationStatus.Expired
         ) {
           return rejectionReason ? (
             <Typography.Text
@@ -161,13 +164,13 @@ export const StaffRequestList: React.FC = () => {
     {
       title: "Actions",
       key: "actions",
-      render: (_: unknown, record: StaffRequestDto) => (
+      render: (_: unknown, record: StaffInvitationDto) => (
         <Space>
-          {record.status === StaffRequestStatus.Pending && (
+          {record.status === StaffInvitationStatus.Pending && (
             <Popconfirm
-              title="Are you sure you want to reject this staff request?"
+              title="Are you sure you want to reject this staff invitation?"
               onConfirm={() => {
-                setSelectedRequest(record);
+                setSelectedInvitation(record);
                 setRejectModalVisible(true);
               }}
             >
@@ -176,19 +179,19 @@ export const StaffRequestList: React.FC = () => {
               </Button>
             </Popconfirm>
           )}
-          {record.status === StaffRequestStatus.Accepted && (
+          {record.status === StaffInvitationStatus.Accepted && (
             <Tag color="green">✓ Accepted</Tag>
           )}
-          {(record.status === StaffRequestStatus.Rejected ||
-            record.status === StaffRequestStatus.Revoked) && (
+          {(record.status === StaffInvitationStatus.Rejected ||
+            record.status === StaffInvitationStatus.Revoked) && (
             <Tag color="red">
               ✗{" "}
-              {record.status === StaffRequestStatus.Revoked
+              {record.status === StaffInvitationStatus.Revoked
                 ? "Revoked"
                 : "Rejected"}
             </Tag>
           )}
-          {record.status === StaffRequestStatus.Expired && (
+          {record.status === StaffInvitationStatus.Expired && (
             <Tag color="default">Expired</Tag>
           )}
         </Space>
@@ -203,20 +206,20 @@ export const StaffRequestList: React.FC = () => {
         style={{ width: "100%", justifyContent: "space-between" }}
       >
         <Typography.Title level={3} style={{ margin: 0 }}>
-          Staff Requests
+          Staff Invitations
         </Typography.Title>
         <Button
           type="primary"
           icon={<PlusOutlined />}
           onClick={() => setCreateModalVisible(true)}
         >
-          Create New Request
+          Create New Invitation
         </Button>
       </Space>
 
       <Table
         columns={columns}
-        dataSource={staffRequests}
+        dataSource={staffInvitations}
         loading={loading}
         rowKey="id"
         pagination={{
@@ -232,27 +235,27 @@ export const StaffRequestList: React.FC = () => {
         onCancel={() => setCreateModalVisible(false)}
         onSuccess={() => {
           setCreateModalVisible(false);
-          fetchStaffRequests();
+          fetchStaffInvitations();
         }}
       />
 
-      {/* Reject Request Modal */}
+      {/* Reject Invitation Modal */}
       <Modal
-        title="Reject Staff Request"
+        title="Reject Staff Invitation"
         open={rejectModalVisible}
         onCancel={() => {
           setRejectModalVisible(false);
-          setSelectedRequest(null);
+          setSelectedInvitation(null);
           rejectForm.resetFields();
         }}
         footer={null}
         destroyOnClose
       >
-        {selectedRequest && (
+        {selectedInvitation && (
           <div>
             <p>
-              Are you sure you want to reject the staff request for{" "}
-              <strong>{selectedRequest.requestedName}</strong>?
+              Are you sure you want to reject the staff invitation for{" "}
+              <strong>{selectedInvitation.requestedName}</strong>?
             </p>
             <Form form={rejectForm} layout="vertical" onFinish={handleReject}>
               <Form.Item
@@ -265,7 +268,7 @@ export const StaffRequestList: React.FC = () => {
                   },
                 ]}
               >
-                <Input.TextArea
+                <TextArea
                   rows={3}
                   placeholder="Provide a reason for rejection..."
                 />
@@ -279,7 +282,7 @@ export const StaffRequestList: React.FC = () => {
                   <Button
                     onClick={() => {
                       setRejectModalVisible(false);
-                      setSelectedRequest(null);
+                      setSelectedInvitation(null);
                       rejectForm.resetFields();
                     }}
                   >

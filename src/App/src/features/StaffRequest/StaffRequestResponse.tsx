@@ -1,21 +1,21 @@
 import React, { useState } from "react";
 import {
   Card,
-  Typography,
+  Alert,
   Button,
   Space,
+  Typography,
+  Tag,
+  Popconfirm,
   Form,
   Input,
   notification,
-  Popconfirm,
   Descriptions,
-  Tag,
-  Alert,
 } from "antd";
 import { CheckOutlined, CloseOutlined } from "@ant-design/icons";
-import { useAuthStore } from "../../auth/authStore";
-import { apiClient } from "../../common/apiClient";
 import { useNavigate } from "react-router-dom";
+import { apiClient } from "../../common/apiClient";
+import { useAuthStore } from "../../auth/authStore";
 import { useTenantStore } from "../Tenant/tenantStore";
 
 const { Title, Text } = Typography;
@@ -33,8 +33,8 @@ export const StaffRequestResponse: React.FC = () => {
     return (
       <Card>
         <Alert
-          message="No Staff Request Found"
-          description="You don't have any pending staff requests to respond to."
+          message="No Staff Invitation Found"
+          description="You don't have any pending staff invitations to respond to."
           type="info"
           showIcon
         />
@@ -45,20 +45,20 @@ export const StaffRequestResponse: React.FC = () => {
   const handleAccept = async () => {
     setLoading(true);
     const payload = {
-      StaffRequestId: staffRequest.id,
+      StaffInvitationId: staffRequest.id,
       IsAccepted: true,
     };
 
     apiClient.post<boolean>(
-      `/api/tenants/staff-requests/${staffRequest.id}/respond`,
+      `/api/tenants/staff-invitations/${staffRequest.id}/respond`,
       payload,
       {
         onSuccess: () => {
           notification.success({
-            message: "Staff request accepted successfully!",
+            message: "Staff invitation accepted successfully!",
             description: "You have been added to the tenant.",
           });
-          // Clear the staff request from auth store
+          // Clear the staff invitation from auth store
           setStaffRequest(null);
           // Redirect to home page
           navigate("/");
@@ -68,7 +68,7 @@ export const StaffRequestResponse: React.FC = () => {
           });
         },
         onServerError: () => {
-          notification.error({ message: "Failed to accept staff request!" });
+          notification.error({ message: "Failed to accept staff invitation!" });
         },
         onFinally: () => {
           setLoading(false);
@@ -80,26 +80,26 @@ export const StaffRequestResponse: React.FC = () => {
   const handleReject = async (values: { rejectionReason: string }) => {
     setLoading(true);
     const payload = {
-      StaffRequestId: staffRequest.id,
+      StaffInvitationId: staffRequest.id,
       IsAccepted: false,
       RejectionReason: values.rejectionReason,
     };
 
     apiClient.post<boolean>(
-      `/api/tenants/staff-requests/${staffRequest.id}/respond`,
+      `/api/tenants/staff-invitations/${staffRequest.id}/respond`,
       payload,
       {
         onSuccess: () => {
           notification.success({
-            message: "Staff request rejected successfully!",
+            message: "Staff invitation rejected successfully!",
           });
-          // Clear the staff request from auth store
+          // Clear the staff invitation from auth store
           setStaffRequest(null);
           // Redirect to home page
           navigate("/");
         },
         onServerError: () => {
-          notification.error({ message: "Failed to reject staff request!" });
+          notification.error({ message: "Failed to reject staff invitation!" });
         },
         onFinally: () => {
           setLoading(false);
@@ -129,13 +129,13 @@ export const StaffRequestResponse: React.FC = () => {
     <Card>
       <Space direction="vertical" size="large" style={{ width: "100%" }}>
         <div>
-          <Title level={2}>Staff Request Response</Title>
+          <Title level={2}>Staff Invitation Response</Title>
           <Text type="secondary">
-            You have a pending staff request that requires your response.
+            You have a pending staff invitation that requires your response.
           </Text>
         </div>
 
-        <Card size="small" title="Request Details">
+        <Card size="small" title="Invitation Details">
           <Descriptions column={1} size="small">
             <Descriptions.Item label="Tenant">
               <Text strong>{staffRequest.tenantName}</Text>
@@ -169,14 +169,15 @@ export const StaffRequestResponse: React.FC = () => {
             <Space direction="vertical" size="middle" style={{ width: "100%" }}>
               <div>
                 <Text>
-                  Please choose whether to accept or reject this staff request:
+                  Please choose whether to accept or reject this staff
+                  invitation:
                 </Text>
               </div>
 
               <Space>
                 <Popconfirm
-                  title="Accept Staff Request"
-                  description="Are you sure you want to accept this staff request? You will be added to the tenant with the requested roles."
+                  title="Accept Staff Invitation"
+                  description="Are you sure you want to accept this staff invitation? You will be added to the tenant with the requested roles."
                   onConfirm={handleAccept}
                 >
                   <Button
@@ -185,7 +186,7 @@ export const StaffRequestResponse: React.FC = () => {
                     loading={loading}
                     size="large"
                   >
-                    Accept Request
+                    Accept Invitation
                   </Button>
                 </Popconfirm>
 
@@ -196,7 +197,7 @@ export const StaffRequestResponse: React.FC = () => {
                   loading={loading}
                   size="large"
                 >
-                  Reject Request
+                  Reject Invitation
                 </Button>
               </Space>
 
@@ -213,13 +214,13 @@ export const StaffRequestResponse: React.FC = () => {
                       {
                         required: true,
                         message:
-                          "Please provide a reason for rejecting this request.",
+                          "Please provide a reason for rejecting this invitation.",
                       },
                     ]}
                   >
                     <TextArea
                       rows={4}
-                      placeholder="Please provide a reason for rejecting this staff request..."
+                      placeholder="Please provide a reason for rejecting this staff invitation..."
                     />
                   </Form.Item>
 
@@ -251,8 +252,8 @@ export const StaffRequestResponse: React.FC = () => {
 
         {staffRequest.status !== 0 && (
           <Alert
-            message="Request Already Processed"
-            description="This staff request has already been processed and cannot be modified."
+            message="Invitation Already Processed"
+            description="This staff invitation has already been processed and cannot be modified."
             type="warning"
             showIcon
           />

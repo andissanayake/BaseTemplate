@@ -11,8 +11,8 @@ public class BaseDbContext : DbContext, IBaseDbContext
     public DbSet<AppUser> AppUser { get; set; }
     public DbSet<UserRole> UserRole { get; set; }
     public DbSet<Tenant> Tenant { get; set; }
-    public DbSet<StaffRequest> StaffRequest { get; set; }
-    public DbSet<StaffRequestRole> StaffRequestRole { get; set; }
+    public DbSet<StaffInvitation> StaffRequest { get; set; }
+    public DbSet<StaffInvitationRole> StaffRequestRole { get; set; }
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
@@ -22,8 +22,8 @@ public class BaseDbContext : DbContext, IBaseDbContext
         builder.Entity<AppUser>().HasQueryFilter(e => !e.IsDeleted);
         builder.Entity<UserRole>().HasQueryFilter(e => !e.IsDeleted);
         builder.Entity<Tenant>().HasQueryFilter(e => !e.IsDeleted);
-        builder.Entity<StaffRequest>().HasQueryFilter(e => !e.IsDeleted);
-        builder.Entity<StaffRequestRole>().HasQueryFilter(e => !e.IsDeleted);
+        builder.Entity<StaffInvitation>().HasQueryFilter(e => !e.IsDeleted);
+        builder.Entity<StaffInvitationRole>().HasQueryFilter(e => !e.IsDeleted);
     }
 
     public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = new CancellationToken())
@@ -57,8 +57,8 @@ public class AppDbContext : DbContext, IAppDbContext
     public DbSet<AppUser> AppUser { get; set; }
     public DbSet<UserRole> UserRole { get; set; }
     public DbSet<Tenant> Tenant { get; set; }
-    public DbSet<StaffRequest> StaffRequest { get; set; }
-    public DbSet<StaffRequestRole> StaffRequestRole { get; set; }
+    public DbSet<StaffInvitation> StaffRequest { get; set; }
+    public DbSet<StaffInvitationRole> StaffRequestRole { get; set; }
     public DbSet<ItemAttributeType> ItemAttributeType { get; set; }
     public DbSet<ItemAttribute> ItemAttribute { get; set; }
     public DbSet<Item> Item { get; set; }
@@ -71,16 +71,16 @@ public class AppDbContext : DbContext, IAppDbContext
         builder.Entity<AppUser>().HasQueryFilter(e => !e.IsDeleted);
         builder.Entity<UserRole>().HasQueryFilter(e => !e.IsDeleted);
         builder.Entity<Tenant>().HasQueryFilter(e => !e.IsDeleted);
-        builder.Entity<StaffRequest>().HasQueryFilter(e => !e.IsDeleted);
-        builder.Entity<StaffRequestRole>().HasQueryFilter(e => !e.IsDeleted);
+        builder.Entity<StaffInvitation>().HasQueryFilter(e => !e.IsDeleted);
+        builder.Entity<StaffInvitationRole>().HasQueryFilter(e => !e.IsDeleted);
         builder.Entity<ItemAttributeType>().HasQueryFilter(e => !e.IsDeleted);
         builder.Entity<ItemAttribute>().HasQueryFilter(e => !e.IsDeleted);
         builder.Entity<Item>().HasQueryFilter(e => !e.IsDeleted);
         builder.Entity<Specification>().HasQueryFilter(e => !e.IsDeleted);
 
         builder.Entity<AppUser>().HasQueryFilter(e => e.TenantId == GetCurrentTenantId());
-        builder.Entity<StaffRequest>().HasQueryFilter(e => e.TenantId == GetCurrentTenantId());
-        builder.Entity<StaffRequestRole>().HasQueryFilter(e => e.TenantId == GetCurrentTenantId());
+        builder.Entity<StaffInvitation>().HasQueryFilter(e => e.TenantId == GetCurrentTenantId());
+        builder.Entity<StaffInvitationRole>().HasQueryFilter(e => e.TenantId == GetCurrentTenantId());
         builder.Entity<ItemAttributeType>().HasQueryFilter(e => e.TenantId == GetCurrentTenantId());
         builder.Entity<ItemAttribute>().HasQueryFilter(e => e.TenantId == GetCurrentTenantId());
         builder.Entity<Item>().HasQueryFilter(e => e.TenantId == GetCurrentTenantId());

@@ -1,4 +1,4 @@
-export interface StaffRequestDto {
+export interface StaffInvitationDto {
   id: number;
   requestedEmail: string;
   requestedName: string;
@@ -6,7 +6,7 @@ export interface StaffRequestDto {
   requestedByAppUserId: number;
   requestedByAppUserName: string;
   requestedByAppUserEmail: string;
-  status: StaffRequestStatus;
+  status: StaffInvitationStatus;
   created: string; // ISO date string
   acceptedAt?: string; // ISO date string
   acceptedByAppUserId?: number;
@@ -15,7 +15,7 @@ export interface StaffRequestDto {
   rejectionReason?: string;
 }
 
-export enum StaffRequestStatus {
+export enum StaffInvitationStatus {
   Pending = 0,
   Accepted = 1,
   Rejected = 2,
@@ -23,19 +23,19 @@ export enum StaffRequestStatus {
   Expired = 4,
 }
 
-export interface CreateStaffRequestRequest {
+export interface CreateStaffInvitationRequest {
   staffEmail: string;
   staffName: string;
   roles: string[];
 }
 
-export interface RespondToStaffRequestRequest {
-  staffRequestId: number;
+export interface RespondToStaffInvitationRequest {
+  staffInvitationId: number;
   rejectionReason: string; // Now required
 }
 
-export interface StaffRequestResponse {
+export interface StaffInvitationResponse {
   success: boolean;
   message?: string;
-  data?: StaffRequestDto[];
+  data?: StaffInvitationDto[];
 }

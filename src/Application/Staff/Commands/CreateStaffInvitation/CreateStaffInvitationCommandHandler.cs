@@ -65,7 +65,7 @@ public class CreateStaffInvitationCommandHandler : IRequestHandler<CreateStaffIn
                 });
         }
 
-        var staffRequest = new StaffRequest
+        var staffRequest = new StaffInvitation
         {
             TenantId = userProfile.TenantId,
             RequestedEmail = request.StaffEmail,
@@ -81,10 +81,10 @@ public class CreateStaffInvitationCommandHandler : IRequestHandler<CreateStaffIn
         // Add roles for the staff request
         foreach (var role in request.Roles)
         {
-            var staffRequestRole = new StaffRequestRole
+            var staffRequestRole = new StaffInvitationRole
             {
                 TenantId = userProfile.TenantId,
-                StaffRequestId = staffRequest.Id,
+                StaffInvitationId = staffRequest.Id,
                 Role = role
             };
             _context.StaffRequestRole.Add(staffRequestRole);

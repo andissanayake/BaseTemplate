@@ -1,6 +1,6 @@
 namespace BaseTemplate.Domain.Entities;
 
-public class StaffRequest : BaseTenantAuditableEntity
+public class StaffInvitation : BaseTenantAuditableEntity
 {
     public string RequestedEmail { get; set; } = string.Empty;
     public string RequestedName { get; set; } = string.Empty;
@@ -13,9 +13,9 @@ public class StaffRequest : BaseTenantAuditableEntity
     public string? RejectionReason { get; set; }
 }
 
-public class StaffRequestRole : BaseTenantAuditableEntity
+public class StaffInvitationRole : BaseTenantAuditableEntity
 {
-    public int StaffRequestId { get; set; }
+    public int StaffInvitationId { get; set; }
     public string Role { get; set; } = string.Empty;
 }
 
@@ -26,4 +26,4 @@ public enum StaffRequestStatus
     Rejected,
     Revoked,
     Expired
-} 
+}

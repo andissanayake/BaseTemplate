@@ -33,7 +33,7 @@ public class RespondToStaffInvitationCommandHandler : IRequestHandler<RespondToS
 
             // Get the roles for this staff request and add them to the user
             var staffRequestRoles = await _context.StaffRequestRole
-                .Where(r => r.StaffRequestId == request.StaffRequestId)
+                .Where(r => r.StaffInvitationId == request.StaffRequestId)
                 .ToListAsync(cancellationToken);
 
             foreach (var role in staffRequestRoles)

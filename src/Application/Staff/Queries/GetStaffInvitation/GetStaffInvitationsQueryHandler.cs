@@ -26,17 +26,17 @@ public class GetStaffInvitationsQueryHandler : IRequestHandler<GetStaffInvitatio
 
         // Get all roles for all staff requests in a single query (exclude soft deleted)
         var staffRequestIds = staffRequests.Select(sr => sr.Id).ToList();
-        var roles = new List<StaffRequestRole>();
+        var roles = new List<StaffInvitationRole>();
 
         if (staffRequestIds.Any())
         {
             roles = await _context.StaffRequestRole
-                .Where(r => r.TenantId == userProfile.TenantId && staffRequestIds.Contains(r.StaffRequestId) && !r.IsDeleted)
+                .Where(r => r.TenantId == userProfile.TenantId && staffRequestIds.Contains(r.StaffInvitationId) && !r.IsDeleted)
                 .ToListAsync(cancellationToken);
         }
 
         // Group roles by staff request ID for efficient lookup
-        var rolesByStaffRequestId = roles.GroupBy(r => r.StaffRequestId).ToDictionary(g => g.Key, g => g.Select(r => r.Role).ToList());
+        var rolesByStaffRequestId = roles.GroupBy(r => r.StaffInvitationId).ToDictionary(g => g.Key, g => g.Select(r => r.Role).ToList());
 
         var result = new List<StaffInvitationDto>();
 

@@ -1,19 +1,17 @@
-import React from "react";
+import React, { useState } from "react";
 import {
+  Modal,
   Form,
   Input,
-  notification,
   Button,
   Space,
   Checkbox,
-  Modal,
+  notification,
 } from "antd";
-import { useStaffRequestStore } from "./staffRequestStore";
 import { apiClient } from "../../common/apiClient";
 import { handleFormValidationErrors } from "../../common/formErrorHandler";
-import { CreateStaffRequestRequest } from "./StaffRequestModel";
+import { CreateStaffInvitationRequest } from "./StaffRequestModel";
 import { Roles } from "../../auth/RolesEnum";
-import { useAuthStore } from "../../auth/authStore";
 
 interface StaffRequestCreateProps {
   visible: boolean;
@@ -27,15 +25,15 @@ const StaffRequestCreate: React.FC<StaffRequestCreateProps> = ({
   onSuccess,
 }) => {
   const [form] = Form.useForm();
-  const { setLoading } = useStaffRequestStore();
-  const { roles } = useAuthStore();
+  const [loading, setLoading] = useState(false);
 
-  const availableRoles = React.useMemo(
-    () =>
-      roles.filter(
-        (role) => role !== Roles.Administrator && role !== Roles.TenantOwner
-      ),
-    [roles]
+  const availableRoles = Object.values(Roles).filter((role) =>
+    [
+      Roles.TenantManager,
+      Roles.StaffManager,
+      Roles.StaffRequestManager,
+      Roles.ItemManager,
+    ].includes(role)
   );
 
   const handleCreateRequest = async (values: {
@@ -44,16 +42,16 @@ const StaffRequestCreate: React.FC<StaffRequestCreateProps> = ({
     roles: string[];
   }) => {
     setLoading(true);
-    const requestData: CreateStaffRequestRequest = {
+    const requestData: CreateStaffInvitationRequest = {
       staffEmail: values.staffEmail,
       staffName: values.staffName,
       roles: values.roles,
     };
 
-    apiClient.post<boolean>("/api/tenants/request-staff", requestData, {
+    apiClient.post<boolean>("/api/tenants/staff-invitation", requestData, {
       onSuccess: () => {
         notification.success({
-          message: "Staff request created successfully!",
+          message: "Staff invitation created successfully!",
         });
         form.resetFields();
         onSuccess();
@@ -66,7 +64,7 @@ const StaffRequestCreate: React.FC<StaffRequestCreateProps> = ({
         });
       },
       onServerError: () => {
-        notification.error({ message: "Failed to create staff request!" });
+        notification.error({ message: "Failed to create staff invitation!" });
       },
       onFinally: () => {
         setLoading(false);
@@ -81,7 +79,7 @@ const StaffRequestCreate: React.FC<StaffRequestCreateProps> = ({
 
   return (
     <Modal
-      title="Create New Staff Request"
+      title="Create New Staff Invitation"
       open={visible}
       onCancel={handleCancel}
       footer={null}
@@ -122,8 +120,8 @@ const StaffRequestCreate: React.FC<StaffRequestCreateProps> = ({
 
         <Form.Item>
           <Space>
-            <Button type="primary" htmlType="submit">
-              Create Request
+            <Button type="primary" htmlType="submit" loading={loading}>
+              Create Invitation
             </Button>
             <Button onClick={handleCancel}>Cancel</Button>
           </Space>

@@ -64,7 +64,7 @@ public class GetUserQueryHandler : IRequestHandler<GetUserQuery, GetUserResponse
             if (staffRequest != null)
             {
                 var staffRequestRoles = await _context.StaffRequestRole
-                    .Where(r => r.StaffRequestId == staffRequest.Id && !r.IsDeleted)
+                    .Where(r => r.StaffInvitationId == staffRequest.Id && !r.IsDeleted)
                     .Select(r => r.Role)
                     .ToListAsync(cancellationToken);
 

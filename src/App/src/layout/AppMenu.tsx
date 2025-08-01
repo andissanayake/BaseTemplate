@@ -122,8 +122,8 @@ export const AppMenu = () => {
         });
 
         menuItems.push({
-          key: "/tenants/view/staff-requests",
-          label: <span>Staff Requests</span>,
+          key: "/tenants/view/staff-invitations",
+          label: <span>Staff Invitations</span>,
           onClick: (e: any) => {
             handleClick(e.key);
           },
@@ -148,7 +148,7 @@ export const AppMenu = () => {
       }
       if (!tenant?.id && staffRequest?.id) {
         menuItems.push({
-          key: "/staff-requests/respond",
+          key: "/staff-invitations/respond",
           label: "Join a Tenant",
           onClick: (e: any) => {
             handleClick(e.key);
