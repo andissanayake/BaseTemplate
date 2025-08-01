@@ -6,6 +6,7 @@ public interface IBaseDbContext
     DbSet<Tenant> Tenant { get; set; }
     DbSet<StaffRequest> StaffRequest { get; set; }
     DbSet<StaffRequestRole> StaffRequestRole { get; set; }
+    Task<int> SaveChangesAsync(CancellationToken cancellationToken);
 }
 public interface IAppDbContext : IBaseDbContext
 {
@@ -13,5 +14,4 @@ public interface IAppDbContext : IBaseDbContext
     DbSet<ItemAttribute> ItemAttribute { get; set; }
     DbSet<Item> Item { get; set; }
     DbSet<Specification> Specification { get; set; }
-    Task<int> SaveChangesAsync(CancellationToken cancellationToken);
 }
