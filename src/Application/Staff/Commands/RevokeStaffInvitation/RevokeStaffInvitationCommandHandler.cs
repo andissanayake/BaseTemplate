@@ -1,18 +1,18 @@
 using Microsoft.EntityFrameworkCore;
-namespace BaseTemplate.Application.Staff.Commands.UpdateStaffRequest;
+namespace BaseTemplate.Application.Staff.Commands.RevokeStaffInvitation;
 
-public class UpdateStaffRequestCommandHandler : IRequestHandler<UpdateStaffRequestCommand, bool>
+public class RevokeStaffInvitationCommandHandler : IRequestHandler<RevokeStaffInvitationCommand, bool>
 {
     private readonly IAppDbContext _context;
     private readonly IUserProfileService _userProfileService;
 
-    public UpdateStaffRequestCommandHandler(IAppDbContext context, IUserProfileService userProfileService)
+    public RevokeStaffInvitationCommandHandler(IAppDbContext context, IUserProfileService userProfileService)
     {
         _context = context;
         _userProfileService = userProfileService;
     }
 
-    public async Task<Result<bool>> HandleAsync(UpdateStaffRequestCommand request, CancellationToken cancellationToken)
+    public async Task<Result<bool>> HandleAsync(RevokeStaffInvitationCommand request, CancellationToken cancellationToken)
     {
         var userProfile = await _userProfileService.GetUserProfileAsync();
 

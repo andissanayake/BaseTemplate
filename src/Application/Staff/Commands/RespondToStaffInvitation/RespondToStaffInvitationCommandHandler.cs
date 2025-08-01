@@ -1,29 +1,20 @@
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 
-namespace BaseTemplate.Application.Staff.Commands.RespondToStaffRequest;
-
-[Authorize]
-public record RespondToStaffRequestCommand : IRequest<bool>
-{
-    public int StaffRequestId { get; set; }
-    public bool IsAccepted { get; set; }
-    public string? RejectionReason { get; set; }
-}
-
-public class RespondToStaffRequestCommandHandler : IRequestHandler<RespondToStaffRequestCommand, bool>
+namespace BaseTemplate.Application.Staff.Commands.RespondToStaffInvitation;
+public class RespondToStaffInvitationCommandHandler : IRequestHandler<RespondToStaffInvitationCommand, bool>
 {
     private readonly IAppDbContext _context;
     private readonly IUser _user;
     private readonly IUserProfileService _userTenantProfileService;
 
-    public RespondToStaffRequestCommandHandler(IAppDbContext context, IUser user, IUserProfileService userTenantProfileService)
+    public RespondToStaffInvitationCommandHandler(IAppDbContext context, IUser user, IUserProfileService userTenantProfileService)
     {
         _context = context;
         _user = user;
         _userTenantProfileService = userTenantProfileService;
     }
 
-    public async Task<Result<bool>> HandleAsync(RespondToStaffRequestCommand request, CancellationToken cancellationToken)
+    public async Task<Result<bool>> HandleAsync(RespondToStaffInvitationCommand request, CancellationToken cancellationToken)
     {
         // Get the staff request and verify it belongs to the current user
         var staffRequest = await _context.StaffRequest

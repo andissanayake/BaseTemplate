@@ -1,9 +1,9 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace BaseTemplate.Application.Staff.Commands.RequestStaff;
+namespace BaseTemplate.Application.Staff.Commands.CreateStaffInvitation;
 
 [Authorize(Roles = Domain.Constants.Roles.StaffRequestManager)]
-public record RequestStaffCommand : IRequest<bool>
+public record CreateStaffInvitationCommand : IRequest<bool>
 {
     [Required]
     [EmailAddress(ErrorMessage = "Please provide a valid email address.")]

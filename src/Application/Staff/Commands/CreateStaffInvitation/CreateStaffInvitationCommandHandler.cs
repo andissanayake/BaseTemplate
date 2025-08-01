@@ -1,19 +1,19 @@
 using Microsoft.EntityFrameworkCore;
 
-namespace BaseTemplate.Application.Staff.Commands.RequestStaff;
+namespace BaseTemplate.Application.Staff.Commands.CreateStaffInvitation;
 
-public class RequestStaffCommandHandler : IRequestHandler<RequestStaffCommand, bool>
+public class CreateStaffInvitationCommandHandler : IRequestHandler<CreateStaffInvitationCommand, bool>
 {
     private readonly IAppDbContext _context;
     private readonly IUserProfileService _userProfileService;
 
-    public RequestStaffCommandHandler(IAppDbContext context, IUserProfileService userProfileService)
+    public CreateStaffInvitationCommandHandler(IAppDbContext context, IUserProfileService userProfileService)
     {
         _context = context;
         _userProfileService = userProfileService;
     }
 
-    public async Task<Result<bool>> HandleAsync(RequestStaffCommand request, CancellationToken cancellationToken)
+    public async Task<Result<bool>> HandleAsync(CreateStaffInvitationCommand request, CancellationToken cancellationToken)
     {
         var userProfile = await _userProfileService.GetUserProfileAsync();
 
@@ -74,7 +74,7 @@ public class RequestStaffCommandHandler : IRequestHandler<RequestStaffCommand, b
             Status = StaffRequestStatus.Pending
         };
         _context.StaffRequest.Add(staffRequest);
-        
+
         // Save the staff request first to get its ID
         await _context.SaveChangesAsync(cancellationToken);
 

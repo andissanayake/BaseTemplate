@@ -1,19 +1,19 @@
 using Microsoft.EntityFrameworkCore;
 
-namespace BaseTemplate.Application.Staff.Queries.GetStaffRequests;
+namespace BaseTemplate.Application.Staff.Queries.GetStaffInvitation;
 
-public class GetStaffRequestsQueryHandler : IRequestHandler<GetStaffRequestsQuery, List<StaffRequestDto>>
+public class GetStaffInvitationsQueryHandler : IRequestHandler<GetStaffInvitationsQuery, List<StaffInvitationDto>>
 {
     private readonly IAppDbContext _context;
     private readonly IUserProfileService _userProfileService;
 
-    public GetStaffRequestsQueryHandler(IAppDbContext context, IUserProfileService userProfileService)
+    public GetStaffInvitationsQueryHandler(IAppDbContext context, IUserProfileService userProfileService)
     {
         _context = context;
         _userProfileService = userProfileService;
     }
 
-    public async Task<Result<List<StaffRequestDto>>> HandleAsync(GetStaffRequestsQuery request, CancellationToken cancellationToken)
+    public async Task<Result<List<StaffInvitationDto>>> HandleAsync(GetStaffInvitationsQuery request, CancellationToken cancellationToken)
     {
         var userProfile = await _userProfileService.GetUserProfileAsync();
 
@@ -38,11 +38,11 @@ public class GetStaffRequestsQueryHandler : IRequestHandler<GetStaffRequestsQuer
         // Group roles by staff request ID for efficient lookup
         var rolesByStaffRequestId = roles.GroupBy(r => r.StaffRequestId).ToDictionary(g => g.Key, g => g.Select(r => r.Role).ToList());
 
-        var result = new List<StaffRequestDto>();
+        var result = new List<StaffInvitationDto>();
 
         foreach (var staffRequest in staffRequests)
         {
-            var dto = new StaffRequestDto
+            var dto = new StaffInvitationDto
             {
                 Id = staffRequest.Id,
                 RequestedEmail = staffRequest.RequestedEmail,
@@ -63,6 +63,6 @@ public class GetStaffRequestsQueryHandler : IRequestHandler<GetStaffRequestsQuer
             result.Add(dto);
         }
 
-        return Result<List<StaffRequestDto>>.Success(result);
+        return Result<List<StaffInvitationDto>>.Success(result);
     }
 }

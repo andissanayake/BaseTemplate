@@ -1,6 +1,6 @@
-namespace BaseTemplate.Application.Staff.Queries.GetStaffRequests;
+namespace BaseTemplate.Application.Staff.Queries.GetStaffInvitation;
 
-public class StaffRequestDto
+public class StaffInvitationDto
 {
     public int Id { get; set; }
     public string RequestedEmail { get; set; } = string.Empty;

@@ -1,11 +1,11 @@
 ﻿using BaseTemplate.Application.Common.Models;
+using BaseTemplate.Application.Staff.Commands.CreateStaffInvitation;
 using BaseTemplate.Application.Staff.Commands.RemoveStaff;
-using BaseTemplate.Application.Staff.Commands.RequestStaff;
-using BaseTemplate.Application.Staff.Commands.RespondToStaffRequest;
-using BaseTemplate.Application.Staff.Commands.UpdateStaffRequest;
+using BaseTemplate.Application.Staff.Commands.RespondToStaffInvitation;
+using BaseTemplate.Application.Staff.Commands.RevokeStaffInvitation;
 using BaseTemplate.Application.Staff.Commands.UpdateStaffRoles;
+using BaseTemplate.Application.Staff.Queries.GetStaffInvitation;
 using BaseTemplate.Application.Staff.Queries.GetStaffMember;
-using BaseTemplate.Application.Staff.Queries.GetStaffRequests;
 using BaseTemplate.Application.Staff.Queries.ListStaff;
 using BaseTemplate.Application.Tenants.Commands.CreateTenant;
 using BaseTemplate.Application.Tenants.Commands.UpdateTenant;
@@ -120,8 +120,8 @@ public class TenantsController : ApiControllerBase
     ///   <li><c>bool</c>: Indicates success or failure</li>
     /// </ul>
     /// </remarks>
-    [HttpPost("request-staff")]
-    public async Task<ActionResult<Result<bool>>> RequestStaff(RequestStaffCommand command)
+    [HttpPost("staff-invitation")]
+    public async Task<ActionResult<Result<bool>>> CreateStaffInvitation(CreateStaffInvitationCommand command)
     {
         // No need to check tenantId in body; tenantId is only in the route now
         return await SendAsync(command);
@@ -144,10 +144,10 @@ public class TenantsController : ApiControllerBase
     ///   <li><c>List&lt;StaffRequestDto&gt;</c>: List of staff requests with details including ID, email, name, roles, status, timestamps, and rejection reasons</li>
     /// </ul>
     /// </remarks>
-    [HttpGet("staff-requests")]
-    public async Task<ActionResult<Result<List<StaffRequestDto>>>> GetStaffRequests()
+    [HttpGet("staff-invitation")]
+    public async Task<ActionResult<Result<List<StaffInvitationDto>>>> GetStaffInvitations()
     {
-        return await SendAsync(new GetStaffRequestsQuery());
+        return await SendAsync(new GetStaffInvitationsQuery());
     }
 
     /// <summary>
@@ -172,8 +172,8 @@ public class TenantsController : ApiControllerBase
     ///   <li><c>bool</c>: Indicates success or failure</li>
     /// </ul>
     /// </remarks>
-    [HttpPost("staff-requests/{staffRequestId}/update")]
-    public async Task<ActionResult<Result<bool>>> UpdateStaffRequest(int staffRequestId, UpdateStaffRequestCommand command)
+    [HttpPost("staff-invirations/{staffInvitationId}/revoke")]
+    public async Task<ActionResult<Result<bool>>> RevokeStaffInvitation(int staffInvitationId, RevokeStaffInvitationCommand command)
     {
 
         return await SendAsync(command);
@@ -203,13 +203,9 @@ public class TenantsController : ApiControllerBase
     ///   <li><c>bool</c>: Indicates success or failure</li>
     /// </ul>
     /// </remarks>
-    [HttpPost("staff-requests/{staffRequestId}/respond")]
-    public async Task<ActionResult<Result<bool>>> RespondToStaffRequest(int staffRequestId, RespondToStaffRequestCommand command)
+    [HttpPost("staff-invitations/{staffInvitationId}/respond")]
+    public async Task<ActionResult<Result<bool>>> RespondToStaffInvitation(int staffInvitationId, RespondToStaffInvitationCommand command)
     {
-        if (staffRequestId != command.StaffRequestId)
-        {
-            return BadRequest();
-        }
 
         return await SendAsync(command);
     }
