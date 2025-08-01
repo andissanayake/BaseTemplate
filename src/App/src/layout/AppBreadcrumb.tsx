@@ -9,7 +9,7 @@ export const AppBreadcrumb = () => {
     "/tenants/create": "Create Tenant",
     "/tenants/view": "Tenant View",
     "/tenants/edit": "Tenant Edit",
-    "/tenants/view/staff-requests": "Staff Requests",
+    "/tenants/view/staff-invitations": "Staff Invitations",
 
     "/items": "Items",
     "/items/create": "Create Item",
@@ -21,6 +21,12 @@ export const AppBreadcrumb = () => {
       `Edit Attribute Type #${params.itemAttributeTypeId}`,
     "/item-attribute-types/view/:itemAttributeTypeId": (params: any) =>
       `View Attribute Type #${params.itemAttributeTypeId}`,
+    "/specifications": "Specifications",
+    "/specifications/create": "Create Specification",
+    "/specifications/edit/:specificationId": (params: any) =>
+      `Edit Specification #${params.specificationId}`,
+    "/specifications/view/:specificationId": (params: any) =>
+      `View Specification #${params.specificationId}`,
     "/profile": "Profile",
 
     "/tenants/view/:tenantId/staff": "Staff Management",
@@ -39,9 +45,18 @@ export const AppBreadcrumb = () => {
   const items = paths
     .map((path) => {
       // Match the most specific route
-      const matchKey = Object.keys(breadcrumbRoutes)
-        .sort((a, b) => b.length - a.length) // longest first
-        .find((key) => matchPath({ path: key, end: true }, path));
+      const routeKeys = Object.keys(breadcrumbRoutes);
+
+      // First try to find an exact match
+      let matchKey = routeKeys.find((key) => key === path);
+
+      // If no exact match, try parameterized routes
+      if (!matchKey) {
+        matchKey = routeKeys
+          .filter((key) => key.includes(":"))
+          .sort((a, b) => b.length - a.length) // longest first
+          .find((key) => matchPath({ path: key, end: true }, path));
+      }
 
       if (!matchKey) return null;
 

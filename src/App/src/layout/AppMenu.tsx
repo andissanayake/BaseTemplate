@@ -17,8 +17,8 @@ export const AppMenu = () => {
     setRoles,
     tenant,
     setTenant,
-    setStaffRequest,
-    staffRequest,
+    setStaffInvitation,
+    staffInvitation,
   } = useAuthStore((state) => state);
   const { currentTenant } = useTenantStore((state) => state);
   const [current, setCurrent] = useState(
@@ -44,7 +44,7 @@ export const AppMenu = () => {
           onSuccess: (data) => {
             setRoles(data?.roles ?? []);
             setTenant(data?.tenant ?? null);
-            setStaffRequest(data?.staffRequest ?? null);
+            setStaffInvitation(data?.staffInvitation ?? null);
           },
           onServerError: () => {
             // Silently handle server error for user details
@@ -62,7 +62,7 @@ export const AppMenu = () => {
   }, [
     setUser,
     setTenant,
-    setStaffRequest,
+    setStaffInvitation,
     setRoles,
     currentTenant?.id,
     currentTenant?.name,
@@ -98,24 +98,8 @@ export const AppMenu = () => {
           },
         });
         menuItems.push({
-          key: "/items",
-          label: <span>Items</span>,
-          onClick: (e: any) => {
-            handleClick(e.key);
-          },
-        });
-
-        menuItems.push({
-          key: "/item-attribute-types",
-          label: <span>Attribute Types</span>,
-          onClick: (e: any) => {
-            handleClick(e.key);
-          },
-        });
-
-        menuItems.push({
-          key: "/tenants/view/staff-requests",
-          label: <span>Staff Requests</span>,
+          key: "/tenants/view/staff-invitations",
+          label: <span>Staff Invitations</span>,
           onClick: (e: any) => {
             handleClick(e.key);
           },
@@ -129,7 +113,7 @@ export const AppMenu = () => {
         });
       }
 
-      if (!tenant?.id && !staffRequest?.id) {
+      if (!tenant?.id && !staffInvitation?.id) {
         menuItems.push({
           key: "/tenants/create",
           label: "Become a Tenant",
@@ -138,9 +122,9 @@ export const AppMenu = () => {
           },
         });
       }
-      if (!tenant?.id && staffRequest?.id) {
+      if (!tenant?.id && staffInvitation?.id) {
         menuItems.push({
-          key: "/staff-requests/respond",
+          key: "/staff-invitations/respond",
           label: "Join a Tenant",
           onClick: (e: any) => {
             handleClick(e.key);
@@ -189,7 +173,7 @@ export const AppMenu = () => {
     handleClick,
     tenant?.id,
     tenant?.name,
-    staffRequest?.id,
+    staffInvitation?.id,
   ]);
 
   return (

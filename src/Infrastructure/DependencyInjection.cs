@@ -17,9 +17,14 @@ public static class DependencyInjection
             return new PostgresConnectionFactory(connectionString);
         });
 
+        services.AddDbContext<BaseDbContext>(options =>
+            options.UseNpgsql(connectionString));
+
         services.AddDbContext<AppDbContext>(options =>
             options.UseNpgsql(connectionString,
                     b => b.MigrationsAssembly(typeof(AppDbContext).Assembly.FullName)));
+
+        services.AddScoped<IBaseDbContext>(provider => provider.GetRequiredService<BaseDbContext>());
 
         services.AddScoped<IAppDbContext>(provider => provider.GetRequiredService<AppDbContext>());
 

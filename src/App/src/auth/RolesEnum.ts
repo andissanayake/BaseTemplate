@@ -2,7 +2,7 @@ export enum Roles {
   Administrator = "Administrator",
   TenantOwner = "TenantOwner",
   ItemManager = "ItemManager",
-  StaffRequestManager = "StaffRequestManager",
+  StaffInvitationManager = "StaffInvitationManager",
   StaffManager = "StaffManager",
   TenantManager = "TenantManager",
 }

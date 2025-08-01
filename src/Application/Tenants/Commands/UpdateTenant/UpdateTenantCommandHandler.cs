@@ -15,10 +15,10 @@ public class UpdateTenantCommandHandler : IRequestHandler<UpdateTenantCommand, b
 
     public async Task<Result<bool>> HandleAsync(UpdateTenantCommand request, CancellationToken cancellationToken)
     {
-        var userProfile = await _userProfileService.GetUserProfileAsync();
+        var userProfile = _userProfileService.UserProfile;
 
         var entity = await _context.Tenant
-            .SingleAsync(t => t.Id == userProfile.TenantId && !t.IsDeleted, cancellationToken);
+            .SingleAsync(t => t.Id == userProfile.TenantId, cancellationToken);
 
         entity.Name = request.Name;
         entity.Address = request.Address;

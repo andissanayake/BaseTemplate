@@ -41,7 +41,7 @@ public class RequestAuthorizer : IRequestAuthorizer
         // Check roles
         if (!string.IsNullOrWhiteSpace(authorizeAttribute.Roles))
         {
-            var userInfo = await _tenantProfileService.GetUserProfileAsync();
+            var userInfo = _tenantProfileService.UserProfile;
             var hasRole = CheckRoles(authorizeAttribute.Roles, userInfo.Roles);
             if (!hasRole)
             {

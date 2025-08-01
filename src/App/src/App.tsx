@@ -9,8 +9,8 @@ import { ProfilePage } from "./pages/ProfilePage";
 import { TenantCreatePage } from "./pages/TenantCreatePage";
 import { TenantEditPage } from "./pages/TenantEditPage";
 import { TenantViewPage } from "./pages/TenantViewPage";
-import { StaffRequestManagementPage } from "./pages/StaffRequestManagementPage";
-import { StaffRequestResponsePage } from "./pages/StaffRequestResponsePage";
+import { StaffInvitationManagementPage } from "./pages/StaffInvitationManagementPage";
+import { StaffInvitationResponsePage } from "./pages/StaffInvitationResponsePage";
 import { StaffManagementPage } from "./pages/StaffManagementPage";
 import { ItemCreatePage } from "./pages/ItemCreatePage";
 import { ItemEditPage } from "./pages/ItemEditPage";
@@ -20,6 +20,10 @@ import ItemAttributeTypeCreatePage from "./pages/ItemAttributeTypeCreatePage";
 import ItemAttributeTypeEditPage from "./pages/ItemAttributeTypeEditPage";
 import ItemAttributeTypeViewPage from "./pages/ItemAttributeTypeViewPage";
 import ItemAttributeTypeListPage from "./pages/ItemAttributeTypeListPage";
+import SpecificationListPage from "./pages/SpecificationListPage";
+import SpecificationCreatePage from "./pages/SpecificationCreatePage";
+import SpecificationEditPage from "./pages/SpecificationEditPage";
+import SpecificationViewPage from "./pages/SpecificationViewPage";
 import { LoginPage } from "./pages/LoginPage";
 import { LogoutPage } from "./pages/LogoutPage";
 import NoAccessPage from "./pages/NoAccessPage";
@@ -101,6 +105,39 @@ export const App = () => {
           />
 
           <Route
+            path="/specifications"
+            element={
+              <ProtectedRoute policy={Policies.User}>
+                <SpecificationListPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/specifications/create"
+            element={
+              <ProtectedRoute policy={Policies.User}>
+                <SpecificationCreatePage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/specifications/edit/:specificationId"
+            element={
+              <ProtectedRoute policy={Policies.User}>
+                <SpecificationEditPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/specifications/view/:specificationId"
+            element={
+              <ProtectedRoute policy={Policies.User}>
+                <SpecificationViewPage />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
             path="/tenants/create"
             element={
               <ProtectedRoute policy={Policies.User}>
@@ -125,18 +162,18 @@ export const App = () => {
             }
           />
           <Route
-            path="/tenants/view/staff-requests"
+            path="/tenants/view/staff-invitations"
             element={
               <ProtectedRoute policy={Policies.User}>
-                <StaffRequestManagementPage />
+                <StaffInvitationManagementPage />
               </ProtectedRoute>
             }
           />
           <Route
-            path="/staff-requests/respond"
+            path="/staff-invitations/respond"
             element={
               <ProtectedRoute policy={Policies.User}>
-                <StaffRequestResponsePage />
+                <StaffInvitationResponsePage />
               </ProtectedRoute>
             }
           />

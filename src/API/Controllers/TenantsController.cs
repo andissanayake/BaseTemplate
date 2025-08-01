@@ -1,11 +1,11 @@
 ﻿using BaseTemplate.Application.Common.Models;
+using BaseTemplate.Application.Staff.Commands.CreateStaffInvitation;
 using BaseTemplate.Application.Staff.Commands.RemoveStaff;
-using BaseTemplate.Application.Staff.Commands.RequestStaff;
-using BaseTemplate.Application.Staff.Commands.RespondToStaffRequest;
-using BaseTemplate.Application.Staff.Commands.UpdateStaffRequest;
+using BaseTemplate.Application.Staff.Commands.RespondToStaffInvitation;
+using BaseTemplate.Application.Staff.Commands.RevokeStaffInvitation;
 using BaseTemplate.Application.Staff.Commands.UpdateStaffRoles;
+using BaseTemplate.Application.Staff.Queries.GetStaffInvitation;
 using BaseTemplate.Application.Staff.Queries.GetStaffMember;
-using BaseTemplate.Application.Staff.Queries.GetStaffRequests;
 using BaseTemplate.Application.Staff.Queries.ListStaff;
 using BaseTemplate.Application.Tenants.Commands.CreateTenant;
 using BaseTemplate.Application.Tenants.Commands.UpdateTenant;
@@ -101,12 +101,12 @@ public class TenantsController : ApiControllerBase
     /// <remarks>
     /// <b>What this endpoint does:</b>
     /// <ul>
-    ///   <li>Creates a staff request for the specified email address and name.</li>
+    ///   <li>Creates a staff invitation for the specified email address and name.</li>
     ///   <li>Validates that only allowed tenant base roles can be requested.</li>
     ///   <li>Checks if the user already exists in the system and belongs to another tenant.</li>
-    ///   <li>Prevents duplicate pending requests for the same email in the tenant.</li>
-    ///   <li>Creates a staff request record with pending status.</li>
-    ///   <li>Associates the requested roles with the staff request.</li>
+    ///   <li>Prevents duplicate pending invitations for the same email in the tenant.</li>
+    ///   <li>Creates a staff invitation record with pending status.</li>
+    ///   <li>Associates the requested roles with the staff invitation.</li>
     ///   <li>Only users with the <c>StaffManager</c> role can perform this action.</li>
     /// </ul>
     /// <b>Request body:</b>
@@ -120,82 +120,82 @@ public class TenantsController : ApiControllerBase
     ///   <li><c>bool</c>: Indicates success or failure</li>
     /// </ul>
     /// </remarks>
-    [HttpPost("request-staff")]
-    public async Task<ActionResult<Result<bool>>> RequestStaff(RequestStaffCommand command)
+    [HttpPost("staff-invitation")]
+    public async Task<ActionResult<Result<bool>>> CreateStaffInvitation(CreateStaffInvitationCommand command)
     {
         // No need to check tenantId in body; tenantId is only in the route now
         return await SendAsync(command);
     }
 
     /// <summary>
-    /// Get all staff requests for the current user's tenant.
+    /// Get all staff invitations for the current user's tenant.
     /// </summary>
     /// <remarks>
     /// <b>What this endpoint does:</b>
     /// <ul>
-    ///   <li>Retrieves all staff requests associated with the current user's tenant.</li>
-    ///   <li>Orders requests by creation date (newest first).</li>
-    ///   <li>Includes all associated roles for each staff request.</li>
-    ///   <li>Returns requests in all statuses (pending, accepted, rejected, revoked).</li>
+    ///   <li>Retrieves all staff invitations associated with the current user's tenant.</li>
+    ///   <li>Orders invitations by creation date (newest first).</li>
+    ///   <li>Includes all associated roles for each staff invitation.</li>
+    ///   <li>Returns invitations in all statuses (pending, accepted, rejected, revoked).</li>
     ///   <li>Includes requester information and timestamps.</li>
     /// </ul>
     /// <b>Response:</b>
     /// <ul>
-    ///   <li><c>List&lt;StaffRequestDto&gt;</c>: List of staff requests with details including ID, email, name, roles, status, timestamps, and rejection reasons</li>
+    ///   <li><c>List&lt;StaffInvitationDto&gt;</c>: List of staff invitations with details including ID, email, name, roles, status, timestamps, and rejection reasons</li>
     /// </ul>
     /// </remarks>
-    [HttpGet("staff-requests")]
-    public async Task<ActionResult<Result<List<StaffRequestDto>>>> GetStaffRequests()
+    [HttpGet("staff-invitation")]
+    public async Task<ActionResult<Result<List<StaffInvitationDto>>>> GetStaffInvitations()
     {
-        return await SendAsync(new GetStaffRequestsQuery());
+        return await SendAsync(new GetStaffInvitationsQuery());
     }
 
     /// <summary>
-    /// Update (revoke/reject) a staff request by the tenant owner.
+    /// Update (revoke/reject) a staff invitation by the tenant owner.
     /// </summary>
     /// <remarks>
     /// <b>What this endpoint does:</b>
     /// <ul>
-    ///   <li>Updates the status of a pending staff request to revoked.</li>
-    ///   <li>Only works on requests that are still in pending status.</li>
+    ///   <li>Updates the status of a pending staff invitation to revoked.</li>
+    ///   <li>Only works on invitations that are still in pending status.</li>
     ///   <li>Requires a rejection reason to be provided.</li>
-    ///   <li>Only users with the <c>StaffRequestManager</c> role can perform this action.</li>
-    ///   <li>Fails if the staff request has already been processed (accepted/rejected).</li>
+    ///   <li>Only users with the <c>StaffInvitationManager</c> role can perform this action.</li>
+    ///   <li>Fails if the staff invitation has already been processed (accepted/rejected).</li>
     /// </ul>
     /// <b>Request body:</b>
     /// <ul>
-    ///   <li><c>StaffRequestId</c> (int, required): ID of the staff request to update</li>
-    ///   <li><c>RejectionReason</c> (string, required): Reason for rejecting the staff request</li>
+    ///   <li><c>StaffInvitationId</c> (int, required): ID of the staff invitation to update</li>
+    ///   <li><c>RejectionReason</c> (string, required): Reason for rejecting the staff invitation</li>
     /// </ul>
     /// <b>Response:</b>
     /// <ul>
     ///   <li><c>bool</c>: Indicates success or failure</li>
     /// </ul>
     /// </remarks>
-    [HttpPost("staff-requests/{staffRequestId}/update")]
-    public async Task<ActionResult<Result<bool>>> UpdateStaffRequest(int staffRequestId, UpdateStaffRequestCommand command)
+    [HttpPost("staff-invitations/{staffInvitationId}/revoke")]
+    public async Task<ActionResult<Result<bool>>> RevokeStaffInvitation(int staffInvitationId, RevokeStaffInvitationCommand command)
     {
 
         return await SendAsync(command);
     }
 
     /// <summary>
-    /// Respond to a staff request (accept or reject) by the invited user.
+    /// Respond to a staff invitation (accept or reject) by the invited user.
     /// </summary>
     /// <remarks>
     /// <b>What this endpoint does:</b>
     /// <ul>
-    ///   <li>Allows the invited user to accept or reject a pending staff request.</li>
-    ///   <li>When accepting: Updates request status to accepted, sets acceptance timestamp, updates user's tenant association, and assigns the requested roles to the user.</li>
-    ///   <li>When rejecting: Updates request status to rejected and stores the rejection reason.</li>
-    ///   <li>Requires rejection reason when rejecting the request.</li>
-    ///   <li>Only works on requests that are still in pending status.</li>
+    ///   <li>Allows the invited user to accept or reject a pending staff invitation.</li>
+    ///   <li>When accepting: Updates invitation status to accepted, sets acceptance timestamp, updates user's tenant association, and assigns the requested roles to the user.</li>
+    ///   <li>When rejecting: Updates invitation status to rejected and stores the rejection reason.</li>
+    ///   <li>Requires rejection reason when rejecting the invitation.</li>
+    ///   <li>Only works on invitations that are still in pending status.</li>
     ///   <li>Invalidates user profile cache after successful acceptance.</li>
     /// </ul>
     /// <b>Request body:</b>
     /// <ul>
-    ///   <li><c>StaffRequestId</c> (int, required): ID of the staff request to respond to</li>
-    ///   <li><c>IsAccepted</c> (bool, required): Whether to accept or reject the request</li>
+    ///   <li><c>StaffInvitationId</c> (int, required): ID of the staff invitation to respond to</li>
+    ///   <li><c>IsAccepted</c> (bool, required): Whether to accept or reject the invitation</li>
     ///   <li><c>RejectionReason</c> (string, optional): Reason for rejection (required when rejecting)</li>
     /// </ul>
     /// <b>Response:</b>
@@ -203,13 +203,9 @@ public class TenantsController : ApiControllerBase
     ///   <li><c>bool</c>: Indicates success or failure</li>
     /// </ul>
     /// </remarks>
-    [HttpPost("staff-requests/{staffRequestId}/respond")]
-    public async Task<ActionResult<Result<bool>>> RespondToStaffRequest(int staffRequestId, RespondToStaffRequestCommand command)
+    [HttpPost("staff-invitations/{staffInvitationId}/respond")]
+    public async Task<ActionResult<Result<bool>>> RespondToStaffInvitation(int staffInvitationId, RespondToStaffInvitationCommand command)
     {
-        if (staffRequestId != command.StaffRequestId)
-        {
-            return BadRequest();
-        }
 
         return await SendAsync(command);
     }

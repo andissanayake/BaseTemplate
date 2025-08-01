@@ -5,19 +5,16 @@ namespace BaseTemplate.Application.ItemAttributeTypes.Queries.GetItemAttributeTy
 public class GetItemAttributeTypeByIdQueryHandler : IRequestHandler<GetItemAttributeTypeByIdQuery, ItemAttributeTypeDto>
 {
     private readonly IAppDbContext _context;
-    private readonly IUserProfileService _userProfileService;
 
-    public GetItemAttributeTypeByIdQueryHandler(IAppDbContext context, IUserProfileService userProfileService)
+    public GetItemAttributeTypeByIdQueryHandler(IAppDbContext context)
     {
         _context = context;
-        _userProfileService = userProfileService;
     }
 
     public async Task<Result<ItemAttributeTypeDto>> HandleAsync(GetItemAttributeTypeByIdQuery request, CancellationToken cancellationToken)
     {
-        var userInfo = await _userProfileService.GetUserProfileAsync();
         var itemAttributeType = await _context.ItemAttributeType
-            .SingleAsync(iat => iat.Id == request.Id && iat.TenantId == userInfo.TenantId && !iat.IsDeleted, cancellationToken);
+            .SingleAsync(iat => iat.Id == request.Id, cancellationToken);
 
         var dto = new ItemAttributeTypeDto
         {

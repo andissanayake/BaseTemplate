@@ -16,7 +16,7 @@ public class UserController : ApiControllerBase
     ///   <li><b>User Record:</b> Ensures the user exists in the system, creating a new record if necessary, and updates name/email if changed.</li>
     ///   <li><b>Roles:</b> Lists all roles assigned to the user. If the user is a Tenant Owner, all base tenant roles are included.</li>
     ///   <li><b>Tenant Information:</b> If the user is associated with a tenant, returns the tenant's ID and name.</li>
-    ///   <li><b>Staff Request:</b> If the user is not associated with a tenant but has a pending staff request (invitation), returns details about the request, including requester info, requested roles, status (Pending, Accepted, Rejected, Revoked, Expired), creation date, and tenant name.</li>
+    ///   <li><b>Staff Invitation:</b> If the user is not associated with a tenant but has a pending staff invitation, returns details about the invitation, including requester info, requested roles, status (Pending, Accepted, Rejected, Revoked, Expired), creation date, and tenant name.</li>
     /// </ul>
     /// <p>This endpoint is typically used by the frontend to determine the user's identity, permissions, and onboarding state.</p>
     /// </remarks>
@@ -25,7 +25,7 @@ public class UserController : ApiControllerBase
     /// <ul>
     ///   <li>User roles</li>
     ///   <li>Tenant details (if any)</li>
-    ///   <li>Staff request information (if any)</li>
+    ///   <li>Staff invitation information (if any)</li>
     /// </ul>
     /// </returns>
     [HttpPost("userDetails")]

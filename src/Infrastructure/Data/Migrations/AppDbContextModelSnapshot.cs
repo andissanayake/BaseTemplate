@@ -33,8 +33,8 @@ namespace BaseTemplate.Infrastructure.Data.Migrations
                     b.Property<DateTimeOffset>("Created")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<string>("CreatedBy")
-                        .HasColumnType("text");
+                    b.Property<int>("CreatedBy")
+                        .HasColumnType("integer");
 
                     b.Property<string>("Email")
                         .HasColumnType("text");
@@ -45,8 +45,8 @@ namespace BaseTemplate.Infrastructure.Data.Migrations
                     b.Property<DateTimeOffset?>("LastModified")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<string>("LastModifiedBy")
-                        .HasColumnType("text");
+                    b.Property<int?>("LastModifiedBy")
+                        .HasColumnType("integer");
 
                     b.Property<string>("Name")
                         .HasColumnType("text");
@@ -79,8 +79,8 @@ namespace BaseTemplate.Infrastructure.Data.Migrations
                     b.Property<DateTimeOffset>("Created")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<string>("CreatedBy")
-                        .HasColumnType("text");
+                    b.Property<int>("CreatedBy")
+                        .HasColumnType("integer");
 
                     b.Property<string>("Description")
                         .HasColumnType("text");
@@ -94,8 +94,8 @@ namespace BaseTemplate.Infrastructure.Data.Migrations
                     b.Property<DateTimeOffset?>("LastModified")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<string>("LastModifiedBy")
-                        .HasColumnType("text");
+                    b.Property<int?>("LastModifiedBy")
+                        .HasColumnType("integer");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -129,8 +129,8 @@ namespace BaseTemplate.Infrastructure.Data.Migrations
                     b.Property<DateTimeOffset>("Created")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<string>("CreatedBy")
-                        .HasColumnType("text");
+                    b.Property<int>("CreatedBy")
+                        .HasColumnType("integer");
 
                     b.Property<bool>("IsActive")
                         .HasColumnType("boolean");
@@ -144,8 +144,8 @@ namespace BaseTemplate.Infrastructure.Data.Migrations
                     b.Property<DateTimeOffset?>("LastModified")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<string>("LastModifiedBy")
-                        .HasColumnType("text");
+                    b.Property<int?>("LastModifiedBy")
+                        .HasColumnType("integer");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -178,8 +178,8 @@ namespace BaseTemplate.Infrastructure.Data.Migrations
                     b.Property<DateTimeOffset>("Created")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<string>("CreatedBy")
-                        .HasColumnType("text");
+                    b.Property<int>("CreatedBy")
+                        .HasColumnType("integer");
 
                     b.Property<string>("Description")
                         .HasColumnType("text");
@@ -193,8 +193,8 @@ namespace BaseTemplate.Infrastructure.Data.Migrations
                     b.Property<DateTimeOffset?>("LastModified")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<string>("LastModifiedBy")
-                        .HasColumnType("text");
+                    b.Property<int?>("LastModifiedBy")
+                        .HasColumnType("integer");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -210,7 +210,53 @@ namespace BaseTemplate.Infrastructure.Data.Migrations
                     b.ToTable("ItemAttributeType");
                 });
 
-            modelBuilder.Entity("BaseTemplate.Domain.Entities.StaffRequest", b =>
+            modelBuilder.Entity("BaseTemplate.Domain.Entities.Specification", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTimeOffset>("Created")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("CreatedBy")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<DateTimeOffset?>("LastModified")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int?>("LastModifiedBy")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<int?>("ParentSpecificationId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("TenantId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ParentSpecificationId");
+
+                    b.HasIndex("TenantId");
+
+                    b.ToTable("Specification");
+                });
+
+            modelBuilder.Entity("BaseTemplate.Domain.Entities.StaffInvitation", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -227,8 +273,8 @@ namespace BaseTemplate.Infrastructure.Data.Migrations
                     b.Property<DateTimeOffset>("Created")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<string>("CreatedBy")
-                        .HasColumnType("text");
+                    b.Property<int>("CreatedBy")
+                        .HasColumnType("integer");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("boolean");
@@ -236,8 +282,8 @@ namespace BaseTemplate.Infrastructure.Data.Migrations
                     b.Property<DateTimeOffset?>("LastModified")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<string>("LastModifiedBy")
-                        .HasColumnType("text");
+                    b.Property<int?>("LastModifiedBy")
+                        .HasColumnType("integer");
 
                     b.Property<string>("RejectionReason")
                         .HasColumnType("text");
@@ -267,10 +313,10 @@ namespace BaseTemplate.Infrastructure.Data.Migrations
 
                     b.HasIndex("TenantId");
 
-                    b.ToTable("StaffRequest");
+                    b.ToTable("StaffInvitation");
                 });
 
-            modelBuilder.Entity("BaseTemplate.Domain.Entities.StaffRequestRole", b =>
+            modelBuilder.Entity("BaseTemplate.Domain.Entities.StaffInvitationRole", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -281,8 +327,8 @@ namespace BaseTemplate.Infrastructure.Data.Migrations
                     b.Property<DateTimeOffset>("Created")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<string>("CreatedBy")
-                        .HasColumnType("text");
+                    b.Property<int>("CreatedBy")
+                        .HasColumnType("integer");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("boolean");
@@ -290,14 +336,14 @@ namespace BaseTemplate.Infrastructure.Data.Migrations
                     b.Property<DateTimeOffset?>("LastModified")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<string>("LastModifiedBy")
-                        .HasColumnType("text");
+                    b.Property<int?>("LastModifiedBy")
+                        .HasColumnType("integer");
 
                     b.Property<string>("Role")
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<int>("StaffRequestId")
+                    b.Property<int>("StaffInvitationId")
                         .HasColumnType("integer");
 
                     b.Property<int>("TenantId")
@@ -307,7 +353,7 @@ namespace BaseTemplate.Infrastructure.Data.Migrations
 
                     b.HasIndex("TenantId");
 
-                    b.ToTable("StaffRequestRole");
+                    b.ToTable("StaffInvitationRole");
                 });
 
             modelBuilder.Entity("BaseTemplate.Domain.Entities.Tenant", b =>
@@ -324,8 +370,8 @@ namespace BaseTemplate.Infrastructure.Data.Migrations
                     b.Property<DateTimeOffset>("Created")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<string>("CreatedBy")
-                        .HasColumnType("text");
+                    b.Property<int>("CreatedBy")
+                        .HasColumnType("integer");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("boolean");
@@ -333,8 +379,8 @@ namespace BaseTemplate.Infrastructure.Data.Migrations
                     b.Property<DateTimeOffset?>("LastModified")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<string>("LastModifiedBy")
-                        .HasColumnType("text");
+                    b.Property<int?>("LastModifiedBy")
+                        .HasColumnType("integer");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -363,8 +409,8 @@ namespace BaseTemplate.Infrastructure.Data.Migrations
                     b.Property<DateTimeOffset>("Created")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<string>("CreatedBy")
-                        .HasColumnType("text");
+                    b.Property<int>("CreatedBy")
+                        .HasColumnType("integer");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("boolean");
@@ -372,8 +418,8 @@ namespace BaseTemplate.Infrastructure.Data.Migrations
                     b.Property<DateTimeOffset?>("LastModified")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<string>("LastModifiedBy")
-                        .HasColumnType("text");
+                    b.Property<int?>("LastModifiedBy")
+                        .HasColumnType("integer");
 
                     b.Property<string>("Role")
                         .IsRequired()
@@ -439,7 +485,24 @@ namespace BaseTemplate.Infrastructure.Data.Migrations
                     b.Navigation("Tenant");
                 });
 
-            modelBuilder.Entity("BaseTemplate.Domain.Entities.StaffRequest", b =>
+            modelBuilder.Entity("BaseTemplate.Domain.Entities.Specification", b =>
+                {
+                    b.HasOne("BaseTemplate.Domain.Entities.Specification", "ParentSpecification")
+                        .WithMany("Children")
+                        .HasForeignKey("ParentSpecificationId");
+
+                    b.HasOne("BaseTemplate.Domain.Entities.Tenant", "Tenant")
+                        .WithMany()
+                        .HasForeignKey("TenantId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("ParentSpecification");
+
+                    b.Navigation("Tenant");
+                });
+
+            modelBuilder.Entity("BaseTemplate.Domain.Entities.StaffInvitation", b =>
                 {
                     b.HasOne("BaseTemplate.Domain.Entities.AppUser", "AcceptedByAppUser")
                         .WithMany()
@@ -464,7 +527,7 @@ namespace BaseTemplate.Infrastructure.Data.Migrations
                     b.Navigation("Tenant");
                 });
 
-            modelBuilder.Entity("BaseTemplate.Domain.Entities.StaffRequestRole", b =>
+            modelBuilder.Entity("BaseTemplate.Domain.Entities.StaffInvitationRole", b =>
                 {
                     b.HasOne("BaseTemplate.Domain.Entities.Tenant", "Tenant")
                         .WithMany()
@@ -484,6 +547,11 @@ namespace BaseTemplate.Infrastructure.Data.Migrations
                         .IsRequired();
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("BaseTemplate.Domain.Entities.Specification", b =>
+                {
+                    b.Navigation("Children");
                 });
 #pragma warning restore 612, 618
         }

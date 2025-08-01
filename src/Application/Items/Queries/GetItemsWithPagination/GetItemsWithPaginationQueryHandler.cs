@@ -5,20 +5,15 @@ namespace BaseTemplate.Application.Items.Queries.GetItemsWithPagination;
 public class GetItemsWithPaginationQueryHandler : IRequestHandler<GetItemsWithPaginationQuery, PaginatedList<ItemBriefDto>>
 {
     private readonly IAppDbContext _context;
-    private readonly IUserProfileService _userProfileService;
 
-    public GetItemsWithPaginationQueryHandler(IAppDbContext context, IUserProfileService userProfileService)
+    public GetItemsWithPaginationQueryHandler(IAppDbContext context)
     {
         _context = context;
-        _userProfileService = userProfileService;
     }
 
     public async Task<Result<PaginatedList<ItemBriefDto>>> HandleAsync(GetItemsWithPaginationQuery request, CancellationToken cancellationToken)
     {
-        var userInfo = await _userProfileService.GetUserProfileAsync();
-
         var query = _context.Item.AsQueryable();
-        query = query.Where(i => i.TenantId == userInfo.TenantId && !i.IsDeleted);
 
         if (!string.IsNullOrEmpty(request.Category))
             query = query.Where(i => i.Category == request.Category);
