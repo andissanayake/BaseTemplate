@@ -11,8 +11,8 @@ public class BaseDbContext : DbContext, IBaseDbContext
     public DbSet<AppUser> AppUser { get; set; }
     public DbSet<UserRole> UserRole { get; set; }
     public DbSet<Tenant> Tenant { get; set; }
-    public DbSet<StaffInvitation> StaffRequest { get; set; }
-    public DbSet<StaffInvitationRole> StaffRequestRole { get; set; }
+    public DbSet<StaffInvitation> StaffInvitation { get; set; }
+    public DbSet<StaffInvitationRole> StaffInvitationRole { get; set; }
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
@@ -57,8 +57,8 @@ public class AppDbContext : DbContext, IAppDbContext
     public DbSet<AppUser> AppUser { get; set; }
     public DbSet<UserRole> UserRole { get; set; }
     public DbSet<Tenant> Tenant { get; set; }
-    public DbSet<StaffInvitation> StaffRequest { get; set; }
-    public DbSet<StaffInvitationRole> StaffRequestRole { get; set; }
+    public DbSet<StaffInvitation> StaffInvitation { get; set; }
+    public DbSet<StaffInvitationRole> StaffInvitationRole { get; set; }
     public DbSet<ItemAttributeType> ItemAttributeType { get; set; }
     public DbSet<ItemAttribute> ItemAttribute { get; set; }
     public DbSet<Item> Item { get; set; }
@@ -107,13 +107,13 @@ public class AppDbContext : DbContext, IAppDbContext
             {
                 case EntityState.Added:
                     entry.Entity.TenantId = userProfile.TenantId;
-                    entry.Entity.CreatedBy = userProfile.Identifier;
+                    entry.Entity.CreatedBy = userProfile.Id;
                     entry.Entity.Created = DateTimeOffset.UtcNow;
                     break;
 
                 case EntityState.Modified:
                     entry.Entity.TenantId = userProfile.TenantId;
-                    entry.Entity.LastModifiedBy = userProfile.Identifier;
+                    entry.Entity.LastModifiedBy = userProfile.Id;
                     entry.Entity.LastModified = DateTimeOffset.UtcNow;
                     break;
             }

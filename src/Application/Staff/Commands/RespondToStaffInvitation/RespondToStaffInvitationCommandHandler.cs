@@ -17,7 +17,7 @@ public class RespondToStaffInvitationCommandHandler : IRequestHandler<RespondToS
     public async Task<Result<bool>> HandleAsync(RespondToStaffInvitationCommand request, CancellationToken cancellationToken)
     {
         // Get the staff request and verify it belongs to the current user
-        var staffRequest = await _context.StaffRequest
+        var staffRequest = await _context.StaffInvitation
             .SingleAsync(sr => sr.Id == request.StaffRequestId && sr.RequestedEmail == _user.Email && sr.Status == StaffRequestStatus.Pending && !sr.IsDeleted, cancellationToken);
 
         if (request.IsAccepted)
@@ -32,7 +32,7 @@ public class RespondToStaffInvitationCommandHandler : IRequestHandler<RespondToS
             staffRequest.AcceptedByAppUserId = user.Id;
 
             // Get the roles for this staff request and add them to the user
-            var staffRequestRoles = await _context.StaffRequestRole
+            var staffRequestRoles = await _context.StaffInvitationRole
                 .Where(r => r.StaffInvitationId == request.StaffRequestId)
                 .ToListAsync(cancellationToken);
 

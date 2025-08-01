@@ -52,7 +52,7 @@ public class CreateStaffInvitationCommandHandler : IRequestHandler<CreateStaffIn
         }
 
         // Check if there's already a pending request for this email in this tenant
-        var existingRequest = await _context.StaffRequest
+        var existingRequest = await _context.StaffInvitation
             .FirstOrDefaultAsync(r => r.TenantId == userProfile.TenantId && r.RequestedEmail == request.StaffEmail && r.Status == StaffRequestStatus.Pending, cancellationToken);
 
         if (existingRequest != null)
@@ -73,7 +73,7 @@ public class CreateStaffInvitationCommandHandler : IRequestHandler<CreateStaffIn
             RequestedByAppUserId = userProfile.Id,
             Status = StaffRequestStatus.Pending
         };
-        _context.StaffRequest.Add(staffRequest);
+        _context.StaffInvitation.Add(staffRequest);
 
         // Save the staff request first to get its ID
         await _context.SaveChangesAsync(cancellationToken);
@@ -87,7 +87,7 @@ public class CreateStaffInvitationCommandHandler : IRequestHandler<CreateStaffIn
                 StaffInvitationId = staffRequest.Id,
                 Role = role
             };
-            _context.StaffRequestRole.Add(staffRequestRole);
+            _context.StaffInvitationRole.Add(staffRequestRole);
         }
         await _context.SaveChangesAsync(cancellationToken);
         return Result<bool>.Success(true, $"Staff request for {request.StaffEmail} has been created successfully. The user will be notified to accept the invitation.");

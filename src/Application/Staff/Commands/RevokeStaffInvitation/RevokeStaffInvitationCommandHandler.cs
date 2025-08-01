@@ -16,7 +16,7 @@ public class RevokeStaffInvitationCommandHandler : IRequestHandler<RevokeStaffIn
     {
         var userProfile = await _userProfileService.GetUserProfileAsync();
 
-        var staffRequest = await _context.StaffRequest
+        var staffRequest = await _context.StaffInvitation
             .SingleAsync(sr => sr.Id == request.StaffRequestId && sr.TenantId == userProfile.TenantId && sr.Status == StaffRequestStatus.Pending, cancellationToken);
 
         // Reject the request

@@ -30,7 +30,7 @@ public class RemoveStaffCommandHandler : IRequestHandler<RemoveStaffCommand, boo
             role.IsDeleted = true;
         }
 
-        var staffRequest = await _context.StaffRequest
+        var staffRequest = await _context.StaffInvitation
             .Where(sr => sr.RequestedEmail == user.Email && sr.TenantId == userProfile.TenantId && sr.Status == StaffRequestStatus.Accepted)
             .SingleAsync(cancellationToken);
         staffRequest.Status = StaffRequestStatus.Expired;

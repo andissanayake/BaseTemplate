@@ -17,7 +17,7 @@ public class GetStaffInvitationsQueryHandler : IRequestHandler<GetStaffInvitatio
     {
         var userProfile = await _userProfileService.GetUserProfileAsync();
 
-        var staffRequests = await _context.StaffRequest
+        var staffRequests = await _context.StaffInvitation
             .Include(sr => sr.RequestedByAppUser)
             .Include(sr => sr.AcceptedByAppUser)
             .Where(sr => sr.TenantId == userProfile.TenantId && !sr.IsDeleted)
@@ -30,7 +30,7 @@ public class GetStaffInvitationsQueryHandler : IRequestHandler<GetStaffInvitatio
 
         if (staffRequestIds.Any())
         {
-            roles = await _context.StaffRequestRole
+            roles = await _context.StaffInvitationRole
                 .Where(r => r.TenantId == userProfile.TenantId && staffRequestIds.Contains(r.StaffInvitationId) && !r.IsDeleted)
                 .ToListAsync(cancellationToken);
         }
