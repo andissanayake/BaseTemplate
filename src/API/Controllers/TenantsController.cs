@@ -159,7 +159,7 @@ public class TenantsController : ApiControllerBase
     ///   <li>Updates the status of a pending staff invitation to revoked.</li>
     ///   <li>Only works on invitations that are still in pending status.</li>
     ///   <li>Requires a rejection reason to be provided.</li>
-    ///   <li>Only users with the <c>StaffRequestManager</c> role can perform this action.</li>
+    ///   <li>Only users with the <c>StaffInvitationManager</c> role can perform this action.</li>
     ///   <li>Fails if the staff invitation has already been processed (accepted/rejected).</li>
     /// </ul>
     /// <b>Request body:</b>

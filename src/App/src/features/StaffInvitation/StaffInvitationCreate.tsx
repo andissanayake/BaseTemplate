@@ -10,16 +10,16 @@ import {
 } from "antd";
 import { apiClient } from "../../common/apiClient";
 import { handleFormValidationErrors } from "../../common/formErrorHandler";
-import { CreateStaffInvitationRequest } from "./StaffRequestModel";
+import { CreateStaffInvitationRequest } from "./StaffInvitationModel";
 import { Roles } from "../../auth/RolesEnum";
 
-interface StaffRequestCreateProps {
+interface StaffInvitationCreateProps {
   visible: boolean;
   onCancel: () => void;
   onSuccess: () => void;
 }
 
-const StaffRequestCreate: React.FC<StaffRequestCreateProps> = ({
+const StaffInvitationCreate: React.FC<StaffInvitationCreateProps> = ({
   visible,
   onCancel,
   onSuccess,
@@ -31,12 +31,12 @@ const StaffRequestCreate: React.FC<StaffRequestCreateProps> = ({
     [
       Roles.TenantManager,
       Roles.StaffManager,
-      Roles.StaffRequestManager,
+      Roles.StaffInvitationManager,
       Roles.ItemManager,
     ].includes(role)
   );
 
-  const handleCreateRequest = async (values: {
+  const handleCreateInvitation = async (values: {
     staffEmail: string;
     staffName: string;
     roles: string[];
@@ -85,7 +85,7 @@ const StaffRequestCreate: React.FC<StaffRequestCreateProps> = ({
       footer={null}
       destroyOnClose
     >
-      <Form form={form} layout="vertical" onFinish={handleCreateRequest}>
+      <Form form={form} layout="vertical" onFinish={handleCreateInvitation}>
         <Form.Item
           label="Email Address"
           name="staffEmail"
@@ -131,4 +131,4 @@ const StaffRequestCreate: React.FC<StaffRequestCreateProps> = ({
   );
 };
 
-export default StaffRequestCreate;
+export default StaffInvitationCreate;

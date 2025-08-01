@@ -9,8 +9,8 @@ import { ProfilePage } from "./pages/ProfilePage";
 import { TenantCreatePage } from "./pages/TenantCreatePage";
 import { TenantEditPage } from "./pages/TenantEditPage";
 import { TenantViewPage } from "./pages/TenantViewPage";
-import { StaffRequestManagementPage } from "./pages/StaffRequestManagementPage";
-import { StaffRequestResponsePage } from "./pages/StaffRequestResponsePage";
+import { StaffInvitationManagementPage } from "./pages/StaffInvitationManagementPage";
+import { StaffInvitationResponsePage } from "./pages/StaffInvitationResponsePage";
 import { StaffManagementPage } from "./pages/StaffManagementPage";
 import { ItemCreatePage } from "./pages/ItemCreatePage";
 import { ItemEditPage } from "./pages/ItemEditPage";
@@ -165,7 +165,7 @@ export const App = () => {
             path="/tenants/view/staff-invitations"
             element={
               <ProtectedRoute policy={Policies.User}>
-                <StaffRequestManagementPage />
+                <StaffInvitationManagementPage />
               </ProtectedRoute>
             }
           />
@@ -173,7 +173,7 @@ export const App = () => {
             path="/staff-invitations/respond"
             element={
               <ProtectedRoute policy={Policies.User}>
-                <StaffRequestResponsePage />
+                <StaffInvitationResponsePage />
               </ProtectedRoute>
             }
           />

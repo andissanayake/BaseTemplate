@@ -2,7 +2,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace BaseTemplate.Application.Staff.Commands.CreateStaffInvitation;
 
-[Authorize(Roles = Domain.Constants.Roles.StaffRequestManager)]
+[Authorize(Roles = Domain.Constants.Roles.StaffInvitationManager)]
 public record CreateStaffInvitationCommand : IRequest<bool>
 {
     [Required]

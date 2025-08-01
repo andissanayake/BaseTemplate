@@ -5,7 +5,7 @@ export interface TenantDetails {
   name: string;
 }
 
-export interface StaffRequestDetails {
+export interface StaffInvitationDetails {
   id: number;
   requesterName: string;
   requesterEmail: string;
@@ -18,5 +18,5 @@ export interface StaffRequestDetails {
 export interface UserDetails {
   roles: Roles[];
   tenant?: TenantDetails;
-  staffRequest?: StaffRequestDetails;
+  staffInvitation?: StaffInvitationDetails;
 }

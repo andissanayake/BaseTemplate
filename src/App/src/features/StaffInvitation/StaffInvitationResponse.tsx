@@ -21,15 +21,15 @@ import { useTenantStore } from "../Tenant/tenantStore";
 const { Title, Text } = Typography;
 const { TextArea } = Input;
 
-export const StaffRequestResponse: React.FC = () => {
-  const { staffRequest, setStaffRequest } = useAuthStore();
+export const StaffInvitationResponse: React.FC = () => {
+  const { staffInvitation, setStaffInvitation } = useAuthStore();
   const { setCurrentTenant } = useTenantStore();
   const [loading, setLoading] = useState(false);
   const [rejectForm] = Form.useForm();
   const [showRejectForm, setShowRejectForm] = useState(false);
   const navigate = useNavigate();
 
-  if (!staffRequest) {
+  if (!staffInvitation) {
     return (
       <Card>
         <Alert
@@ -45,12 +45,12 @@ export const StaffRequestResponse: React.FC = () => {
   const handleAccept = async () => {
     setLoading(true);
     const payload = {
-      StaffInvitationId: staffRequest.id,
+      StaffInvitationId: staffInvitation.id,
       IsAccepted: true,
     };
 
     apiClient.post<boolean>(
-      `/api/tenants/staff-invitations/${staffRequest.id}/respond`,
+      `/api/tenants/staff-invitations/${staffInvitation.id}/respond`,
       payload,
       {
         onSuccess: () => {
@@ -59,12 +59,12 @@ export const StaffRequestResponse: React.FC = () => {
             description: "You have been added to the tenant.",
           });
           // Clear the staff invitation from auth store
-          setStaffRequest(null);
+          setStaffInvitation(null);
           // Redirect to home page
           navigate("/");
           setCurrentTenant({
             id: -1,
-            name: staffRequest.tenantName,
+            name: staffInvitation.tenantName,
           });
         },
         onServerError: () => {
@@ -80,13 +80,13 @@ export const StaffRequestResponse: React.FC = () => {
   const handleReject = async (values: { rejectionReason: string }) => {
     setLoading(true);
     const payload = {
-      StaffInvitationId: staffRequest.id,
+      StaffInvitationId: staffInvitation.id,
       IsAccepted: false,
       RejectionReason: values.rejectionReason,
     };
 
     apiClient.post<boolean>(
-      `/api/tenants/staff-invitations/${staffRequest.id}/respond`,
+      `/api/tenants/staff-invitations/${staffInvitation.id}/respond`,
       payload,
       {
         onSuccess: () => {
@@ -94,7 +94,7 @@ export const StaffRequestResponse: React.FC = () => {
             message: "Staff invitation rejected successfully!",
           });
           // Clear the staff invitation from auth store
-          setStaffRequest(null);
+          setStaffInvitation(null);
           // Redirect to home page
           navigate("/");
         },
@@ -138,17 +138,17 @@ export const StaffRequestResponse: React.FC = () => {
         <Card size="small" title="Invitation Details">
           <Descriptions column={1} size="small">
             <Descriptions.Item label="Tenant">
-              <Text strong>{staffRequest.tenantName}</Text>
+              <Text strong>{staffInvitation.tenantName}</Text>
             </Descriptions.Item>
             <Descriptions.Item label="Requester Name">
-              {staffRequest.requesterName}
+              {staffInvitation.requesterName}
             </Descriptions.Item>
             <Descriptions.Item label="Requester Email">
-              {staffRequest.requesterEmail}
+              {staffInvitation.requesterEmail}
             </Descriptions.Item>
             <Descriptions.Item label="Requested Roles">
               <Space wrap>
-                {staffRequest.roles.map((role) => (
+                {staffInvitation.roles.map((role) => (
                   <Tag key={role} color="blue">
                     {role}
                   </Tag>
@@ -156,15 +156,15 @@ export const StaffRequestResponse: React.FC = () => {
               </Space>
             </Descriptions.Item>
             <Descriptions.Item label="Status">
-              {getStatusTag(staffRequest.status)}
+              {getStatusTag(staffInvitation.status)}
             </Descriptions.Item>
             <Descriptions.Item label="Created">
-              {new Date(staffRequest.created).toLocaleDateString()}
+              {new Date(staffInvitation.created).toLocaleDateString()}
             </Descriptions.Item>
           </Descriptions>
         </Card>
 
-        {staffRequest.status === 0 && (
+        {staffInvitation.status === 0 && (
           <Card size="small" title="Your Response">
             <Space direction="vertical" size="middle" style={{ width: "100%" }}>
               <div>
@@ -250,7 +250,7 @@ export const StaffRequestResponse: React.FC = () => {
           </Card>
         )}
 
-        {staffRequest.status !== 0 && (
+        {staffInvitation.status !== 0 && (
           <Alert
             message="Invitation Already Processed"
             description="This staff invitation has already been processed and cannot be modified."

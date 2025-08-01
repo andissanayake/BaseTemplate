@@ -13,12 +13,15 @@ import {
 } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
 import { apiClient } from "../../common/apiClient";
-import { StaffInvitationDto, StaffInvitationStatus } from "./StaffRequestModel";
-import StaffRequestCreate from "./StaffRequestCreate";
+import {
+  StaffInvitationDto,
+  StaffInvitationStatus,
+} from "./StaffInvitationModel";
+import StaffInvitationCreate from "./StaffInvitationCreate";
 
 const { TextArea } = Input;
 
-export const StaffRequestList: React.FC = () => {
+export const StaffInvitationList: React.FC = () => {
   const [staffInvitations, setStaffInvitations] = useState<
     StaffInvitationDto[]
   >([]);
@@ -230,7 +233,7 @@ export const StaffRequestList: React.FC = () => {
         }}
       />
 
-      <StaffRequestCreate
+      <StaffInvitationCreate
         visible={createModalVisible}
         onCancel={() => setCreateModalVisible(false)}
         onSuccess={() => {
