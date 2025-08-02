@@ -60,7 +60,7 @@ const SpecificationList: React.FC = () => {
         });
         loadSpecifications();
       },
-      onValidationError: (error, message) => {
+      onValidationError: (_error, message) => {
         notification.error({ message: message });
       },
       onServerError: () => {
