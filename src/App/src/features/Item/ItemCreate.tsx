@@ -23,7 +23,7 @@ const ItemCreate: React.FC = () => {
     form.validateFields().then(async (values) => {
       setLoading(true);
       apiClient.post<number>(
-        `/api/items`,
+        `/api/item`,
         {
           ...values,
           category: values.category?.join(",") || "",

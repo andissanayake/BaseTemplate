@@ -1,5 +1,6 @@
 namespace BaseTemplate.Application.TenantFeatures.Specifications.Commands.CreateSpecification;
 
+[Authorize(Roles = Roles.SpecificationManager)]
 public record CreateSpecificationCommand : IRequest<int>
 {
     public string Name { get; init; } = string.Empty;

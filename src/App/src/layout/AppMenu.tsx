@@ -7,6 +7,8 @@ import { useLocation, useNavigate } from "react-router";
 import { useAuthStore } from "../auth/authStore";
 import { apiClient } from "../common/apiClient";
 import { useTenantStore } from "../features/Tenant/tenantStore";
+import { useAuthPolicy } from "../auth/authPolicy";
+import { Roles } from "../auth/RolesEnum";
 
 export const AppMenu = () => {
   const navigate = useNavigate();
@@ -20,6 +22,8 @@ export const AppMenu = () => {
     setStaffInvitation,
     staffInvitation,
   } = useAuthStore((state) => state);
+  const { isUser, isGuest, hasRole, hasTenant, hasInvitation } =
+    useAuthPolicy();
   const { currentTenant } = useTenantStore((state) => state);
   const [current, setCurrent] = useState(
     location.pathname === "/" || location.pathname === ""
@@ -88,54 +92,64 @@ export const AppMenu = () => {
       },
     });
 
-    if (user) {
-      if (tenant?.id) {
-        menuItems.push({
-          key: "/tenants/view",
-          label: <span>{tenant.name}</span>,
-          onClick: (e: any) => {
-            handleClick(e.key);
-          },
-        });
-        menuItems.push({
-          key: "/tenants/view/staff-invitations",
-          label: <span>Staff Invitation</span>,
-          onClick: (e: any) => {
-            handleClick(e.key);
-          },
-        });
-        menuItems.push({
-          key: "/tenants/view/staff",
-          label: <span>Staff</span>,
-          onClick: (e: any) => {
-            handleClick(e.key);
-          },
-        });
+    if (isUser()) {
+      if (hasTenant()) {
+        if (hasRole([Roles.TenantManager])) {
+          menuItems.push({
+            key: "/tenants/view",
+            label: <span>{tenant?.name}</span>,
+            onClick: (e: any) => {
+              handleClick(e.key);
+            },
+          });
+        }
+        if (hasRole([Roles.StaffInvitationManager])) {
+          menuItems.push({
+            key: "/tenants/view/staff-invitations",
+            label: <span>Staff Invitation</span>,
+            onClick: (e: any) => {
+              handleClick(e.key);
+            },
+          });
+        }
+        if (hasRole([Roles.StaffManager])) {
+          menuItems.push({
+            key: "/tenants/view/staff",
+            label: <span>Staff</span>,
+            onClick: (e: any) => {
+              handleClick(e.key);
+            },
+          });
+        }
+        if (hasRole([Roles.ItemManager])) {
+          menuItems.push({
+            key: "/items",
+            label: "Item",
+            onClick: (e: any) => {
+              handleClick(e.key);
+            },
+          });
+        }
+        if (hasRole([Roles.AttributeManager])) {
+          menuItems.push({
+            key: "/item-attribute-types",
+            label: "Attribute Type",
+            onClick: (e: any) => {
+              handleClick(e.key);
+            },
+          });
+        }
+        if (hasRole([Roles.SpecificationManager])) {
+          menuItems.push({
+            key: "/specifications",
+            label: "Specification",
+            onClick: (e: any) => {
+              handleClick(e.key);
+            },
+          });
+        }
       }
-
-      menuItems.push({
-        key: "/items",
-        label: "Item",
-        onClick: (e: any) => {
-          handleClick(e.key);
-        },
-      });
-      menuItems.push({
-        key: "/item-attribute-types",
-        label: "Attribute Type",
-        onClick: (e: any) => {
-          handleClick(e.key);
-        },
-      });
-      menuItems.push({
-        key: "/specifications",
-        label: "Specification",
-        onClick: (e: any) => {
-          handleClick(e.key);
-        },
-      });
-
-      if (!tenant?.id && !staffInvitation?.id) {
+      if (!hasTenant() && !hasInvitation()) {
         menuItems.push({
           key: "/tenants/create",
           label: "Become a Tenant",
@@ -144,7 +158,7 @@ export const AppMenu = () => {
           },
         });
       }
-      if (!tenant?.id && staffInvitation?.id) {
+      if (hasInvitation()) {
         menuItems.push({
           key: "/staff-invitations/respond",
           label: "Join a Tenant",
@@ -158,8 +172,8 @@ export const AppMenu = () => {
         key: "/profile",
         label: (
           <span>
-            <Avatar src={user.photoURL} style={{ marginRight: 8 }} />
-            {user.displayName}
+            <Avatar src={user?.photoURL} style={{ marginRight: 8 }} />
+            {user?.displayName}
           </span>
         ),
         onClick: (e: any) => {
@@ -175,7 +189,7 @@ export const AppMenu = () => {
           handleClick(e.key);
         },
       });
-    } else {
+    } else if (isGuest()) {
       menuItems.push({
         key: "/login",
         label: "Login",
