@@ -1,5 +1,5 @@
 using BaseTemplate.Application.Common.Models;
-using BaseTemplate.Application.ItemAttributes.Queries.GetItemAttributes;
+using BaseTemplate.Application.TenantFeatures.ItemAttributes.Queries.GetItemAttributes;
 using BaseTemplate.Application.TenantFeatures.ItemAttributeTypes.Commands.CreateItemAttributeType;
 using BaseTemplate.Application.TenantFeatures.ItemAttributeTypes.Commands.DeleteItemAttributeType;
 using BaseTemplate.Application.TenantFeatures.ItemAttributeTypes.Commands.UpdateItemAttributeType;

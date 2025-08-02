@@ -1,9 +1,9 @@
 using BaseTemplate.Application.Common.Models;
-using BaseTemplate.Application.Items.Commands.CreateItem;
-using BaseTemplate.Application.Items.Commands.DeleteItem;
-using BaseTemplate.Application.Items.Commands.UpdateItem;
-using BaseTemplate.Application.Items.Queries.GetItemById;
-using BaseTemplate.Application.Items.Queries.GetItemsWithPagination;
+using BaseTemplate.Application.TenantFeatures.Items.Commands.CreateItem;
+using BaseTemplate.Application.TenantFeatures.Items.Commands.DeleteItem;
+using BaseTemplate.Application.TenantFeatures.Items.Commands.UpdateItem;
+using BaseTemplate.Application.TenantFeatures.Items.Queries.GetItemById;
+using BaseTemplate.Application.TenantFeatures.Items.Queries.GetItemsWithPagination;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 

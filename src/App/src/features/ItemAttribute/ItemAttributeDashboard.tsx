@@ -60,7 +60,7 @@ const ItemAttributeDashboard: React.FC<ItemAttributeDashboardProps> = ({
   const loadItemAttributes = useCallback(async () => {
     setLoading(true);
     apiClient.get<ItemAttribute[]>(
-      `/api/itemAttributeType/${itemAttributeTypeId}/ItemAttribute?itemAttributeTypeId=${itemAttributeTypeId}`,
+      `/api/item-attribute-type/${itemAttributeTypeId}/item-attribute`,
       {
         onSuccess: (data) => {
           setTotalCount(data?.length || 0);
@@ -103,7 +103,7 @@ const ItemAttributeDashboard: React.FC<ItemAttributeDashboardProps> = ({
       const updatedData = { ...row, id };
 
       setLoading(true);
-      apiClient.put<boolean>(`/api/itemAttributes/${id}`, updatedData, {
+      apiClient.put<boolean>(`/api/item-attribute`, updatedData, {
         onSuccess: () => {
           notification.success({
             message: "Item attribute updated successfully!",
@@ -138,7 +138,7 @@ const ItemAttributeDashboard: React.FC<ItemAttributeDashboardProps> = ({
       ...values,
       itemAttributeTypeId: itemAttributeTypeId,
     };
-    apiClient.post<number>(`/api/itemAttributes`, createData, {
+    apiClient.post<number>(`/api/item-attribute`, createData, {
       onSuccess: () => {
         notification.success({
           message: "Item attribute created successfully!",
@@ -167,7 +167,7 @@ const ItemAttributeDashboard: React.FC<ItemAttributeDashboardProps> = ({
   // Delete item attribute
   const handleDelete = async (id: number) => {
     setLoading(true);
-    apiClient.delete<boolean>(`/api/itemAttributes/${id}`, undefined, {
+    apiClient.delete<boolean>(`/api/item-attribute/${id}`, undefined, {
       onSuccess: () => {
         const newTotalCount = totalCount - 1;
         const lastPage = Math.ceil(newTotalCount / pageSize);

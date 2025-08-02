@@ -1,8 +1,8 @@
 using BaseTemplate.Application.Common.Models;
-using BaseTemplate.Application.ItemAttributes.Commands.CreateItemAttribute;
-using BaseTemplate.Application.ItemAttributes.Commands.DeleteItemAttribute;
-using BaseTemplate.Application.ItemAttributes.Commands.UpdateItemAttribute;
-using BaseTemplate.Application.ItemAttributes.Queries.GetItemAttributeById;
+using BaseTemplate.Application.TenantFeatures.ItemAttributes.Commands.CreateItemAttribute;
+using BaseTemplate.Application.TenantFeatures.ItemAttributes.Commands.DeleteItemAttribute;
+using BaseTemplate.Application.TenantFeatures.ItemAttributes.Commands.UpdateItemAttribute;
+using BaseTemplate.Application.TenantFeatures.ItemAttributes.Queries.GetItemAttributeById;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
