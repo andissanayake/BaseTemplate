@@ -8,7 +8,7 @@ public class GetItemAttributesQueryHandler(IAppDbContext context) : IRequestHand
 
     public async Task<Result<List<ItemAttributeBriefDto>>> HandleAsync(GetItemAttributesQuery request, CancellationToken cancellationToken)
     {
-        var items = await _context.ItemAttribute
+        var items = await _context.ItemAttribute.AsNoTracking()
             .Where(ia => ia.ItemAttributeTypeId == request.ItemAttributeTypeId)
             .Include(ia => ia.ItemAttributeType)
             .OrderByDescending(ia => ia.Created)

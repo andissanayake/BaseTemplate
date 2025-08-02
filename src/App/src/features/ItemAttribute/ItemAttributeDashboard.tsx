@@ -25,7 +25,6 @@ import {
   CreateItemAttributeRequest,
 } from "./ItemAttributeModel";
 import { apiClient } from "../../common/apiClient";
-import { useAuthStore } from "../../auth/authStore";
 import { handleFormValidationErrors } from "../../common/formErrorHandler";
 
 interface ItemAttributeDashboardProps {
@@ -35,7 +34,6 @@ interface ItemAttributeDashboardProps {
 const ItemAttributeDashboard: React.FC<ItemAttributeDashboardProps> = ({
   itemAttributeTypeId,
 }) => {
-  const { tenant } = useAuthStore();
   const [editingKey, setEditingKey] = useState<number | null>(null);
   const [isCreateModalVisible, setIsCreateModalVisible] = useState(false);
   const [form] = Form.useForm();
@@ -53,8 +51,6 @@ const ItemAttributeDashboard: React.FC<ItemAttributeDashboardProps> = ({
     setItemAttributeList,
     setCurrentPage,
   } = useItemAttributeStore();
-
-  if (!tenant?.id) throw new Error("Tenant ID is required");
 
   // Load item attributes
   const loadItemAttributes = useCallback(async () => {

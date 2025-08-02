@@ -10,7 +10,7 @@ public class GetUserCommandHandler(IBaseDbContext context, IUser user) : IReques
     public async Task<Result<GetUserResponse>> HandleAsync(GetUserCommand request, CancellationToken cancellationToken)
     {
         var response = new GetUserResponse();
-        var user = await _context.AppUser
+        var user = await _context.AppUser.AsNoTracking()
             .FirstOrDefaultAsync(u => u.SsoId == _user.Identifier, cancellationToken);
 
         if (user == null)
@@ -27,7 +27,7 @@ public class GetUserCommandHandler(IBaseDbContext context, IUser user) : IReques
 
         if (user.TenantId.HasValue)
         {
-            var tenant = await _context.Tenant
+            var tenant = await _context.Tenant.AsNoTracking()
                 .Where(t => t.Id == user.TenantId.Value)
                 .SingleAsync(cancellationToken);
 
@@ -35,7 +35,7 @@ public class GetUserCommandHandler(IBaseDbContext context, IUser user) : IReques
         }
         else
         {
-            var staffRequest = await _context.StaffInvitation
+            var staffRequest = await _context.StaffInvitation.AsNoTracking()
                 .Include(sr => sr.RequestedByAppUser)
                 .Where(sr => sr.RequestedEmail == _user.Email && sr.Status == StaffInvitationStatus.Pending)
                 .OrderByDescending(sr => sr.Created)
@@ -43,12 +43,12 @@ public class GetUserCommandHandler(IBaseDbContext context, IUser user) : IReques
 
             if (staffRequest != null)
             {
-                var staffRequestRoles = await _context.StaffInvitationRole
+                var staffRequestRoles = await _context.StaffInvitationRole.AsNoTracking()
                     .Where(r => r.StaffInvitationId == staffRequest.Id)
                     .Select(r => r.Role)
                     .ToListAsync(cancellationToken);
 
-                var staffTenantName = await _context.Tenant
+                var staffTenantName = await _context.Tenant.AsNoTracking()
                     .Where(t => t.Id == staffRequest.TenantId)
                     .Select(t => t.Name)
                     .SingleAsync(cancellationToken);
@@ -65,7 +65,7 @@ public class GetUserCommandHandler(IBaseDbContext context, IUser user) : IReques
                 };
             }
         }
-        var roles = await _context.UserRole
+        var roles = await _context.UserRole.AsNoTracking()
             .Where(r => r.UserId == user.Id)
             .Select(r => r.Role)
             .ToListAsync(cancellationToken);

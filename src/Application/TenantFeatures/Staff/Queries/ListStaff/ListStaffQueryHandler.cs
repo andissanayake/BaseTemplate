@@ -31,7 +31,7 @@ public class ListStaffQueryHandler(IAppDbContext context, IUserProfileService us
         var roles = new List<UserRole>();
         if (userIds.Count != 0)
         {
-            roles = await _context.UserRole
+            roles = await _context.UserRole.AsNoTracking()
                 .Where(r => userIds.Contains(r.UserId))
                 .ToListAsync(cancellationToken);
         }

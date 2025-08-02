@@ -8,7 +8,7 @@ public class GetStaffInvitationsQueryHandler(IAppDbContext context) : IRequestHa
 
     public async Task<Result<List<StaffInvitationDto>>> HandleAsync(GetStaffInvitationsQuery request, CancellationToken cancellationToken)
     {
-        var staffRequests = await _context.StaffInvitation
+        var staffRequests = await _context.StaffInvitation.AsNoTracking()
             .Include(sr => sr.RequestedByAppUser)
             .Include(sr => sr.AcceptedByAppUser)
             .OrderByDescending(sr => sr.Created)

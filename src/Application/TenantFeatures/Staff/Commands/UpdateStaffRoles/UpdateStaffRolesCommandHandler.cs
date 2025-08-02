@@ -9,7 +9,7 @@ public class UpdateStaffRolesCommandHandler(IAppDbContext context, IUserProfileS
 
     public async Task<Result<bool>> HandleAsync(UpdateStaffRolesCommand request, CancellationToken cancellationToken)
     {
-        var user = await _context.AppUser
+        var user = await _context.AppUser.AsNoTracking()
             .SingleAsync(u => u.Id == request.StaffId, cancellationToken);
 
         var existingRoles = await _context.UserRole

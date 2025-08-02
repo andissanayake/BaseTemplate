@@ -16,12 +16,10 @@ import { apiClient } from "../../common/apiClient";
 import { useStaffStore } from "./staffStore";
 import { StaffMemberDto } from "./StaffModel";
 import StaffRoleEdit from "./StaffRoleEdit";
-import { useAuthStore } from "../../auth/authStore";
 
 const { Title } = Typography;
 
 const StaffList: React.FC = () => {
-  const { tenant } = useAuthStore();
   const {
     staffMembers,
     loading,
@@ -34,7 +32,7 @@ const StaffList: React.FC = () => {
   const [selectedStaff, setSelectedStaff] = useState<StaffMemberDto | null>(
     null
   );
-  if (!tenant?.id) throw new Error("Tenant ID is required");
+
   const loadStaffMembers = async () => {
     setLoading(true);
     apiClient.get<StaffMemberDto[]>("/api/staff", {
@@ -55,7 +53,7 @@ const StaffList: React.FC = () => {
 
   useEffect(() => {
     loadStaffMembers();
-  }, [tenant?.id]);
+  }, []);
 
   const handleRemoveStaff = async (staffId: number) => {
     apiClient.delete<boolean>(`/api/staff/${staffId}`, undefined, {

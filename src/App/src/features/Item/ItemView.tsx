@@ -3,18 +3,15 @@ import { Card, Descriptions, Space, Tag, Typography, Button } from "antd";
 import { useParams, useNavigate } from "react-router-dom";
 import { useItemStore } from "./itemStore";
 import { apiClient } from "../../common/apiClient";
-import { useAuthStore } from "../../auth/authStore";
 import { Item } from "./ItemModel";
 import { notification } from "antd";
 
 const ItemView: React.FC = () => {
   const { setLoading } = useItemStore();
-  const { tenant } = useAuthStore();
   const navigate = useNavigate();
   const { itemId } = useParams();
 
   if (!itemId) throw new Error("itemId is required");
-  if (!tenant?.id) throw new Error("Tenant ID is required");
 
   const [item, setItem] = React.useState<Item | null>(null);
 
@@ -36,7 +33,7 @@ const ItemView: React.FC = () => {
       });
     };
     fetchItem();
-  }, [itemId, tenant?.id]);
+  }, [itemId]);
 
   if (!item) {
     return (

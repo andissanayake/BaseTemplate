@@ -13,15 +13,11 @@ import { useItemStore } from "./itemStore";
 import { useNavigate } from "react-router-dom";
 import { apiClient } from "../../common/apiClient";
 import { handleFormValidationErrors } from "../../common/formErrorHandler";
-import { useAuthStore } from "../../auth/authStore";
 
 const ItemCreate: React.FC = () => {
   const [form] = Form.useForm();
   const navigate = useNavigate();
   const { setLoading } = useItemStore();
-  const { tenant } = useAuthStore();
-
-  if (!tenant?.id) throw new Error("Tenant ID is required");
 
   const handleSaveItem = () => {
     form.validateFields().then(async (values) => {
@@ -31,7 +27,6 @@ const ItemCreate: React.FC = () => {
         {
           ...values,
           category: values.category?.join(",") || "",
-          tenantId: tenant.id,
         },
         {
           onSuccess: () => {

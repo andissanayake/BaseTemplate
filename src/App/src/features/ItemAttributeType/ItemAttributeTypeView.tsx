@@ -3,19 +3,16 @@ import { Card, Descriptions, Space, Tag, Typography, Button } from "antd";
 import { useParams, useNavigate } from "react-router-dom";
 import { useItemAttributeTypeStore } from "./itemAttributeTypeStore";
 import { apiClient } from "../../common/apiClient";
-import { useAuthStore } from "../../auth/authStore";
 import { ItemAttributeType } from "./ItemAttributeTypeModel";
 import { notification } from "antd";
 import ItemAttributeDashboard from "../ItemAttribute/ItemAttributeDashboard";
 
 const ItemAttributeTypeView: React.FC = () => {
   const { setLoading } = useItemAttributeTypeStore();
-  const { tenant } = useAuthStore();
   const navigate = useNavigate();
   const { itemAttributeTypeId } = useParams();
 
   if (!itemAttributeTypeId) throw new Error("itemAttributeTypeId is required");
-  if (!tenant?.id) throw new Error("Tenant ID is required");
 
   const [itemAttributeType, setItemAttributeType] =
     React.useState<ItemAttributeType | null>(null);
@@ -43,7 +40,7 @@ const ItemAttributeTypeView: React.FC = () => {
       );
     };
     fetchItemAttributeType();
-  }, [itemAttributeTypeId, tenant?.id]);
+  }, [itemAttributeTypeId]);
 
   if (!itemAttributeType) {
     return (

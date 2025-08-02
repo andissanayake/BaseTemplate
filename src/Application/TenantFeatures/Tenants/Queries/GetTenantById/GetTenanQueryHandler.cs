@@ -9,7 +9,7 @@ public class GetTenanQueryHandler(IAppDbContext context, IUserProfileService use
     public async Task<Result<GetTenantResponse>> HandleAsync(GetTenantQuery request, CancellationToken cancellationToken)
     {
         var userProfile = _userProfileService.UserProfile;
-        var entity = await _context.Tenant.SingleAsync(t => t.Id == userProfile.TenantId, cancellationToken);
+        var entity = await _context.Tenant.AsNoTracking().SingleAsync(t => t.Id == userProfile.TenantId, cancellationToken);
 
         var tenant = new GetTenantResponse { Name = entity.Name, Id = entity.Id, Address = entity.Address };
         return Result<GetTenantResponse>.Success(tenant);

@@ -28,7 +28,7 @@ const StaffRoleEdit: React.FC<StaffRoleEditProps> = ({
   onSuccess,
   onCancel,
 }) => {
-  const { tenant, roles } = useAuthStore();
+  const { roles } = useAuthStore();
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
 
@@ -40,8 +40,6 @@ const StaffRoleEdit: React.FC<StaffRoleEditProps> = ({
       ),
     [roles]
   );
-
-  if (!tenant?.id) throw new Error("Tenant ID is required");
 
   const handleSubmit = async (values: { newRoles: string[] }) => {
     setLoading(true);
