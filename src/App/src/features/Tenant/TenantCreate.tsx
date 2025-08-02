@@ -13,7 +13,7 @@ const TenantCreate: React.FC = () => {
   const handleSaveTenant = () => {
     form.validateFields().then(async (values) => {
       setLoading(true);
-      apiClient.post<number>("/api/tenants", values, {
+      apiClient.post<number>("/api/tenant", values, {
         onSuccess: (newTenantId) => {
           notification.success({ message: "Tenant created successfully!" });
           const newTenantData = { ...values, id: newTenantId };

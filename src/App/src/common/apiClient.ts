@@ -57,10 +57,11 @@ class ApiClient {
         const status = response.status;
         const data = response.data;
         const details = data?.details;
+        const message = data?.message;
         switch (status) {
           case 400:
             if (details) {
-              onValidationError?.(details);
+              onValidationError?.(details, message);
             }
             break;
           case 401:
@@ -79,7 +80,7 @@ class ApiClient {
             break;
           case 500:
             if (details) {
-              onServerError?.(details);
+              onServerError?.(details, message);
             }
             onServerError?.();
             break;

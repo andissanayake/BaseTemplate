@@ -3,10 +3,16 @@ import { ResultCodeMapper } from "./resultCodeMapper";
 
 export interface ResultHandlers<T> {
   onSuccess?: (data: T) => void;
-  onValidationError?: (details: Record<string, string[]>) => void;
+  onValidationError?: (
+    details: Record<string, string[]>,
+    message?: string
+  ) => void;
   onUnauthorized?: (details?: Record<string, string[]>) => void;
   onForbidden?: (details?: Record<string, string[]>) => void;
-  onServerError?: (details?: Record<string, string[]>) => void;
+  onServerError?: (
+    details?: Record<string, string[]>,
+    message?: string
+  ) => void;
   onFallback?: (result?: Result<T>) => void;
   onFinally?: () => void;
 }
@@ -33,7 +39,7 @@ export function handleResult<T>(
         break;
 
       case ResultCodeMapper.DefaultValidationErrorCode:
-        onValidationError(result.details ?? {});
+        onValidationError(result.details ?? {}, result.message);
         break;
 
       case ResultCodeMapper.DefaultUnauthorizedCode:
@@ -45,7 +51,7 @@ export function handleResult<T>(
         break;
 
       case ResultCodeMapper.DefaultServerErrorCode:
-        onServerError(result.details);
+        onServerError(result.details, result.message);
         break;
 
       default:

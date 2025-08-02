@@ -40,7 +40,7 @@ export const AppMenu = () => {
     const unsubscribe = onAuthStateChangedListener(async (user) => {
       if (user) {
         setUser(user);
-        apiClient.post<any>("/api/user/userDetails", undefined, {
+        apiClient.post<any>("/api/user/user-details", undefined, {
           onSuccess: (data) => {
             setRoles(data?.roles ?? []);
             setTenant(data?.tenant ?? null);
@@ -99,19 +99,41 @@ export const AppMenu = () => {
         });
         menuItems.push({
           key: "/tenants/view/staff-invitations",
-          label: <span>Staff Invitations</span>,
+          label: <span>Staff Invitation</span>,
           onClick: (e: any) => {
             handleClick(e.key);
           },
         });
         menuItems.push({
           key: "/tenants/view/staff",
-          label: <span>Staff Management</span>,
+          label: <span>Staff</span>,
           onClick: (e: any) => {
             handleClick(e.key);
           },
         });
       }
+
+      menuItems.push({
+        key: "/items",
+        label: "Item",
+        onClick: (e: any) => {
+          handleClick(e.key);
+        },
+      });
+      menuItems.push({
+        key: "/item-attribute-types",
+        label: "Attribute Type",
+        onClick: (e: any) => {
+          handleClick(e.key);
+        },
+      });
+      menuItems.push({
+        key: "/specifications",
+        label: "Specification",
+        onClick: (e: any) => {
+          handleClick(e.key);
+        },
+      });
 
       if (!tenant?.id && !staffInvitation?.id) {
         menuItems.push({

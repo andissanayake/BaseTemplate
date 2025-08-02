@@ -31,7 +31,7 @@ const SpecificationList: React.FC = () => {
   const loadSpecifications = useCallback(async () => {
     setLoading(true);
     apiClient.get<{ specifications: SpecificationModel[] }>(
-      "/api/specifications",
+      "/api/specification",
       {
         onSuccess: (data) => {
           setSpecifications(data?.specifications || []);
@@ -53,15 +53,15 @@ const SpecificationList: React.FC = () => {
 
   const handleDelete = async (id: number) => {
     setLoading(true);
-    apiClient.delete<boolean>(`/api/specifications/${id}`, undefined, {
+    apiClient.delete<boolean>(`/api/specification/${id}`, undefined, {
       onSuccess: () => {
         notification.success({
           message: "Specification deleted successfully!",
         });
         loadSpecifications();
       },
-      onValidationError: (error) => {
-        notification.error({ message: error.message });
+      onValidationError: (_error, message) => {
+        notification.error({ message: message });
       },
       onServerError: () => {
         notification.error({ message: "Failed to delete specification!" });

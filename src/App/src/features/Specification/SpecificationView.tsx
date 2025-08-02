@@ -30,20 +30,17 @@ const SpecificationView: React.FC = () => {
 
   const loadSpecification = () => {
     setLoading(true);
-    apiClient.get<SpecificationModel>(
-      `/api/specifications/${specificationId}`,
-      {
-        onSuccess: (data) => {
-          setSpecification(data);
-        },
-        onServerError: () => {
-          notification.error({ message: "Failed to load specification!" });
-        },
-        onFinally: () => {
-          setLoading(false);
-        },
-      }
-    );
+    apiClient.get<SpecificationModel>(`/api/specification/${specificationId}`, {
+      onSuccess: (data) => {
+        setSpecification(data);
+      },
+      onServerError: () => {
+        notification.error({ message: "Failed to load specification!" });
+      },
+      onFinally: () => {
+        setLoading(false);
+      },
+    });
   };
 
   if (loading) {

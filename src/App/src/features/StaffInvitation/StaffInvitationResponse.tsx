@@ -45,67 +45,59 @@ export const StaffInvitationResponse: React.FC = () => {
   const handleAccept = async () => {
     setLoading(true);
     const payload = {
-      StaffInvitationId: staffInvitation.id,
-      IsAccepted: true,
+      staffInvitationId: staffInvitation.id,
+      isAccepted: true,
     };
 
-    apiClient.post<boolean>(
-      `/api/tenants/staff-invitations/${staffInvitation.id}/respond`,
-      payload,
-      {
-        onSuccess: () => {
-          notification.success({
-            message: "Staff invitation accepted successfully!",
-            description: "You have been added to the tenant.",
-          });
-          // Clear the staff invitation from auth store
-          setStaffInvitation(null);
-          // Redirect to home page
-          navigate("/");
-          setCurrentTenant({
-            id: -1,
-            name: staffInvitation.tenantName,
-          });
-        },
-        onServerError: () => {
-          notification.error({ message: "Failed to accept staff invitation!" });
-        },
-        onFinally: () => {
-          setLoading(false);
-        },
-      }
-    );
+    apiClient.post<boolean>(`/api/staff-invitation/respond`, payload, {
+      onSuccess: () => {
+        notification.success({
+          message: "Staff invitation accepted successfully!",
+          description: "You have been added to the tenant.",
+        });
+        // Clear the staff invitation from auth store
+        setStaffInvitation(null);
+        // Redirect to home page
+        navigate("/");
+        setCurrentTenant({
+          id: -1,
+          name: staffInvitation.tenantName,
+        });
+      },
+      onServerError: () => {
+        notification.error({ message: "Failed to accept staff invitation!" });
+      },
+      onFinally: () => {
+        setLoading(false);
+      },
+    });
   };
 
   const handleReject = async (values: { rejectionReason: string }) => {
     setLoading(true);
     const payload = {
-      StaffInvitationId: staffInvitation.id,
-      IsAccepted: false,
-      RejectionReason: values.rejectionReason,
+      staffInvitationId: staffInvitation.id,
+      isAccepted: false,
+      rejectionReason: values.rejectionReason,
     };
 
-    apiClient.post<boolean>(
-      `/api/tenants/staff-invitations/${staffInvitation.id}/respond`,
-      payload,
-      {
-        onSuccess: () => {
-          notification.success({
-            message: "Staff invitation rejected successfully!",
-          });
-          // Clear the staff invitation from auth store
-          setStaffInvitation(null);
-          // Redirect to home page
-          navigate("/");
-        },
-        onServerError: () => {
-          notification.error({ message: "Failed to reject staff invitation!" });
-        },
-        onFinally: () => {
-          setLoading(false);
-        },
-      }
-    );
+    apiClient.post<boolean>(`/api/staff-invitation/respond`, payload, {
+      onSuccess: () => {
+        notification.success({
+          message: "Staff invitation rejected successfully!",
+        });
+        // Clear the staff invitation from auth store
+        setStaffInvitation(null);
+        // Redirect to home page
+        navigate("/");
+      },
+      onServerError: () => {
+        notification.error({ message: "Failed to reject staff invitation!" });
+      },
+      onFinally: () => {
+        setLoading(false);
+      },
+    });
   };
 
   const getStatusTag = (status: number) => {
@@ -129,7 +121,9 @@ export const StaffInvitationResponse: React.FC = () => {
     <Card>
       <Space direction="vertical" size="large" style={{ width: "100%" }}>
         <div>
-          <Title level={2}>Staff Invitation Response</Title>
+          <Title level={2}>
+            You have Invitation to join {staffInvitation.tenantName}
+          </Title>
           <Text type="secondary">
             You have a pending staff invitation that requires your response.
           </Text>

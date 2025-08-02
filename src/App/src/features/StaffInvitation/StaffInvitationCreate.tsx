@@ -48,7 +48,7 @@ const StaffInvitationCreate: React.FC<StaffInvitationCreateProps> = ({
       roles: values.roles,
     };
 
-    apiClient.post<boolean>("/api/tenants/staff-invitation", requestData, {
+    apiClient.post<boolean>("/api/staff-invitation", requestData, {
       onSuccess: () => {
         notification.success({
           message: "Staff invitation created successfully!",

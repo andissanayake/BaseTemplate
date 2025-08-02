@@ -47,7 +47,7 @@ const StaffRoleEdit: React.FC<StaffRoleEditProps> = ({
     setLoading(true);
 
     apiClient.put<boolean>(
-      `/api/tenants/staff/${staffMember.id}/roles`,
+      `/api/staff/roles`,
       {
         staffId: staffMember.id,
         newRoles: values.newRoles,

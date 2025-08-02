@@ -25,7 +25,7 @@ export const TenantView: React.FC = () => {
 
   useAsyncEffect(async () => {
     setLoading(true);
-    apiClient.get<Tenant>("/api/tenants", {
+    apiClient.get<Tenant>("/api/tenant", {
       onSuccess: (data) => {
         setCurrentTenant(data);
       },

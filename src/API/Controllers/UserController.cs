@@ -1,10 +1,11 @@
 ﻿using BaseTemplate.Application.Common.Models;
-using BaseTemplate.Application.Users.Queries.GetUser;
+using BaseTemplate.Application.GlobalFeatures.Users.Commands.GetUser;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BaseTemplate.API.Controllers;
 [Authorize]
+[Route("api/user")]
 public class UserController : ApiControllerBase
 {
     /// <summary>
@@ -28,9 +29,9 @@ public class UserController : ApiControllerBase
     ///   <li>Staff invitation information (if any)</li>
     /// </ul>
     /// </returns>
-    [HttpPost("userDetails")]
+    [HttpPost("user-details")]
     public async Task<ActionResult<Result<GetUserResponse>>> GetUser()
     {
-        return await SendAsync(new GetUserQuery());
+        return await SendAsync(new GetUserCommand());
     }
 }

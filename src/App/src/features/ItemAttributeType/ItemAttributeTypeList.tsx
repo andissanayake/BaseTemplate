@@ -40,7 +40,7 @@ const ItemAttributeTypeList: React.FC = () => {
 
   const loadItemAttributeTypes = useCallback(async () => {
     setLoading(true);
-    apiClient.get<ItemAttributeType[]>(`/api/itemAttributeTypes`, {
+    apiClient.get<ItemAttributeType[]>(`/api/item-attribute-type`, {
       onSuccess: (data) => {
         setTotalCount(data?.length || 0);
         setItemAttributeTypeList(data || []);
@@ -61,7 +61,7 @@ const ItemAttributeTypeList: React.FC = () => {
 
   const handleDelete = async (id: number) => {
     setLoading(true);
-    apiClient.delete<boolean>(`/api/itemAttributeTypes/${id}`, undefined, {
+    apiClient.delete<boolean>(`/api/item-attribute-type/${id}`, undefined, {
       onSuccess: () => {
         const newTotalCount = totalCount - 1;
         const lastPage = Math.ceil(newTotalCount / pageSize);

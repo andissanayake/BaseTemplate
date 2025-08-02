@@ -37,7 +37,7 @@ const StaffList: React.FC = () => {
   if (!tenant?.id) throw new Error("Tenant ID is required");
   const loadStaffMembers = async () => {
     setLoading(true);
-    apiClient.get<StaffMemberDto[]>("/api/tenants/staff", {
+    apiClient.get<StaffMemberDto[]>("/api/staff", {
       onSuccess: (data) => {
         setStaffMembers(data || []);
       },
@@ -58,7 +58,7 @@ const StaffList: React.FC = () => {
   }, [tenant?.id]);
 
   const handleRemoveStaff = async (staffId: number) => {
-    apiClient.delete<boolean>(`/api/tenants/staff/${staffId}`, undefined, {
+    apiClient.delete<boolean>(`/api/staff/${staffId}`, undefined, {
       onSuccess: () => {
         removeStaffMember(staffId.toString());
         message.success("Staff member removed successfully");
