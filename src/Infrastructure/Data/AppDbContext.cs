@@ -62,23 +62,17 @@ public class AppDbContext(DbContextOptions<AppDbContext> options, IUserProfileSe
     {
         base.OnModelCreating(builder);
 
+        // Combined query filters for soft delete and tenant isolation
         builder.Entity<AppUser>().HasQueryFilter(e => !e.IsDeleted);
         builder.Entity<UserRole>().HasQueryFilter(e => !e.IsDeleted);
         builder.Entity<Tenant>().HasQueryFilter(e => !e.IsDeleted);
-        builder.Entity<StaffInvitation>().HasQueryFilter(e => !e.IsDeleted);
-        builder.Entity<StaffInvitationRole>().HasQueryFilter(e => !e.IsDeleted);
-        builder.Entity<ItemAttributeType>().HasQueryFilter(e => !e.IsDeleted);
-        builder.Entity<ItemAttribute>().HasQueryFilter(e => !e.IsDeleted);
-        builder.Entity<Item>().HasQueryFilter(e => !e.IsDeleted);
-        builder.Entity<Specification>().HasQueryFilter(e => !e.IsDeleted);
 
-        builder.Entity<AppUser>().HasQueryFilter(e => e.TenantId == _profileService.UserProfile.TenantId);
-        builder.Entity<StaffInvitation>().HasQueryFilter(e => e.TenantId == _profileService.UserProfile.TenantId);
-        builder.Entity<StaffInvitationRole>().HasQueryFilter(e => e.TenantId == _profileService.UserProfile.TenantId);
-        builder.Entity<ItemAttributeType>().HasQueryFilter(e => e.TenantId == _profileService.UserProfile.TenantId);
-        builder.Entity<ItemAttribute>().HasQueryFilter(e => e.TenantId == _profileService.UserProfile.TenantId);
-        builder.Entity<Item>().HasQueryFilter(e => e.TenantId == _profileService.UserProfile.TenantId);
-        builder.Entity<Specification>().HasQueryFilter(e => e.TenantId == _profileService.UserProfile.TenantId);
+        builder.Entity<StaffInvitation>().HasQueryFilter(e => !e.IsDeleted && e.TenantId == _profileService.UserProfile.TenantId);
+        builder.Entity<StaffInvitationRole>().HasQueryFilter(e => !e.IsDeleted && e.TenantId == _profileService.UserProfile.TenantId);
+        builder.Entity<ItemAttributeType>().HasQueryFilter(e => !e.IsDeleted && e.TenantId == _profileService.UserProfile.TenantId);
+        builder.Entity<ItemAttribute>().HasQueryFilter(e => !e.IsDeleted && e.TenantId == _profileService.UserProfile.TenantId);
+        builder.Entity<Item>().HasQueryFilter(e => !e.IsDeleted && e.TenantId == _profileService.UserProfile.TenantId);
+        builder.Entity<Specification>().HasQueryFilter(e => !e.IsDeleted && e.TenantId == _profileService.UserProfile.TenantId);
     }
 
 

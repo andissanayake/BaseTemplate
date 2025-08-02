@@ -9,7 +9,6 @@ public class GetItemAttributeTypesQueryHandler(IAppDbContext context) : IRequest
     public async Task<Result<List<ItemAttributeTypeBriefDto>>> HandleAsync(GetItemAttributeTypesQuery request, CancellationToken cancellationToken)
     {
         var items = await _context.ItemAttributeType
-            .Where(at => at.IsActive)
             .OrderByDescending(at => at.Created)
             .Select(at => new ItemAttributeTypeBriefDto
             {
