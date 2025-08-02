@@ -28,6 +28,7 @@ import { LoginPage } from "./pages/LoginPage";
 import { LogoutPage } from "./pages/LogoutPage";
 import NoAccessPage from "./pages/NoAccessPage";
 import { ErrorBoundary } from "./layout/ErrorBoundary";
+import { Roles } from "./auth/RolesEnum";
 
 export const App = () => {
   return (
@@ -43,7 +44,10 @@ export const App = () => {
             <Route
               path="/items"
               element={
-                <ProtectedRoute policy={Policies.User}>
+                <ProtectedRoute
+                  policy={Policies.Role}
+                  roles={[Roles.ItemManager]}
+                >
                   <ItemListPage />
                 </ProtectedRoute>
               }
@@ -51,7 +55,10 @@ export const App = () => {
             <Route
               path="/items/create"
               element={
-                <ProtectedRoute policy={Policies.User}>
+                <ProtectedRoute
+                  policy={Policies.Role}
+                  roles={[Roles.ItemManager]}
+                >
                   <ItemCreatePage />
                 </ProtectedRoute>
               }
@@ -59,7 +66,10 @@ export const App = () => {
             <Route
               path="/items/edit/:itemId"
               element={
-                <ProtectedRoute policy={Policies.User}>
+                <ProtectedRoute
+                  policy={Policies.Role}
+                  roles={[Roles.ItemManager]}
+                >
                   <ItemEditPage />
                 </ProtectedRoute>
               }
@@ -67,7 +77,10 @@ export const App = () => {
             <Route
               path="/items/view/:itemId"
               element={
-                <ProtectedRoute policy={Policies.User}>
+                <ProtectedRoute
+                  policy={Policies.Role}
+                  roles={[Roles.ItemManager]}
+                >
                   <ItemViewPage />
                 </ProtectedRoute>
               }
@@ -76,7 +89,10 @@ export const App = () => {
             <Route
               path="/item-attribute-types"
               element={
-                <ProtectedRoute policy={Policies.User}>
+                <ProtectedRoute
+                  policy={Policies.Role}
+                  roles={[Roles.AttributeManager]}
+                >
                   <ItemAttributeTypeListPage />
                 </ProtectedRoute>
               }
@@ -84,7 +100,10 @@ export const App = () => {
             <Route
               path="/item-attribute-types/create"
               element={
-                <ProtectedRoute policy={Policies.User}>
+                <ProtectedRoute
+                  policy={Policies.Role}
+                  roles={[Roles.AttributeManager]}
+                >
                   <ItemAttributeTypeCreatePage />
                 </ProtectedRoute>
               }
@@ -92,7 +111,10 @@ export const App = () => {
             <Route
               path="/item-attribute-types/edit/:itemAttributeTypeId"
               element={
-                <ProtectedRoute policy={Policies.User}>
+                <ProtectedRoute
+                  policy={Policies.Role}
+                  roles={[Roles.AttributeManager]}
+                >
                   <ItemAttributeTypeEditPage />
                 </ProtectedRoute>
               }
@@ -100,7 +122,10 @@ export const App = () => {
             <Route
               path="/item-attribute-types/view/:itemAttributeTypeId"
               element={
-                <ProtectedRoute policy={Policies.User}>
+                <ProtectedRoute
+                  policy={Policies.Role}
+                  roles={[Roles.AttributeManager]}
+                >
                   <ItemAttributeTypeViewPage />
                 </ProtectedRoute>
               }
@@ -109,7 +134,10 @@ export const App = () => {
             <Route
               path="/specifications"
               element={
-                <ProtectedRoute policy={Policies.User}>
+                <ProtectedRoute
+                  policy={Policies.Role}
+                  roles={[Roles.SpecificationManager]}
+                >
                   <SpecificationListPage />
                 </ProtectedRoute>
               }
@@ -117,7 +145,10 @@ export const App = () => {
             <Route
               path="/specifications/create"
               element={
-                <ProtectedRoute policy={Policies.User}>
+                <ProtectedRoute
+                  policy={Policies.Role}
+                  roles={[Roles.SpecificationManager]}
+                >
                   <SpecificationCreatePage />
                 </ProtectedRoute>
               }
@@ -125,7 +156,10 @@ export const App = () => {
             <Route
               path="/specifications/edit/:specificationId"
               element={
-                <ProtectedRoute policy={Policies.User}>
+                <ProtectedRoute
+                  policy={Policies.Role}
+                  roles={[Roles.SpecificationManager]}
+                >
                   <SpecificationEditPage />
                 </ProtectedRoute>
               }
@@ -133,7 +167,10 @@ export const App = () => {
             <Route
               path="/specifications/view/:specificationId"
               element={
-                <ProtectedRoute policy={Policies.User}>
+                <ProtectedRoute
+                  policy={Policies.Role}
+                  roles={[Roles.SpecificationManager]}
+                >
                   <SpecificationViewPage />
                 </ProtectedRoute>
               }
@@ -142,7 +179,10 @@ export const App = () => {
             <Route
               path="/tenants/create"
               element={
-                <ProtectedRoute policy={Policies.User}>
+                <ProtectedRoute
+                  policy={Policies.Role}
+                  roles={[Roles.TenantManager]}
+                >
                   <TenantCreatePage />
                 </ProtectedRoute>
               }
@@ -150,7 +190,10 @@ export const App = () => {
             <Route
               path="/tenants/edit"
               element={
-                <ProtectedRoute policy={Policies.User}>
+                <ProtectedRoute
+                  policy={Policies.Role}
+                  roles={[Roles.TenantManager]}
+                >
                   <TenantEditPage />
                 </ProtectedRoute>
               }
@@ -158,7 +201,10 @@ export const App = () => {
             <Route
               path="/tenants/view"
               element={
-                <ProtectedRoute policy={Policies.User}>
+                <ProtectedRoute
+                  policy={Policies.Role}
+                  roles={[Roles.TenantManager]}
+                >
                   <TenantViewPage />
                 </ProtectedRoute>
               }
@@ -166,7 +212,10 @@ export const App = () => {
             <Route
               path="/tenants/view/staff-invitations"
               element={
-                <ProtectedRoute policy={Policies.User}>
+                <ProtectedRoute
+                  policy={Policies.Role}
+                  roles={[Roles.StaffInvitationManager]}
+                >
                   <StaffInvitationManagementPage />
                 </ProtectedRoute>
               }
@@ -182,7 +231,10 @@ export const App = () => {
             <Route
               path="/tenants/view/staff"
               element={
-                <ProtectedRoute policy={Policies.User}>
+                <ProtectedRoute
+                  policy={Policies.Role}
+                  roles={[Roles.StaffManager]}
+                >
                   <StaffManagementPage />
                 </ProtectedRoute>
               }

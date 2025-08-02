@@ -10,13 +10,15 @@ public abstract class Roles
     public const string StaffManager = nameof(StaffManager);
     public const string TenantManager = nameof(TenantManager);
     public const string AttributeManager = nameof(AttributeManager);
+    public const string SpecificationManager = nameof(SpecificationManager);
 
-    public static readonly List<string> TenantBaseRoles = new()
-    {
+    public static readonly List<string> TenantBaseRoles =
+    [
         ItemManager,
         StaffInvitationManager,
         StaffManager,
         TenantManager,
-        AttributeManager
-    };
+        AttributeManager,
+        SpecificationManager
+    ];
 }
