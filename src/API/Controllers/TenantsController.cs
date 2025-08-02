@@ -1,7 +1,7 @@
 ﻿using BaseTemplate.Application.Common.Models;
 using BaseTemplate.Application.GlobalFeatures.Tenants.Commands.CreateTenant;
-using BaseTemplate.Application.Staff.Commands.RemoveStaff;
 using BaseTemplate.Application.TenantFeatures.Staff.Commands.CreateStaffInvitation;
+using BaseTemplate.Application.TenantFeatures.Staff.Commands.RemoveStaff;
 using BaseTemplate.Application.TenantFeatures.Staff.Commands.RevokeStaffInvitation;
 using BaseTemplate.Application.TenantFeatures.Staff.Commands.UpdateStaffRoles;
 using BaseTemplate.Application.TenantFeatures.Staff.Queries.GetStaffInvitation;
@@ -268,8 +268,8 @@ public class TenantsController : ApiControllerBase
     ///   <li><c>bool</c>: Indicates success or failure</li>
     /// </ul>
     /// </remarks>
-    [HttpPut("staff/{staffId}/roles")]
-    public async Task<ActionResult<Result<bool>>> UpdateStaffRoles(int staffId, UpdateStaffRolesCommand command)
+    [HttpPut("staff/roles")]
+    public async Task<ActionResult<Result<bool>>> UpdateStaffRoles(UpdateStaffRolesCommand command)
     {
 
         return await SendAsync(command);

@@ -11,11 +11,13 @@ public class StaffInvitation : BaseTenantAuditableEntity
     public int? AcceptedByAppUserId { get; set; }
     public AppUser? AcceptedByAppUser { get; set; }
     public string? RejectionReason { get; set; }
+    public List<StaffInvitationRole> StaffInvitationRoles { get; set; } = [];
 }
 
 public class StaffInvitationRole : BaseTenantAuditableEntity
 {
     public int StaffInvitationId { get; set; }
+    public StaffInvitation StaffInvitation { get; set; } = default!;
     public string Role { get; set; } = string.Empty;
 }
 

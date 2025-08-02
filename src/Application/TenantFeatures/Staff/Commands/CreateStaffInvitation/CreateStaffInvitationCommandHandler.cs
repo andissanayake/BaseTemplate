@@ -22,8 +22,8 @@ public class CreateStaffInvitationCommandHandler(IAppDbContext context) : IReque
 
         // Check if the staff member already exists in the system
         var existingUser = await _context.AppUser
-            .FirstOrDefaultAsync(u => u.Email == request.StaffEmail, cancellationToken);
-        if (existingUser != null && existingUser.TenantId != null)
+            .FirstOrDefaultAsync(u => u.Email.Trim().ToLowerInvariant() == request.StaffEmail.Trim().ToLowerInvariant(), cancellationToken);
+        if (existingUser != null && existingUser.TenantId.HasValue)
         {
             return Result<bool>.Validation(
                 "User already exists in another tenant.",
@@ -34,10 +34,10 @@ public class CreateStaffInvitationCommandHandler(IAppDbContext context) : IReque
         }
 
         // Check if there's already a pending request for this email in this tenant
-        var existingRequest = await _context.StaffInvitation
-            .FirstOrDefaultAsync(r => r.RequestedEmail == request.StaffEmail && r.Status == StaffInvitationStatus.Pending, cancellationToken);
+        var existingInvitation = await _context.StaffInvitation.AsNoTracking()
+            .AnyAsync(r => r.RequestedEmail.Trim().ToLowerInvariant() == request.StaffEmail.Trim().ToLowerInvariant() && r.Status == StaffInvitationStatus.Pending, cancellationToken);
 
-        if (existingRequest != null)
+        if (existingInvitation)
         {
             return Result<bool>.Validation(
                 "Pending request already exists.",
@@ -47,19 +47,20 @@ public class CreateStaffInvitationCommandHandler(IAppDbContext context) : IReque
                 });
         }
 
-        var staffRequest = new StaffInvitation
+        var staffInvitation = new StaffInvitation
         {
             RequestedEmail = request.StaffEmail,
             RequestedName = request.StaffName,
-            Status = StaffInvitationStatus.Pending
+            Status = StaffInvitationStatus.Pending,
+            StaffInvitationRoles = [],
+
         };
-        _context.StaffInvitation.Add(staffRequest);
-        await _context.SaveChangesAsync(cancellationToken);
 
         // Add roles for the staff request
-        _context.StaffInvitationRole.AddRange(
-            request.Roles.Select(srr => new StaffInvitationRole() { StaffInvitationId = staffRequest.Id, Role = srr })
+        staffInvitation.StaffInvitationRoles.AddRange(
+            request.Roles.Select(srr => new StaffInvitationRole() { Role = srr })
             );
+        _context.StaffInvitation.Add(staffInvitation);
         await _context.SaveChangesAsync(cancellationToken);
         return Result<bool>.Success(true, $"Staff request for {request.StaffEmail} has been created successfully. The user will be notified to accept the invitation.");
     }

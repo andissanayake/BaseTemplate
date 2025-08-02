@@ -2,14 +2,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace BaseTemplate.Application.TenantFeatures.Staff.Queries.GetStaffInvitation;
 
-public class GetStaffInvitationsQueryHandler : IRequestHandler<GetStaffInvitationsQuery, List<StaffInvitationDto>>
+public class GetStaffInvitationsQueryHandler(IAppDbContext context) : IRequestHandler<GetStaffInvitationsQuery, List<StaffInvitationDto>>
 {
-    private readonly IAppDbContext _context;
-
-    public GetStaffInvitationsQueryHandler(IAppDbContext context)
-    {
-        _context = context;
-    }
+    private readonly IAppDbContext _context = context;
 
     public async Task<Result<List<StaffInvitationDto>>> HandleAsync(GetStaffInvitationsQuery request, CancellationToken cancellationToken)
     {
@@ -23,7 +18,7 @@ public class GetStaffInvitationsQueryHandler : IRequestHandler<GetStaffInvitatio
         var staffRequestIds = staffRequests.Select(sr => sr.Id).ToList();
         var roles = new List<StaffInvitationRole>();
 
-        if (staffRequestIds.Any())
+        if (staffRequestIds.Count != 0)
         {
             roles = await _context.StaffInvitationRole
                 .Where(r => staffRequestIds.Contains(r.StaffInvitationId))
@@ -42,10 +37,10 @@ public class GetStaffInvitationsQueryHandler : IRequestHandler<GetStaffInvitatio
                 Id = staffRequest.Id,
                 RequestedEmail = staffRequest.RequestedEmail,
                 RequestedName = staffRequest.RequestedName,
-                Roles = rolesByStaffRequestId.GetValueOrDefault(staffRequest.Id, new List<string>()),
+                Roles = rolesByStaffRequestId.GetValueOrDefault(staffRequest.Id, []),
                 RequestedByAppUserId = staffRequest.RequestedByAppUserId,
                 RequestedByAppUserName = staffRequest.RequestedByAppUser.Name ?? string.Empty,
-                RequestedByAppUserEmail = staffRequest.RequestedByAppUser.Email ?? string.Empty,
+                RequestedByAppUserEmail = staffRequest.RequestedByAppUser.Email,
                 Status = staffRequest.Status,
                 Created = staffRequest.Created,
                 AcceptedAt = staffRequest.AcceptedAt,
