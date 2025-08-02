@@ -1,4 +1,4 @@
-namespace BaseTemplate.Application.Staff.Queries.ListStaff;
+namespace BaseTemplate.Application.TenantFeatures.Staff.Queries.ListStaff;
 
 public class StaffMemberDto
 {

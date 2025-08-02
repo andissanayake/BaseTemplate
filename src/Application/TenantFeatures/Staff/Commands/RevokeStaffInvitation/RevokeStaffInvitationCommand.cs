@@ -1,4 +1,4 @@
-namespace BaseTemplate.Application.Staff.Commands.RevokeStaffInvitation;
+namespace BaseTemplate.Application.TenantFeatures.Staff.Commands.RevokeStaffInvitation;
 
 [Authorize(Roles = Roles.StaffInvitationManager)]
 public record RevokeStaffInvitationCommand : IRequest<bool>

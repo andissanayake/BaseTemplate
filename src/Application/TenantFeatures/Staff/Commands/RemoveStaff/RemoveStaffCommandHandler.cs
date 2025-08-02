@@ -1,6 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 
-namespace BaseTemplate.Application.Staff.Commands.RemoveStaff;
+namespace BaseTemplate.Application.TenantFeatures.Staff.Commands.RemoveStaff;
 
 public class RemoveStaffCommandHandler : IRequestHandler<RemoveStaffCommand, bool>
 {

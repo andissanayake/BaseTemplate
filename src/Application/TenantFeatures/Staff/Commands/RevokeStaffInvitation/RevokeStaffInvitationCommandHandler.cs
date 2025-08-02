@@ -1,5 +1,5 @@
 using Microsoft.EntityFrameworkCore;
-namespace BaseTemplate.Application.Staff.Commands.RevokeStaffInvitation;
+namespace BaseTemplate.Application.TenantFeatures.Staff.Commands.RevokeStaffInvitation;
 
 public class RevokeStaffInvitationCommandHandler : IRequestHandler<RevokeStaffInvitationCommand, bool>
 {

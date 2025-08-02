@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace BaseTemplate.Application.Staff.Commands.CreateStaffInvitation;
+namespace BaseTemplate.Application.TenantFeatures.Staff.Commands.CreateStaffInvitation;
 
 [Authorize(Roles = Domain.Constants.Roles.StaffInvitationManager)]
 public record CreateStaffInvitationCommand : IRequest<bool>
@@ -16,5 +16,5 @@ public record CreateStaffInvitationCommand : IRequest<bool>
 
     [Required]
     [MinLength(1, ErrorMessage = "At least one role must be selected.")]
-    public List<string> Roles { get; set; } = new();
+    public List<string> Roles { get; set; } = [];
 }

@@ -1,27 +1,22 @@
 using Microsoft.EntityFrameworkCore;
 
-namespace BaseTemplate.Application.Staff.Commands.CreateStaffInvitation;
+namespace BaseTemplate.Application.TenantFeatures.Staff.Commands.CreateStaffInvitation;
 
-public class CreateStaffInvitationCommandHandler : IRequestHandler<CreateStaffInvitationCommand, bool>
+public class CreateStaffInvitationCommandHandler(IAppDbContext context) : IRequestHandler<CreateStaffInvitationCommand, bool>
 {
-    private readonly IAppDbContext _context;
-
-    public CreateStaffInvitationCommandHandler(IAppDbContext context)
-    {
-        _context = context;
-    }
+    private readonly IAppDbContext _context = context;
 
     public async Task<Result<bool>> HandleAsync(CreateStaffInvitationCommand request, CancellationToken cancellationToken)
     {
         // Validate that only allowed roles can be requested
         var invalidRoles = request.Roles.Except(Roles.TenantBaseRoles, StringComparer.OrdinalIgnoreCase).ToList();
-        if (invalidRoles.Any())
+        if (invalidRoles.Count != 0)
         {
             return Result<bool>.Validation(
                 "Invalid roles selected.",
                 new Dictionary<string, string[]>
                 {
-                    ["Roles"] = new[] { $"The following roles are not allowed for staff requests: {string.Join(", ", invalidRoles)}. Allowed roles are: {string.Join(", ", Roles.TenantBaseRoles)}." }
+                    ["Roles"] = [$"The following roles are not allowed for staff requests: {string.Join(", ", invalidRoles)}. Allowed roles are: {string.Join(", ", Roles.TenantBaseRoles)}."]
                 });
         }
 
@@ -34,7 +29,7 @@ public class CreateStaffInvitationCommandHandler : IRequestHandler<CreateStaffIn
                 "User already exists in another tenant.",
                 new Dictionary<string, string[]>
                 {
-                    ["StaffEmail"] = new[] { $"User with email {request.StaffEmail} already exists in the system and belongs to another tenant." }
+                    ["StaffEmail"] = [$"User with email {request.StaffEmail} already exists in the system and belongs to another tenant."]
                 });
         }
 
@@ -48,7 +43,7 @@ public class CreateStaffInvitationCommandHandler : IRequestHandler<CreateStaffIn
                 "Pending request already exists.",
                 new Dictionary<string, string[]>
                 {
-                    ["StaffEmail"] = new[] { $"A pending staff request for {request.StaffEmail} already exists for this tenant." }
+                    ["StaffEmail"] = [$"A pending staff request for {request.StaffEmail} already exists for this tenant."]
                 });
         }
 
@@ -59,20 +54,12 @@ public class CreateStaffInvitationCommandHandler : IRequestHandler<CreateStaffIn
             Status = StaffInvitationStatus.Pending
         };
         _context.StaffInvitation.Add(staffRequest);
-
-        // Save the staff request first to get its ID
         await _context.SaveChangesAsync(cancellationToken);
 
         // Add roles for the staff request
-        foreach (var role in request.Roles)
-        {
-            var staffRequestRole = new StaffInvitationRole
-            {
-                StaffInvitationId = staffRequest.Id,
-                Role = role
-            };
-            _context.StaffInvitationRole.Add(staffRequestRole);
-        }
+        _context.StaffInvitationRole.AddRange(
+            request.Roles.Select(srr => new StaffInvitationRole() { StaffInvitationId = staffRequest.Id, Role = srr })
+            );
         await _context.SaveChangesAsync(cancellationToken);
         return Result<bool>.Success(true, $"Staff request for {request.StaffEmail} has been created successfully. The user will be notified to accept the invitation.");
     }

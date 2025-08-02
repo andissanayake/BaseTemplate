@@ -1,6 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 
-namespace BaseTemplate.Application.Staff.Queries.GetStaffMember;
+namespace BaseTemplate.Application.TenantFeatures.Staff.Queries.GetStaffMember;
 [Authorize(Roles = Roles.StaffManager)]
 public record GetStaffMemberQuery(int StaffId) : IRequest<StaffMemberDetailDto>;
 

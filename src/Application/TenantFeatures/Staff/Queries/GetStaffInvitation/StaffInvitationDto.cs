@@ -1,4 +1,4 @@
-namespace BaseTemplate.Application.Staff.Queries.GetStaffInvitation;
+namespace BaseTemplate.Application.TenantFeatures.Staff.Queries.GetStaffInvitation;
 
 public class StaffInvitationDto
 {

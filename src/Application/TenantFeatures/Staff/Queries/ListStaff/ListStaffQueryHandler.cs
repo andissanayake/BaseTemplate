@@ -1,6 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 
-namespace BaseTemplate.Application.Staff.Queries.ListStaff;
+namespace BaseTemplate.Application.TenantFeatures.Staff.Queries.ListStaff;
 
 public class ListStaffQueryHandler : IRequestHandler<ListStaffQuery, List<StaffMemberDto>>
 {

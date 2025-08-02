@@ -1,6 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 
-namespace BaseTemplate.Application.Staff.Queries.GetStaffInvitation;
+namespace BaseTemplate.Application.TenantFeatures.Staff.Queries.GetStaffInvitation;
 
 public class GetStaffInvitationsQueryHandler : IRequestHandler<GetStaffInvitationsQuery, List<StaffInvitationDto>>
 {

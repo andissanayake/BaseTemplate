@@ -1,6 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 
-namespace BaseTemplate.Application.Staff.Commands.UpdateStaffRoles;
+namespace BaseTemplate.Application.TenantFeatures.Staff.Commands.UpdateStaffRoles;
 
 public class UpdateStaffRolesCommandHandler : IRequestHandler<UpdateStaffRolesCommand, bool>
 {
