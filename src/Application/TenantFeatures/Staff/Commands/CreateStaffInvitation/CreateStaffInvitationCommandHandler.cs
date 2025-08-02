@@ -2,9 +2,11 @@ using Microsoft.EntityFrameworkCore;
 
 namespace BaseTemplate.Application.TenantFeatures.Staff.Commands.CreateStaffInvitation;
 
-public class CreateStaffInvitationCommandHandler(IAppDbContext context) : IRequestHandler<CreateStaffInvitationCommand, bool>
+public class CreateStaffInvitationCommandHandler(IAppDbContext context, IUserProfileService userProfileService) : IRequestHandler<CreateStaffInvitationCommand, bool>
 {
     private readonly IAppDbContext _context = context;
+    private readonly IUserProfileService _userProfileService = userProfileService;
+
 
     public async Task<Result<bool>> HandleAsync(CreateStaffInvitationCommand request, CancellationToken cancellationToken)
     {
@@ -22,7 +24,7 @@ public class CreateStaffInvitationCommandHandler(IAppDbContext context) : IReque
 
         // Check if the staff member already exists in the system
         var existingUser = await _context.AppUser
-            .FirstOrDefaultAsync(u => u.Email.Trim().ToLowerInvariant() == request.StaffEmail.Trim().ToLowerInvariant(), cancellationToken);
+            .FirstOrDefaultAsync(u => u.Email.Trim().ToLower() == request.StaffEmail.Trim().ToLower(), cancellationToken);
         if (existingUser != null && existingUser.TenantId.HasValue)
         {
             return Result<bool>.Validation(
@@ -35,7 +37,7 @@ public class CreateStaffInvitationCommandHandler(IAppDbContext context) : IReque
 
         // Check if there's already a pending request for this email in this tenant
         var existingInvitation = await _context.StaffInvitation.AsNoTracking()
-            .AnyAsync(r => r.RequestedEmail.Trim().ToLowerInvariant() == request.StaffEmail.Trim().ToLowerInvariant() && r.Status == StaffInvitationStatus.Pending, cancellationToken);
+            .AnyAsync(r => r.RequestedEmail.Trim().ToLower() == request.StaffEmail.Trim().ToLower() && r.Status == StaffInvitationStatus.Pending, cancellationToken);
 
         if (existingInvitation)
         {
@@ -53,6 +55,7 @@ public class CreateStaffInvitationCommandHandler(IAppDbContext context) : IReque
             RequestedName = request.StaffName,
             Status = StaffInvitationStatus.Pending,
             StaffInvitationRoles = [],
+            RequestedByAppUserId = _userProfileService.UserProfile.Id
 
         };
 

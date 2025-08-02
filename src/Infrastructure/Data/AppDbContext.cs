@@ -5,9 +5,8 @@ using Microsoft.EntityFrameworkCore;
 
 namespace BaseTemplate.Infrastructure.Data;
 
-public class BaseDbContext : DbContext, IBaseDbContext
+public class BaseDbContext(DbContextOptions<BaseDbContext> options) : DbContext(options), IBaseDbContext
 {
-    public BaseDbContext(DbContextOptions<BaseDbContext> options) : base(options) { }
     public DbSet<AppUser> AppUser { get; set; }
     public DbSet<UserRole> UserRole { get; set; }
     public DbSet<Tenant> Tenant { get; set; }
@@ -45,14 +44,9 @@ public class BaseDbContext : DbContext, IBaseDbContext
         return await base.SaveChangesAsync(cancellationToken);
     }
 }
-public class AppDbContext : DbContext, IAppDbContext
+public class AppDbContext(DbContextOptions<AppDbContext> options, IUserProfileService profileService) : DbContext(options), IAppDbContext
 {
-    private readonly IUserProfileService _profileService;
-
-    public AppDbContext(DbContextOptions<AppDbContext> options, IUserProfileService profileService) : base(options)
-    {
-        _profileService = profileService;
-    }
+    private readonly IUserProfileService _profileService = profileService;
 
     public DbSet<AppUser> AppUser { get; set; }
     public DbSet<UserRole> UserRole { get; set; }
@@ -90,20 +84,26 @@ public class AppDbContext : DbContext, IAppDbContext
 
     public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = new CancellationToken())
     {
-        foreach (var entry in ChangeTracker.Entries<BaseTenantAuditableEntity>())
+        foreach (var entry in ChangeTracker.Entries<BaseAuditableEntity>())
         {
             switch (entry.State)
             {
                 case EntityState.Added:
-                    entry.Entity.TenantId = _profileService.UserProfile.TenantId;
                     entry.Entity.CreatedBy = _profileService.UserProfile.Id;
                     entry.Entity.Created = DateTimeOffset.UtcNow;
+                    if (entry.Entity is BaseTenantAuditableEntity tenantCreateEntity)
+                    {
+                        tenantCreateEntity.TenantId = _profileService.UserProfile.TenantId;
+                    }
                     break;
 
                 case EntityState.Modified:
-                    entry.Entity.TenantId = _profileService.UserProfile.TenantId;
                     entry.Entity.LastModifiedBy = _profileService.UserProfile.Id;
                     entry.Entity.LastModified = DateTimeOffset.UtcNow;
+                    if (entry.Entity is BaseTenantAuditableEntity tenantEditEntity)
+                    {
+                        tenantEditEntity.TenantId = _profileService.UserProfile.TenantId;
+                    }
                     break;
             }
         }

@@ -25,7 +25,7 @@ const TenantEdit: React.FC = () => {
         address: values.address,
       };
       setLoading(true);
-      apiClient.put<boolean>("/api/tenants", payload, {
+      apiClient.put<boolean>("/api/tenant", payload, {
         onSuccess: () => {
           notification.success({ message: "Tenant updated successfully!" });
           setCurrentTenant({ ...currentTenant, ...payload });
@@ -50,7 +50,7 @@ const TenantEdit: React.FC = () => {
   useAsyncEffect(async () => {
     setLoading(true);
     form.resetFields();
-    apiClient.get<Tenant>("/api/tenants", {
+    apiClient.get<Tenant>("/api/tenant", {
       onSuccess: (data) => {
         if (data) {
           form.setFieldsValue(data);

@@ -40,7 +40,7 @@ export const AppMenu = () => {
     const unsubscribe = onAuthStateChangedListener(async (user) => {
       if (user) {
         setUser(user);
-        apiClient.post<any>("/api/user/userDetails", undefined, {
+        apiClient.post<any>("/api/user/user-details", undefined, {
           onSuccess: (data) => {
             setRoles(data?.roles ?? []);
             setTenant(data?.tenant ?? null);

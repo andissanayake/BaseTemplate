@@ -30,7 +30,7 @@ public class UserController : ApiControllerBase
     ///   <li>Staff invitation information (if any)</li>
     /// </ul>
     /// </returns>
-    [HttpPost("userDetails")]
+    [HttpPost("user-details")]
     public async Task<ActionResult<Result<GetUserResponse>>> GetUser()
     {
         return await SendAsync(new GetUserCommand());

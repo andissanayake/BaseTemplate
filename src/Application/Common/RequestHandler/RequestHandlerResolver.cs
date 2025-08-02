@@ -1,13 +1,8 @@
 namespace BaseTemplate.Application.Common.RequestHandler;
 
-public class RequestHandlerResolver : IRequestHandlerResolver
+public class RequestHandlerResolver(IServiceProvider provider) : IRequestHandlerResolver
 {
-    private readonly IServiceProvider _provider;
-
-    public RequestHandlerResolver(IServiceProvider provider)
-    {
-        _provider = provider;
-    }
+    private readonly IServiceProvider _provider = provider;
 
     public async Task<Result<TResponse>> ResolveAndExecuteAsync<TResponse>(IRequest<TResponse> request, Type requestType, CancellationToken cancellationToken)
     {
@@ -35,4 +30,4 @@ public class RequestHandlerResolver : IRequestHandlerResolver
             return Result<TResponse>.ServerError($"Handler execution failed: {ex.Message}");
         }
     }
-} 
+}

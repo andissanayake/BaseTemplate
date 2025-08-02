@@ -34,7 +34,7 @@ export const StaffInvitationList: React.FC = () => {
 
   const fetchStaffInvitations = async () => {
     setLoading(true);
-    apiClient.get<StaffInvitationDto[]>("/api/tenants/staff-invitation", {
+    apiClient.get<StaffInvitationDto[]>("/api/staff-invitation", {
       onSuccess: (data) => {
         setStaffInvitations(data || []);
       },
@@ -59,7 +59,7 @@ export const StaffInvitationList: React.FC = () => {
     if (!selectedInvitation) return;
     setLoading(true);
     apiClient.post<boolean>(
-      `/api/tenants/staff-invitations/${selectedInvitation.id}/revoke`,
+      `/api/staff-invitations/${selectedInvitation.id}/revoke`,
       {
         staffInvitationId: selectedInvitation.id,
         rejectionReason: values.rejectionReason,
