@@ -3,14 +3,14 @@ using BaseTemplate.Application.ItemAttributes.Commands.CreateItemAttribute;
 using BaseTemplate.Application.ItemAttributes.Commands.DeleteItemAttribute;
 using BaseTemplate.Application.ItemAttributes.Commands.UpdateItemAttribute;
 using BaseTemplate.Application.ItemAttributes.Queries.GetItemAttributeById;
-using BaseTemplate.Application.ItemAttributes.Queries.GetItemAttributes;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BaseTemplate.API.Controllers;
 
 [Authorize]
-public class ItemAttributesController : ApiControllerBase
+[Route("api/item-attribute")]
+public class ItemAttributeController : ApiControllerBase
 {
     /// <summary>
     /// Create a new item attribute.
@@ -86,8 +86,8 @@ public class ItemAttributesController : ApiControllerBase
     ///   <li><c>bool</c>: Indicates success or failure</li>
     /// </ul>
     /// </remarks>
-    [HttpPut("{id}")]
-    public async Task<ActionResult<Result<bool>>> Update(int id, [FromBody] UpdateItemAttributeCommand command)
+    [HttpPut]
+    public async Task<ActionResult<Result<bool>>> Update([FromBody] UpdateItemAttributeCommand command)
     {
         return await SendAsync(command);
     }
@@ -140,34 +140,5 @@ public class ItemAttributesController : ApiControllerBase
     public async Task<ActionResult<Result<ItemAttributeDto>>> GetById(int id)
     {
         return await SendAsync(new GetItemAttributeByIdQuery(id));
-    }
-
-    /// <summary>
-    /// Get all item attributes for a specific attribute type.
-    /// </summary>
-    /// <remarks>
-    /// <b>What this endpoint does:</b>
-    /// <ul>
-    ///   <li>Retrieves all item attributes belonging to a specific attribute type</li>
-    ///   <li>Validates that the attribute type belongs to the current user's tenant</li>
-    ///   <li>Returns only active attributes (where IsActive = true)</li>
-    ///   <li>Results are ordered by creation date (newest first)</li>
-    ///   <li>Requires AttributeManager role permission</li>
-    /// </ul>
-    /// <b>Response:</b>
-    /// <ul>
-    ///   <li><c>List&lt;ItemAttributeBriefDto&gt;</c>: List of item attributes with basic information including Id, Name, Code, Value, IsActive, ItemAttributeTypeId, ItemAttributeTypeName</li>
-    /// </ul>
-    /// </remarks>
-    [HttpGet("/api/itemAttributeType/{itemAttributeTypeId}/ItemAttribute")]
-    public async Task<ActionResult<Result<List<ItemAttributeBriefDto>>>> GetAll(
-        [FromQuery] int itemAttributeTypeId)
-    {
-        var query = new GetItemAttributesQuery
-        {
-            ItemAttributeTypeId = itemAttributeTypeId
-        };
-
-        return await SendAsync(query);
     }
 }

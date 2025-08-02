@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace BaseTemplate.API.Controllers;
 [Authorize]
+[Route("api/user")]
 public class UserController : ApiControllerBase
 {
     /// <summary>

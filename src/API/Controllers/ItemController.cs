@@ -10,7 +10,8 @@ using Microsoft.AspNetCore.Mvc;
 namespace BaseTemplate.API.Controllers;
 
 [Authorize]
-public class ItemsController : ApiControllerBase
+[Route("api/item")]
+public class ItemController : ApiControllerBase
 {
     [HttpGet]
     public async Task<ActionResult<Result<PaginatedList<ItemBriefDto>>>> GetItemsWithPagination([FromQuery] GetItemsWithPaginationQuery query)
@@ -27,27 +28,12 @@ public class ItemsController : ApiControllerBase
     [HttpPost]
     public async Task<ActionResult<Result<int>>> Create(CreateItemCommand command)
     {
-        if (command == null)
-        {
-            return BadRequest(Result<int>.Validation("Command is required", []));
-        }
-
         return await SendAsync(command);
     }
 
-    [HttpPut("{id}")]
-    public async Task<ActionResult<Result<bool>>> Update(int id, UpdateItemCommand command)
+    [HttpPut]
+    public async Task<ActionResult<Result<bool>>> Update(UpdateItemCommand command)
     {
-        if (command == null)
-        {
-            return BadRequest(Result<bool>.Validation("Command is required", []));
-        }
-
-        if (id != command.Id)
-        {
-            return BadRequest(Result<bool>.Validation("ID mismatch", []));
-        }
-
         return await SendAsync(command);
     }
 

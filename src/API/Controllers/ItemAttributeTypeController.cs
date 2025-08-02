@@ -1,4 +1,5 @@
 using BaseTemplate.Application.Common.Models;
+using BaseTemplate.Application.ItemAttributes.Queries.GetItemAttributes;
 using BaseTemplate.Application.ItemAttributeTypes.Commands.CreateItemAttributeType;
 using BaseTemplate.Application.ItemAttributeTypes.Commands.DeleteItemAttributeType;
 using BaseTemplate.Application.ItemAttributeTypes.Commands.UpdateItemAttributeType;
@@ -10,7 +11,8 @@ using Microsoft.AspNetCore.Mvc;
 namespace BaseTemplate.API.Controllers;
 
 [Authorize]
-public class ItemAttributeTypesController : ApiControllerBase
+[Route("api/item-attribute-type")]
+public class ItemAttributeTypeController : ApiControllerBase
 {
     /// <summary>
     /// Get all item attribute types for the current tenant.
@@ -89,11 +91,6 @@ public class ItemAttributeTypesController : ApiControllerBase
     [HttpPost]
     public async Task<ActionResult<Result<int>>> Create(CreateItemAttributeTypeCommand command)
     {
-        if (command == null)
-        {
-            return BadRequest(Result<int>.Validation("Command is required", []));
-        }
-
         return await SendAsync(command);
     }
 
@@ -126,19 +123,9 @@ public class ItemAttributeTypesController : ApiControllerBase
     ///   <li><c>bool</c>: Indicates success or failure</li>
     /// </ul>
     /// </remarks>
-    [HttpPut("{id}")]
-    public async Task<ActionResult<Result<bool>>> Update(int id, UpdateItemAttributeTypeCommand command)
+    [HttpPut]
+    public async Task<ActionResult<Result<bool>>> Update(UpdateItemAttributeTypeCommand command)
     {
-        if (command == null)
-        {
-            return BadRequest(Result<bool>.Validation("Command is required", []));
-        }
-
-        if (id != command.Id)
-        {
-            return BadRequest(Result<bool>.Validation("ID mismatch", []));
-        }
-
         return await SendAsync(command);
     }
 
@@ -169,5 +156,33 @@ public class ItemAttributeTypesController : ApiControllerBase
     {
         var command = new DeleteItemAttributeTypeCommand { Id = id };
         return await SendAsync(command);
+    }
+    /// <summary>
+    /// Get all item attributes for a specific attribute type.
+    /// </summary>
+    /// <remarks>
+    /// <b>What this endpoint does:</b>
+    /// <ul>
+    ///   <li>Retrieves all item attributes belonging to a specific attribute type</li>
+    ///   <li>Validates that the attribute type belongs to the current user's tenant</li>
+    ///   <li>Returns only active attributes (where IsActive = true)</li>
+    ///   <li>Results are ordered by creation date (newest first)</li>
+    ///   <li>Requires AttributeManager role permission</li>
+    /// </ul>
+    /// <b>Response:</b>
+    /// <ul>
+    ///   <li><c>List&lt;ItemAttributeBriefDto&gt;</c>: List of item attributes with basic information including Id, Name, Code, Value, IsActive, ItemAttributeTypeId, ItemAttributeTypeName</li>
+    /// </ul>
+    /// </remarks>
+    [HttpGet("{id}/item-attribute")]
+    public async Task<ActionResult<Result<List<ItemAttributeBriefDto>>>> GetAll(
+        [FromRoute] int id)
+    {
+        var query = new GetItemAttributesQuery
+        {
+            ItemAttributeTypeId = id
+        };
+
+        return await SendAsync(query);
     }
 }

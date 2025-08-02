@@ -10,7 +10,8 @@ using Microsoft.AspNetCore.Mvc;
 namespace BaseTemplate.API.Controllers;
 
 [Authorize]
-public class SpecificationsController : ApiControllerBase
+[Route("api/specification")]
+public class SpecificationController : ApiControllerBase
 {
     /// <summary>
     /// Get all root specifications for the current tenant with their children
@@ -41,33 +42,17 @@ public class SpecificationsController : ApiControllerBase
     [HttpPost]
     public async Task<ActionResult<Result<int>>> CreateSpecification(CreateSpecificationCommand command)
     {
-        if (command == null)
-        {
-            return BadRequest(Result<int>.Validation("Command is required", []));
-        }
-
         return await SendAsync(command);
     }
 
     /// <summary>
     /// Update an existing specification
     /// </summary>
-    /// <param name="id">Specification ID</param>
     /// <param name="command">Update specification command</param>
     /// <returns>Success status</returns>
-    [HttpPut("{id}")]
-    public async Task<ActionResult<Result<bool>>> UpdateSpecification(int id, UpdateSpecificationCommand command)
+    [HttpPut]
+    public async Task<ActionResult<Result<bool>>> UpdateSpecification(UpdateSpecificationCommand command)
     {
-        if (command == null)
-        {
-            return BadRequest(Result<bool>.Validation("Command is required", []));
-        }
-
-        if (id != command.Id)
-        {
-            return BadRequest(Result<bool>.Validation("ID mismatch", []));
-        }
-
         return await SendAsync(command);
     }
 
@@ -81,4 +66,4 @@ public class SpecificationsController : ApiControllerBase
     {
         return await SendAsync(new DeleteSpecificationCommand(id));
     }
-} 
+}
