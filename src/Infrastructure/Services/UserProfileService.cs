@@ -3,30 +3,20 @@ using Microsoft.Extensions.Caching.Memory;
 
 namespace BaseTemplate.Infrastructure.Services
 {
-    public class UserProfileService : IUserProfileService
+    public class UserProfileService(IBaseDbContext context, IMemoryCache cache, IUser user) : IUserProfileService
     {
-        private readonly IBaseDbContext _context;
-        private readonly IMemoryCache _cache;
-        private readonly IUser _user;
+        private readonly IBaseDbContext _context = context;
+        private readonly IMemoryCache _cache = cache;
+        private readonly IUser _user = user;
         private UserProfile? _userProfile;
 
         public UserProfile UserProfile
         {
             get
             {
-                if (_userProfile == null)
-                {
-                    _userProfile = GetUserProfile();
-                }
+                _userProfile ??= GetUserProfile();
                 return _userProfile;
             }
-        }
-
-        public UserProfileService(IBaseDbContext context, IMemoryCache cache, IUser user)
-        {
-            _context = context;
-            _cache = cache;
-            _user = user;
         }
 
         private UserProfile GetUserProfile()

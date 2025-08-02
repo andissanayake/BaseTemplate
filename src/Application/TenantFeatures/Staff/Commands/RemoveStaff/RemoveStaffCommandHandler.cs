@@ -2,9 +2,10 @@ using Microsoft.EntityFrameworkCore;
 
 namespace BaseTemplate.Application.TenantFeatures.Staff.Commands.RemoveStaff;
 
-public class RemoveStaffCommandHandler(IAppDbContext context) : IRequestHandler<RemoveStaffCommand, bool>
+public class RemoveStaffCommandHandler(IAppDbContext context, IUserProfileService userProfileService) : IRequestHandler<RemoveStaffCommand, bool>
 {
     private readonly IAppDbContext _context = context;
+    private readonly IUserProfileService _userProfileService = userProfileService;
 
     public async Task<Result<bool>> HandleAsync(RemoveStaffCommand request, CancellationToken cancellationToken)
     {
@@ -25,6 +26,7 @@ public class RemoveStaffCommandHandler(IAppDbContext context) : IRequestHandler<
             .SingleAsync(cancellationToken);
         staffRequest.Status = StaffInvitationStatus.Expired;
         await _context.SaveChangesAsync(cancellationToken);
+        await _userProfileService.InvalidateUserProfileCacheAsync(user.SsoId);
         return Result<bool>.Success(true);
     }
 }
