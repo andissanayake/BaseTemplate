@@ -12,6 +12,7 @@ import { apiClient } from "../../common/apiClient";
 import { handleFormValidationErrors } from "../../common/formErrorHandler";
 import { CreateStaffInvitationRequest } from "./StaffInvitationModel";
 import { Roles } from "../../auth/RolesEnum";
+import { useAuthStore } from "../../auth/authStore";
 
 interface StaffInvitationCreateProps {
   visible: boolean;
@@ -26,14 +27,11 @@ const StaffInvitationCreate: React.FC<StaffInvitationCreateProps> = ({
 }) => {
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
-
-  const availableRoles = Object.values(Roles).filter((role) =>
-    [
-      Roles.TenantManager,
-      Roles.StaffManager,
-      Roles.StaffInvitationManager,
-      Roles.ItemManager,
-    ].includes(role)
+  const { roles } = useAuthStore();
+  // Available roles - you can customize this based on your application
+  const availableRoles = React.useMemo(
+    () => roles.filter((role) => role !== Roles.TenantOwner),
+    [roles]
   );
 
   const handleCreateInvitation = async (values: {

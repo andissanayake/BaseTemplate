@@ -36,7 +36,7 @@ const ItemList: React.FC = () => {
   const loadItems = useCallback(async () => {
     setLoading(true);
     apiClient.get<{ items: Item[]; totalCount: number }>(
-      `/api/items?PageNumber=${currentPage}&PageSize=${pageSize}`,
+      `/api/item?PageNumber=${currentPage}&PageSize=${pageSize}`,
       {
         onSuccess: (data) => {
           setTotalCount(data?.totalCount || 0);
@@ -59,7 +59,7 @@ const ItemList: React.FC = () => {
 
   const handleDelete = async (id: number) => {
     setLoading(true);
-    apiClient.delete<boolean>(`/api/items/${id}`, undefined, {
+    apiClient.delete<boolean>(`/api/item/${id}`, undefined, {
       onSuccess: () => {
         const newTotalCount = totalCount - 1;
         const lastPage = Math.ceil(newTotalCount / pageSize);

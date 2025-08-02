@@ -34,10 +34,7 @@ const StaffRoleEdit: React.FC<StaffRoleEditProps> = ({
 
   // Available roles - you can customize this based on your application
   const availableRoles = React.useMemo(
-    () =>
-      roles.filter(
-        (role) => role !== Roles.Administrator && role !== Roles.TenantOwner
-      ),
+    () => roles.filter((role) => role !== Roles.TenantOwner),
     [roles]
   );
 

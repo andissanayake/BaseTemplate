@@ -18,7 +18,7 @@ const ItemView: React.FC = () => {
   useEffect(() => {
     const fetchItem = async () => {
       setLoading(true);
-      apiClient.get<Item>(`/api/items/${itemId}`, {
+      apiClient.get<Item>(`/api/item/${itemId}`, {
         onSuccess: (data) => {
           if (data) {
             setItem(data);

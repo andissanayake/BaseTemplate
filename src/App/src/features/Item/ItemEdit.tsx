@@ -29,7 +29,7 @@ const ItemEdit: React.FC = () => {
       values.id = +itemId;
       values.category = values.category?.join(",") || "";
       setLoading(true);
-      apiClient.put<boolean>(`/api/items/${values.id}`, values, {
+      apiClient.put<boolean>(`/api/item`, values, {
         onSuccess: () => {
           notification.success({
             message: "Item updated successfully!",
@@ -55,7 +55,7 @@ const ItemEdit: React.FC = () => {
   useAsyncEffect(async () => {
     form.resetFields();
     setLoading(true);
-    apiClient.get<Item>(`/api/items/${itemId}`, {
+    apiClient.get<Item>(`/api/item/${itemId}`, {
       onSuccess: (data) => {
         if (data) {
           form.setFieldsValue({
