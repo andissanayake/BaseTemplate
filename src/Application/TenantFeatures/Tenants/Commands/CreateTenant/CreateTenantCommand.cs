@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace BaseTemplate.Application.Tenants.Commands.CreateTenant;
+namespace BaseTemplate.Application.TenantFeatures.Tenants.Commands.CreateTenant;
 
 [Authorize]
 public record CreateTenantCommand : IRequest<int>

@@ -1,4 +1,4 @@
-namespace BaseTemplate.Application.Tenants.Queries.GetTenantById;
+namespace BaseTemplate.Application.TenantFeatures.Tenants.Queries.GetTenantById;
 
 public record GetTenantResponse
 {

@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace BaseTemplate.Application.Tenants.Commands.UpdateTenant;
+namespace BaseTemplate.Application.TenantFeatures.Tenants.Commands.UpdateTenant;
 
 [Authorize(Roles = Roles.TenantManager)]
 public record UpdateTenantCommand : IRequest<bool>

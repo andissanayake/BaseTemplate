@@ -1,15 +1,10 @@
 using Microsoft.EntityFrameworkCore;
-namespace BaseTemplate.Application.Tenants.Queries.GetTenantById;
+namespace BaseTemplate.Application.TenantFeatures.Tenants.Queries.GetTenantById;
 
-public class GetTenantByIdQueryHandler : IRequestHandler<GetTenantByIdQuery, GetTenantResponse>
+public class GetTenantByIdQueryHandler(IAppDbContext context, IUserProfileService userProfileService) : IRequestHandler<GetTenantByIdQuery, GetTenantResponse>
 {
-    private readonly IAppDbContext _context;
-    private readonly IUserProfileService _userProfileService;
-    public GetTenantByIdQueryHandler(IAppDbContext context, IUserProfileService userProfileService)
-    {
-        _context = context;
-        _userProfileService = userProfileService;
-    }
+    private readonly IAppDbContext _context = context;
+    private readonly IUserProfileService _userProfileService = userProfileService;
 
     public async Task<Result<GetTenantResponse>> HandleAsync(GetTenantByIdQuery request, CancellationToken cancellationToken)
     {

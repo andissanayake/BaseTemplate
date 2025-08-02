@@ -6,9 +6,9 @@ using BaseTemplate.Application.Staff.Commands.UpdateStaffRoles;
 using BaseTemplate.Application.Staff.Queries.GetStaffInvitation;
 using BaseTemplate.Application.Staff.Queries.GetStaffMember;
 using BaseTemplate.Application.Staff.Queries.ListStaff;
-using BaseTemplate.Application.Tenants.Commands.CreateTenant;
-using BaseTemplate.Application.Tenants.Commands.UpdateTenant;
-using BaseTemplate.Application.Tenants.Queries.GetTenantById;
+using BaseTemplate.Application.TenantFeatures.Tenants.Commands.CreateTenant;
+using BaseTemplate.Application.TenantFeatures.Tenants.Commands.UpdateTenant;
+using BaseTemplate.Application.TenantFeatures.Tenants.Queries.GetTenantById;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
