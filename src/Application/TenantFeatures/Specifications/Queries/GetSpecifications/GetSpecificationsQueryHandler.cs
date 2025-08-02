@@ -8,7 +8,7 @@ public class GetSpecificationsQueryHandler(IAppDbContext context) : IRequestHand
 
     public async Task<Result<GetSpecificationsResponse>> HandleAsync(GetSpecificationsQuery request, CancellationToken cancellationToken)
     {
-        var allSpecifications = await _context.Specification
+        var allSpecifications = await _context.Specification.AsNoTracking()
             .Select(s => new SpecificationBriefDto
             {
                 Id = s.Id,

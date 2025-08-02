@@ -18,7 +18,7 @@ public class DeleteSpecificationCommandHandler(IAppDbContext context) : IRequest
         if (hasChildren)
             return Result<bool>.Validation("Cannot delete specification that has child specifications.");
 
-        _context.Specification.Remove(specification);
+        specification.IsDeleted = true;
         await _context.SaveChangesAsync(cancellationToken);
         return Result<bool>.Success(true);
     }

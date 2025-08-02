@@ -8,7 +8,7 @@ public class GetItemsWithPaginationQueryHandler(IAppDbContext context) : IReques
 
     public async Task<Result<PaginatedList<ItemBriefDto>>> HandleAsync(GetItemsWithPaginationQuery request, CancellationToken cancellationToken)
     {
-        var query = _context.Item.AsQueryable();
+        var query = _context.Item.AsNoTracking().AsQueryable();
 
         if (!string.IsNullOrEmpty(request.Category))
             query = query.Where(i => i.Category == request.Category);

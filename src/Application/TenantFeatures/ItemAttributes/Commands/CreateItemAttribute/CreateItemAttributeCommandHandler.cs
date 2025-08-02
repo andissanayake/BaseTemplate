@@ -10,7 +10,7 @@ public class CreateItemAttributeCommandHandler(IAppDbContext context) : IRequest
     {
 
         // Check if code already exists for this tenant
-        var existingAttribute = await _context.ItemAttribute
+        var existingAttribute = await _context.ItemAttribute.AsNoTracking()
             .FirstOrDefaultAsync(a => a.Code == request.Code, cancellationToken);
 
         if (existingAttribute != null)

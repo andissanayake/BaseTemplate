@@ -17,7 +17,7 @@ public class UpdateItemAttributeCommandHandler : IRequestHandler<UpdateItemAttri
             .SingleAsync(a => a.Id == request.Id, cancellationToken);
 
         // Check if code already exists for this tenant (excluding current item)
-        var existingAttribute = await _context.ItemAttribute
+        var existingAttribute = await _context.ItemAttribute.AsNoTracking()
             .FirstOrDefaultAsync(a => a.Code == request.Code && a.Id != request.Id, cancellationToken);
 
         if (existingAttribute != null)

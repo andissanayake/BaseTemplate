@@ -8,7 +8,7 @@ public class GetItemAttributeByIdQueryHandler(IAppDbContext context) : IRequestH
 
     public async Task<Result<ItemAttributeDto>> HandleAsync(GetItemAttributeByIdQuery request, CancellationToken cancellationToken)
     {
-        var itemAttribute = await _context.ItemAttribute
+        var itemAttribute = await _context.ItemAttribute.AsNoTracking()
             .Where(ia => ia.Id == request.Id)
             .Include(ia => ia.ItemAttributeType)
             .Select(ia => new ItemAttributeDto
@@ -20,11 +20,8 @@ public class GetItemAttributeByIdQueryHandler(IAppDbContext context) : IRequestH
                 IsActive = ia.IsActive,
                 ItemAttributeTypeId = ia.ItemAttributeTypeId,
                 ItemAttributeTypeName = ia.ItemAttributeType!.Name
-            })
-            .FirstOrDefaultAsync(cancellationToken);
+            }).SingleAsync(cancellationToken);
 
-        return itemAttribute == null
-            ? Result<ItemAttributeDto>.NotFound($"ItemAttribute with id {request.Id} not found.")
-            : Result<ItemAttributeDto>.Success(itemAttribute);
+        return Result<ItemAttributeDto>.Success(itemAttribute);
     }
 }

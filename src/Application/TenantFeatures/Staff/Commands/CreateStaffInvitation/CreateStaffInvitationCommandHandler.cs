@@ -23,7 +23,7 @@ public class CreateStaffInvitationCommandHandler(IAppDbContext context, IUserPro
         }
 
         // Check if the staff member already exists in the system
-        var existingUser = await _context.AppUser
+        var existingUser = await _context.AppUser.AsNoTracking()
             .FirstOrDefaultAsync(u => u.Email.Trim().ToLower() == request.StaffEmail.Trim().ToLower(), cancellationToken);
         if (existingUser != null && existingUser.TenantId.HasValue)
         {

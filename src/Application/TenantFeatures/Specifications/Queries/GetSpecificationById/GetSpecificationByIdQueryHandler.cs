@@ -8,7 +8,7 @@ public class GetSpecificationByIdQueryHandler(IAppDbContext context) : IRequestH
 
     public async Task<Result<GetSpecificationByIdResponse>> HandleAsync(GetSpecificationByIdQuery request, CancellationToken cancellationToken)
     {
-        var specification = await _context.Specification
+        var specification = await _context.Specification.AsNoTracking()
             .Include(s => s.ParentSpecification)
             .SingleAsync(s => s.Id == request.Id, cancellationToken);
 

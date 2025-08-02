@@ -8,7 +8,7 @@ public class GetItemByIdQueryHandler(IAppDbContext context) : IRequestHandler<Ge
 
     public async Task<Result<ItemDto>> HandleAsync(GetItemByIdQuery request, CancellationToken cancellationToken)
     {
-        var entity = await _context.Item
+        var entity = await _context.Item.AsNoTracking()
             .SingleAsync(i => i.Id == request.Id, cancellationToken);
 
         var itemDto = new ItemDto
