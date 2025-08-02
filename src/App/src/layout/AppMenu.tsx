@@ -113,6 +113,28 @@ export const AppMenu = () => {
         });
       }
 
+      menuItems.push({
+        key: "/items",
+        label: "Item",
+        onClick: (e: any) => {
+          handleClick(e.key);
+        },
+      });
+      menuItems.push({
+        key: "/item-attribute-types",
+        label: "Attribute Type",
+        onClick: (e: any) => {
+          handleClick(e.key);
+        },
+      });
+      menuItems.push({
+        key: "/specifications",
+        label: "Specification",
+        onClick: (e: any) => {
+          handleClick(e.key);
+        },
+      });
+
       if (!tenant?.id && !staffInvitation?.id) {
         menuItems.push({
           key: "/tenants/create",

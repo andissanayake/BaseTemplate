@@ -1,4 +1,4 @@
-namespace BaseTemplate.Application.Specifications.Queries.GetSpecifications;
+namespace BaseTemplate.Application.TenantFeatures.Specifications.Queries.GetSpecifications;
 
 public record GetSpecificationsResponse
 {

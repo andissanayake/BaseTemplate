@@ -1,23 +1,15 @@
 using Microsoft.EntityFrameworkCore;
 
-namespace BaseTemplate.Application.Specifications.Commands.DeleteSpecification;
+namespace BaseTemplate.Application.TenantFeatures.Specifications.Commands.DeleteSpecification;
 
-public class DeleteSpecificationCommandHandler : IRequestHandler<DeleteSpecificationCommand, bool>
+public class DeleteSpecificationCommandHandler(IAppDbContext context) : IRequestHandler<DeleteSpecificationCommand, bool>
 {
-    private readonly IAppDbContext _context;
-
-    public DeleteSpecificationCommandHandler(IAppDbContext context)
-    {
-        _context = context;
-    }
+    private readonly IAppDbContext _context = context;
 
     public async Task<Result<bool>> HandleAsync(DeleteSpecificationCommand request, CancellationToken cancellationToken)
     {
         var specification = await _context.Specification
-            .FirstOrDefaultAsync(s => s.Id == request.Id, cancellationToken);
-
-        if (specification == null)
-            return Result<bool>.NotFound($"Specification with ID {request.Id} not found.");
+            .SingleAsync(s => s.Id == request.Id, cancellationToken);
 
         // Check if there are any child specifications
         var hasChildren = await _context.Specification
@@ -28,7 +20,6 @@ public class DeleteSpecificationCommandHandler : IRequestHandler<DeleteSpecifica
 
         _context.Specification.Remove(specification);
         await _context.SaveChangesAsync(cancellationToken);
-
         return Result<bool>.Success(true);
     }
 }

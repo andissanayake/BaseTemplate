@@ -1,5 +1,5 @@
 using BaseTemplate.Application.Common.RequestHandler;
 
-namespace BaseTemplate.Application.Specifications.Queries.GetSpecifications;
+namespace BaseTemplate.Application.TenantFeatures.Specifications.Queries.GetSpecifications;
 
 public record GetSpecificationsQuery : IRequest<GetSpecificationsResponse>; 

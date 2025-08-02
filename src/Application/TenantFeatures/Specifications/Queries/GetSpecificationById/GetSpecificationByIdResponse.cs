@@ -1,4 +1,4 @@
-namespace BaseTemplate.Application.Specifications.Queries.GetSpecificationById;
+namespace BaseTemplate.Application.TenantFeatures.Specifications.Queries.GetSpecificationById;
 
 public record GetSpecificationByIdResponse
 {

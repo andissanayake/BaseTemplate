@@ -1,6 +1,6 @@
 using BaseTemplate.Application.Common.RequestHandler;
 
-namespace BaseTemplate.Application.Specifications.Commands.UpdateSpecification;
+namespace BaseTemplate.Application.TenantFeatures.Specifications.Commands.UpdateSpecification;
 
 public record UpdateSpecificationCommand : IRequest<bool>
 {

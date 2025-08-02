@@ -1,21 +1,13 @@
-using BaseTemplate.Application.Common.Interfaces;
-using BaseTemplate.Application.Common.Models;
 using Microsoft.EntityFrameworkCore;
 
-namespace BaseTemplate.Application.Specifications.Queries.GetSpecifications;
+namespace BaseTemplate.Application.TenantFeatures.Specifications.Queries.GetSpecifications;
 
-public class GetSpecificationsQueryHandler : IRequestHandler<GetSpecificationsQuery, GetSpecificationsResponse>
+public class GetSpecificationsQueryHandler(IAppDbContext context) : IRequestHandler<GetSpecificationsQuery, GetSpecificationsResponse>
 {
-    private readonly IAppDbContext _context;
-
-    public GetSpecificationsQueryHandler(IAppDbContext context)
-    {
-        _context = context;
-    }
+    private readonly IAppDbContext _context = context;
 
     public async Task<Result<GetSpecificationsResponse>> HandleAsync(GetSpecificationsQuery request, CancellationToken cancellationToken)
     {
-        // Get all specifications for the tenant
         var allSpecifications = await _context.Specification
             .Select(s => new SpecificationBriefDto
             {
@@ -43,9 +35,9 @@ public class GetSpecificationsQueryHandler : IRequestHandler<GetSpecificationsQu
         // Build the hierarchical structure
         foreach (var spec in allSpecifications)
         {
-            if (spec.ParentSpecificationId.HasValue && specificationLookup.ContainsKey(spec.ParentSpecificationId.Value))
+            if (spec.ParentSpecificationId.HasValue && specificationLookup.TryGetValue(spec.ParentSpecificationId.Value, out SpecificationBriefDto? value))
             {
-                var parent = specificationLookup[spec.ParentSpecificationId.Value];
+                var parent = value;
                 parent.Children.Add(spec);
             }
         }
@@ -63,21 +55,19 @@ public class GetSpecificationsQueryHandler : IRequestHandler<GetSpecificationsQu
         var pathParts = new List<string>();
         var current = spec;
 
-        // Build path from current specification up to root
         while (current != null)
         {
             pathParts.Insert(0, current.Name);
-            
-            if (current.ParentSpecificationId.HasValue && lookup.ContainsKey(current.ParentSpecificationId.Value))
+
+            if (current.ParentSpecificationId.HasValue && lookup.TryGetValue(current.ParentSpecificationId.Value, out SpecificationBriefDto? value))
             {
-                current = lookup[current.ParentSpecificationId.Value];
+                current = value;
             }
             else
             {
                 break;
             }
         }
-
         return string.Join(" / ", pathParts);
     }
 }

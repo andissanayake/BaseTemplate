@@ -1,18 +1,12 @@
-namespace BaseTemplate.Application.Specifications.Commands.CreateSpecification;
+namespace BaseTemplate.Application.TenantFeatures.Specifications.Commands.CreateSpecification;
 
-public class CreateSpecificationCommandHandler : IRequestHandler<CreateSpecificationCommand, int>
+public class CreateSpecificationCommandHandler(IAppDbContext context) : IRequestHandler<CreateSpecificationCommand, int>
 {
-    private readonly IAppDbContext _context;
-
-    public CreateSpecificationCommandHandler(IAppDbContext context)
-    {
-        _context = context;
-    }
-
+    private readonly IAppDbContext _context = context;
     public async Task<Result<int>> HandleAsync(CreateSpecificationCommand request, CancellationToken cancellationToken)
     {
 
-        var specification = new Specification
+        var specification = new Specification()
         {
             Name = request.Name,
             Description = request.Description,

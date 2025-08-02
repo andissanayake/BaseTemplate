@@ -1,9 +1,9 @@
 using BaseTemplate.Application.Common.Models;
-using BaseTemplate.Application.Specifications.Commands.CreateSpecification;
-using BaseTemplate.Application.Specifications.Commands.DeleteSpecification;
-using BaseTemplate.Application.Specifications.Commands.UpdateSpecification;
-using BaseTemplate.Application.Specifications.Queries.GetSpecificationById;
-using BaseTemplate.Application.Specifications.Queries.GetSpecifications;
+using BaseTemplate.Application.TenantFeatures.Specifications.Commands.CreateSpecification;
+using BaseTemplate.Application.TenantFeatures.Specifications.Commands.DeleteSpecification;
+using BaseTemplate.Application.TenantFeatures.Specifications.Commands.UpdateSpecification;
+using BaseTemplate.Application.TenantFeatures.Specifications.Queries.GetSpecificationById;
+using BaseTemplate.Application.TenantFeatures.Specifications.Queries.GetSpecifications;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
