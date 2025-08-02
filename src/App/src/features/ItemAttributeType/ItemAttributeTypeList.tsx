@@ -18,11 +18,8 @@ import { useItemAttributeTypeStore } from "./itemAttributeTypeStore";
 import { ItemAttributeType } from "./ItemAttributeTypeModel";
 import { apiClient } from "../../common/apiClient";
 import { Link } from "react-router-dom";
-import { useAuthStore } from "../../auth/authStore";
 
 const ItemAttributeTypeList: React.FC = () => {
-  const { tenant } = useAuthStore();
-
   const {
     itemAttributeTypeList,
     loading,
@@ -35,8 +32,6 @@ const ItemAttributeTypeList: React.FC = () => {
     setItemAttributeTypeList,
     setCurrentPage,
   } = useItemAttributeTypeStore();
-
-  if (!tenant?.id) throw new Error("Tenant ID is required");
 
   const loadItemAttributeTypes = useCallback(async () => {
     setLoading(true);
@@ -53,7 +48,7 @@ const ItemAttributeTypeList: React.FC = () => {
         setLoading(false);
       },
     });
-  }, [setLoading, setTotalCount, setItemAttributeTypeList, tenant?.id]);
+  }, [setLoading, setTotalCount, setItemAttributeTypeList]);
 
   useEffect(() => {
     loadItemAttributeTypes();

@@ -18,11 +18,8 @@ import { useItemStore } from "./itemStore";
 import { Item } from "./ItemModel";
 import { apiClient } from "../../common/apiClient";
 import { Link } from "react-router-dom";
-import { useAuthStore } from "../../auth/authStore";
 
 const ItemList: React.FC = () => {
-  const { tenant } = useAuthStore();
-
   const {
     itemList,
     loading,
@@ -35,8 +32,6 @@ const ItemList: React.FC = () => {
     setItemList,
     setCurrentPage,
   } = useItemStore();
-
-  if (!tenant?.id) throw new Error("Tenant ID is required");
 
   const loadItems = useCallback(async () => {
     setLoading(true);
@@ -56,14 +51,7 @@ const ItemList: React.FC = () => {
         },
       }
     );
-  }, [
-    currentPage,
-    pageSize,
-    setLoading,
-    setTotalCount,
-    setItemList,
-    tenant?.id,
-  ]);
+  }, [currentPage, pageSize, setLoading, setTotalCount, setItemList]);
 
   useEffect(() => {
     loadItems();

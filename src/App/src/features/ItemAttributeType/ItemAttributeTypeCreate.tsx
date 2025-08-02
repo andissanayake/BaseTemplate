@@ -4,15 +4,11 @@ import { useItemAttributeTypeStore } from "./itemAttributeTypeStore";
 import { useNavigate } from "react-router-dom";
 import { apiClient } from "../../common/apiClient";
 import { handleFormValidationErrors } from "../../common/formErrorHandler";
-import { useAuthStore } from "../../auth/authStore";
 
 const ItemAttributeTypeCreate: React.FC = () => {
   const [form] = Form.useForm();
   const navigate = useNavigate();
   const { setLoading } = useItemAttributeTypeStore();
-  const { tenant } = useAuthStore();
-
-  if (!tenant?.id) throw new Error("Tenant ID is required");
 
   const handleSaveItemAttributeType = () => {
     form.validateFields().then(async (values) => {

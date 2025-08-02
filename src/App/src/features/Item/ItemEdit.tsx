@@ -14,23 +14,19 @@ import { useNavigate, useParams } from "react-router-dom";
 import { apiClient } from "../../common/apiClient";
 import { useAsyncEffect } from "../../common/useAsyncEffect";
 import { handleFormValidationErrors } from "../../common/formErrorHandler";
-import { useAuthStore } from "../../auth/authStore";
 import { Item } from "./ItemModel";
 
 const ItemEdit: React.FC = () => {
   const { setLoading } = useItemStore();
-  const { tenant } = useAuthStore();
   const [form] = Form.useForm();
   const navigate = useNavigate();
   const { itemId } = useParams();
 
   if (!itemId) throw new Error("itemId is required");
-  if (!tenant?.id) throw new Error("Tenant ID is required");
 
   const handleSaveItem = () => {
     form.validateFields().then(async (values) => {
       values.id = +itemId;
-      values.tenantId = +tenant.id;
       values.category = values.category?.join(",") || "";
       setLoading(true);
       apiClient.put<boolean>(`/api/items/${values.id}`, values, {
