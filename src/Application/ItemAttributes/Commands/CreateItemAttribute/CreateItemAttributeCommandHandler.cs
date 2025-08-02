@@ -2,14 +2,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace BaseTemplate.Application.ItemAttributes.Commands.CreateItemAttribute;
 
-public class CreateItemAttributeCommandHandler : IRequestHandler<CreateItemAttributeCommand, int>
+public class CreateItemAttributeCommandHandler(IAppDbContext context) : IRequestHandler<CreateItemAttributeCommand, int>
 {
-    private readonly IAppDbContext _context;
-
-    public CreateItemAttributeCommandHandler(IAppDbContext context)
-    {
-        _context = context;
-    }
+    private readonly IAppDbContext _context = context;
 
     public async Task<Result<int>> HandleAsync(CreateItemAttributeCommand request, CancellationToken cancellationToken)
     {
@@ -23,7 +18,7 @@ public class CreateItemAttributeCommandHandler : IRequestHandler<CreateItemAttri
             return Result<int>.Validation("Code must be unique within the tenant",
                                 new Dictionary<string, string[]>
                                 {
-                                    ["Code"] = new[] { $"Code must be unique within the tenant." }
+                                    ["Code"] = [$"Code must be unique within the tenant."]
                                 });
         }
 

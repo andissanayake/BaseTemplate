@@ -2,14 +2,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace BaseTemplate.Application.Items.Commands.UpdateItem;
 
-public class UpdateItemCommandHandler : IRequestHandler<UpdateItemCommand, bool>
+public class UpdateItemCommandHandler(IAppDbContext context) : IRequestHandler<UpdateItemCommand, bool>
 {
-    private readonly IAppDbContext _context;
-
-    public UpdateItemCommandHandler(IAppDbContext context)
-    {
-        _context = context;
-    }
+    private readonly IAppDbContext _context = context;
 
     public async Task<Result<bool>> HandleAsync(UpdateItemCommand request, CancellationToken cancellationToken)
     {

@@ -25,7 +25,7 @@ public class UpdateItemAttributeCommandHandler : IRequestHandler<UpdateItemAttri
             return Result<bool>.Validation("Code must be unique within the tenant",
                                                 new Dictionary<string, string[]>
                                                 {
-                                                    ["Code"] = new[] { $"Code must be unique within the tenant." }
+                                                    ["Code"] = [$"Code must be unique within the tenant."]
                                                 });
         }
 

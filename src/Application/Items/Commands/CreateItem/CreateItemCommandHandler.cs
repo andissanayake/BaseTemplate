@@ -1,12 +1,8 @@
 namespace BaseTemplate.Application.Items.Commands.CreateItem;
 
-public class CreateItemCommandHandler : IRequestHandler<CreateItemCommand, int>
+public class CreateItemCommandHandler(IAppDbContext context) : IRequestHandler<CreateItemCommand, int>
 {
-    private readonly IAppDbContext _context;
-    public CreateItemCommandHandler(IAppDbContext context)
-    {
-        _context = context;
-    }
+    private readonly IAppDbContext _context = context;
 
     public async Task<Result<int>> HandleAsync(CreateItemCommand request, CancellationToken cancellationToken)
     {
