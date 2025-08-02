@@ -8,7 +8,7 @@ public class RevokeStaffInvitationCommandHandler(IAppDbContext context) : IReque
     public async Task<Result<bool>> HandleAsync(RevokeStaffInvitationCommand request, CancellationToken cancellationToken)
     {
         var staffRequest = await _context.StaffInvitation
-            .SingleAsync(sr => sr.Id == request.StaffRequestId && sr.Status == StaffInvitationStatus.Pending, cancellationToken);
+            .SingleAsync(sr => sr.Id == request.StaffInvitationId && sr.Status == StaffInvitationStatus.Pending, cancellationToken);
 
         staffRequest.Status = StaffInvitationStatus.Revoked;
         staffRequest.RejectionReason = request.RejectionReason;

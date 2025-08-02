@@ -59,7 +59,7 @@ export const StaffInvitationList: React.FC = () => {
     if (!selectedInvitation) return;
     setLoading(true);
     apiClient.post<boolean>(
-      `/api/staff-invitations/${selectedInvitation.id}/revoke`,
+      `/api/staff-invitation/revoke`,
       {
         staffInvitationId: selectedInvitation.id,
         rejectionReason: values.rejectionReason,
