@@ -19,7 +19,7 @@ public class CreateTenantCommandHandler(IBaseDbContext context, IUser user, IUse
             Name = request.Name,
             Address = request.Address,
             OwnerId = existingUser.Id,
-            Created = existingUser.Created,
+            CreatedBy = existingUser.Id,
         };
         _context.Tenant.Add(tenant);
 
@@ -27,7 +27,8 @@ public class CreateTenantCommandHandler(IBaseDbContext context, IUser user, IUse
         var userRole = new UserRole
         {
             UserId = existingUser.Id,
-            Role = Roles.TenantOwner
+            Role = Roles.TenantOwner,
+            CreatedBy = existingUser.Id
         };
         _context.UserRole.Add(userRole);
         await _context.SaveChangesAsync(cancellationToken);

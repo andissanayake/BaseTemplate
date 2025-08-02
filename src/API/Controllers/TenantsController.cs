@@ -36,7 +36,7 @@ public class TenantsController : ApiControllerBase
     [HttpGet]
     public async Task<ActionResult<Result<GetTenantResponse>>> GetById()
     {
-        return await SendAsync(new GetTenantByIdQuery());
+        return await SendAsync(new GetTenantQuery());
     }
 
     /// <summary>
