@@ -33,7 +33,7 @@ const SpecificationCreate: React.FC = () => {
 
   const loadParentOptions = () => {
     apiClient.get<{ specifications: SpecificationModel[] }>(
-      "/api/specifications",
+      "/api/specification",
       {
         onSuccess: (data) => {
           if (data?.specifications) {
@@ -73,7 +73,7 @@ const SpecificationCreate: React.FC = () => {
 
   const onFinish = (values: SpecificationCreateModel) => {
     setLoading(true);
-    apiClient.post<number>("/api/specifications", values, {
+    apiClient.post<number>("/api/specification", values, {
       onSuccess: () => {
         notification.success({
           message: "Specification created successfully!",

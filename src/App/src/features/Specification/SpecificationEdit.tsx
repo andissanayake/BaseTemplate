@@ -36,30 +36,27 @@ const SpecificationEdit: React.FC = () => {
   }, [specificationId]);
 
   const loadSpecification = () => {
-    apiClient.get<SpecificationModel>(
-      `/api/specifications/${specificationId}`,
-      {
-        onSuccess: (data) => {
-          if (data) {
-            form.setFieldsValue({
-              name: data.name,
-              description: data.description,
-              parentSpecificationId: data.parentSpecificationId,
-            });
-          }
-          setInitialLoading(false);
-        },
-        onServerError: () => {
-          notification.error({ message: "Failed to load specification!" });
-          setInitialLoading(false);
-        },
-      }
-    );
+    apiClient.get<SpecificationModel>(`/api/specification/${specificationId}`, {
+      onSuccess: (data) => {
+        if (data) {
+          form.setFieldsValue({
+            name: data.name,
+            description: data.description,
+            parentSpecificationId: data.parentSpecificationId,
+          });
+        }
+        setInitialLoading(false);
+      },
+      onServerError: () => {
+        notification.error({ message: "Failed to load specification!" });
+        setInitialLoading(false);
+      },
+    });
   };
 
   const loadParentOptions = () => {
     apiClient.get<{ specifications: SpecificationModel[] }>(
-      "/api/specifications",
+      "/api/specification",
       {
         onSuccess: (data) => {
           if (data?.specifications) {
@@ -156,24 +153,20 @@ const SpecificationEdit: React.FC = () => {
       id: parseInt(specificationId),
     };
 
-    apiClient.put<boolean>(
-      `/api/specifications/${specificationId}`,
-      updateData,
-      {
-        onSuccess: () => {
-          notification.success({
-            message: "Specification updated successfully!",
-          });
-          navigate("/specifications");
-        },
-        onServerError: () => {
-          notification.error({ message: "Failed to update specification!" });
-        },
-        onFinally: () => {
-          setLoading(false);
-        },
-      }
-    );
+    apiClient.put<boolean>(`/api/specification`, updateData, {
+      onSuccess: () => {
+        notification.success({
+          message: "Specification updated successfully!",
+        });
+        navigate("/specifications");
+      },
+      onServerError: () => {
+        notification.error({ message: "Failed to update specification!" });
+      },
+      onFinally: () => {
+        setLoading(false);
+      },
+    });
   };
 
   if (initialLoading) {
