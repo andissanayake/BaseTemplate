@@ -99,14 +99,14 @@ export const AppMenu = () => {
         });
         menuItems.push({
           key: "/tenants/view/staff-invitations",
-          label: <span>Staff Invitations</span>,
+          label: <span>Staff Invitation</span>,
           onClick: (e: any) => {
             handleClick(e.key);
           },
         });
         menuItems.push({
           key: "/tenants/view/staff",
-          label: <span>Staff Management</span>,
+          label: <span>Staff</span>,
           onClick: (e: any) => {
             handleClick(e.key);
           },
