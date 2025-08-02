@@ -2,9 +2,10 @@ using Microsoft.EntityFrameworkCore;
 
 namespace BaseTemplate.Application.TenantFeatures.Staff.Commands.UpdateStaffRoles;
 
-public class UpdateStaffRolesCommandHandler(IAppDbContext context) : IRequestHandler<UpdateStaffRolesCommand, bool>
+public class UpdateStaffRolesCommandHandler(IAppDbContext context, IUserProfileService userProfileService) : IRequestHandler<UpdateStaffRolesCommand, bool>
 {
     private readonly IAppDbContext _context = context;
+    private readonly IUserProfileService _userProfileService = userProfileService;
 
     public async Task<Result<bool>> HandleAsync(UpdateStaffRolesCommand request, CancellationToken cancellationToken)
     {
@@ -43,6 +44,7 @@ public class UpdateStaffRolesCommandHandler(IAppDbContext context) : IRequestHan
             }
         }
         await _context.SaveChangesAsync(cancellationToken);
+        await _userProfileService.InvalidateUserProfileCacheAsync(user.SsoId);
         return Result<bool>.Success(true);
     }
 }
