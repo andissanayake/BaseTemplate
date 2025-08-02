@@ -1,10 +1,10 @@
 using Microsoft.EntityFrameworkCore;
 
-namespace BaseTemplate.Application.TenantFeatures.Tenants.Commands.CreateTenant;
+namespace BaseTemplate.Application.GlobalFeatures.Tenants.Commands.CreateTenant;
 
-public class CreateTenantCommandHandler(IAppDbContext context, IUser user, IUserProfileService userProfileService) : IRequestHandler<CreateTenantCommand, int>
+public class CreateTenantCommandHandler(IBaseDbContext context, IUser user, IUserProfileService userProfileService) : IRequestHandler<CreateTenantCommand, int>
 {
-    private readonly IAppDbContext _context = context;
+    private readonly IBaseDbContext _context = context;
     private readonly IUser _user = user;
     private readonly IUserProfileService _userProfileService = userProfileService;
 
@@ -18,7 +18,8 @@ public class CreateTenantCommandHandler(IAppDbContext context, IUser user, IUser
         {
             Name = request.Name,
             Address = request.Address,
-            OwnerId = existingUser.Id
+            OwnerId = existingUser.Id,
+            Created = existingUser.Created,
         };
         _context.Tenant.Add(tenant);
 

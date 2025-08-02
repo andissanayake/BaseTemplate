@@ -1,4 +1,5 @@
 ﻿using BaseTemplate.Application.Common.Models;
+using BaseTemplate.Application.GlobalFeatures.Tenants.Commands.CreateTenant;
 using BaseTemplate.Application.Staff.Commands.CreateStaffInvitation;
 using BaseTemplate.Application.Staff.Commands.RemoveStaff;
 using BaseTemplate.Application.Staff.Commands.RevokeStaffInvitation;
@@ -6,7 +7,6 @@ using BaseTemplate.Application.Staff.Commands.UpdateStaffRoles;
 using BaseTemplate.Application.Staff.Queries.GetStaffInvitation;
 using BaseTemplate.Application.Staff.Queries.GetStaffMember;
 using BaseTemplate.Application.Staff.Queries.ListStaff;
-using BaseTemplate.Application.TenantFeatures.Tenants.Commands.CreateTenant;
 using BaseTemplate.Application.TenantFeatures.Tenants.Commands.UpdateTenant;
 using BaseTemplate.Application.TenantFeatures.Tenants.Queries.GetTenantById;
 using Microsoft.AspNetCore.Authorization;
