@@ -1,4 +1,4 @@
-namespace BaseTemplate.Application.Users.Queries.GetUser;
+namespace BaseTemplate.Application.GlobalFeatures.Users.Commands.GetUser;
 
 public record TenantDetails
 {

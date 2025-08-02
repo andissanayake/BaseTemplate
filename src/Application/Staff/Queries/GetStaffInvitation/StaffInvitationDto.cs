@@ -9,7 +9,7 @@ public class StaffInvitationDto
     public int RequestedByAppUserId { get; set; }
     public string RequestedByAppUserName { get; set; } = string.Empty;
     public string RequestedByAppUserEmail { get; set; } = string.Empty;
-    public StaffRequestStatus Status { get; set; }
+    public StaffInvitationStatus Status { get; set; }
     public DateTimeOffset Created { get; set; }
     public DateTimeOffset? AcceptedAt { get; set; }
     public int? AcceptedByAppUserId { get; set; }

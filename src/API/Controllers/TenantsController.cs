@@ -1,7 +1,6 @@
 ﻿using BaseTemplate.Application.Common.Models;
 using BaseTemplate.Application.Staff.Commands.CreateStaffInvitation;
 using BaseTemplate.Application.Staff.Commands.RemoveStaff;
-using BaseTemplate.Application.Staff.Commands.RespondToStaffInvitation;
 using BaseTemplate.Application.Staff.Commands.RevokeStaffInvitation;
 using BaseTemplate.Application.Staff.Commands.UpdateStaffRoles;
 using BaseTemplate.Application.Staff.Queries.GetStaffInvitation;
@@ -172,43 +171,8 @@ public class TenantsController : ApiControllerBase
     ///   <li><c>bool</c>: Indicates success or failure</li>
     /// </ul>
     /// </remarks>
-    [HttpPost("staff-invitations/{staffInvitationId}/revoke")]
-    public async Task<ActionResult<Result<bool>>> RevokeStaffInvitation(int staffInvitationId, RevokeStaffInvitationCommand command)
-    {
-
-        return await SendAsync(command);
-    }
-
-    /// <summary>
-    /// Respond to a staff invitation (accept or reject) by the invited user.
-    /// </summary>
-    /// <remarks>
-    /// <b>What this endpoint does:</b>
-    /// <ul>
-    ///   <li>Allows the invited user to accept or reject a pending staff invitation.</li>
-    ///   <li>When accepting: Updates invitation status to accepted, sets acceptance timestamp, updates user's tenant association, and assigns the requested roles to the user.</li>
-    ///   <li>When rejecting: Updates invitation status to rejected and stores the rejection reason.</li>
-    ///   <li>Requires rejection reason when rejecting the invitation.</li>
-    ///   <li>Only works on invitations that are still in pending status.</li>
-    ///   <li>Invalidates user profile cache after successful acceptance.</li>
-    /// </ul>
-    /// <b>Request body:</b>
-    /// <ul>
-    ///   <li><c>StaffInvitationId</c> (int, required): ID of the staff invitation to respond to</li>
-    ///   <li><c>IsAccepted</c> (bool, required): Whether to accept or reject the invitation</li>
-    ///   <li><c>RejectionReason</c> (string, optional): Reason for rejection (required when rejecting)</li>
-    /// </ul>
-    /// <b>Response:</b>
-    /// <ul>
-    ///   <li><c>bool</c>: Indicates success or failure</li>
-    /// </ul>
-    /// </remarks>
-    [HttpPost("staff-invitations/{staffInvitationId}/respond")]
-    public async Task<ActionResult<Result<bool>>> RespondToStaffInvitation(int staffInvitationId, RespondToStaffInvitationCommand command)
-    {
-
-        return await SendAsync(command);
-    }
+    [HttpPost("staff-invitations/revoke")]
+    public async Task<ActionResult<Result<bool>>> RevokeStaffInvitation(RevokeStaffInvitationCommand command) => await SendAsync(command);
 
     // Staff Management Endpoints
     /// <summary>

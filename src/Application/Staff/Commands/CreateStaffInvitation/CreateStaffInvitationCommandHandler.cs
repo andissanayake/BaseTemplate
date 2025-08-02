@@ -40,7 +40,7 @@ public class CreateStaffInvitationCommandHandler : IRequestHandler<CreateStaffIn
 
         // Check if there's already a pending request for this email in this tenant
         var existingRequest = await _context.StaffInvitation
-            .FirstOrDefaultAsync(r => r.RequestedEmail == request.StaffEmail && r.Status == StaffRequestStatus.Pending, cancellationToken);
+            .FirstOrDefaultAsync(r => r.RequestedEmail == request.StaffEmail && r.Status == StaffInvitationStatus.Pending, cancellationToken);
 
         if (existingRequest != null)
         {
@@ -56,7 +56,7 @@ public class CreateStaffInvitationCommandHandler : IRequestHandler<CreateStaffIn
         {
             RequestedEmail = request.StaffEmail,
             RequestedName = request.StaffName,
-            Status = StaffRequestStatus.Pending
+            Status = StaffInvitationStatus.Pending
         };
         _context.StaffInvitation.Add(staffRequest);
 

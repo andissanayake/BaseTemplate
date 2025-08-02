@@ -27,9 +27,9 @@ public class RemoveStaffCommandHandler : IRequestHandler<RemoveStaffCommand, boo
         }
 
         var staffRequest = await _context.StaffInvitation
-            .Where(sr => sr.RequestedEmail == user.Email && sr.Status == StaffRequestStatus.Accepted)
+            .Where(sr => sr.RequestedEmail == user.Email && sr.Status == StaffInvitationStatus.Accepted)
             .SingleAsync(cancellationToken);
-        staffRequest.Status = StaffRequestStatus.Expired;
+        staffRequest.Status = StaffInvitationStatus.Expired;
 
         await _context.SaveChangesAsync(cancellationToken);
 

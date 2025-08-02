@@ -13,10 +13,10 @@ public class RevokeStaffInvitationCommandHandler : IRequestHandler<RevokeStaffIn
     public async Task<Result<bool>> HandleAsync(RevokeStaffInvitationCommand request, CancellationToken cancellationToken)
     {
         var staffRequest = await _context.StaffInvitation
-            .SingleAsync(sr => sr.Id == request.StaffRequestId && sr.Status == StaffRequestStatus.Pending, cancellationToken);
+            .SingleAsync(sr => sr.Id == request.StaffRequestId && sr.Status == StaffInvitationStatus.Pending, cancellationToken);
 
         // Reject the request
-        staffRequest.Status = StaffRequestStatus.Revoked;
+        staffRequest.Status = StaffInvitationStatus.Revoked;
         staffRequest.RejectionReason = request.RejectionReason;
         await _context.SaveChangesAsync(cancellationToken);
 

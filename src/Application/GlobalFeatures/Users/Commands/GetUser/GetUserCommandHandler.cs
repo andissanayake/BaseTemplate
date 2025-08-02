@@ -1,26 +1,18 @@
 using Microsoft.EntityFrameworkCore;
 
-namespace BaseTemplate.Application.Users.Queries.GetUser;
+namespace BaseTemplate.Application.GlobalFeatures.Users.Commands.GetUser;
 
-public class GetUserQueryHandler : IRequestHandler<GetUserQuery, GetUserResponse>
+public class GetUserCommandHandler(IBaseDbContext context, IUser user) : IRequestHandler<GetUserCommand, GetUserResponse>
 {
-    private readonly IUser _user;
-    private readonly IBaseDbContext _context;
+    private readonly IUser _user = user;
+    private readonly IBaseDbContext _context = context;
 
-    public GetUserQueryHandler(IBaseDbContext context, IUser user)
-    {
-        _context = context;
-        _user = user;
-    }
-
-    public async Task<Result<GetUserResponse>> HandleAsync(GetUserQuery request, CancellationToken cancellationToken)
+    public async Task<Result<GetUserResponse>> HandleAsync(GetUserCommand request, CancellationToken cancellationToken)
     {
         var response = new GetUserResponse();
-        // Try to load user entity
         var user = await _context.AppUser
             .FirstOrDefaultAsync(u => u.SsoId == _user.Identifier, cancellationToken);
 
-        // If not found, create user and use the new entity
         if (user == null)
         {
             user = new AppUser
@@ -41,23 +33,11 @@ public class GetUserQueryHandler : IRequestHandler<GetUserQuery, GetUserResponse
 
             response.Tenant = new TenantDetails() { Id = tenant.Id, Name = tenant.Name };
         }
-
-        var roles = await _context.UserRole
-            .Where(r => r.UserId == user.Id)
-            .Select(r => r.Role)
-            .ToListAsync(cancellationToken);
-        if (roles.Any(r => r == Roles.TenantOwner))
-        {
-            roles.AddRange(Roles.TenantBaseRoles);
-        }
-
-        response.Roles = roles;
-
-        if (!user.TenantId.HasValue)
+        else
         {
             var staffRequest = await _context.StaffInvitation
                 .Include(sr => sr.RequestedByAppUser)
-                .Where(sr => sr.RequestedEmail == _user.Email && sr.Status == StaffRequestStatus.Pending)
+                .Where(sr => sr.RequestedEmail == _user.Email && sr.Status == StaffInvitationStatus.Pending)
                 .OrderByDescending(sr => sr.Created)
                 .FirstOrDefaultAsync(cancellationToken);
 
@@ -73,7 +53,7 @@ public class GetUserQueryHandler : IRequestHandler<GetUserQuery, GetUserResponse
                     .Select(t => t.Name)
                     .SingleAsync(cancellationToken);
 
-                response.StaffRequest = new StaffRequestDetails
+                response.StaffInvitation = new StaffInvitationDetails
                 {
                     Id = staffRequest.Id,
                     RequesterName = staffRequest.RequestedByAppUser.Name!,
@@ -85,6 +65,17 @@ public class GetUserQueryHandler : IRequestHandler<GetUserQuery, GetUserResponse
                 };
             }
         }
+        var roles = await _context.UserRole
+            .Where(r => r.UserId == user.Id)
+            .Select(r => r.Role)
+            .ToListAsync(cancellationToken);
+
+        if (roles.Any(r => r == Roles.TenantOwner))
+        {
+            roles.AddRange(Roles.TenantBaseRoles);
+        }
+
+        response.Roles = roles;
 
         return Result<GetUserResponse>.Success(response);
     }

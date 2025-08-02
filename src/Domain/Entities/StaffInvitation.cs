@@ -6,7 +6,7 @@ public class StaffInvitation : BaseTenantAuditableEntity
     public string RequestedName { get; set; } = string.Empty;
     public int RequestedByAppUserId { get; set; }
     public AppUser RequestedByAppUser { get; set; } = null!;
-    public StaffRequestStatus Status { get; set; } = StaffRequestStatus.Pending;
+    public StaffInvitationStatus Status { get; set; } = StaffInvitationStatus.Pending;
     public DateTimeOffset? AcceptedAt { get; set; }
     public int? AcceptedByAppUserId { get; set; }
     public AppUser? AcceptedByAppUser { get; set; }
@@ -19,7 +19,7 @@ public class StaffInvitationRole : BaseTenantAuditableEntity
     public string Role { get; set; } = string.Empty;
 }
 
-public enum StaffRequestStatus
+public enum StaffInvitationStatus
 {
     Pending,
     Accepted,
