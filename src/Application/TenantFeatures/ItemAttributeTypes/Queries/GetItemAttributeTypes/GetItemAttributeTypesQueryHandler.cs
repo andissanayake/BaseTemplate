@@ -1,19 +1,15 @@
 using Microsoft.EntityFrameworkCore;
 
-namespace BaseTemplate.Application.ItemAttributeTypes.Queries.GetItemAttributeTypes;
+namespace BaseTemplate.Application.TenantFeatures.ItemAttributeTypes.Queries.GetItemAttributeTypes;
 
-public class GetItemAttributeTypesQueryHandler : IRequestHandler<GetItemAttributeTypesQuery, List<ItemAttributeTypeBriefDto>>
+public class GetItemAttributeTypesQueryHandler(IAppDbContext context) : IRequestHandler<GetItemAttributeTypesQuery, List<ItemAttributeTypeBriefDto>>
 {
-    private readonly IAppDbContext _context;
-
-    public GetItemAttributeTypesQueryHandler(IAppDbContext context)
-    {
-        _context = context;
-    }
+    private readonly IAppDbContext _context = context;
 
     public async Task<Result<List<ItemAttributeTypeBriefDto>>> HandleAsync(GetItemAttributeTypesQuery request, CancellationToken cancellationToken)
     {
         var items = await _context.ItemAttributeType
+            .Where(at => at.IsActive)
             .OrderByDescending(at => at.Created)
             .Select(at => new ItemAttributeTypeBriefDto
             {
@@ -26,4 +22,4 @@ public class GetItemAttributeTypesQueryHandler : IRequestHandler<GetItemAttribut
 
         return Result<List<ItemAttributeTypeBriefDto>>.Success(items);
     }
-} 
+}

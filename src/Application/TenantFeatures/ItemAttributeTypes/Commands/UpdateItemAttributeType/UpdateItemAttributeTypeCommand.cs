@@ -1,4 +1,4 @@
-namespace BaseTemplate.Application.ItemAttributeTypes.Commands.UpdateItemAttributeType;
+namespace BaseTemplate.Application.TenantFeatures.ItemAttributeTypes.Commands.UpdateItemAttributeType;
 
 [Authorize(Roles = Roles.AttributeManager)]
 public class UpdateItemAttributeTypeCommand : IRequest<bool>

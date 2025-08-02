@@ -24,7 +24,7 @@ const ItemAttributeTypeView: React.FC = () => {
     const fetchItemAttributeType = async () => {
       setLoading(true);
       apiClient.get<ItemAttributeType>(
-        `/api/itemAttributeTypes/${itemAttributeTypeId}`,
+        `/api/item-attribute-type/${itemAttributeTypeId}`,
         {
           onSuccess: (data) => {
             if (data) {

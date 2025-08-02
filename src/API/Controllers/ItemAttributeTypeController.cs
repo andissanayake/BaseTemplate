@@ -1,10 +1,10 @@
 using BaseTemplate.Application.Common.Models;
 using BaseTemplate.Application.ItemAttributes.Queries.GetItemAttributes;
-using BaseTemplate.Application.ItemAttributeTypes.Commands.CreateItemAttributeType;
-using BaseTemplate.Application.ItemAttributeTypes.Commands.DeleteItemAttributeType;
-using BaseTemplate.Application.ItemAttributeTypes.Commands.UpdateItemAttributeType;
-using BaseTemplate.Application.ItemAttributeTypes.Queries.GetItemAttributeTypeById;
-using BaseTemplate.Application.ItemAttributeTypes.Queries.GetItemAttributeTypes;
+using BaseTemplate.Application.TenantFeatures.ItemAttributeTypes.Commands.CreateItemAttributeType;
+using BaseTemplate.Application.TenantFeatures.ItemAttributeTypes.Commands.DeleteItemAttributeType;
+using BaseTemplate.Application.TenantFeatures.ItemAttributeTypes.Commands.UpdateItemAttributeType;
+using BaseTemplate.Application.TenantFeatures.ItemAttributeTypes.Queries.GetItemAttributeTypeById;
+using BaseTemplate.Application.TenantFeatures.ItemAttributeTypes.Queries.GetItemAttributeTypes;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 

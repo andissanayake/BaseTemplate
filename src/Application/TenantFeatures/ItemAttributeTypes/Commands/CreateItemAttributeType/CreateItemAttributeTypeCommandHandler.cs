@@ -1,4 +1,4 @@
-namespace BaseTemplate.Application.ItemAttributeTypes.Commands.CreateItemAttributeType;
+namespace BaseTemplate.Application.TenantFeatures.ItemAttributeTypes.Commands.CreateItemAttributeType;
 
 public class CreateItemAttributeTypeCommandHandler(IAppDbContext context) : IRequestHandler<CreateItemAttributeTypeCommand, int>
 {

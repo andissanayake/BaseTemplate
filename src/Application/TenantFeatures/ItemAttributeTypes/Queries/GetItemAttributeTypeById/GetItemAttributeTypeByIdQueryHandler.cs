@@ -1,15 +1,10 @@
 using Microsoft.EntityFrameworkCore;
 
-namespace BaseTemplate.Application.ItemAttributeTypes.Queries.GetItemAttributeTypeById;
+namespace BaseTemplate.Application.TenantFeatures.ItemAttributeTypes.Queries.GetItemAttributeTypeById;
 
-public class GetItemAttributeTypeByIdQueryHandler : IRequestHandler<GetItemAttributeTypeByIdQuery, ItemAttributeTypeDto>
+public class GetItemAttributeTypeByIdQueryHandler(IAppDbContext context) : IRequestHandler<GetItemAttributeTypeByIdQuery, ItemAttributeTypeDto>
 {
-    private readonly IAppDbContext _context;
-
-    public GetItemAttributeTypeByIdQueryHandler(IAppDbContext context)
-    {
-        _context = context;
-    }
+    private readonly IAppDbContext _context = context;
 
     public async Task<Result<ItemAttributeTypeDto>> HandleAsync(GetItemAttributeTypeByIdQuery request, CancellationToken cancellationToken)
     {
@@ -23,7 +18,6 @@ public class GetItemAttributeTypeByIdQueryHandler : IRequestHandler<GetItemAttri
             Description = itemAttributeType.Description,
             IsActive = itemAttributeType.IsActive
         };
-
         return Result<ItemAttributeTypeDto>.Success(dto);
     }
 }

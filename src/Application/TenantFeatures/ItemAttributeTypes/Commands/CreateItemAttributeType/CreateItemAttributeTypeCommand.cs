@@ -1,4 +1,4 @@
-namespace BaseTemplate.Application.ItemAttributeTypes.Commands.CreateItemAttributeType;
+namespace BaseTemplate.Application.TenantFeatures.ItemAttributeTypes.Commands.CreateItemAttributeType;
 
 [Authorize(Roles = Roles.AttributeManager)]
 public class CreateItemAttributeTypeCommand : IRequest<int>

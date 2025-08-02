@@ -1,6 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 
-namespace BaseTemplate.Application.ItemAttributeTypes.Commands.UpdateItemAttributeType;
+namespace BaseTemplate.Application.TenantFeatures.ItemAttributeTypes.Commands.UpdateItemAttributeType;
 
 public class UpdateItemAttributeTypeCommandHandler(IAppDbContext context) : IRequestHandler<UpdateItemAttributeTypeCommand, bool>
 {
@@ -15,7 +15,6 @@ public class UpdateItemAttributeTypeCommandHandler(IAppDbContext context) : IReq
         itemAttributeType.Name = request.Name;
         itemAttributeType.Description = request.Description;
         itemAttributeType.IsActive = true;
-
         await _context.SaveChangesAsync(cancellationToken);
         return Result<bool>.Success(true);
     }

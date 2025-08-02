@@ -22,7 +22,7 @@ const ItemAttributeTypeEdit: React.FC = () => {
     form.validateFields().then(async (values) => {
       values.id = +itemAttributeTypeId;
       setLoading(true);
-      apiClient.put<boolean>(`/api/itemAttributeTypes/${values.id}`, values, {
+      apiClient.put<boolean>(`/api/item-attribute-type/${values.id}`, values, {
         onSuccess: () => {
           notification.success({
             message: "Item attribute type updated successfully!",

@@ -18,7 +18,7 @@ const ItemAttributeTypeCreate: React.FC = () => {
     form.validateFields().then(async (values) => {
       setLoading(true);
       apiClient.post<number>(
-        `/api/itemAttributeTypes`,
+        `/api/item-attribute-type`,
         {
           ...values,
         },

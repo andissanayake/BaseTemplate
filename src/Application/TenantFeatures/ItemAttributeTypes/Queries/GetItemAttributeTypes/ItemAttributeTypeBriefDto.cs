@@ -1,4 +1,4 @@
-namespace BaseTemplate.Application.ItemAttributeTypes.Queries.GetItemAttributeTypes;
+namespace BaseTemplate.Application.TenantFeatures.ItemAttributeTypes.Queries.GetItemAttributeTypes;
 
 public class ItemAttributeTypeBriefDto
 {
