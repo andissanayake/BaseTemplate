@@ -1,31 +1,32 @@
 import React from "react";
 import { Form, Input, notification, Button, Space, Typography } from "antd";
-import { useItemAttributeTypeStore } from "./itemAttributeTypeStore";
+import { useCharacteristicTypeStore } from "./characteristicTypeStore";
 import { useNavigate, useParams } from "react-router-dom";
 import { apiClient } from "../../common/apiClient";
 import { useAsyncEffect } from "../../common/useAsyncEffect";
 import { handleFormValidationErrors } from "../../common/formErrorHandler";
-import { ItemAttributeType } from "./ItemAttributeTypeModel";
+import { CharacteristicType } from "./CharacteristicTypeModel";
 
-const ItemAttributeTypeEdit: React.FC = () => {
-  const { setLoading } = useItemAttributeTypeStore();
+const CharacteristicTypeEdit: React.FC = () => {
+  const { setLoading } = useCharacteristicTypeStore();
 
   const [form] = Form.useForm();
   const navigate = useNavigate();
-  const { itemAttributeTypeId } = useParams();
+  const { characteristicTypeId } = useParams();
 
-  if (!itemAttributeTypeId) throw new Error("itemAttributeTypeId is required");
+  if (!characteristicTypeId)
+    throw new Error("characteristicTypeId is required");
 
-  const handleSaveItemAttributeType = () => {
+  const handleSaveCharacteristicType = () => {
     form.validateFields().then(async (values) => {
-      values.id = +itemAttributeTypeId;
+      values.id = +characteristicTypeId;
       setLoading(true);
-      apiClient.put<boolean>(`/api/item-attribute-type`, values, {
+      apiClient.put<boolean>(`/api/characteristic-type`, values, {
         onSuccess: () => {
           notification.success({
-            message: "Item attribute type updated successfully!",
+            message: "Characteristic type updated successfully!",
           });
-          navigate(`/item-attribute-types`);
+          navigate(`/characteristic-types`);
         },
         onValidationError: (updateErrors) => {
           handleFormValidationErrors({
@@ -35,7 +36,7 @@ const ItemAttributeTypeEdit: React.FC = () => {
         },
         onServerError: () => {
           notification.error({
-            message: "Failed to save item attribute type!",
+            message: "Failed to save characteristic type!",
           });
         },
         onFinally: () => {
@@ -48,8 +49,8 @@ const ItemAttributeTypeEdit: React.FC = () => {
   useAsyncEffect(async () => {
     form.resetFields();
     setLoading(true);
-    apiClient.get<ItemAttributeType>(
-      `/api/item-attribute-type/${itemAttributeTypeId}`,
+    apiClient.get<CharacteristicType>(
+      `/api/characteristic-type/${characteristicTypeId}`,
       {
         onSuccess: (data) => {
           if (data) {
@@ -60,7 +61,7 @@ const ItemAttributeTypeEdit: React.FC = () => {
         },
         onServerError: () => {
           notification.error({
-            message: "Failed to fetch item attribute type!",
+            message: "Failed to fetch characteristic type!",
           });
         },
         onFinally: () => {
@@ -68,19 +69,19 @@ const ItemAttributeTypeEdit: React.FC = () => {
         },
       }
     );
-  }, [itemAttributeTypeId, form]);
+  }, [characteristicTypeId, form]);
 
   return (
     <>
       <Space className="mb-4">
         <Typography.Title level={3} style={{ margin: 0 }}>
-          Edit Item Attribute Type
+          Edit Characteristic Type
         </Typography.Title>
       </Space>
       <Form
         form={form}
         layout="vertical"
-        onFinish={handleSaveItemAttributeType}
+        onFinish={handleSaveCharacteristicType}
       >
         <Form.Item
           label="Name"
@@ -88,15 +89,15 @@ const ItemAttributeTypeEdit: React.FC = () => {
           rules={[
             {
               required: true,
-              message: "Please enter the attribute type name!",
+              message: "Please enter the characteristic type name!",
             },
           ]}
         >
-          <Input placeholder="Enter attribute type name" />
+          <Input placeholder="Enter characteristic type name" />
         </Form.Item>
 
         <Form.Item label="Description" name="description">
-          <Input.TextArea placeholder="Enter attribute type description" />
+          <Input.TextArea placeholder="Enter characteristic type description" />
         </Form.Item>
 
         <Form.Item>
@@ -106,7 +107,7 @@ const ItemAttributeTypeEdit: React.FC = () => {
             </Button>
             <Button
               type="default"
-              onClick={() => navigate(`/item-attribute-types`)}
+              onClick={() => navigate(`/characteristic-types`)}
             >
               Cancel
             </Button>
@@ -117,4 +118,4 @@ const ItemAttributeTypeEdit: React.FC = () => {
   );
 };
 
-export default ItemAttributeTypeEdit;
+export default CharacteristicTypeEdit;

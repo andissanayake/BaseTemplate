@@ -1,4 +1,4 @@
-export interface ItemAttributeType {
+export interface CharacteristicType {
   id: number;
   name: string;
   description?: string;

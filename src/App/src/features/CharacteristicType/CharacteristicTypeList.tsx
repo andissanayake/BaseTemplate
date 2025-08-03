@@ -14,14 +14,14 @@ import {
   PlusOutlined,
   EyeOutlined,
 } from "@ant-design/icons";
-import { useItemAttributeTypeStore } from "./itemAttributeTypeStore";
-import { ItemAttributeType } from "./ItemAttributeTypeModel";
+import { useCharacteristicTypeStore } from "./characteristicTypeStore";
+import { CharacteristicType } from "./CharacteristicTypeModel";
 import { apiClient } from "../../common/apiClient";
 import { Link } from "react-router-dom";
 
-const ItemAttributeTypeList: React.FC = () => {
+const CharacteristicTypeList: React.FC = () => {
   const {
-    itemAttributeTypeList,
+    characteristicTypeList,
     loading,
     totalCount,
     currentPage,
@@ -29,34 +29,34 @@ const ItemAttributeTypeList: React.FC = () => {
     setPagination,
     setLoading,
     setTotalCount,
-    setItemAttributeTypeList,
+    setCharacteristicTypeList,
     setCurrentPage,
-  } = useItemAttributeTypeStore();
+  } = useCharacteristicTypeStore();
 
-  const loadItemAttributeTypes = useCallback(async () => {
+  const loadCharacteristicTypes = useCallback(async () => {
     setLoading(true);
-    apiClient.get<ItemAttributeType[]>(`/api/item-attribute-type`, {
+    apiClient.get<CharacteristicType[]>(`/api/characteristic-type`, {
       onSuccess: (data) => {
         setTotalCount(data?.length || 0);
-        setItemAttributeTypeList(data || []);
+        setCharacteristicTypeList(data || []);
       },
       onServerError: () => {
-        setItemAttributeTypeList([]);
-        notification.error({ message: "Failed to load item attribute types!" });
+        setCharacteristicTypeList([]);
+        notification.error({ message: "Failed to load characteristic types!" });
       },
       onFinally: () => {
         setLoading(false);
       },
     });
-  }, [setLoading, setTotalCount, setItemAttributeTypeList]);
+  }, [setLoading, setTotalCount, setCharacteristicTypeList]);
 
   useEffect(() => {
-    loadItemAttributeTypes();
-  }, [loadItemAttributeTypes]);
+    loadCharacteristicTypes();
+  }, [loadCharacteristicTypes]);
 
   const handleDelete = async (id: number) => {
     setLoading(true);
-    apiClient.delete<boolean>(`/api/item-attribute-type/${id}`, undefined, {
+    apiClient.delete<boolean>(`/api/characteristic-type/${id}`, undefined, {
       onSuccess: () => {
         const newTotalCount = totalCount - 1;
         const lastPage = Math.ceil(newTotalCount / pageSize);
@@ -64,13 +64,13 @@ const ItemAttributeTypeList: React.FC = () => {
           setCurrentPage(lastPage);
         }
         notification.success({
-          message: "Item attribute type deleted successfully!",
+          message: "Characteristic type deleted successfully!",
         });
-        loadItemAttributeTypes();
+        loadCharacteristicTypes();
       },
       onServerError: () => {
         notification.error({
-          message: "Failed to delete item attribute type!",
+          message: "Failed to delete characteristic type!",
         });
       },
       onFinally: () => {
@@ -106,22 +106,22 @@ const ItemAttributeTypeList: React.FC = () => {
     },
     {
       title: "Actions",
-      render: (_: unknown, record: ItemAttributeType) => (
+      render: (_: unknown, record: CharacteristicType) => (
         <Space>
           <Link
-            to={`/item-attribute-types/view/${record.id}`}
+            to={`/characteristic-types/view/${record.id}`}
             rel="noopener noreferrer"
           >
             <Button type="link" icon={<EyeOutlined />} />
           </Link>
           <Link
-            to={`/item-attribute-types/edit/${record.id}`}
+            to={`/characteristic-types/edit/${record.id}`}
             rel="noopener noreferrer"
           >
             <Button type="link" icon={<EditOutlined />} />
           </Link>
           <Popconfirm
-            title="Are you sure to delete this item attribute type?"
+            title="Are you sure to delete this characteristic type?"
             onConfirm={() => handleDelete(record.id)}
           >
             <Button type="link" icon={<DeleteOutlined />} />
@@ -138,9 +138,9 @@ const ItemAttributeTypeList: React.FC = () => {
         style={{ width: "100%", justifyContent: "space-between" }}
       >
         <Typography.Title level={3} style={{ margin: 0 }}>
-          Item Attribute Types
+          Characteristic Types
         </Typography.Title>
-        <Link to={`/item-attribute-types/create`} rel="noopener noreferrer">
+        <Link to={`/characteristic-types/create`} rel="noopener noreferrer">
           <Button type="primary" icon={<PlusOutlined />}>
             Create
           </Button>
@@ -148,7 +148,7 @@ const ItemAttributeTypeList: React.FC = () => {
       </Space>
       <Table
         columns={columns}
-        dataSource={itemAttributeTypeList}
+        dataSource={characteristicTypeList}
         loading={loading}
         pagination={{
           current: currentPage,
@@ -162,4 +162,4 @@ const ItemAttributeTypeList: React.FC = () => {
   );
 };
 
-export default ItemAttributeTypeList;
+export default CharacteristicTypeList;

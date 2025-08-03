@@ -19,20 +19,20 @@ import {
   SaveOutlined,
   CloseOutlined,
 } from "@ant-design/icons";
-import { useItemAttributeStore } from "./itemAttributeStore";
+import { useCharacteristicStore } from "./characteristicStore";
 import {
-  ItemAttribute,
-  CreateItemAttributeRequest,
-} from "./ItemAttributeModel";
+  Characteristic,
+  CreateCharacteristicRequest,
+} from "./CharacteristicModel";
 import { apiClient } from "../../common/apiClient";
 import { handleFormValidationErrors } from "../../common/formErrorHandler";
 
-interface ItemAttributeDashboardProps {
-  itemAttributeTypeId: number;
+interface CharacteristicDashboardProps {
+  characteristicTypeId: number;
 }
 
-const ItemAttributeDashboard: React.FC<ItemAttributeDashboardProps> = ({
-  itemAttributeTypeId,
+const CharacteristicDashboard: React.FC<CharacteristicDashboardProps> = ({
+  characteristicTypeId,
 }) => {
   const [editingKey, setEditingKey] = useState<number | null>(null);
   const [isCreateModalVisible, setIsCreateModalVisible] = useState(false);
@@ -40,7 +40,7 @@ const ItemAttributeDashboard: React.FC<ItemAttributeDashboardProps> = ({
   const [createForm] = Form.useForm();
 
   const {
-    itemAttributeList,
+    characteristicList,
     loading,
     totalCount,
     currentPage,
@@ -48,39 +48,39 @@ const ItemAttributeDashboard: React.FC<ItemAttributeDashboardProps> = ({
     setPagination,
     setLoading,
     setTotalCount,
-    setItemAttributeList,
+    setCharacteristicList,
     setCurrentPage,
-  } = useItemAttributeStore();
+  } = useCharacteristicStore();
 
-  // Load item attributes
-  const loadItemAttributes = useCallback(async () => {
+  // Load characteristics
+  const loadCharacteristics = useCallback(async () => {
     setLoading(true);
-    apiClient.get<ItemAttribute[]>(
-      `/api/item-attribute-type/${itemAttributeTypeId}/item-attribute`,
+    apiClient.get<Characteristic[]>(
+      `/api/characteristic-type/${characteristicTypeId}/characteristic`,
       {
         onSuccess: (data) => {
           setTotalCount(data?.length || 0);
-          setItemAttributeList(data || []);
+          setCharacteristicList(data || []);
         },
         onServerError: () => {
-          setItemAttributeList([]);
-          notification.error({ message: "Failed to load item attributes!" });
+          setCharacteristicList([]);
+          notification.error({ message: "Failed to load characteristics!" });
         },
         onFinally: () => {
           setLoading(false);
         },
       }
     );
-  }, [setLoading, setTotalCount, setItemAttributeList, itemAttributeTypeId]);
+  }, [setLoading, setTotalCount, setCharacteristicList, characteristicTypeId]);
 
   useEffect(() => {
-    loadItemAttributes();
-  }, [loadItemAttributes]);
+    loadCharacteristics();
+  }, [loadCharacteristics]);
 
   // Inline editing functions
-  const isEditing = (record: ItemAttribute) => record.id === editingKey;
+  const isEditing = (record: Characteristic) => record.id === editingKey;
 
-  const edit = (record: ItemAttribute) => {
+  const edit = (record: Characteristic) => {
     form.setFieldsValue({
       name: record.name,
       code: record.code,
@@ -99,13 +99,13 @@ const ItemAttributeDashboard: React.FC<ItemAttributeDashboardProps> = ({
       const updatedData = { ...row, id };
 
       setLoading(true);
-      apiClient.put<boolean>(`/api/item-attribute`, updatedData, {
+      apiClient.put<boolean>(`/api/characteristic`, updatedData, {
         onSuccess: () => {
           notification.success({
-            message: "Item attribute updated successfully!",
+            message: "Characteristic updated successfully!",
           });
           setEditingKey(null);
-          loadItemAttributes();
+          loadCharacteristics();
         },
         onValidationError: (errors: Record<string, string[]>) => {
           handleFormValidationErrors({
@@ -115,7 +115,7 @@ const ItemAttributeDashboard: React.FC<ItemAttributeDashboardProps> = ({
         },
         onServerError: () => {
           notification.error({
-            message: "Failed to update item attribute!",
+            message: "Failed to update characteristic!",
           });
         },
         onFinally: () => {
@@ -127,21 +127,21 @@ const ItemAttributeDashboard: React.FC<ItemAttributeDashboardProps> = ({
     }
   };
 
-  // Create new item attribute
-  const handleCreate = async (values: CreateItemAttributeRequest) => {
+  // Create new characteristic
+  const handleCreate = async (values: CreateCharacteristicRequest) => {
     setLoading(true);
     const createData = {
       ...values,
-      itemAttributeTypeId: itemAttributeTypeId,
+      characteristicTypeId: characteristicTypeId,
     };
-    apiClient.post<number>(`/api/item-attribute`, createData, {
+    apiClient.post<number>(`/api/characteristic`, createData, {
       onSuccess: () => {
         notification.success({
-          message: "Item attribute created successfully!",
+          message: "Characteristic created successfully!",
         });
         setIsCreateModalVisible(false);
         createForm.resetFields();
-        loadItemAttributes();
+        loadCharacteristics();
       },
       onValidationError: (errors: Record<string, string[]>) => {
         handleFormValidationErrors({
@@ -151,7 +151,7 @@ const ItemAttributeDashboard: React.FC<ItemAttributeDashboardProps> = ({
       },
       onServerError: () => {
         notification.error({
-          message: "Failed to create item attribute!",
+          message: "Failed to create characteristic!",
         });
       },
       onFinally: () => {
@@ -160,10 +160,10 @@ const ItemAttributeDashboard: React.FC<ItemAttributeDashboardProps> = ({
     });
   };
 
-  // Delete item attribute
+  // Delete characteristic
   const handleDelete = async (id: number) => {
     setLoading(true);
-    apiClient.delete<boolean>(`/api/item-attribute/${id}`, undefined, {
+    apiClient.delete<boolean>(`/api/characteristic/${id}`, undefined, {
       onSuccess: () => {
         const newTotalCount = totalCount - 1;
         const lastPage = Math.ceil(newTotalCount / pageSize);
@@ -171,13 +171,13 @@ const ItemAttributeDashboard: React.FC<ItemAttributeDashboardProps> = ({
           setCurrentPage(lastPage);
         }
         notification.success({
-          message: "Item attribute deleted successfully!",
+          message: "Characteristic deleted successfully!",
         });
-        loadItemAttributes();
+        loadCharacteristics();
       },
       onServerError: () => {
         notification.error({
-          message: "Failed to delete item attribute!",
+          message: "Failed to delete characteristic!",
         });
       },
       onFinally: () => {
@@ -196,7 +196,7 @@ const ItemAttributeDashboard: React.FC<ItemAttributeDashboardProps> = ({
       title: "Name",
       dataIndex: "name",
       key: "name",
-      render: (text: string, record: ItemAttribute) => {
+      render: (text: string, record: Characteristic) => {
         if (isEditing(record)) {
           return (
             <Form.Item
@@ -215,7 +215,7 @@ const ItemAttributeDashboard: React.FC<ItemAttributeDashboardProps> = ({
       title: "Code",
       dataIndex: "code",
       key: "code",
-      render: (text: string, record: ItemAttribute) => {
+      render: (text: string, record: Characteristic) => {
         if (isEditing(record)) {
           return (
             <Form.Item
@@ -234,7 +234,7 @@ const ItemAttributeDashboard: React.FC<ItemAttributeDashboardProps> = ({
       title: "Value",
       dataIndex: "value",
       key: "value",
-      render: (text: string, record: ItemAttribute) => {
+      render: (text: string, record: Characteristic) => {
         if (isEditing(record)) {
           return (
             <Form.Item
@@ -262,7 +262,7 @@ const ItemAttributeDashboard: React.FC<ItemAttributeDashboardProps> = ({
     {
       title: "Actions",
       key: "actions",
-      render: (_: unknown, record: ItemAttribute) => {
+      render: (_: unknown, record: Characteristic) => {
         const isEdit = isEditing(record);
         return (
           <Space>
@@ -285,7 +285,7 @@ const ItemAttributeDashboard: React.FC<ItemAttributeDashboardProps> = ({
                   disabled={editingKey !== null}
                 />
                 <Popconfirm
-                  title="Are you sure to delete this item attribute?"
+                  title="Are you sure to delete this characteristic?"
                   onConfirm={() => handleDelete(record.id)}
                 >
                   <Button type="link" icon={<DeleteOutlined />} />
@@ -299,27 +299,27 @@ const ItemAttributeDashboard: React.FC<ItemAttributeDashboardProps> = ({
   ];
 
   return (
-    <Card title="Item Attributes" style={{ marginTop: 16 }}>
+    <Card title="Characteristics" style={{ marginTop: 16 }}>
       <Space
         className="mb-4"
         style={{ width: "100%", justifyContent: "space-between" }}
       >
         <Typography.Text>
-          Manage attributes for this attribute type
+          Manage characteristics for this characteristic type
         </Typography.Text>
         <Button
           type="primary"
           icon={<PlusOutlined />}
           onClick={() => setIsCreateModalVisible(true)}
         >
-          Add Attribute
+          Add Characteristic
         </Button>
       </Space>
 
       <Form form={form} component={false}>
         <Table
           columns={columns}
-          dataSource={itemAttributeList}
+          dataSource={characteristicList}
           loading={loading}
           pagination={{
             current: currentPage,
@@ -336,7 +336,7 @@ const ItemAttributeDashboard: React.FC<ItemAttributeDashboardProps> = ({
 
       {/* Create Modal */}
       <Modal
-        title="Add New Attribute"
+        title="Add New Characteristic"
         open={isCreateModalVisible}
         onCancel={() => {
           setIsCreateModalVisible(false);
@@ -350,7 +350,7 @@ const ItemAttributeDashboard: React.FC<ItemAttributeDashboardProps> = ({
           layout="vertical"
           onFinish={handleCreate}
           initialValues={{
-            itemAttributeTypeId: itemAttributeTypeId,
+            characteristicTypeId: characteristicTypeId,
           }}
         >
           <Form.Item
@@ -398,4 +398,4 @@ const ItemAttributeDashboard: React.FC<ItemAttributeDashboardProps> = ({
   );
 };
 
-export default ItemAttributeDashboard;
+export default CharacteristicDashboard;

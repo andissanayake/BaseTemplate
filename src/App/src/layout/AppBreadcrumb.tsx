@@ -15,12 +15,12 @@ export const AppBreadcrumb = () => {
     "/items/create": "Create Item",
     "/items/edit/:itemId": (params: any) => `Edit Item #${params.itemId}`,
     "/items/view/:itemId": (params: any) => `View Item #${params.itemId}`,
-    "/item-attribute-types": "Attribute Types",
-    "/item-attribute-types/create": "Create Attribute Type",
-    "/item-attribute-types/edit/:itemAttributeTypeId": (params: any) =>
-      `Edit Attribute Type #${params.itemAttributeTypeId}`,
-    "/item-attribute-types/view/:itemAttributeTypeId": (params: any) =>
-      `View Attribute Type #${params.itemAttributeTypeId}`,
+    "/characteristic-types": "Characteristic Types",
+    "/characteristic-types/create": "Create Characteristic Type",
+    "/characteristic-types/edit/:characteristicTypeId": (params: any) =>
+      `Edit Characteristic Type #${params.characteristicTypeId}`,
+    "/characteristic-types/view/:characteristicTypeId": (params: any) =>
+      `View Characteristic Type #${params.characteristicTypeId}`,
     "/specifications": "Specifications",
     "/specifications/create": "Create Specification",
     "/specifications/edit/:specificationId": (params: any) =>

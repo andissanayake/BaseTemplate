@@ -16,10 +16,10 @@ import { ItemCreatePage } from "./pages/ItemCreatePage";
 import { ItemEditPage } from "./pages/ItemEditPage";
 import { ItemViewPage } from "./pages/ItemViewPage";
 import { ItemListPage } from "./pages/ItemListPage";
-import ItemAttributeTypeCreatePage from "./pages/ItemAttributeTypeCreatePage";
-import ItemAttributeTypeEditPage from "./pages/ItemAttributeTypeEditPage";
-import ItemAttributeTypeViewPage from "./pages/ItemAttributeTypeViewPage";
-import ItemAttributeTypeListPage from "./pages/ItemAttributeTypeListPage";
+import CharacteristicTypeCreatePage from "./pages/CharacteristicTypeCreatePage";
+import CharacteristicTypeEditPage from "./pages/CharacteristicTypeEditPage";
+import CharacteristicTypeViewPage from "./pages/CharacteristicTypeViewPage";
+import CharacteristicTypeListPage from "./pages/CharacteristicTypeListPage";
 import SpecificationListPage from "./pages/SpecificationListPage";
 import SpecificationCreatePage from "./pages/SpecificationCreatePage";
 import SpecificationEditPage from "./pages/SpecificationEditPage";
@@ -87,46 +87,46 @@ export const App = () => {
             />
 
             <Route
-              path="/item-attribute-types"
+              path="/characteristic-types"
               element={
                 <ProtectedRoute
                   policy={Policies.Role}
                   roles={[Roles.AttributeManager]}
                 >
-                  <ItemAttributeTypeListPage />
+                  <CharacteristicTypeListPage />
                 </ProtectedRoute>
               }
             />
             <Route
-              path="/item-attribute-types/create"
+              path="/characteristic-types/create"
               element={
                 <ProtectedRoute
                   policy={Policies.Role}
                   roles={[Roles.AttributeManager]}
                 >
-                  <ItemAttributeTypeCreatePage />
+                  <CharacteristicTypeCreatePage />
                 </ProtectedRoute>
               }
             />
             <Route
-              path="/item-attribute-types/edit/:itemAttributeTypeId"
+              path="/characteristic-types/edit/:characteristicTypeId"
               element={
                 <ProtectedRoute
                   policy={Policies.Role}
                   roles={[Roles.AttributeManager]}
                 >
-                  <ItemAttributeTypeEditPage />
+                  <CharacteristicTypeEditPage />
                 </ProtectedRoute>
               }
             />
             <Route
-              path="/item-attribute-types/view/:itemAttributeTypeId"
+              path="/characteristic-types/view/:characteristicTypeId"
               element={
                 <ProtectedRoute
                   policy={Policies.Role}
                   roles={[Roles.AttributeManager]}
                 >
-                  <ItemAttributeTypeViewPage />
+                  <CharacteristicTypeViewPage />
                 </ProtectedRoute>
               }
             />
