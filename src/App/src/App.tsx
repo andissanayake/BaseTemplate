@@ -179,10 +179,7 @@ export const App = () => {
             <Route
               path="/tenants/create"
               element={
-                <ProtectedRoute
-                  policy={Policies.Role}
-                  roles={[Roles.TenantManager]}
-                >
+                <ProtectedRoute policy={Policies.User}>
                   <TenantCreatePage />
                 </ProtectedRoute>
               }

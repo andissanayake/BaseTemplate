@@ -6,4 +6,6 @@ export interface Item {
   price: number;
   category?: string;
   isActive: boolean;
+  specificationId: number;
+  specificationFullPath: string;
 }

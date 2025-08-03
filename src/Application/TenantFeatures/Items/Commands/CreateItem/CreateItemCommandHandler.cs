@@ -13,7 +13,8 @@ public class CreateItemCommandHandler(IAppDbContext context) : IRequestHandler<C
             Description = request.Description,
             Price = request.Price,
             Category = request.Category,
-            IsActive = true
+            IsActive = true,
+            SpecificationId = request.SpecificationId
         };
 
         _context.Item.Add(entity);

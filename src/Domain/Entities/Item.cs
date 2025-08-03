@@ -7,4 +7,6 @@ public class Item : BaseTenantAuditableEntity
     public decimal Price { get; set; }
     public bool IsActive { get; set; } = true;
     public string? Category { get; set; }
+    public int SpecificationId { get; set; }
+    public Specification Specification { get; set; } = default!;
 }

@@ -9,7 +9,11 @@ public class GetItemByIdQueryHandler(IAppDbContext context) : IRequestHandler<Ge
     public async Task<Result<ItemDto>> HandleAsync(GetItemByIdQuery request, CancellationToken cancellationToken)
     {
         var entity = await _context.Item.AsNoTracking()
+            .Include(i => i.Specification)
+                .ThenInclude(s => s.ParentSpecification)
             .SingleAsync(i => i.Id == request.Id, cancellationToken);
+
+        var specificationFullPath = entity.Specification?.FullPath ?? string.Empty;
 
         var itemDto = new ItemDto
         {
@@ -19,7 +23,9 @@ public class GetItemByIdQueryHandler(IAppDbContext context) : IRequestHandler<Ge
             Description = entity.Description,
             Price = entity.Price,
             IsActive = entity.IsActive,
-            Category = entity.Category
+            Category = entity.Category,
+            SpecificationId = entity.SpecificationId,
+            SpecificationFullPath = specificationFullPath
         };
 
         return Result<ItemDto>.Success(itemDto);

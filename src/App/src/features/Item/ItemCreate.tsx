@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   Form,
   Input,
@@ -13,11 +13,42 @@ import { useItemStore } from "./itemStore";
 import { useNavigate } from "react-router-dom";
 import { apiClient } from "../../common/apiClient";
 import { handleFormValidationErrors } from "../../common/formErrorHandler";
+import { SpecificationModel } from "../Specification/SpecificationModel";
+import { getAllSpecifications } from "../Specification/SpecificationUtils";
 
 const ItemCreate: React.FC = () => {
   const [form] = Form.useForm();
   const navigate = useNavigate();
   const { setLoading } = useItemStore();
+  const [specificationOptions, setSpecificationOptions] = useState<
+    { value: number; label: string }[]
+  >([]);
+
+  useEffect(() => {
+    loadSpecifications();
+  }, []);
+
+  const loadSpecifications = () => {
+    apiClient.get<{ specifications: SpecificationModel[] }>(
+      "/api/specification",
+      {
+        onSuccess: (data) => {
+          if (data?.specifications) {
+            // Flatten specifications for dropdown
+            const allSpecs = getAllSpecifications(data.specifications);
+            const options = allSpecs.map((spec) => ({
+              value: spec.id,
+              label: spec.fullPath || spec.name,
+            }));
+            setSpecificationOptions(options);
+          }
+        },
+        onServerError: () => {
+          notification.error({ message: "Failed to load specifications!" });
+        },
+      }
+    );
+  };
 
   const handleSaveItem = () => {
     form.validateFields().then(async (values) => {
@@ -81,6 +112,23 @@ const ItemCreate: React.FC = () => {
             step={0.01}
             style={{ width: "100%" }}
             placeholder="Enter item price"
+          />
+        </Form.Item>
+
+        <Form.Item
+          label="Specification"
+          name="specificationId"
+          rules={[
+            { required: true, message: "Please select a specification!" },
+          ]}
+        >
+          <Select
+            placeholder="Select specification"
+            options={specificationOptions}
+            showSearch
+            filterOption={(input, option) =>
+              (option?.label ?? "").toLowerCase().includes(input.toLowerCase())
+            }
           />
         </Form.Item>
 

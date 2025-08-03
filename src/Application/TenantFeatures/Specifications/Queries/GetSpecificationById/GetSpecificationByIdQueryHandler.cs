@@ -18,7 +18,8 @@ public class GetSpecificationByIdQueryHandler(IAppDbContext context) : IRequestH
             Name = specification.Name,
             Description = specification.Description,
             ParentSpecificationId = specification.ParentSpecificationId,
-            ParentSpecificationName = specification.ParentSpecification?.Name
+            ParentSpecificationName = specification.ParentSpecification?.Name,
+            FullPath = specification.FullPath
         };
         return Result<GetSpecificationByIdResponse>.Success(response);
     }

@@ -7,4 +7,5 @@ public record GetSpecificationByIdResponse
     public string Description { get; init; } = string.Empty;
     public int? ParentSpecificationId { get; init; }
     public string? ParentSpecificationName { get; init; }
+    public string FullPath { get; init; } = string.Empty;
 } 

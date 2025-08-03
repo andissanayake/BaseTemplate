@@ -16,6 +16,7 @@ public class UpdateItemCommandHandler(IAppDbContext context) : IRequestHandler<U
         entity.Price = request.Price;
         entity.Category = request.Category;
         entity.IsActive = request.IsActive;
+        entity.SpecificationId = request.SpecificationId;
 
         await _context.SaveChangesAsync(cancellationToken);
         return Result<bool>.Success(true);

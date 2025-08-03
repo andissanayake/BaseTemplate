@@ -9,31 +9,28 @@ public class GetSpecificationsQueryHandler(IAppDbContext context) : IRequestHand
     public async Task<Result<GetSpecificationsResponse>> HandleAsync(GetSpecificationsQuery request, CancellationToken cancellationToken)
     {
         var allSpecifications = await _context.Specification.AsNoTracking()
-            .Select(s => new SpecificationBriefDto
-            {
-                Id = s.Id,
-                Name = s.Name,
-                Description = s.Description,
-                ParentSpecificationId = s.ParentSpecificationId,
-                FullPath = string.Empty, // Will be populated below
-                Children = new List<SpecificationBriefDto>()
-            })
+            .Include(s => s.ParentSpecification)
             .ToListAsync(cancellationToken);
 
-        // Create a lookup for quick access
-        var specificationLookup = allSpecifications.ToDictionary(s => s.Id);
-
-        // Populate FullPath for all specifications
-        foreach (var spec in allSpecifications)
+        // Create DTOs with full paths using entity property
+        var specificationDtos = allSpecifications.Select(s => new SpecificationBriefDto
         {
-            spec.FullPath = BuildFullPath(spec, specificationLookup);
-        }
+            Id = s.Id,
+            Name = s.Name,
+            Description = s.Description,
+            ParentSpecificationId = s.ParentSpecificationId,
+            FullPath = s.FullPath,
+            Children = []
+        }).ToList();
+
+        // Create a lookup for quick access
+        var specificationLookup = specificationDtos.ToDictionary(s => s.Id);
 
         // Get only root specifications (those without parents)
-        var rootSpecifications = allSpecifications.Where(s => !s.ParentSpecificationId.HasValue).ToList();
+        var rootSpecifications = specificationDtos.Where(s => !s.ParentSpecificationId.HasValue).ToList();
 
         // Build the hierarchical structure
-        foreach (var spec in allSpecifications)
+        foreach (var spec in specificationDtos)
         {
             if (spec.ParentSpecificationId.HasValue && specificationLookup.TryGetValue(spec.ParentSpecificationId.Value, out SpecificationBriefDto? value))
             {
@@ -48,26 +45,5 @@ public class GetSpecificationsQueryHandler(IAppDbContext context) : IRequestHand
         };
 
         return Result<GetSpecificationsResponse>.Success(response);
-    }
-
-    private static string BuildFullPath(SpecificationBriefDto spec, Dictionary<int, SpecificationBriefDto> lookup)
-    {
-        var pathParts = new List<string>();
-        var current = spec;
-
-        while (current != null)
-        {
-            pathParts.Insert(0, current.Name);
-
-            if (current.ParentSpecificationId.HasValue && lookup.TryGetValue(current.ParentSpecificationId.Value, out SpecificationBriefDto? value))
-            {
-                current = value;
-            }
-            else
-            {
-                break;
-            }
-        }
-        return string.Join(" / ", pathParts);
     }
 }
