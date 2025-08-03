@@ -7,7 +7,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace BaseTemplate.Infrastructure.Data.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialCreate : Migration
+    public partial class Initial : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -41,7 +41,7 @@ namespace BaseTemplate.Infrastructure.Data.Migrations
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     SsoId = table.Column<string>(type: "text", nullable: false),
                     Name = table.Column<string>(type: "text", nullable: true),
-                    Email = table.Column<string>(type: "text", nullable: true),
+                    Email = table.Column<string>(type: "text", nullable: false),
                     TenantId = table.Column<int>(type: "integer", nullable: true),
                     Created = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
                     CreatedBy = table.Column<int>(type: "integer", nullable: false),
@@ -57,35 +57,6 @@ namespace BaseTemplate.Infrastructure.Data.Migrations
                         column: x => x.TenantId,
                         principalTable: "Tenant",
                         principalColumn: "Id");
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Item",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    Name = table.Column<string>(type: "text", nullable: false),
-                    Description = table.Column<string>(type: "text", nullable: true),
-                    Price = table.Column<decimal>(type: "numeric", nullable: false),
-                    IsActive = table.Column<bool>(type: "boolean", nullable: false),
-                    Category = table.Column<string>(type: "text", nullable: true),
-                    Created = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
-                    CreatedBy = table.Column<int>(type: "integer", nullable: false),
-                    LastModified = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
-                    LastModifiedBy = table.Column<int>(type: "integer", nullable: true),
-                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false),
-                    TenantId = table.Column<int>(type: "integer", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Item", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Item_Tenant_TenantId",
-                        column: x => x.TenantId,
-                        principalTable: "Tenant",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -106,9 +77,9 @@ namespace BaseTemplate.Infrastructure.Data.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_ItemAttributeType", x => x.Id);
+                    table.PrimaryKey("PK_CharacteristicType", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_ItemAttributeType_Tenant_TenantId",
+                        name: "FK_CharacteristicType_Tenant_TenantId",
                         column: x => x.TenantId,
                         principalTable: "Tenant",
                         principalColumn: "Id",
@@ -141,32 +112,6 @@ namespace BaseTemplate.Infrastructure.Data.Migrations
                         principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_Specification_Tenant_TenantId",
-                        column: x => x.TenantId,
-                        principalTable: "Tenant",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "StaffInvitationRole",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    StaffInvitationId = table.Column<int>(type: "integer", nullable: false),
-                    Role = table.Column<string>(type: "text", nullable: false),
-                    Created = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
-                    CreatedBy = table.Column<int>(type: "integer", nullable: false),
-                    LastModified = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
-                    LastModifiedBy = table.Column<int>(type: "integer", nullable: true),
-                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false),
-                    TenantId = table.Column<int>(type: "integer", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_StaffInvitationRole", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_StaffInvitationRole_Tenant_TenantId",
                         column: x => x.TenantId,
                         principalTable: "Tenant",
                         principalColumn: "Id",
@@ -250,7 +195,7 @@ namespace BaseTemplate.Infrastructure.Data.Migrations
                     Code = table.Column<string>(type: "text", nullable: false),
                     Value = table.Column<string>(type: "text", nullable: false),
                     IsActive = table.Column<bool>(type: "boolean", nullable: false),
-                    ItemAttributeTypeId = table.Column<int>(type: "integer", nullable: false),
+                    CharacteristicTypeId = table.Column<int>(type: "integer", nullable: false),
                     Created = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
                     CreatedBy = table.Column<int>(type: "integer", nullable: false),
                     LastModified = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
@@ -260,15 +205,83 @@ namespace BaseTemplate.Infrastructure.Data.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_ItemAttribute", x => x.Id);
+                    table.PrimaryKey("PK_Characteristic", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_ItemAttribute_ItemAttributeType_ItemAttributeTypeId",
-                        column: x => x.ItemAttributeTypeId,
+                        name: "FK_Characteristic_CharacteristicType_CharacteristicTypeId",
+                        column: x => x.CharacteristicTypeId,
                         principalTable: "CharacteristicType",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_ItemAttribute_Tenant_TenantId",
+                        name: "FK_Characteristic_Tenant_TenantId",
+                        column: x => x.TenantId,
+                        principalTable: "Tenant",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Item",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    Name = table.Column<string>(type: "text", nullable: false),
+                    Description = table.Column<string>(type: "text", nullable: true),
+                    Price = table.Column<decimal>(type: "numeric", nullable: false),
+                    IsActive = table.Column<bool>(type: "boolean", nullable: false),
+                    Category = table.Column<string>(type: "text", nullable: true),
+                    SpecificationId = table.Column<int>(type: "integer", nullable: false),
+                    Created = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
+                    CreatedBy = table.Column<int>(type: "integer", nullable: false),
+                    LastModified = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
+                    LastModifiedBy = table.Column<int>(type: "integer", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false),
+                    TenantId = table.Column<int>(type: "integer", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Item", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Item_Specification_SpecificationId",
+                        column: x => x.SpecificationId,
+                        principalTable: "Specification",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Item_Tenant_TenantId",
+                        column: x => x.TenantId,
+                        principalTable: "Tenant",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "StaffInvitationRole",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    StaffInvitationId = table.Column<int>(type: "integer", nullable: false),
+                    Role = table.Column<string>(type: "text", nullable: false),
+                    Created = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
+                    CreatedBy = table.Column<int>(type: "integer", nullable: false),
+                    LastModified = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
+                    LastModifiedBy = table.Column<int>(type: "integer", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false),
+                    TenantId = table.Column<int>(type: "integer", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_StaffInvitationRole", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_StaffInvitationRole_StaffInvitation_StaffInvitationId",
+                        column: x => x.StaffInvitationId,
+                        principalTable: "StaffInvitation",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_StaffInvitationRole_Tenant_TenantId",
                         column: x => x.TenantId,
                         principalTable: "Tenant",
                         principalColumn: "Id",
@@ -281,23 +294,28 @@ namespace BaseTemplate.Infrastructure.Data.Migrations
                 column: "TenantId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Item_TenantId",
-                table: "Item",
-                column: "TenantId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_ItemAttribute_ItemAttributeTypeId",
+                name: "IX_Characteristic_CharacteristicTypeId",
                 table: "Characteristic",
                 column: "CharacteristicTypeId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_ItemAttribute_TenantId",
+                name: "IX_Characteristic_TenantId",
                 table: "Characteristic",
                 column: "TenantId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_ItemAttributeType_TenantId",
+                name: "IX_CharacteristicType_TenantId",
                 table: "CharacteristicType",
+                column: "TenantId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Item_SpecificationId",
+                table: "Item",
+                column: "SpecificationId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Item_TenantId",
+                table: "Item",
                 column: "TenantId");
 
             migrationBuilder.CreateIndex(
@@ -326,6 +344,11 @@ namespace BaseTemplate.Infrastructure.Data.Migrations
                 column: "TenantId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_StaffInvitationRole_StaffInvitationId",
+                table: "StaffInvitationRole",
+                column: "StaffInvitationId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_StaffInvitationRole_TenantId",
                 table: "StaffInvitationRole",
                 column: "TenantId");
@@ -340,16 +363,10 @@ namespace BaseTemplate.Infrastructure.Data.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "Item");
-
-            migrationBuilder.DropTable(
                 name: "Characteristic");
 
             migrationBuilder.DropTable(
-                name: "Specification");
-
-            migrationBuilder.DropTable(
-                name: "StaffInvitation");
+                name: "Item");
 
             migrationBuilder.DropTable(
                 name: "StaffInvitationRole");
@@ -359,6 +376,12 @@ namespace BaseTemplate.Infrastructure.Data.Migrations
 
             migrationBuilder.DropTable(
                 name: "CharacteristicType");
+
+            migrationBuilder.DropTable(
+                name: "Specification");
+
+            migrationBuilder.DropTable(
+                name: "StaffInvitation");
 
             migrationBuilder.DropTable(
                 name: "AppUser");
