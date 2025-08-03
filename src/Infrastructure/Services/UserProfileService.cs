@@ -9,7 +9,6 @@ namespace BaseTemplate.Infrastructure.Services
         private readonly IMemoryCache _cache = cache;
         private readonly IUser _user = user;
         private UserProfile? _userProfile;
-
         public UserProfile UserProfile
         {
             get
@@ -18,7 +17,6 @@ namespace BaseTemplate.Infrastructure.Services
                 return _userProfile;
             }
         }
-
         private UserProfile GetUserProfile()
         {
             var cacheKey = $"user_profile:{_user.Identifier}";
