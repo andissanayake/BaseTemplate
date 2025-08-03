@@ -17,6 +17,7 @@ namespace BaseTemplate.Infrastructure.Services
                 return _userProfile;
             }
         }
+
         private UserProfile GetUserProfile()
         {
             var cacheKey = $"user_profile:{_user.Identifier}";
@@ -60,7 +61,7 @@ namespace BaseTemplate.Infrastructure.Services
             {
                 var cacheKey = $"user_profile:{identifier}";
                 _cache.Remove(cacheKey);
-                _userProfile = null; // Reset the cached instance
+                _userProfile = null;
             }
             return Task.CompletedTask;
         }
