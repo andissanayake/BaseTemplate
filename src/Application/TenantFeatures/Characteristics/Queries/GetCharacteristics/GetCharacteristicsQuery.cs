@@ -3,5 +3,5 @@ namespace BaseTemplate.Application.TenantFeatures.Characteristics.Queries.GetCha
 [Authorize(Roles = Roles.AttributeManager)]
 public class GetCharacteristicsQuery : IRequest<List<CharacteristicBriefDto>>
 {
-    public int ItemAttributeTypeId { get; set; }
+    public int CharacteristicTypeId { get; set; }
 }

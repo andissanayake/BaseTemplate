@@ -8,7 +8,7 @@ public class GetCharacteristicByIdQueryHandler(IAppDbContext context) : IRequest
 
     public async Task<Result<CharacteristicDto>> HandleAsync(GetICharacteristicByIdQuery request, CancellationToken cancellationToken)
     {
-        var itemAttribute = await _context.Characteristic.AsNoTracking()
+        var characteristic = await _context.Characteristic.AsNoTracking()
             .Where(ia => ia.Id == request.Id)
             .Include(ia => ia.CharacteristicType)
             .Select(ia => new CharacteristicDto
@@ -18,10 +18,10 @@ public class GetCharacteristicByIdQueryHandler(IAppDbContext context) : IRequest
                 Code = ia.Code,
                 Value = ia.Value,
                 IsActive = ia.IsActive,
-                ItemAttributeTypeId = ia.CharacteristicTypeId,
-                ItemAttributeTypeName = ia.CharacteristicType!.Name
+                            CharacteristicTypeId = ia.CharacteristicTypeId,
+            CharacteristicTypeName = ia.CharacteristicType!.Name
             }).SingleAsync(cancellationToken);
 
-        return Result<CharacteristicDto>.Success(itemAttribute);
+        return Result<CharacteristicDto>.Success(characteristic);
     }
 }

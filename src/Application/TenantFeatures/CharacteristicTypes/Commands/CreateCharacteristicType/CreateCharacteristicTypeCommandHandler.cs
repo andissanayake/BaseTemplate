@@ -7,15 +7,15 @@ public class CreateCharacteristicTypeCommandHandler(IAppDbContext context) : IRe
     public async Task<Result<int>> HandleAsync(CreateCharacteristicTypeCommand request, CancellationToken cancellationToken)
     {
 
-        var itemAttributeType = new CharacteristicType
+        var characteristicType = new CharacteristicType
         {
             Name = request.Name,
             Description = request.Description,
             IsActive = true,
         };
 
-        _context.CharacteristicType.Add(itemAttributeType);
+        _context.CharacteristicType.Add(characteristicType);
         await _context.SaveChangesAsync(cancellationToken);
-        return Result<int>.Success(itemAttributeType.Id);
+        return Result<int>.Success(characteristicType.Id);
     }
 }

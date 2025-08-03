@@ -8,10 +8,10 @@ public class DeleteCharacteristicCommandHandler(IAppDbContext context) : IReques
 
     public async Task<Result<bool>> HandleAsync(DeleteCharacteristicCommand request, CancellationToken cancellationToken)
     {
-        var itemAttribute = await _context.Characteristic
+        var characteristic = await _context.Characteristic
             .SingleAsync(a => a.Id == request.Id, cancellationToken);
 
-        itemAttribute.IsDeleted = true;
+        characteristic.IsDeleted = true;
         await _context.SaveChangesAsync(cancellationToken);
         return Result<bool>.Success(true);
     }

@@ -9,7 +9,7 @@ public class GetCharacteristicsQueryHandler(IAppDbContext context) : IRequestHan
     public async Task<Result<List<CharacteristicBriefDto>>> HandleAsync(GetCharacteristicsQuery request, CancellationToken cancellationToken)
     {
         var items = await _context.Characteristic.AsNoTracking()
-            .Where(ia => ia.CharacteristicTypeId == request.ItemAttributeTypeId)
+            .Where(ia => ia.CharacteristicTypeId == request.CharacteristicTypeId)
             .Include(ia => ia.CharacteristicType)
             .OrderByDescending(ia => ia.Created)
             .Select(ia => new CharacteristicBriefDto
@@ -19,8 +19,8 @@ public class GetCharacteristicsQueryHandler(IAppDbContext context) : IRequestHan
                 Code = ia.Code,
                 Value = ia.Value,
                 IsActive = ia.IsActive,
-                ItemAttributeTypeId = ia.CharacteristicTypeId,
-                ItemAttributeTypeName = ia.CharacteristicType.Name
+                CharacteristicTypeId = ia.CharacteristicTypeId,
+                CharacteristicTypeName = ia.CharacteristicType.Name
             })
             .ToListAsync(cancellationToken);
 

@@ -22,17 +22,17 @@ public class CreateCharacteristicCommandHandler(IAppDbContext context) : IReques
                                 });
         }
 
-        var itemAttribute = new Characteristic
+        var characteristic = new Characteristic
         {
             Name = request.Name,
             Code = request.Code,
             Value = request.Value,
-            CharacteristicTypeId = request.ItemAttributeTypeId,
+            CharacteristicTypeId = request.CharacteristicTypeId,
             IsActive = true
         };
 
-        _context.Characteristic.Add(itemAttribute);
+        _context.Characteristic.Add(characteristic);
         await _context.SaveChangesAsync(cancellationToken);
-        return Result<int>.Success(itemAttribute.Id);
+        return Result<int>.Success(characteristic.Id);
     }
 }

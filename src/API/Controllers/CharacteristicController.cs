@@ -53,21 +53,21 @@ public class CharacteristicController : ApiControllerBase
     }
 
     /// <summary>
-    /// Update an existing item attribute.
+    /// Update an existing characteristic.
     /// </summary>
     /// <remarks>
     /// <b>What this endpoint does:</b>
     /// <ul>
-    ///   <li>Updates an existing item attribute for the current tenant</li>
-    ///   <li>Validates that the attribute exists and belongs to the current tenant</li>
-    ///   <li>Validates that the new name and code are unique within the attribute type (if being changed)</li>
+    ///   <li>Updates an existing characteristic for the current tenant</li>
+///   <li>Validates that the characteristic exists and belongs to the current tenant</li>
+///   <li>Validates that the new name and code are unique within the characteristic type (if being changed)</li>
     ///   <li>Requires AttributeManager role permission</li>
     /// </ul>
     /// <b>Validation Rules:</b>
     /// <ul>
-    ///   <li>Attribute must exist and belong to current tenant</li>
-    ///   <li>Name is required and must be unique within the attribute type</li>
-    ///   <li>Code is required and must be unique within the attribute type</li>
+    ///   <li>Characteristic must exist and belong to current tenant</li>
+///   <li>Name is required and must be unique within the characteristic type</li>
+///   <li>Code is required and must be unique within the characteristic type</li>
     ///   <li>Value is required</li>
     ///   <li>Maximum name length: 255 characters</li>
     ///   <li>Maximum code length: 50 characters</li>
@@ -76,10 +76,10 @@ public class CharacteristicController : ApiControllerBase
     /// <b>Request body:</b>
     /// <ul>
     ///   <li><c>Id</c> (int, required): ID of the attribute to update</li>
-    ///   <li><c>Name</c> (string, required): Updated name of the attribute (must be unique within attribute type)</li>
-    ///   <li><c>Code</c> (string, required): Updated code of the attribute (must be unique within attribute type)</li>
-    ///   <li><c>Value</c> (string, required): Updated value of the attribute</li>
-    ///   <li><c>CharacteristicTypeId</c> (int, required): ID of the attribute type this attribute belongs to</li>
+    ///   <li><c>Name</c> (string, required): Updated name of the characteristic (must be unique within characteristic type)</li>
+///   <li><c>Code</c> (string, required): Updated code of the characteristic (must be unique within characteristic type)</li>
+///   <li><c>Value</c> (string, required): Updated value of the characteristic</li>
+///   <li><c>CharacteristicTypeId</c> (int, required): ID of the characteristic type this characteristic belongs to</li>
     /// </ul>
     /// <b>Response:</b>
     /// <ul>
@@ -93,20 +93,20 @@ public class CharacteristicController : ApiControllerBase
     }
 
     /// <summary>
-    /// Soft delete an item attribute.
+    /// Soft delete a characteristic.
     /// </summary>
     /// <remarks>
     /// <b>What this endpoint does:</b>
     /// <ul>
     ///   <li>Performs a soft delete by setting IsActive to false</li>
-    ///   <li>Validates that the attribute exists and belongs to the current tenant</li>
-    ///   <li>Does not physically delete the record (preserves data integrity)</li>
+///   <li>Validates that the characteristic exists and belongs to the current tenant</li>
+///   <li>Does not physically delete the record (preserves data integrity)</li>
     ///   <li>Requires AttributeManager role permission</li>
     /// </ul>
     /// <b>Important Notes:</b>
     /// <ul>
     ///   <li>This is a soft delete - the record is not physically removed</li>
-    ///   <li>Associated items will still reference this attribute</li>
+    ///   <li>Associated items will still reference this characteristic</li>
     ///   <li>Consider the impact on existing items before deletion</li>
     /// </ul>
     /// <b>Response:</b>
@@ -121,19 +121,19 @@ public class CharacteristicController : ApiControllerBase
     }
 
     /// <summary>
-    /// Get a specific item attribute by ID.
+    /// Get a specific characteristic by ID.
     /// </summary>
     /// <remarks>
     /// <b>What this endpoint does:</b>
     /// <ul>
-    ///   <li>Retrieves detailed information about a specific item attribute</li>
-    ///   <li>Validates that the attribute belongs to the current user's tenant</li>
-    ///   <li>Returns NotFound if the item attribute does not exist or doesn't belong to the tenant</li>
+    ///   <li>Retrieves detailed information about a specific characteristic</li>
+///   <li>Validates that the characteristic belongs to the current user's tenant</li>
+///   <li>Returns NotFound if the characteristic does not exist or doesn't belong to the tenant</li>
     ///   <li>Requires AttributeManager role permission</li>
     /// </ul>
     /// <b>Response:</b>
     /// <ul>
-    ///   <li><c>CharacteristicDto</c>: Detailed item attribute information including Id, Name, Code, Value, IsActive, CharacteristicTypeId, ItemAttributeTypeName</li>
+    ///   <li><c>CharacteristicDto</c>: Detailed characteristic information including Id, Name, Code, Value, IsActive, CharacteristicTypeId, CharacteristicTypeName</li>
     /// </ul>
     /// </remarks>
     [HttpGet("{id}")]

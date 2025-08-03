@@ -8,15 +8,15 @@ public class GetCharacteristicTypeByIdQueryHandler(IAppDbContext context) : IReq
 
     public async Task<Result<CharacteristicTypeDto>> HandleAsync(GetCharacteristicTypeByIdQuery request, CancellationToken cancellationToken)
     {
-        var itemAttributeType = await _context.CharacteristicType
+        var characteristicType = await _context.CharacteristicType
             .SingleAsync(iat => iat.Id == request.Id, cancellationToken);
 
         var dto = new CharacteristicTypeDto
         {
-            Id = itemAttributeType.Id,
-            Name = itemAttributeType.Name,
-            Description = itemAttributeType.Description,
-            IsActive = itemAttributeType.IsActive
+            Id = characteristicType.Id,
+            Name = characteristicType.Name,
+            Description = characteristicType.Description,
+            IsActive = characteristicType.IsActive
         };
         return Result<CharacteristicTypeDto>.Success(dto);
     }

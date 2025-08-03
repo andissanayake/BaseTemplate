@@ -51,7 +51,7 @@ public class CharacteristicTypeController : ApiControllerBase
     /// </ul>
     /// <b>Response:</b>
     /// <ul>
-    ///   <li><c>ItemAttributeTypeDto</c>: Detailed item attribute type information including Id, Name, Description, IsActive</li>
+    ///   <li><c>CharacteristicTypeDto</c>: Detailed characteristic type information including Id, Name, Description, IsActive</li>
     /// </ul>
     /// </remarks>
     [HttpGet("{id}")]
@@ -95,7 +95,7 @@ public class CharacteristicTypeController : ApiControllerBase
     }
 
     /// <summary>
-    /// Update an existing item attribute type.
+    /// Update an existing characteristic type.
     /// </summary>
     /// <remarks>
     /// <b>What this endpoint does:</b>
@@ -130,7 +130,7 @@ public class CharacteristicTypeController : ApiControllerBase
     }
 
     /// <summary>
-    /// Soft delete an item attribute type.
+    /// Soft delete a characteristic type.
     /// </summary>
     /// <remarks>
     /// <b>What this endpoint does:</b>
@@ -143,8 +143,8 @@ public class CharacteristicTypeController : ApiControllerBase
     /// <b>Important Notes:</b>
     /// <ul>
     ///   <li>This is a soft delete - the record is not physically removed</li>
-    ///   <li>Associated item attributes will still reference this type</li>
-    ///   <li>Consider the impact on existing item attributes before deletion</li>
+    ///   <li>Associated characteristics will still reference this type</li>
+    ///   <li>Consider the impact on existing characteristics before deletion</li>
     /// </ul>
     /// <b>Response:</b>
     /// <ul>
@@ -158,29 +158,29 @@ public class CharacteristicTypeController : ApiControllerBase
         return await SendAsync(command);
     }
     /// <summary>
-    /// Get all item attributes for a specific attribute type.
+    /// Get all characteristics for a specific characteristic type.
     /// </summary>
     /// <remarks>
     /// <b>What this endpoint does:</b>
     /// <ul>
-    ///   <li>Retrieves all item attributes belonging to a specific attribute type</li>
-    ///   <li>Validates that the attribute type belongs to the current user's tenant</li>
-    ///   <li>Returns only active attributes (where IsActive = true)</li>
+    ///   <li>Retrieves all characteristics belonging to a specific characteristic type</li>
+    ///   <li>Validates that the characteristic type belongs to the current user's tenant</li>
+    ///   <li>Returns only active characteristics (where IsActive = true)</li>
     ///   <li>Results are ordered by creation date (newest first)</li>
     ///   <li>Requires AttributeManager role permission</li>
     /// </ul>
     /// <b>Response:</b>
     /// <ul>
-    ///   <li><c>List&lt;CharacteristicBriefDto&gt;</c>: List of item attributes with basic information including Id, Name, Code, Value, IsActive, CharacteristicTypeId, ItemAttributeTypeName</li>
+    ///   <li><c>List&lt;CharacteristicBriefDto&gt;</c>: List of characteristics with basic information including Id, Name, Code, Value, IsActive, CharacteristicTypeId, CharacteristicTypeName</li>
     /// </ul>
     /// </remarks>
-    [HttpGet("{id}/item-attribute")]
+    [HttpGet("{id}/characteristic")]
     public async Task<ActionResult<Result<List<CharacteristicBriefDto>>>> GetAll(
         [FromRoute] int id)
     {
         var query = new GetCharacteristicsQuery
         {
-            ItemAttributeTypeId = id
+            CharacteristicTypeId = id
         };
 
         return await SendAsync(query);

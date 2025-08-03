@@ -13,7 +13,7 @@ public class UpdateCharacteristicCommandHandler : IRequestHandler<UpdateCharacte
     public async Task<Result<bool>> HandleAsync(UpdateCharacteristicCommand request, CancellationToken cancellationToken)
     {
 
-        var itemAttribute = await _context.Characteristic
+        var characteristic = await _context.Characteristic
             .SingleAsync(a => a.Id == request.Id, cancellationToken);
 
         // Check if code already exists for this tenant (excluding current item)
@@ -29,9 +29,9 @@ public class UpdateCharacteristicCommandHandler : IRequestHandler<UpdateCharacte
                                                 });
         }
 
-        itemAttribute.Name = request.Name;
-        itemAttribute.Code = request.Code;
-        itemAttribute.Value = request.Value;
+        characteristic.Name = request.Name;
+        characteristic.Code = request.Code;
+        characteristic.Value = request.Value;
         await _context.SaveChangesAsync(cancellationToken);
         return Result<bool>.Success(true);
     }
