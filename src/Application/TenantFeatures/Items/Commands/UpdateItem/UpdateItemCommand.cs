@@ -18,4 +18,7 @@ public record UpdateItemCommand : IRequest<bool>
 
     public string? Category { get; init; }
     public bool IsActive { get; init; }
+    
+    [Required]
+    public int SpecificationId { get; init; }
 }

@@ -1,6 +1,7 @@
+using BaseTemplate.Application;
+using BaseTemplate.Infrastructure;
 using Serilog;
 using Serilog.Events;
-
 namespace BaseTemplate.API;
 public class Program
 {
@@ -27,15 +28,9 @@ public class Program
         builder.Services.AddInfrastructure(builder.Configuration);
         builder.Services.AddAPI(builder.Configuration);
 
-        builder.Services.AddCors(options =>
-        {
-            options.AddPolicy(name: CLIENT_POLICY_KEY, builder =>
-            {
-                builder.WithOrigins("http://localhost:5000")
+        builder.Services.AddCors(options => options.AddPolicy(name: CLIENT_POLICY_KEY, builder => builder.WithOrigins("http://localhost:5000")
                    .AllowAnyMethod()
-                   .AllowAnyHeader();
-            });
-        });
+                   .AllowAnyHeader()));
 
         // Add SwaggerGen and include XML comments
         builder.Services.AddSwaggerGen(c =>

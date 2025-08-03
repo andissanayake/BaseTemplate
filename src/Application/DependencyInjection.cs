@@ -1,6 +1,7 @@
 ﻿using System.Reflection;
+using Microsoft.Extensions.DependencyInjection;
 
-namespace Microsoft.Extensions.DependencyInjection;
+namespace BaseTemplate.Application;
 
 public static class DependencyInjection
 {

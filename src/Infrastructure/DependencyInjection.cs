@@ -3,8 +3,9 @@ using BaseTemplate.Infrastructure.Data;
 using BaseTemplate.Infrastructure.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 
-namespace Microsoft.Extensions.DependencyInjection;
+namespace BaseTemplate.Infrastructure;
 
 public static class DependencyInjection
 {

@@ -100,6 +100,13 @@ const ItemList: React.FC = () => {
       render: (price: number) => `$${price.toFixed(2)}`,
     },
     {
+      title: "Specification",
+      dataIndex: "specificationFullPath",
+      key: "specificationFullPath",
+      render: (specificationFullPath: string) =>
+        specificationFullPath || "No specification",
+    },
+    {
       title: "Categories",
       dataIndex: "category",
       key: "category",

@@ -8,7 +8,10 @@ public class GetItemsWithPaginationQueryHandler(IAppDbContext context) : IReques
 
     public async Task<Result<PaginatedList<ItemBriefDto>>> HandleAsync(GetItemsWithPaginationQuery request, CancellationToken cancellationToken)
     {
-        var query = _context.Item.AsNoTracking().AsQueryable();
+        var query = _context.Item.AsNoTracking()
+            .Include(i => i.Specification)
+                .ThenInclude(s => s.ParentSpecification)
+            .AsQueryable();
 
         if (!string.IsNullOrEmpty(request.Category))
             query = query.Where(i => i.Category == request.Category);
@@ -22,19 +25,22 @@ public class GetItemsWithPaginationQueryHandler(IAppDbContext context) : IReques
             .OrderBy(i => i.Name)
             .Skip((request.PageNumber - 1) * request.PageSize)
             .Take(request.PageSize)
-            .Select(i => new ItemBriefDto
-            {
-                Id = i.Id,
-                TenantId = i.TenantId,
-                Name = i.Name,
-                Description = i.Description,
-                Price = i.Price,
-                IsActive = i.IsActive,
-                Category = i.Category
-            })
             .ToListAsync(cancellationToken);
 
+        var itemDtos = items.Select(i => new ItemBriefDto
+        {
+            Id = i.Id,
+            TenantId = i.TenantId,
+            Name = i.Name,
+            Description = i.Description,
+            Price = i.Price,
+            IsActive = i.IsActive,
+            Category = i.Category,
+            SpecificationId = i.SpecificationId,
+            SpecificationFullPath = i.Specification?.FullPath ?? string.Empty
+        }).ToList();
+
         return Result<PaginatedList<ItemBriefDto>>.Success(
-            new PaginatedList<ItemBriefDto>(items, totalCount, request.PageNumber, request.PageSize));
+            new PaginatedList<ItemBriefDto>(itemDtos, totalCount, request.PageNumber, request.PageSize));
     }
 }

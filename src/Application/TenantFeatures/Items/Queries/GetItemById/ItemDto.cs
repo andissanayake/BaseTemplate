@@ -9,4 +9,6 @@ public class ItemDto
     public decimal Price { get; init; }
     public bool IsActive { get; init; }
     public string? Category { get; init; }
+    public int SpecificationId { get; init; }
+    public string SpecificationFullPath { get; init; } = string.Empty;
 } 

@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.OpenApi.Models;
 
 
-namespace Microsoft.Extensions.DependencyInjection;
+namespace BaseTemplate.API;
 
 public static class DependencyInjection
 {
