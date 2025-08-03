@@ -89,7 +89,7 @@ namespace BaseTemplate.Infrastructure.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "ItemAttributeType",
+                name: "CharacteristicType",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
@@ -241,7 +241,7 @@ namespace BaseTemplate.Infrastructure.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "ItemAttribute",
+                name: "Characteristic",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
@@ -264,7 +264,7 @@ namespace BaseTemplate.Infrastructure.Data.Migrations
                     table.ForeignKey(
                         name: "FK_ItemAttribute_ItemAttributeType_ItemAttributeTypeId",
                         column: x => x.ItemAttributeTypeId,
-                        principalTable: "ItemAttributeType",
+                        principalTable: "CharacteristicType",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
@@ -287,17 +287,17 @@ namespace BaseTemplate.Infrastructure.Data.Migrations
 
             migrationBuilder.CreateIndex(
                 name: "IX_ItemAttribute_ItemAttributeTypeId",
-                table: "ItemAttribute",
-                column: "ItemAttributeTypeId");
+                table: "Characteristic",
+                column: "CharacteristicTypeId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_ItemAttribute_TenantId",
-                table: "ItemAttribute",
+                table: "Characteristic",
                 column: "TenantId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_ItemAttributeType_TenantId",
-                table: "ItemAttributeType",
+                table: "CharacteristicType",
                 column: "TenantId");
 
             migrationBuilder.CreateIndex(
@@ -343,7 +343,7 @@ namespace BaseTemplate.Infrastructure.Data.Migrations
                 name: "Item");
 
             migrationBuilder.DropTable(
-                name: "ItemAttribute");
+                name: "Characteristic");
 
             migrationBuilder.DropTable(
                 name: "Specification");
@@ -358,7 +358,7 @@ namespace BaseTemplate.Infrastructure.Data.Migrations
                 name: "UserRole");
 
             migrationBuilder.DropTable(
-                name: "ItemAttributeType");
+                name: "CharacteristicType");
 
             migrationBuilder.DropTable(
                 name: "AppUser");

@@ -117,7 +117,7 @@ namespace BaseTemplate.Infrastructure.Data.Migrations
                     b.ToTable("Item");
                 });
 
-            modelBuilder.Entity("BaseTemplate.Domain.Entities.ItemAttribute", b =>
+            modelBuilder.Entity("BaseTemplate.Domain.Entities.Characteristic", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -141,7 +141,7 @@ namespace BaseTemplate.Infrastructure.Data.Migrations
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("boolean");
 
-                    b.Property<int>("ItemAttributeTypeId")
+                    b.Property<int>("CharacteristicTypeId")
                         .HasColumnType("integer");
 
                     b.Property<DateTimeOffset?>("LastModified")
@@ -163,14 +163,14 @@ namespace BaseTemplate.Infrastructure.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ItemAttributeTypeId");
+                    b.HasIndex("CharacteristicTypeId");
 
                     b.HasIndex("TenantId");
 
-                    b.ToTable("ItemAttribute");
+                    b.ToTable("Characteristic");
                 });
 
-            modelBuilder.Entity("BaseTemplate.Domain.Entities.ItemAttributeType", b =>
+            modelBuilder.Entity("BaseTemplate.Domain.Entities.CharacteristicType", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -210,7 +210,7 @@ namespace BaseTemplate.Infrastructure.Data.Migrations
 
                     b.HasIndex("TenantId");
 
-                    b.ToTable("ItemAttributeType");
+                    b.ToTable("CharacteristicType");
                 });
 
             modelBuilder.Entity("BaseTemplate.Domain.Entities.Specification", b =>
@@ -458,11 +458,11 @@ namespace BaseTemplate.Infrastructure.Data.Migrations
                     b.Navigation("Tenant");
                 });
 
-            modelBuilder.Entity("BaseTemplate.Domain.Entities.ItemAttribute", b =>
+            modelBuilder.Entity("BaseTemplate.Domain.Entities.Characteristic", b =>
                 {
-                    b.HasOne("BaseTemplate.Domain.Entities.ItemAttributeType", "ItemAttributeType")
+                    b.HasOne("BaseTemplate.Domain.Entities.CharacteristicType", "CharacteristicType")
                         .WithMany()
-                        .HasForeignKey("ItemAttributeTypeId")
+                        .HasForeignKey("CharacteristicTypeId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -472,12 +472,12 @@ namespace BaseTemplate.Infrastructure.Data.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("ItemAttributeType");
+                    b.Navigation("CharacteristicType");
 
                     b.Navigation("Tenant");
                 });
 
-            modelBuilder.Entity("BaseTemplate.Domain.Entities.ItemAttributeType", b =>
+            modelBuilder.Entity("BaseTemplate.Domain.Entities.CharacteristicType", b =>
                 {
                     b.HasOne("BaseTemplate.Domain.Entities.Tenant", "Tenant")
                         .WithMany()

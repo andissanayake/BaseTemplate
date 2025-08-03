@@ -10,8 +10,8 @@ public interface IBaseDbContext
 }
 public interface IAppDbContext : IBaseDbContext
 {
-    DbSet<ItemAttributeType> ItemAttributeType { get; set; }
-    DbSet<ItemAttribute> ItemAttribute { get; set; }
+    DbSet<CharacteristicType> CharacteristicType { get; set; }
+    DbSet<Characteristic> Characteristic { get; set; }
     DbSet<Item> Item { get; set; }
     DbSet<Specification> Specification { get; set; }
 }

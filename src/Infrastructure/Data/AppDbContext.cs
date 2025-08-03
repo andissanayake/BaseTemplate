@@ -53,8 +53,8 @@ public class AppDbContext(DbContextOptions<AppDbContext> options, IUserProfileSe
     public DbSet<Tenant> Tenant { get; set; }
     public DbSet<StaffInvitation> StaffInvitation { get; set; }
     public DbSet<StaffInvitationRole> StaffInvitationRole { get; set; }
-    public DbSet<ItemAttributeType> ItemAttributeType { get; set; }
-    public DbSet<ItemAttribute> ItemAttribute { get; set; }
+    public DbSet<CharacteristicType> CharacteristicType { get; set; }
+    public DbSet<Characteristic> Characteristic { get; set; }
     public DbSet<Item> Item { get; set; }
     public DbSet<Specification> Specification { get; set; }
 
@@ -69,8 +69,8 @@ public class AppDbContext(DbContextOptions<AppDbContext> options, IUserProfileSe
 
         builder.Entity<StaffInvitation>().HasQueryFilter(e => !e.IsDeleted && e.TenantId == _profileService.UserProfile.TenantId);
         builder.Entity<StaffInvitationRole>().HasQueryFilter(e => !e.IsDeleted && e.TenantId == _profileService.UserProfile.TenantId);
-        builder.Entity<ItemAttributeType>().HasQueryFilter(e => !e.IsDeleted && e.TenantId == _profileService.UserProfile.TenantId);
-        builder.Entity<ItemAttribute>().HasQueryFilter(e => !e.IsDeleted && e.TenantId == _profileService.UserProfile.TenantId);
+        builder.Entity<CharacteristicType>().HasQueryFilter(e => !e.IsDeleted && e.TenantId == _profileService.UserProfile.TenantId);
+        builder.Entity<Characteristic>().HasQueryFilter(e => !e.IsDeleted && e.TenantId == _profileService.UserProfile.TenantId);
         builder.Entity<Item>().HasQueryFilter(e => !e.IsDeleted && e.TenantId == _profileService.UserProfile.TenantId);
         builder.Entity<Specification>().HasQueryFilter(e => !e.IsDeleted && e.TenantId == _profileService.UserProfile.TenantId);
     }
