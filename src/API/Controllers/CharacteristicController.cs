@@ -13,37 +13,37 @@ namespace BaseTemplate.API.Controllers;
 public class CharacteristicController : ApiControllerBase
 {
     /// <summary>
-    /// Create a new item attribute.
+    /// Create a new characteristic.
     /// </summary>
     /// <remarks>
     /// <b>What this endpoint does:</b>
     /// <ul>
-    ///   <li>Creates a new item attribute for the current tenant</li>
-    ///   <li>Validates that the item attribute type exists and belongs to the current tenant</li>
-    ///   <li>Validates that the name and code are unique within the item attribute type</li>
+    ///   <li>Creates a new characteristic for the current tenant</li>
+///   <li>Validates that the characteristic type exists and belongs to the current tenant</li>
+///   <li>Validates that the name and code are unique within the characteristic type</li>
     ///   <li>Automatically sets IsActive to true and associates with current tenant</li>
     ///   <li>Requires AttributeManager role permission</li>
     /// </ul>
     /// <b>Validation Rules:</b>
     /// <ul>
-    ///   <li>Name is required and must be unique within the attribute type</li>
-    ///   <li>Code is required and must be unique within the attribute type</li>
-    ///   <li>Value is required</li>
-    ///   <li>CharacteristicTypeId must reference an existing attribute type</li>
+    ///   <li>Name is required and must be unique within the characteristic type</li>
+///   <li>Code is required and must be unique within the characteristic type</li>
+///   <li>Value is required</li>
+///   <li>CharacteristicTypeId must reference an existing characteristic type</li>
     ///   <li>Maximum name length: 255 characters</li>
     ///   <li>Maximum code length: 50 characters</li>
     ///   <li>Maximum value length: 500 characters</li>
     /// </ul>
     /// <b>Request body:</b>
     /// <ul>
-    ///   <li><c>Name</c> (string, required): Name of the attribute (must be unique within attribute type)</li>
-    ///   <li><c>Code</c> (string, required): Code of the attribute (must be unique within attribute type)</li>
-    ///   <li><c>Value</c> (string, required): Value of the attribute</li>
-    ///   <li><c>CharacteristicTypeId</c> (int, required): ID of the attribute type this attribute belongs to</li>
+    ///   <li><c>Name</c> (string, required): Name of the characteristic (must be unique within characteristic type)</li>
+///   <li><c>Code</c> (string, required): Code of the characteristic (must be unique within characteristic type)</li>
+///   <li><c>Value</c> (string, required): Value of the characteristic</li>
+///   <li><c>CharacteristicTypeId</c> (int, required): ID of the characteristic type this characteristic belongs to</li>
     /// </ul>
     /// <b>Response:</b>
     /// <ul>
-    ///   <li><c>int</c>: The ID of the newly created item attribute</li>
+    ///   <li><c>int</c>: The ID of the newly created characteristic</li>
     /// </ul>
     /// </remarks>
     [HttpPost]
@@ -75,7 +75,7 @@ public class CharacteristicController : ApiControllerBase
     /// </ul>
     /// <b>Request body:</b>
     /// <ul>
-    ///   <li><c>Id</c> (int, required): ID of the attribute to update</li>
+    ///   <li><c>Id</c> (int, required): ID of the characteristic to update</li>
     ///   <li><c>Name</c> (string, required): Updated name of the characteristic (must be unique within characteristic type)</li>
 ///   <li><c>Code</c> (string, required): Updated code of the characteristic (must be unique within characteristic type)</li>
 ///   <li><c>Value</c> (string, required): Updated value of the characteristic</li>

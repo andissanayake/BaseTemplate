@@ -15,19 +15,19 @@ namespace BaseTemplate.API.Controllers;
 public class CharacteristicTypeController : ApiControllerBase
 {
     /// <summary>
-    /// Get all item attribute types for the current tenant.
+    /// Get all characteristic types for the current tenant.
     /// </summary>
     /// <remarks>
     /// <b>What this endpoint does:</b>
     /// <ul>
-    ///   <li>Retrieves all item attribute types belonging to the current user's tenant</li>
-    ///   <li>Returns only active attribute types (where IsActive = true)</li>
+    ///   <li>Retrieves all characteristic types belonging to the current user's tenant</li>
+///   <li>Returns only active characteristic types (where IsActive = true)</li>
     ///   <li>Results are ordered by creation date (newest first)</li>
     ///   <li>Requires AttributeManager role permission</li>
     /// </ul>
     /// <b>Response:</b>
     /// <ul>
-    ///   <li><c>List&lt;CharacteristicTypeBriefDto&gt;</c>: List of item attribute types with basic information including Id, Name, Description, IsActive</li>
+    ///   <li><c>List&lt;CharacteristicTypeBriefDto&gt;</c>: List of characteristic types with basic information including Id, Name, Description, IsActive</li>
     /// </ul>
     /// </remarks>
     [HttpGet]
@@ -39,14 +39,14 @@ public class CharacteristicTypeController : ApiControllerBase
     }
 
     /// <summary>
-    /// Get a specific item attribute type by ID.
+    /// Get a specific characteristic type by ID.
     /// </summary>
     /// <remarks>
     /// <b>What this endpoint does:</b>
     /// <ul>
-    ///   <li>Retrieves detailed information about a specific item attribute type</li>
-    ///   <li>Validates that the attribute type belongs to the current user's tenant</li>
-    ///   <li>Returns NotFound if the item attribute type does not exist or doesn't belong to the tenant</li>
+    ///   <li>Retrieves detailed information about a specific characteristic type</li>
+///   <li>Validates that the characteristic type belongs to the current user's tenant</li>
+///   <li>Returns NotFound if the characteristic type does not exist or doesn't belong to the tenant</li>
     ///   <li>Requires AttributeManager role permission</li>
     /// </ul>
     /// <b>Response:</b>
@@ -62,13 +62,13 @@ public class CharacteristicTypeController : ApiControllerBase
     }
 
     /// <summary>
-    /// Create a new item attribute type.
+    /// Create a new characteristic type.
     /// </summary>
     /// <remarks>
     /// <b>What this endpoint does:</b>
     /// <ul>
-    ///   <li>Creates a new item attribute type for the current tenant</li>
-    ///   <li>Validates that the name is unique within the tenant (case-sensitive)</li>
+    ///   <li>Creates a new characteristic type for the current tenant</li>
+///   <li>Validates that the name is unique within the tenant (case-sensitive)</li>
     ///   <li>Automatically sets IsActive to true and associates with current tenant</li>
     ///   <li>Requires AttributeManager role permission</li>
     /// </ul>
@@ -80,12 +80,12 @@ public class CharacteristicTypeController : ApiControllerBase
     /// </ul>
     /// <b>Request body:</b>
     /// <ul>
-    ///   <li><c>Name</c> (string, required): Name of the attribute type (must be unique within tenant)</li>
-    ///   <li><c>Description</c> (string, optional): Description of the attribute type</li>
+    ///   <li><c>Name</c> (string, required): Name of the characteristic type (must be unique within tenant)</li>
+///   <li><c>Description</c> (string, optional): Description of the characteristic type</li>
     /// </ul>
     /// <b>Response:</b>
     /// <ul>
-    ///   <li><c>int</c>: The ID of the newly created item attribute type</li>
+    ///   <li><c>int</c>: The ID of the newly created characteristic type</li>
     /// </ul>
     /// </remarks>
     [HttpPost]
@@ -100,23 +100,23 @@ public class CharacteristicTypeController : ApiControllerBase
     /// <remarks>
     /// <b>What this endpoint does:</b>
     /// <ul>
-    ///   <li>Updates an existing item attribute type for the current tenant</li>
-    ///   <li>Validates that the attribute type exists and belongs to the current tenant</li>
-    ///   <li>Validates that the new name is unique within the tenant (if name is being changed)</li>
+    ///   <li>Updates an existing characteristic type for the current tenant</li>
+///   <li>Validates that the characteristic type exists and belongs to the current tenant</li>
+///   <li>Validates that the new name is unique within the tenant (if name is being changed)</li>
     ///   <li>Requires AttributeManager role permission</li>
     /// </ul>
     /// <b>Validation Rules:</b>
     /// <ul>
-    ///   <li>Attribute type must exist and belong to current tenant</li>
-    ///   <li>Name is required and must be unique within the tenant</li>
-    ///   <li>Description is optional</li>
+    ///   <li>Characteristic type must exist and belong to current tenant</li>
+///   <li>Name is required and must be unique within the tenant</li>
+///   <li>Description is optional</li>
     ///   <li>Maximum name length: 255 characters</li>
     /// </ul>
     /// <b>Request body:</b>
     /// <ul>
-    ///   <li><c>Id</c> (int, required): ID of the attribute type to update</li>
-    ///   <li><c>Name</c> (string, required): Updated name of the attribute type (must be unique within tenant)</li>
-    ///   <li><c>Description</c> (string, optional): Updated description of the attribute type</li>
+    ///   <li><c>Id</c> (int, required): ID of the characteristic type to update</li>
+///   <li><c>Name</c> (string, required): Updated name of the characteristic type (must be unique within tenant)</li>
+///   <li><c>Description</c> (string, optional): Updated description of the characteristic type</li>
     /// </ul>
     /// <b>Response:</b>
     /// <ul>
@@ -136,7 +136,7 @@ public class CharacteristicTypeController : ApiControllerBase
     /// <b>What this endpoint does:</b>
     /// <ul>
     ///   <li>Performs a soft delete by setting IsActive to false</li>
-    ///   <li>Validates that the attribute type exists and belongs to the current tenant</li>
+///   <li>Validates that the characteristic type exists and belongs to the current tenant</li>
     ///   <li>Does not physically delete the record (preserves data integrity)</li>
     ///   <li>Requires AttributeManager role permission</li>
     /// </ul>
