@@ -8,6 +8,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Data\Scripts\**" />
+    <EmbeddedResource Remove="Data\Scripts\**" />
+    <None Remove="Data\Scripts\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="CsvHelper" Version="33.0.1" />
     <PackageReference Include="Dapper" Version="2.1.66" />
     <PackageReference Include="Dapper.SimpleCRUD" Version="2.3.0" />
@@ -27,7 +33,6 @@
 
   <ItemGroup>
     <Folder Include="Data\Migrations\" />
-    <Folder Include="Data\Scripts\" />
   </ItemGroup>
 
 </Project>
