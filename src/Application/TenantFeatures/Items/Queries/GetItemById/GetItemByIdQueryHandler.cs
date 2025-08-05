@@ -11,9 +11,19 @@ public class GetItemByIdQueryHandler(IAppDbContext context) : IRequestHandler<Ge
         var entity = await _context.Item.AsNoTracking()
             .Include(i => i.Specification)
                 .ThenInclude(s => s.ParentSpecification)
+            .Include(i => i.ItemCharacteristicTypeList)
+                .ThenInclude(ict => ict.CharacteristicType)
             .SingleAsync(i => i.Id == request.Id, cancellationToken);
 
         var specificationFullPath = entity.Specification?.FullPath ?? string.Empty;
+
+        var characteristicTypes = entity.ItemCharacteristicTypeList.Select(ict => new ItemCharacteristicTypeDto
+        {
+            Id = ict.Id,
+            CharacteristicTypeId = ict.CharacteristicTypeId,
+            CharacteristicTypeName = ict.CharacteristicType.Name,
+            CharacteristicTypeDescription = ict.CharacteristicType.Description
+        }).ToList();
 
         var itemDto = new ItemDto
         {
@@ -25,7 +35,8 @@ public class GetItemByIdQueryHandler(IAppDbContext context) : IRequestHandler<Ge
             IsActive = entity.IsActive,
             Category = entity.Category,
             SpecificationId = entity.SpecificationId,
-            SpecificationFullPath = specificationFullPath
+            SpecificationFullPath = specificationFullPath,
+            CharacteristicTypes = characteristicTypes
         };
 
         return Result<ItemDto>.Success(itemDto);

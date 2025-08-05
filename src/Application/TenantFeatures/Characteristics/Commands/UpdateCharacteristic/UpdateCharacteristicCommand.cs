@@ -1,6 +1,6 @@
 namespace BaseTemplate.Application.TenantFeatures.Characteristics.Commands.UpdateCharacteristic;
 
-[Authorize(Roles = Roles.AttributeManager)]
+[Authorize(Roles = Roles.CharacteristicManager)]
 public class UpdateCharacteristicCommand : IRequest<bool>
 {
     public int Id { get; set; }

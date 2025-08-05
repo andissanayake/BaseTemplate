@@ -21,4 +21,6 @@ public record UpdateItemCommand : IRequest<bool>
     
     [Required]
     public int SpecificationId { get; init; }
+    
+    public List<int> CharacteristicTypeIds { get; init; } = [];
 }

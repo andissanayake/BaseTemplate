@@ -14,4 +14,5 @@ public interface IAppDbContext : IBaseDbContext
     DbSet<Characteristic> Characteristic { get; set; }
     DbSet<Item> Item { get; set; }
     DbSet<Specification> Specification { get; set; }
+    DbSet<ItemCharacteristicType> ItemCharacteristicType { get; set; }
 }

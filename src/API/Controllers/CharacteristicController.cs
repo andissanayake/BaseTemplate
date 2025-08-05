@@ -22,7 +22,7 @@ public class CharacteristicController : ApiControllerBase
 ///   <li>Validates that the characteristic type exists and belongs to the current tenant</li>
 ///   <li>Validates that the name and code are unique within the characteristic type</li>
     ///   <li>Automatically sets IsActive to true and associates with current tenant</li>
-    ///   <li>Requires AttributeManager role permission</li>
+    ///   <li>Requires CharacteristicManager role permission</li>
     /// </ul>
     /// <b>Validation Rules:</b>
     /// <ul>
@@ -61,7 +61,7 @@ public class CharacteristicController : ApiControllerBase
     ///   <li>Updates an existing characteristic for the current tenant</li>
 ///   <li>Validates that the characteristic exists and belongs to the current tenant</li>
 ///   <li>Validates that the new name and code are unique within the characteristic type (if being changed)</li>
-    ///   <li>Requires AttributeManager role permission</li>
+    ///   <li>Requires CharacteristicManager role permission</li>
     /// </ul>
     /// <b>Validation Rules:</b>
     /// <ul>
@@ -101,7 +101,7 @@ public class CharacteristicController : ApiControllerBase
     ///   <li>Performs a soft delete by setting IsActive to false</li>
 ///   <li>Validates that the characteristic exists and belongs to the current tenant</li>
 ///   <li>Does not physically delete the record (preserves data integrity)</li>
-    ///   <li>Requires AttributeManager role permission</li>
+    ///   <li>Requires CharacteristicManager role permission</li>
     /// </ul>
     /// <b>Important Notes:</b>
     /// <ul>
@@ -129,7 +129,7 @@ public class CharacteristicController : ApiControllerBase
     ///   <li>Retrieves detailed information about a specific characteristic</li>
 ///   <li>Validates that the characteristic belongs to the current user's tenant</li>
 ///   <li>Returns NotFound if the characteristic does not exist or doesn't belong to the tenant</li>
-    ///   <li>Requires AttributeManager role permission</li>
+    ///   <li>Requires CharacteristicManager role permission</li>
     /// </ul>
     /// <b>Response:</b>
     /// <ul>

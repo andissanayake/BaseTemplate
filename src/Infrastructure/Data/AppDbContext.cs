@@ -57,7 +57,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options, IUserProfileSe
     public DbSet<Characteristic> Characteristic { get; set; }
     public DbSet<Item> Item { get; set; }
     public DbSet<Specification> Specification { get; set; }
-
+    public DbSet<ItemCharacteristicType> ItemCharacteristicType { get; set; }
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);

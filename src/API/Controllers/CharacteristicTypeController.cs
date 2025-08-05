@@ -23,7 +23,7 @@ public class CharacteristicTypeController : ApiControllerBase
     ///   <li>Retrieves all characteristic types belonging to the current user's tenant</li>
 ///   <li>Returns only active characteristic types (where IsActive = true)</li>
     ///   <li>Results are ordered by creation date (newest first)</li>
-    ///   <li>Requires AttributeManager role permission</li>
+    ///   <li>Requires CharacteristicManager role permission</li>
     /// </ul>
     /// <b>Response:</b>
     /// <ul>
@@ -47,7 +47,7 @@ public class CharacteristicTypeController : ApiControllerBase
     ///   <li>Retrieves detailed information about a specific characteristic type</li>
 ///   <li>Validates that the characteristic type belongs to the current user's tenant</li>
 ///   <li>Returns NotFound if the characteristic type does not exist or doesn't belong to the tenant</li>
-    ///   <li>Requires AttributeManager role permission</li>
+    ///   <li>Requires CharacteristicManager role permission</li>
     /// </ul>
     /// <b>Response:</b>
     /// <ul>
@@ -70,7 +70,7 @@ public class CharacteristicTypeController : ApiControllerBase
     ///   <li>Creates a new characteristic type for the current tenant</li>
 ///   <li>Validates that the name is unique within the tenant (case-sensitive)</li>
     ///   <li>Automatically sets IsActive to true and associates with current tenant</li>
-    ///   <li>Requires AttributeManager role permission</li>
+    ///   <li>Requires CharacteristicManager role permission</li>
     /// </ul>
     /// <b>Validation Rules:</b>
     /// <ul>
@@ -103,7 +103,7 @@ public class CharacteristicTypeController : ApiControllerBase
     ///   <li>Updates an existing characteristic type for the current tenant</li>
 ///   <li>Validates that the characteristic type exists and belongs to the current tenant</li>
 ///   <li>Validates that the new name is unique within the tenant (if name is being changed)</li>
-    ///   <li>Requires AttributeManager role permission</li>
+    ///   <li>Requires CharacteristicManager role permission</li>
     /// </ul>
     /// <b>Validation Rules:</b>
     /// <ul>
@@ -138,7 +138,7 @@ public class CharacteristicTypeController : ApiControllerBase
     ///   <li>Performs a soft delete by setting IsActive to false</li>
 ///   <li>Validates that the characteristic type exists and belongs to the current tenant</li>
     ///   <li>Does not physically delete the record (preserves data integrity)</li>
-    ///   <li>Requires AttributeManager role permission</li>
+    ///   <li>Requires CharacteristicManager role permission</li>
     /// </ul>
     /// <b>Important Notes:</b>
     /// <ul>
@@ -167,7 +167,7 @@ public class CharacteristicTypeController : ApiControllerBase
     ///   <li>Validates that the characteristic type belongs to the current user's tenant</li>
     ///   <li>Returns only active characteristics (where IsActive = true)</li>
     ///   <li>Results are ordered by creation date (newest first)</li>
-    ///   <li>Requires AttributeManager role permission</li>
+    ///   <li>Requires CharacteristicManager role permission</li>
     /// </ul>
     /// <b>Response:</b>
     /// <ul>

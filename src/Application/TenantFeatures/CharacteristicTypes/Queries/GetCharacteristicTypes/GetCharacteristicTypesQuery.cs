@@ -1,6 +1,6 @@
 namespace BaseTemplate.Application.TenantFeatures.CharacteristicTypes.Queries.GetCharacteristicTypes;
 
-[Authorize(Roles = Roles.AttributeManager)]
+[Authorize(Roles = Roles.CharacteristicManager)]
 public class GetCharacteristicTypesQuery : IRequest<List<CharacteristicTypeBriefDto>>
 {
 }

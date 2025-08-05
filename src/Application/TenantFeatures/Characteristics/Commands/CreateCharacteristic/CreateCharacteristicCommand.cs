@@ -1,6 +1,6 @@
 namespace BaseTemplate.Application.TenantFeatures.Characteristics.Commands.CreateCharacteristic;
 
-[Authorize(Roles = Roles.AttributeManager)]
+[Authorize(Roles = Roles.CharacteristicManager)]
 public class CreateCharacteristicCommand : IRequest<int>
 {
     public string Name { get; set; } = string.Empty;
