@@ -91,7 +91,7 @@ export const App = () => {
               element={
                 <ProtectedRoute
                   policy={Policies.Role}
-                  roles={[Roles.AttributeManager]}
+                  roles={[Roles.CharacteristicManager]}
                 >
                   <CharacteristicTypeListPage />
                 </ProtectedRoute>
@@ -102,7 +102,7 @@ export const App = () => {
               element={
                 <ProtectedRoute
                   policy={Policies.Role}
-                  roles={[Roles.AttributeManager]}
+                  roles={[Roles.CharacteristicManager]}
                 >
                   <CharacteristicTypeCreatePage />
                 </ProtectedRoute>
@@ -113,7 +113,7 @@ export const App = () => {
               element={
                 <ProtectedRoute
                   policy={Policies.Role}
-                  roles={[Roles.AttributeManager]}
+                  roles={[Roles.CharacteristicManager]}
                 >
                   <CharacteristicTypeEditPage />
                 </ProtectedRoute>
@@ -124,7 +124,7 @@ export const App = () => {
               element={
                 <ProtectedRoute
                   policy={Policies.Role}
-                  roles={[Roles.AttributeManager]}
+                  roles={[Roles.CharacteristicManager]}
                 >
                   <CharacteristicTypeViewPage />
                 </ProtectedRoute>
