@@ -1,4 +1,4 @@
-import axiosInstance from "../auth/axiosInstance";
+import { axiosInstance } from "../auth/axiosInstance";
 import { ResultHandlers } from "./handleResult";
 
 class ApiClient {

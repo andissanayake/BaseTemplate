@@ -92,4 +92,4 @@ const CharacteristicTypeCreate: React.FC = () => {
   );
 };
 
-export default CharacteristicTypeCreate;
+export { CharacteristicTypeCreate };

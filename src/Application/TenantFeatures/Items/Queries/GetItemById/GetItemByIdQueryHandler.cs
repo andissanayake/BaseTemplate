@@ -28,10 +28,8 @@ public class GetItemByIdQueryHandler(IAppDbContext context) : IRequestHandler<Ge
         var itemDto = new ItemDto
         {
             Id = entity.Id,
-            TenantId = entity.TenantId,
             Name = entity.Name,
             Description = entity.Description,
-            Price = entity.Price,
             IsActive = entity.IsActive,
             Tags = entity.Tags,
             SpecificationId = entity.SpecificationId,

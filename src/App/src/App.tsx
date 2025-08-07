@@ -2,7 +2,7 @@ import "./App.css";
 import { Policies } from "./auth/PoliciesEnum";
 import { Routes, Route } from "react-router";
 import { DefaultLayout } from "./layout/DefaultLayout";
-import ProtectedRoute from "./layout/ProtectedRoute";
+import { ProtectedRoute } from "./layout/ProtectedRoute";
 import { HomePage } from "./pages/HomePage";
 import { NotFoundPage } from "./pages/NotFoundPage";
 import { ProfilePage } from "./pages/ProfilePage";
@@ -16,17 +16,17 @@ import { ItemCreatePage } from "./pages/ItemCreatePage";
 import { ItemEditPage } from "./pages/ItemEditPage";
 import { ItemViewPage } from "./pages/ItemViewPage";
 import { ItemListPage } from "./pages/ItemListPage";
-import CharacteristicTypeCreatePage from "./pages/CharacteristicTypeCreatePage";
-import CharacteristicTypeEditPage from "./pages/CharacteristicTypeEditPage";
-import CharacteristicTypeViewPage from "./pages/CharacteristicTypeViewPage";
-import CharacteristicTypeListPage from "./pages/CharacteristicTypeListPage";
-import SpecificationListPage from "./pages/SpecificationListPage";
-import SpecificationCreatePage from "./pages/SpecificationCreatePage";
-import SpecificationEditPage from "./pages/SpecificationEditPage";
-import SpecificationViewPage from "./pages/SpecificationViewPage";
+import { CharacteristicTypeCreatePage } from "./pages/CharacteristicTypeCreatePage";
+import { CharacteristicTypeEditPage } from "./pages/CharacteristicTypeEditPage";
+import { CharacteristicTypeViewPage } from "./pages/CharacteristicTypeViewPage";
+import { CharacteristicTypeListPage } from "./pages/CharacteristicTypeListPage";
+import { SpecificationListPage } from "./pages/SpecificationListPage";
+import { SpecificationCreatePage } from "./pages/SpecificationCreatePage";
+import { SpecificationEditPage } from "./pages/SpecificationEditPage";
+import { SpecificationViewPage } from "./pages/SpecificationViewPage";
 import { LoginPage } from "./pages/LoginPage";
 import { LogoutPage } from "./pages/LogoutPage";
-import NoAccessPage from "./pages/NoAccessPage";
+import { NoAccessPage } from "./pages/NoAccessPage";
 import { ErrorBoundary } from "./layout/ErrorBoundary";
 import { Roles } from "./auth/RolesEnum";
 
@@ -253,5 +253,3 @@ export const App = () => {
     </>
   );
 };
-
-export default App;

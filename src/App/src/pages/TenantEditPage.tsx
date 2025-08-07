@@ -1,5 +1,5 @@
 import { Card } from "antd";
-import TenantEdit from "../features/Tenant/TenantEdit";
+import { TenantEdit } from "../features/Tenant/TenantEdit";
 
 export const TenantEditPage = () => {
   return (

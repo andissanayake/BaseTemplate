@@ -22,6 +22,8 @@ const SpecificationView: React.FC = () => {
     null
   );
 
+  if (!specificationId) throw new Error("specificationId is required");
+
   useEffect(() => {
     if (specificationId) {
       loadSpecification();
@@ -104,4 +106,4 @@ const SpecificationView: React.FC = () => {
   );
 };
 
-export default SpecificationView;
+export { SpecificationView };

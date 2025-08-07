@@ -1,5 +1,5 @@
 import { Card } from "antd";
-import CharacteristicTypeEdit from "../features/CharacteristicType/CharacteristicTypeEdit";
+import { CharacteristicTypeEdit } from "../features/CharacteristicType/CharacteristicTypeEdit";
 
 const CharacteristicTypeEditPage: React.FC = () => {
   return (
@@ -9,4 +9,4 @@ const CharacteristicTypeEditPage: React.FC = () => {
   );
 };
 
-export default CharacteristicTypeEditPage;
+export { CharacteristicTypeEditPage };

@@ -118,4 +118,4 @@ const CharacteristicTypeEdit: React.FC = () => {
   );
 };
 
-export default CharacteristicTypeEdit;
+export { CharacteristicTypeEdit };

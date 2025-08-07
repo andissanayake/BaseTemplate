@@ -102,4 +102,4 @@ const TenantEdit: React.FC = () => {
   );
 };
 
-export default TenantEdit;
+export { TenantEdit };

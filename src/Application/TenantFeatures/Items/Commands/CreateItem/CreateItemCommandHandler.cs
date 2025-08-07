@@ -10,7 +10,6 @@ public class CreateItemCommandHandler(IAppDbContext context) : IRequestHandler<C
         {
             Name = request.Name,
             Description = request.Description,
-            Price = request.Price,
             Tags = request.Tags,
             IsActive = true,
             SpecificationId = request.SpecificationId

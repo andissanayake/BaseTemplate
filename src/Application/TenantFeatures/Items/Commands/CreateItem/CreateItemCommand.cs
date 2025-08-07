@@ -11,8 +11,6 @@ public record CreateItemCommand : IRequest<int>
 
     public string? Description { get; init; }
 
-    [Range(0, double.MaxValue, ErrorMessage = "Price must be greater than or equal to 0.")]
-    public decimal Price { get; init; }
     public string? Tags { get; init; }
 
     [Required]

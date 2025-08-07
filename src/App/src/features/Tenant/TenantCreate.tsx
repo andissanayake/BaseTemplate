@@ -71,4 +71,4 @@ const TenantCreate: React.FC = () => {
   );
 };
 
-export default TenantCreate;
+export { TenantCreate };

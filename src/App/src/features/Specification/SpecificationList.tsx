@@ -137,4 +137,4 @@ const SpecificationList: React.FC = () => {
   );
 };
 
-export default SpecificationList;
+export { SpecificationList };

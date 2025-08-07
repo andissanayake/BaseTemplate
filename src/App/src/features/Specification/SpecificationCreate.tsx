@@ -139,4 +139,4 @@ const SpecificationCreate: React.FC = () => {
   );
 };
 
-export default SpecificationCreate;
+export { SpecificationCreate };

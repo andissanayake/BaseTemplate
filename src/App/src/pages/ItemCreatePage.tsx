@@ -1,5 +1,5 @@
 import { Card } from "antd";
-import ItemCreate from "../features/Item/ItemCreate";
+import { ItemCreate } from "../features/Item/ItemCreate";
 
 export const ItemCreatePage = () => {
   return (

@@ -3,7 +3,6 @@ import {
   Form,
   Input,
   notification,
-  InputNumber,
   Button,
   Space,
   Typography,
@@ -57,7 +56,7 @@ const ItemCreate: React.FC = () => {
         `/api/item`,
         {
           ...values,
-          category: values.category?.join(",") || "",
+          tags: values.tags?.join(",") || "",
         },
         {
           onSuccess: () => {
@@ -103,19 +102,6 @@ const ItemCreate: React.FC = () => {
         </Form.Item>
 
         <Form.Item
-          label="Price"
-          name="price"
-          rules={[{ required: true, message: "Please enter the item price!" }]}
-        >
-          <InputNumber
-            min={0}
-            step={0.01}
-            style={{ width: "100%" }}
-            placeholder="Enter item price"
-          />
-        </Form.Item>
-
-        <Form.Item
           label="Specification"
           name="specificationId"
           rules={[
@@ -132,11 +118,11 @@ const ItemCreate: React.FC = () => {
           />
         </Form.Item>
 
-        <Form.Item label="Categories" name="category">
+        <Form.Item label="Tags" name="tags">
           <Select
             mode="tags"
             style={{ width: "100%" }}
-            placeholder="Enter categories"
+            placeholder="Enter tags"
             tokenSeparators={[","]}
           />
         </Form.Item>
@@ -156,4 +142,4 @@ const ItemCreate: React.FC = () => {
   );
 };
 
-export default ItemCreate;
+export { ItemCreate };

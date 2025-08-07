@@ -17,7 +17,7 @@ import {
   StaffInvitationDto,
   StaffInvitationStatus,
 } from "./StaffInvitationModel";
-import StaffInvitationCreate from "./StaffInvitationCreate";
+import { StaffInvitationCreate } from "./StaffInvitationCreate";
 
 const { TextArea } = Input;
 
