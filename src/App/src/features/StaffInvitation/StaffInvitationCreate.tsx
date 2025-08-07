@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import {
   Modal,
   Form,
@@ -29,7 +29,7 @@ const StaffInvitationCreate: React.FC<StaffInvitationCreateProps> = ({
   const [loading, setLoading] = useState(false);
   const { roles } = useAuthStore();
   // Available roles - you can customize this based on your application
-  const availableRoles = React.useMemo(
+  const availableRoles = useMemo(
     () => roles.filter((role) => role !== Roles.TenantOwner),
     [roles]
   );

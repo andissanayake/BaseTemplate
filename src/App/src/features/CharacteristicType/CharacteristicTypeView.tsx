@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { Card, Descriptions, Space, Tag, Typography, Button } from "antd";
 import { useParams, useNavigate } from "react-router-dom";
 import { useCharacteristicTypeStore } from "./characteristicTypeStore";
@@ -16,7 +16,7 @@ const CharacteristicTypeView: React.FC = () => {
     throw new Error("characteristicTypeId is required");
 
   const [characteristicType, setCharacteristicType] =
-    React.useState<CharacteristicType | null>(null);
+    useState<CharacteristicType | null>(null);
 
   useEffect(() => {
     const fetchCharacteristicType = async () => {

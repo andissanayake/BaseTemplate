@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import {
   Form,
   Select,
@@ -33,7 +33,7 @@ const StaffRoleEdit: React.FC<StaffRoleEditProps> = ({
   const [loading, setLoading] = useState(false);
 
   // Available roles - you can customize this based on your application
-  const availableRoles = React.useMemo(
+  const availableRoles = useMemo(
     () => roles.filter((role) => role !== Roles.TenantOwner),
     [roles]
   );

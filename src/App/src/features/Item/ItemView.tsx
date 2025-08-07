@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { Card, Descriptions, Space, Tag, Typography, Button } from "antd";
 import { useParams, useNavigate } from "react-router-dom";
 import { useItemStore } from "./itemStore";
@@ -13,7 +13,7 @@ const ItemView: React.FC = () => {
 
   if (!itemId) throw new Error("itemId is required");
 
-  const [item, setItem] = React.useState<Item | null>(null);
+  const [item, setItem] = useState<Item | null>(null);
 
   useEffect(() => {
     const fetchItem = async () => {
