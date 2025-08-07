@@ -19,13 +19,13 @@ public class UpdateItemCommandHandler(IAppDbContext context) : IRequestHandler<U
         entity.SpecificationId = request.SpecificationId;
 
         // Handle characteristic type relationships
-        if (request.CharacteristicTypeIds.Any())
+        if (request.CharacteristicTypeIds.Count != 0)
         {
             // Remove existing characteristic type relationships
             var existingCharacteristicTypes = await _context.ItemCharacteristicType
                 .Where(ict => ict.ItemId == request.Id)
                 .ToListAsync(cancellationToken);
-            
+
             _context.ItemCharacteristicType.RemoveRange(existingCharacteristicTypes);
 
             // Add new characteristic type relationships
@@ -43,7 +43,7 @@ public class UpdateItemCommandHandler(IAppDbContext context) : IRequestHandler<U
             var existingCharacteristicTypes = await _context.ItemCharacteristicType
                 .Where(ict => ict.ItemId == request.Id)
                 .ToListAsync(cancellationToken);
-            
+
             _context.ItemCharacteristicType.RemoveRange(existingCharacteristicTypes);
         }
 
