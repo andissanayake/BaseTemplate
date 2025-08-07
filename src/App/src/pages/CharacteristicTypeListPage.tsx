@@ -1,5 +1,5 @@
 import { Card } from "antd";
-import CharacteristicTypeList from "../features/CharacteristicType/CharacteristicTypeList";
+import { CharacteristicTypeList } from "../features/CharacteristicType/CharacteristicTypeList";
 
 const CharacteristicTypeListPage: React.FC = () => {
   return (
@@ -9,4 +9,4 @@ const CharacteristicTypeListPage: React.FC = () => {
   );
 };
 
-export default CharacteristicTypeListPage;
+export { CharacteristicTypeListPage };

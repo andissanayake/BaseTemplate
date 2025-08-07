@@ -57,7 +57,7 @@ const ItemCreate: React.FC = () => {
         `/api/item`,
         {
           ...values,
-          category: values.category?.join(",") || "",
+          tags: values.tags?.join(",") || "",
         },
         {
           onSuccess: () => {
@@ -132,11 +132,11 @@ const ItemCreate: React.FC = () => {
           />
         </Form.Item>
 
-        <Form.Item label="Categories" name="category">
+        <Form.Item label="Tags" name="tags">
           <Select
             mode="tags"
             style={{ width: "100%" }}
-            placeholder="Enter categories"
+            placeholder="Enter tags"
             tokenSeparators={[","]}
           />
         </Form.Item>
@@ -156,4 +156,4 @@ const ItemCreate: React.FC = () => {
   );
 };
 
-export default ItemCreate;
+export { ItemCreate };

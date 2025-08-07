@@ -4,7 +4,7 @@ export interface Item {
   name: string;
   description?: string;
   price: number;
-  category?: string;
+  tags?: string;
   isActive: boolean;
   specificationId: number;
   specificationFullPath: string;

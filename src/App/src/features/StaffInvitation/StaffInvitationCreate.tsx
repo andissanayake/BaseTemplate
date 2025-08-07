@@ -129,4 +129,4 @@ const StaffInvitationCreate: React.FC<StaffInvitationCreateProps> = ({
   );
 };
 
-export default StaffInvitationCreate;
+export { StaffInvitationCreate };

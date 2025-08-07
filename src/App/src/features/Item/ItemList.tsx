@@ -107,16 +107,16 @@ const ItemList: React.FC = () => {
         specificationFullPath || "No specification",
     },
     {
-      title: "Categories",
-      dataIndex: "category",
-      key: "category",
-      render: (category: string) => (
+      title: "Tags",
+      dataIndex: "tags",
+      key: "tags",
+      render: (tags: string) => (
         <Space wrap>
-          {category
+          {tags
             ?.split(",")
             .filter(Boolean)
-            .map((cat) => (
-              <Tag key={cat}>{cat}</Tag>
+            .map((tag) => (
+              <Tag key={tag}>{tag}</Tag>
             ))}
         </Space>
       ),
@@ -173,4 +173,4 @@ const ItemList: React.FC = () => {
   );
 };
 
-export default ItemList;
+export { ItemList };

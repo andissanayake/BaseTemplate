@@ -35,4 +35,4 @@ export const setupAxios = () => {
   );
 };
 
-export default axiosInstance;
+export { axiosInstance };

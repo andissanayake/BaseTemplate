@@ -43,9 +43,7 @@ const ItemView: React.FC = () => {
     );
   }
 
-  const categories = item.category
-    ? item.category.split(",").filter(Boolean)
-    : [];
+  const tags = item.tags ? item.tags.split(",").filter(Boolean) : [];
 
   return (
     <Card>
@@ -83,17 +81,17 @@ const ItemView: React.FC = () => {
           {item.specificationFullPath || "No specification assigned"}
         </Descriptions.Item>
 
-        <Descriptions.Item label="Categories">
-          {categories.length > 0 ? (
+        <Descriptions.Item label="Tags">
+          {tags.length > 0 ? (
             <Space wrap>
-              {categories.map((category: string) => (
-                <Tag color="blue" key={category}>
-                  {category.trim()}
+              {tags.map((tag: string) => (
+                <Tag color="blue" key={tag}>
+                  {tag.trim()}
                 </Tag>
               ))}
             </Space>
           ) : (
-            "No categories assigned"
+            "No tags assigned"
           )}
         </Descriptions.Item>
 

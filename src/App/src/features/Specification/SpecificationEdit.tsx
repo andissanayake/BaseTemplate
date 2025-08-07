@@ -221,4 +221,4 @@ const SpecificationEdit: React.FC = () => {
   );
 };
 
-export default SpecificationEdit;
+export { SpecificationEdit };

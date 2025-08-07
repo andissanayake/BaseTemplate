@@ -15,7 +15,7 @@ import { DeleteOutlined, EditOutlined, UserOutlined } from "@ant-design/icons";
 import { apiClient } from "../../common/apiClient";
 import { useStaffStore } from "./staffStore";
 import { StaffMemberDto } from "./StaffModel";
-import StaffRoleEdit from "./StaffRoleEdit";
+import { StaffRoleEdit } from "./StaffRoleEdit";
 
 const { Title } = Typography;
 
@@ -203,4 +203,4 @@ const StaffList: React.FC = () => {
   );
 };
 
-export default StaffList;
+export { StaffList };

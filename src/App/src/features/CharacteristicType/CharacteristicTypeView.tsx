@@ -5,7 +5,7 @@ import { useCharacteristicTypeStore } from "./characteristicTypeStore";
 import { apiClient } from "../../common/apiClient";
 import { CharacteristicType } from "./CharacteristicTypeModel";
 import { notification } from "antd";
-import CharacteristicDashboard from "../Characteristic/CharacteristicDashboard";
+import { CharacteristicDashboard } from "../Characteristic/CharacteristicDashboard";
 
 const CharacteristicTypeView: React.FC = () => {
   const { setLoading } = useCharacteristicTypeStore();

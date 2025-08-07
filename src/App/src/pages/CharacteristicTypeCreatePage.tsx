@@ -1,5 +1,5 @@
 import { Card } from "antd";
-import CharacteristicTypeCreate from "../features/CharacteristicType/CharacteristicTypeCreate";
+import { CharacteristicTypeCreate } from "../features/CharacteristicType/CharacteristicTypeCreate";
 
 const CharacteristicTypeCreatePage: React.FC = () => {
   return (
@@ -9,4 +9,4 @@ const CharacteristicTypeCreatePage: React.FC = () => {
   );
 };
 
-export default CharacteristicTypeCreatePage;
+export { CharacteristicTypeCreatePage };

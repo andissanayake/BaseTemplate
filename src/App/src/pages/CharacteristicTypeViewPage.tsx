@@ -5,4 +5,4 @@ const CharacteristicTypeViewPage: React.FC = () => {
   return <CharacteristicTypeView />;
 };
 
-export default CharacteristicTypeViewPage;
+export { CharacteristicTypeViewPage };

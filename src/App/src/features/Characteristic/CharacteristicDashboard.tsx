@@ -94,37 +94,33 @@ const CharacteristicDashboard: React.FC<CharacteristicDashboardProps> = ({
   };
 
   const save = async (id: number) => {
-    try {
-      const row = await form.validateFields();
-      const updatedData = { ...row, id };
+    const row = await form.validateFields();
+    const updatedData = { ...row, id };
 
-      setLoading(true);
-      apiClient.put<boolean>(`/api/characteristic`, updatedData, {
-        onSuccess: () => {
-          notification.success({
-            message: "Characteristic updated successfully!",
-          });
-          setEditingKey(null);
-          loadCharacteristics();
-        },
-        onValidationError: (errors: Record<string, string[]>) => {
-          handleFormValidationErrors({
-            form,
-            errors,
-          });
-        },
-        onServerError: () => {
-          notification.error({
-            message: "Failed to update characteristic!",
-          });
-        },
-        onFinally: () => {
-          setLoading(false);
-        },
-      });
-    } catch (errInfo) {
-      console.log("Validate Failed:", errInfo);
-    }
+    setLoading(true);
+    apiClient.put<boolean>(`/api/characteristic`, updatedData, {
+      onSuccess: () => {
+        notification.success({
+          message: "Characteristic updated successfully!",
+        });
+        setEditingKey(null);
+        loadCharacteristics();
+      },
+      onValidationError: (errors: Record<string, string[]>) => {
+        handleFormValidationErrors({
+          form,
+          errors,
+        });
+      },
+      onServerError: () => {
+        notification.error({
+          message: "Failed to update characteristic!",
+        });
+      },
+      onFinally: () => {
+        setLoading(false);
+      },
+    });
   };
 
   // Create new characteristic
@@ -398,4 +394,4 @@ const CharacteristicDashboard: React.FC<CharacteristicDashboardProps> = ({
   );
 };
 
-export default CharacteristicDashboard;
+export { CharacteristicDashboard };

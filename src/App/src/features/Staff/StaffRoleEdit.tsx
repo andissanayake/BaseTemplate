@@ -123,4 +123,4 @@ const StaffRoleEdit: React.FC<StaffRoleEditProps> = ({
   );
 };
 
-export default StaffRoleEdit;
+export { StaffRoleEdit };

@@ -162,4 +162,4 @@ const CharacteristicTypeList: React.FC = () => {
   );
 };
 
-export default CharacteristicTypeList;
+export { CharacteristicTypeList };

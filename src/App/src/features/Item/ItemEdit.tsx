@@ -58,7 +58,7 @@ const ItemEdit: React.FC = () => {
   const handleSaveItem = () => {
     form.validateFields().then(async (values) => {
       values.id = +itemId;
-      values.category = values.category?.join(",") || "";
+      values.tags = values.tags?.join(",") || "";
       setLoading(true);
       apiClient.put<boolean>(`/api/item`, values, {
         onSuccess: () => {
@@ -91,9 +91,7 @@ const ItemEdit: React.FC = () => {
         if (data) {
           form.setFieldsValue({
             ...data,
-            category: data.category
-              ? data.category.split(",").filter(Boolean)
-              : [],
+            tags: data.tags ? data.tags.split(",").filter(Boolean) : [],
           });
         }
       },
@@ -156,11 +154,11 @@ const ItemEdit: React.FC = () => {
           />
         </Form.Item>
 
-        <Form.Item label="Categories" name="category">
+        <Form.Item label="Tags" name="tags">
           <Select
             mode="tags"
             style={{ width: "100%" }}
-            placeholder="Enter categories"
+            placeholder="Enter tags"
             tokenSeparators={[","]}
           />
         </Form.Item>
@@ -180,4 +178,4 @@ const ItemEdit: React.FC = () => {
   );
 };
 
-export default ItemEdit;
+export { ItemEdit };

@@ -18,4 +18,4 @@ const NoAccessPage: React.FC = () => {
   );
 };
 
-export default NoAccessPage;
+export { NoAccessPage };

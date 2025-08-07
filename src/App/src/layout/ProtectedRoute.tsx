@@ -33,4 +33,4 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   return hasAccess() ? <>{children}</> : <Navigate to="/no-access" />;
 };
 
-export default ProtectedRoute;
+export { ProtectedRoute };
