@@ -130,10 +130,10 @@ export const AppMenu = () => {
             },
           });
         }
-        if (hasRole([Roles.AttributeManager])) {
+        if (hasRole([Roles.CharacteristicManager])) {
           menuItems.push({
-            key: "/item-attribute-types",
-            label: "Attribute Type",
+            key: "/characteristic-types",
+            label: "Characteristic Type",
             onClick: (e: any) => {
               handleClick(e.key);
             },

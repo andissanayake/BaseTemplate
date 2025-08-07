@@ -4,6 +4,6 @@ export enum Roles {
   StaffInvitationManager = "StaffInvitationManager",
   StaffManager = "StaffManager",
   TenantManager = "TenantManager",
-  AttributeManager = "AttributeManager",
+  CharacteristicManager = "CharacteristicManager",
   SpecificationManager = "SpecificationManager",
 }

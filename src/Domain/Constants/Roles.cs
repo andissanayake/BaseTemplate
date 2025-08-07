@@ -9,7 +9,7 @@ public abstract class Roles
     public const string StaffInvitationManager = nameof(StaffInvitationManager);
     public const string StaffManager = nameof(StaffManager);
     public const string TenantManager = nameof(TenantManager);
-    public const string AttributeManager = nameof(AttributeManager);
+    public const string CharacteristicManager = nameof(CharacteristicManager);
     public const string SpecificationManager = nameof(SpecificationManager);
 
     public static readonly List<string> TenantBaseRoles =
@@ -18,7 +18,7 @@ public abstract class Roles
         StaffInvitationManager,
         StaffManager,
         TenantManager,
-        AttributeManager,
+        CharacteristicManager,
         SpecificationManager
     ];
 }

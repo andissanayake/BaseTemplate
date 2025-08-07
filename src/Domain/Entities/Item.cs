@@ -9,4 +9,5 @@ public class Item : BaseTenantAuditableEntity
     public string? Category { get; set; }
     public int SpecificationId { get; set; }
     public Specification Specification { get; set; } = default!;
+    public List<ItemCharacteristicType> ItemCharacteristicTypeList { get; set; } = [];
 }

@@ -19,6 +19,7 @@ public class CreateItemCommandHandler(IAppDbContext context) : IRequestHandler<C
 
         _context.Item.Add(entity);
         await _context.SaveChangesAsync(cancellationToken);
+
         return Result<int>.Success(entity.Id);
     }
 }
