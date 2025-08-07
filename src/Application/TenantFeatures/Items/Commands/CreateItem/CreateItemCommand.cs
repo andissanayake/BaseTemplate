@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 namespace BaseTemplate.Application.TenantFeatures.Items.Commands.CreateItem;
 
 [Authorize(Roles = Roles.ItemManager)]
-public record CreateItemCommand() : IRequest<int>
+public record CreateItemCommand : IRequest<int>
 {
     [Required]
     [MaxLength(200, ErrorMessage = "The name cannot exceed 200 characters.")]
@@ -13,8 +13,8 @@ public record CreateItemCommand() : IRequest<int>
 
     [Range(0, double.MaxValue, ErrorMessage = "Price must be greater than or equal to 0.")]
     public decimal Price { get; init; }
-    public string? Category { get; init; }
-    
+    public string? Tags { get; init; }
+
     [Required]
     public int SpecificationId { get; init; }
 }

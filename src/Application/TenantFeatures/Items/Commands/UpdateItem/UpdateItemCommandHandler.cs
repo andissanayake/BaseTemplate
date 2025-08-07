@@ -15,7 +15,7 @@ public class UpdateItemCommandHandler(IAppDbContext context) : IRequestHandler<U
         entity.Name = request.Name;
         entity.Description = request.Description;
         entity.Price = request.Price;
-        entity.Category = request.Category;
+        entity.Tags = request.Tags;
         entity.IsActive = request.IsActive;
         entity.SpecificationId = request.SpecificationId;
 

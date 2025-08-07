@@ -8,7 +8,7 @@ public class ItemBriefDto
     public string? Description { get; init; }
     public decimal Price { get; init; }
     public bool IsActive { get; init; }
-    public string? Category { get; init; }
+    public string? Tags { get; init; }
     public int SpecificationId { get; init; }
     public string SpecificationFullPath { get; init; } = string.Empty;
 } 

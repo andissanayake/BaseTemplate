@@ -8,9 +8,21 @@ public class GetSpecificationsQueryHandler(IAppDbContext context) : IRequestHand
 
     public async Task<Result<GetSpecificationsResponse>> HandleAsync(GetSpecificationsQuery request, CancellationToken cancellationToken)
     {
+        // Load all specifications without includes
         var allSpecifications = await _context.Specification.AsNoTracking()
-            .Include(s => s.ParentSpecification)
             .ToListAsync(cancellationToken);
+
+        // Create a lookup for quick access
+        var specificationLookup = allSpecifications.ToDictionary(s => s.Id);
+
+        // Build the parent hierarchy by setting ParentSpecification references
+        foreach (var spec in allSpecifications)
+        {
+            if (spec.ParentSpecificationId.HasValue && specificationLookup.TryGetValue(spec.ParentSpecificationId.Value, out var parent))
+            {
+                spec.ParentSpecification = parent;
+            }
+        }
 
         // Create DTOs with full paths using entity property
         var specificationDtos = allSpecifications.Select(s => new SpecificationBriefDto
@@ -23,8 +35,8 @@ public class GetSpecificationsQueryHandler(IAppDbContext context) : IRequestHand
             Children = []
         }).ToList();
 
-        // Create a lookup for quick access
-        var specificationLookup = specificationDtos.ToDictionary(s => s.Id);
+        // Create a lookup for quick access to DTOs
+        var specificationDtoLookup = specificationDtos.ToDictionary(s => s.Id);
 
         // Get only root specifications (those without parents)
         var rootSpecifications = specificationDtos.Where(s => !s.ParentSpecificationId.HasValue).ToList();
@@ -32,7 +44,7 @@ public class GetSpecificationsQueryHandler(IAppDbContext context) : IRequestHand
         // Build the hierarchical structure
         foreach (var spec in specificationDtos)
         {
-            if (spec.ParentSpecificationId.HasValue && specificationLookup.TryGetValue(spec.ParentSpecificationId.Value, out SpecificationBriefDto? value))
+            if (spec.ParentSpecificationId.HasValue && specificationDtoLookup.TryGetValue(spec.ParentSpecificationId.Value, out SpecificationBriefDto? value))
             {
                 var parent = value;
                 parent.Children.Add(spec);

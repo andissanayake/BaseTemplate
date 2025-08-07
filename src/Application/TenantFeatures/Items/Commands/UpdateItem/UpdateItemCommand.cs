@@ -5,6 +5,7 @@ namespace BaseTemplate.Application.TenantFeatures.Items.Commands.UpdateItem;
 [Authorize(Roles = Roles.ItemManager)]
 public record UpdateItemCommand : IRequest<bool>
 {
+    [Required]
     public int Id { get; init; }
 
     [Required]
@@ -16,11 +17,11 @@ public record UpdateItemCommand : IRequest<bool>
     [Range(0, double.MaxValue, ErrorMessage = "Price must be greater than or equal to 0.")]
     public decimal Price { get; init; }
 
-    public string? Category { get; init; }
+    public string? Tags { get; init; }
     public bool IsActive { get; init; }
-    
+
     [Required]
     public int SpecificationId { get; init; }
-    
+
     public List<int> CharacteristicTypeIds { get; init; } = [];
 }
