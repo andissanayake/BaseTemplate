@@ -94,12 +94,6 @@ const ItemList: React.FC = () => {
       key: "description",
     },
     {
-      title: "Price",
-      dataIndex: "price",
-      key: "price",
-      render: (price: number) => `$${price.toFixed(2)}`,
-    },
-    {
       title: "Specification",
       dataIndex: "specificationFullPath",
       key: "specificationFullPath",

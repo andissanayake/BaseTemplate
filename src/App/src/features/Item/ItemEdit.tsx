@@ -3,7 +3,6 @@ import {
   Form,
   Input,
   notification,
-  InputNumber,
   Button,
   Space,
   Typography,
@@ -122,19 +121,6 @@ const ItemEdit: React.FC = () => {
 
         <Form.Item label="Description" name="description">
           <Input.TextArea placeholder="Enter item description" />
-        </Form.Item>
-
-        <Form.Item
-          label="Price"
-          name="price"
-          rules={[{ required: true, message: "Please enter the item price!" }]}
-        >
-          <InputNumber
-            min={0}
-            step={0.01}
-            style={{ width: "100%" }}
-            placeholder="Enter item price"
-          />
         </Form.Item>
 
         <Form.Item

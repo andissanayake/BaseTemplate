@@ -73,10 +73,6 @@ const ItemView: React.FC = () => {
           {item.description || "-"}
         </Descriptions.Item>
 
-        <Descriptions.Item label="Price">
-          ${item.price?.toFixed(2) || "0.00"}
-        </Descriptions.Item>
-
         <Descriptions.Item label="Specification">
           {item.specificationFullPath || "No specification assigned"}
         </Descriptions.Item>

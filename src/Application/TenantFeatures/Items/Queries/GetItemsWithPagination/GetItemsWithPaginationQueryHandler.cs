@@ -33,7 +33,6 @@ public class GetItemsWithPaginationQueryHandler(IAppDbContext context) : IReques
             TenantId = i.TenantId,
             Name = i.Name,
             Description = i.Description,
-            Price = i.Price,
             IsActive = i.IsActive,
             Tags = i.Tags,
             SpecificationId = i.SpecificationId,
