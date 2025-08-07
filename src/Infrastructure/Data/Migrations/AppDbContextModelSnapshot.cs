@@ -170,9 +170,6 @@ namespace BaseTemplate.Infrastructure.Data.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("Category")
-                        .HasColumnType("text");
-
                     b.Property<DateTimeOffset>("Created")
                         .HasColumnType("timestamp with time zone");
 
@@ -204,6 +201,9 @@ namespace BaseTemplate.Infrastructure.Data.Migrations
                     b.Property<int>("SpecificationId")
                         .HasColumnType("integer");
 
+                    b.Property<string>("Tags")
+                        .HasColumnType("text");
+
                     b.Property<int>("TenantId")
                         .HasColumnType("integer");
 
@@ -214,6 +214,49 @@ namespace BaseTemplate.Infrastructure.Data.Migrations
                     b.HasIndex("TenantId");
 
                     b.ToTable("Item");
+                });
+
+            modelBuilder.Entity("BaseTemplate.Domain.Entities.ItemCharacteristicType", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("CharacteristicTypeId")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTimeOffset>("Created")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("CreatedBy")
+                        .HasColumnType("integer");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<int>("ItemId")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTimeOffset?>("LastModified")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int?>("LastModifiedBy")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("TenantId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CharacteristicTypeId");
+
+                    b.HasIndex("ItemId");
+
+                    b.HasIndex("TenantId");
+
+                    b.ToTable("ItemCharacteristicType");
                 });
 
             modelBuilder.Entity("BaseTemplate.Domain.Entities.Specification", b =>
@@ -501,6 +544,33 @@ namespace BaseTemplate.Infrastructure.Data.Migrations
                     b.Navigation("Tenant");
                 });
 
+            modelBuilder.Entity("BaseTemplate.Domain.Entities.ItemCharacteristicType", b =>
+                {
+                    b.HasOne("BaseTemplate.Domain.Entities.CharacteristicType", "CharacteristicType")
+                        .WithMany()
+                        .HasForeignKey("CharacteristicTypeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("BaseTemplate.Domain.Entities.Item", "Item")
+                        .WithMany("ItemCharacteristicTypeList")
+                        .HasForeignKey("ItemId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("BaseTemplate.Domain.Entities.Tenant", "Tenant")
+                        .WithMany()
+                        .HasForeignKey("TenantId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("CharacteristicType");
+
+                    b.Navigation("Item");
+
+                    b.Navigation("Tenant");
+                });
+
             modelBuilder.Entity("BaseTemplate.Domain.Entities.Specification", b =>
                 {
                     b.HasOne("BaseTemplate.Domain.Entities.Specification", "ParentSpecification")
@@ -571,6 +641,11 @@ namespace BaseTemplate.Infrastructure.Data.Migrations
                         .IsRequired();
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("BaseTemplate.Domain.Entities.Item", b =>
+                {
+                    b.Navigation("ItemCharacteristicTypeList");
                 });
 
             modelBuilder.Entity("BaseTemplate.Domain.Entities.Specification", b =>

@@ -6,13 +6,12 @@ public class CreateItemCommandHandler(IAppDbContext context) : IRequestHandler<C
 
     public async Task<Result<int>> HandleAsync(CreateItemCommand request, CancellationToken cancellationToken)
     {
-
         var entity = new Item
         {
             Name = request.Name,
             Description = request.Description,
             Price = request.Price,
-            Category = request.Category,
+            Tags = request.Tags,
             IsActive = true,
             SpecificationId = request.SpecificationId
         };

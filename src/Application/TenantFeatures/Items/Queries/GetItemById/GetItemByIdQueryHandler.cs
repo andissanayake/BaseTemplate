@@ -33,7 +33,7 @@ public class GetItemByIdQueryHandler(IAppDbContext context) : IRequestHandler<Ge
             Description = entity.Description,
             Price = entity.Price,
             IsActive = entity.IsActive,
-            Category = entity.Category,
+            Tags = entity.Tags,
             SpecificationId = entity.SpecificationId,
             SpecificationFullPath = specificationFullPath,
             CharacteristicTypes = characteristicTypes

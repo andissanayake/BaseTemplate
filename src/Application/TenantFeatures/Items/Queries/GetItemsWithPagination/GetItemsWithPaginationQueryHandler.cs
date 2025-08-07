@@ -13,8 +13,8 @@ public class GetItemsWithPaginationQueryHandler(IAppDbContext context) : IReques
                 .ThenInclude(s => s.ParentSpecification)
             .AsQueryable();
 
-        if (!string.IsNullOrEmpty(request.Category))
-            query = query.Where(i => i.Category == request.Category);
+        if (!string.IsNullOrEmpty(request.Tags))
+            query = query.Where(i => i.Tags == request.Tags);
 
         if (request.IsActive.HasValue)
             query = query.Where(i => i.IsActive == request.IsActive.Value);
@@ -35,7 +35,7 @@ public class GetItemsWithPaginationQueryHandler(IAppDbContext context) : IReques
             Description = i.Description,
             Price = i.Price,
             IsActive = i.IsActive,
-            Category = i.Category,
+            Tags = i.Tags,
             SpecificationId = i.SpecificationId,
             SpecificationFullPath = i.Specification?.FullPath ?? string.Empty
         }).ToList();

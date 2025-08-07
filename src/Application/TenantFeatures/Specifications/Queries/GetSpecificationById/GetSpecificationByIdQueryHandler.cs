@@ -8,9 +8,24 @@ public class GetSpecificationByIdQueryHandler(IAppDbContext context) : IRequestH
 
     public async Task<Result<GetSpecificationByIdResponse>> HandleAsync(GetSpecificationByIdQuery request, CancellationToken cancellationToken)
     {
-        var specification = await _context.Specification.AsNoTracking()
-            .Include(s => s.ParentSpecification)
-            .SingleAsync(s => s.Id == request.Id, cancellationToken);
+        // Load all specifications to build the complete hierarchy
+        var allSpecifications = await _context.Specification.AsNoTracking()
+            .ToListAsync(cancellationToken);
+
+        // Create a lookup for quick access
+        var specificationLookup = allSpecifications.ToDictionary(s => s.Id);
+
+        // Build the parent hierarchy by setting ParentSpecification references
+        foreach (var spec in allSpecifications)
+        {
+            if (spec.ParentSpecificationId.HasValue && specificationLookup.TryGetValue(spec.ParentSpecificationId.Value, out var parent))
+            {
+                spec.ParentSpecification = parent;
+            }
+        }
+
+        // Find the requested specification
+        var specification = allSpecifications.FirstOrDefault(s => s.Id == request.Id);
 
         var response = new GetSpecificationByIdResponse
         {

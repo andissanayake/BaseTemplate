@@ -73,6 +73,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options, IUserProfileSe
         builder.Entity<Characteristic>().HasQueryFilter(e => !e.IsDeleted && e.TenantId == _profileService.UserProfile.TenantId);
         builder.Entity<Item>().HasQueryFilter(e => !e.IsDeleted && e.TenantId == _profileService.UserProfile.TenantId);
         builder.Entity<Specification>().HasQueryFilter(e => !e.IsDeleted && e.TenantId == _profileService.UserProfile.TenantId);
+        builder.Entity<ItemCharacteristicType>().HasQueryFilter(e => !e.IsDeleted && e.TenantId == _profileService.UserProfile.TenantId);
     }
 
 

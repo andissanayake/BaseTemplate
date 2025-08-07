@@ -213,6 +213,6 @@ This project is part of the BaseTemplate solution and follows the same licensing
 
 
 
-dotnet ef migrations add "SpecificationForItem" --project src\Infrastructure --startup-project src\API --output-dir Data\Migrations --context AppDbContext
+dotnet ef migrations add "Initialize" --project src\Infrastructure --startup-project src\API --output-dir Data\Migrations --context AppDbContext
 
 dotnet ef database update --project src\Infrastructure --startup-project src\API --context AppDbContext

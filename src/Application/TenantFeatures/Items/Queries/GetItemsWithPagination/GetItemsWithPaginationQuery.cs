@@ -11,6 +11,6 @@ public record GetItemsWithPaginationQuery : IRequest<PaginatedList<ItemBriefDto>
     [Range(1, int.MaxValue, ErrorMessage = "Page size must be greater than or equal to 1.")]
     public int PageSize { get; init; } = 10;
 
-    public string? Category { get; init; }
+    public string? Tags { get; init; }
     public bool? IsActive { get; init; }
 }
