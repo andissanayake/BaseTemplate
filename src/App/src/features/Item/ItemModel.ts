@@ -6,4 +6,5 @@ export interface Item {
   isActive: boolean;
   specificationId: number;
   specificationFullPath: string;
+  hasVariant?: boolean;
 }
