@@ -1,10 +1,12 @@
 using Microsoft.EntityFrameworkCore;
+using BaseTemplate.Application.TenantFeatures.Items.Queries.GetItemVariantByItemId;
 
 namespace BaseTemplate.Application.TenantFeatures.Items.Commands.UpdateItemCharacteristicType;
 
-public class UpdateItemCharacteristicTypeCommandHandler(IAppDbContext context) : IRequestHandler<UpdateItemCharacteristicTypeCommand, bool>
+public class UpdateItemCharacteristicTypeCommandHandler(IAppDbContext context, IMediator mediator) : IRequestHandler<UpdateItemCharacteristicTypeCommand, bool>
 {
     private readonly IAppDbContext _context = context;
+    private readonly IMediator _mediator = mediator;
 
     public async Task<Result<bool>> HandleAsync(UpdateItemCharacteristicTypeCommand request, CancellationToken cancellationToken)
     {
@@ -169,11 +171,13 @@ public class UpdateItemCharacteristicTypeCommandHandler(IAppDbContext context) :
             
             foreach (var combination in variantCombinations)
             {
-                // Get characteristic codes for this combination
+                // Get characteristic codes for this combination ordered by characteristic type
                 var characteristicCodes = await _context.Characteristic
+                    .Include(c => c.CharacteristicType)
                     .Where(c => combination.Contains(c.Id))
+                    .OrderBy(c => c.CharacteristicType.Name)
+                    .ThenBy(c => c.Code)
                     .Select(c => c.Code)
-                    .OrderBy(code => code)
                     .ToListAsync(cancellationToken);
                 
                 var variantCode = $"{item.Code}-{string.Join("-", characteristicCodes)}";
@@ -225,14 +229,16 @@ public class UpdateItemCharacteristicTypeCommandHandler(IAppDbContext context) :
         // Create variants for new combinations
         foreach (var combination in newCombinations)
         {
-            // Get characteristic codes for this combination
+            // Get characteristic codes for this combination ordered by characteristic type
             var characteristicCodes = await _context.Characteristic
+                .Include(c => c.CharacteristicType)
                 .Where(c => combination.Contains(c.Id))
+                .OrderBy(c => c.CharacteristicType.Name)
+                .ThenBy(c => c.Code)
                 .Select(c => c.Code)
-                .OrderBy(code => code)
                 .ToListAsync(cancellationToken);
             
-            var variantCode = $"{item.Name}-{string.Join("-", characteristicCodes)}";
+            var variantCode = $"{item.Code}-{string.Join("-", characteristicCodes)}";
             
             var newVariant = new ItemVariant
             {
@@ -277,14 +283,16 @@ public class UpdateItemCharacteristicTypeCommandHandler(IAppDbContext context) :
             
             foreach (var combination in variantCombinations)
             {
-                // Get characteristic codes for this combination
+                // Get characteristic codes for this combination ordered by characteristic type
                 var characteristicCodes = await _context.Characteristic
+                    .Include(c => c.CharacteristicType)
                     .Where(c => combination.Contains(c.Id))
+                    .OrderBy(c => c.CharacteristicType.Name)
+                    .ThenBy(c => c.Code)
                     .Select(c => c.Code)
-                    .OrderBy(code => code)
                     .ToListAsync(cancellationToken);
                 
-                var variantCode = $"{item.Name}-{string.Join("-", characteristicCodes)}";
+                var variantCode = $"{item.Code}-{string.Join("-", characteristicCodes)}";
                 
                 var newVariant = new ItemVariant
                 {
@@ -354,6 +362,18 @@ public class UpdateItemCharacteristicTypeCommandHandler(IAppDbContext context) :
             GenerateCombinationsRecursive(characteristicLists, currentTypeIndex + 1, currentCombination, allCombinations);
             currentCombination.RemoveAt(currentCombination.Count - 1);
         }
+    }
+
+    /// <summary>
+    /// Gets all item variants for the specified item ID using the query handler
+    /// </summary>
+    /// <param name="itemId">The item ID to get variants for</param>
+    /// <param name="cancellationToken">Cancellation token</param>
+    /// <returns>List of item variant DTOs</returns>
+    public async Task<Result<List<ItemVariantDto>>> GetItemVariantsAsync(int itemId, CancellationToken cancellationToken)
+    {
+        var query = new GetItemVariantsByItemIdQuery(itemId);
+        return await _mediator.SendAsync(query, cancellationToken);
     }
 }
 

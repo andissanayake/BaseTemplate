@@ -10,6 +10,7 @@ import {
   ItemCharacteristicTypesStep,
   ItemCharacteristicTypesStepHandle,
 } from "./ItemCharacteristicTypesStep";
+import { ItemVariantsStep, ItemVariantsStepHandle } from "./ItemVariantsStep";
 
 const ItemEdit: React.FC = () => {
   const { setLoading } = useItemStore();
@@ -20,6 +21,7 @@ const ItemEdit: React.FC = () => {
   const basicInfoRef = useRef<ItemBasicInfoStepHandle>(null);
   const characteristicTypesRef =
     useRef<ItemCharacteristicTypesStepHandle>(null);
+  const variantsRef = useRef<ItemVariantsStepHandle>(null);
 
   if (!itemId) throw new Error("itemId is required");
 
@@ -28,12 +30,21 @@ const ItemEdit: React.FC = () => {
       basicInfoRef.current?.save();
     } else if (currentStep === 1) {
       characteristicTypesRef.current?.save();
+    } else if (currentStep === 2) {
+      // Variants step doesn't require saving, just navigate
+      navigate(`/items`);
     }
   };
 
   const handleStepSuccess = () => {
     if (currentStep === 0) {
       setCurrentStep(1);
+    } else if (currentStep === 1) {
+      setCurrentStep(2);
+      // Refresh variants when moving to variants step
+      setTimeout(() => {
+        variantsRef.current?.refresh();
+      }, 100);
     } else {
       navigate(`/items`);
     }
@@ -58,6 +69,16 @@ const ItemEdit: React.FC = () => {
           ref={characteristicTypesRef}
           itemId={itemId}
           onSaveSuccess={handleStepSuccess}
+          onLoadingChange={setLoading}
+        />
+      ),
+    },
+    {
+      title: "Item Variants",
+      content: (
+        <ItemVariantsStep
+          ref={variantsRef}
+          itemId={itemId}
           onLoadingChange={setLoading}
         />
       ),
@@ -91,7 +112,12 @@ const ItemEdit: React.FC = () => {
           )}
           {currentStep === 1 && (
             <Button type="primary" onClick={handleStepSave}>
-              Save & Finish
+              Next
+            </Button>
+          )}
+          {currentStep === 2 && (
+            <Button type="primary" onClick={handleStepSave}>
+              Finish
             </Button>
           )}
         </Space>

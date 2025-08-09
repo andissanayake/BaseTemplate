@@ -12,6 +12,10 @@ public record UpdateItemCommand : IRequest<bool>
     [MaxLength(200, ErrorMessage = "The name cannot exceed 200 characters.")]
     public string Name { get; init; } = string.Empty;
 
+    [Required]
+    [MaxLength(50, ErrorMessage = "The code cannot exceed 50 characters.")]
+    public string Code { get; init; } = string.Empty;
+
     public string? Description { get; init; }
 
     public string? Tags { get; init; }
