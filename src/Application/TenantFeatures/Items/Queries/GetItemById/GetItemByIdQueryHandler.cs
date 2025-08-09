@@ -34,7 +34,8 @@ public class GetItemByIdQueryHandler(IAppDbContext context) : IRequestHandler<Ge
             Tags = entity.Tags,
             SpecificationId = entity.SpecificationId,
             SpecificationFullPath = specificationFullPath,
-            CharacteristicTypes = characteristicTypes
+            CharacteristicTypes = characteristicTypes,
+            HasVariant = entity.HasVariant,
         };
 
         return Result<ItemDto>.Success(itemDto);

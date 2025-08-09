@@ -36,7 +36,8 @@ public class GetItemsWithPaginationQueryHandler(IAppDbContext context) : IReques
             IsActive = i.IsActive,
             Tags = i.Tags,
             SpecificationId = i.SpecificationId,
-            SpecificationFullPath = i.Specification?.FullPath ?? string.Empty
+            SpecificationFullPath = i.Specification.FullPath,
+            HasVariant = i.HasVariant,
         }).ToList();
 
         return Result<PaginatedList<ItemBriefDto>>.Success(

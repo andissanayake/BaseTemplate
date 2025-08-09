@@ -15,4 +15,6 @@ public record CreateItemCommand : IRequest<int>
 
     [Required]
     public int SpecificationId { get; init; }
+
+    public bool? HasVariant { get; init; }
 }

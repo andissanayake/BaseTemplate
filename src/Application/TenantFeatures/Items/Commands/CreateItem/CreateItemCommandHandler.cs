@@ -12,7 +12,8 @@ public class CreateItemCommandHandler(IAppDbContext context) : IRequestHandler<C
             Description = request.Description,
             Tags = request.Tags,
             IsActive = true,
-            SpecificationId = request.SpecificationId
+            SpecificationId = request.SpecificationId,
+            HasVariant = request.HasVariant.HasValue ? request.HasVariant.Value : false,
         };
 
         _context.Item.Add(entity);

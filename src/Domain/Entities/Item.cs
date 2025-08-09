@@ -7,6 +7,7 @@ public class Item : BaseTenantAuditableEntity
     public bool IsActive { get; set; } = true;
     public string? Tags { get; set; }
     public int SpecificationId { get; set; }
+    public bool HasVariant { get; set; }
     public Specification Specification { get; set; } = default!;
     public List<ItemCharacteristicType> ItemCharacteristicTypeList { get; set; } = [];
 }
