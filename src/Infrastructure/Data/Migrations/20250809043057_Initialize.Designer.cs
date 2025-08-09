@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace BaseTemplate.Infrastructure.Data.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250807084313_Initialize")]
+    [Migration("20250809043057_Initialize")]
     partial class Initialize
     {
         /// <inheritdoc />
@@ -197,9 +197,6 @@ namespace BaseTemplate.Infrastructure.Data.Migrations
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("text");
-
-                    b.Property<decimal>("Price")
-                        .HasColumnType("numeric");
 
                     b.Property<int>("SpecificationId")
                         .HasColumnType("integer");

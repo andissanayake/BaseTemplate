@@ -228,7 +228,6 @@ namespace BaseTemplate.Infrastructure.Data.Migrations
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     Name = table.Column<string>(type: "text", nullable: false),
                     Description = table.Column<string>(type: "text", nullable: true),
-                    Price = table.Column<decimal>(type: "numeric", nullable: false),
                     IsActive = table.Column<bool>(type: "boolean", nullable: false),
                     Tags = table.Column<string>(type: "text", nullable: true),
                     SpecificationId = table.Column<int>(type: "integer", nullable: false),

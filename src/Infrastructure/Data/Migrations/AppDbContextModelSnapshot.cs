@@ -195,9 +195,6 @@ namespace BaseTemplate.Infrastructure.Data.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<decimal>("Price")
-                        .HasColumnType("numeric");
-
                     b.Property<int>("SpecificationId")
                         .HasColumnType("integer");
 
