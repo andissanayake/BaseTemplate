@@ -7,6 +7,7 @@ import {
   Space,
   Typography,
   Select,
+  Switch,
 } from "antd";
 import { useItemStore } from "./itemStore";
 import { useNavigate } from "react-router-dom";
@@ -125,6 +126,16 @@ const ItemCreate: React.FC = () => {
             placeholder="Enter tags"
             tokenSeparators={[","]}
           />
+        </Form.Item>
+
+        <Form.Item
+          label="Has Variants"
+          name="hasVariant"
+          valuePropName="checked"
+          initialValue={false}
+          extra="Enable this if the item will have variants based on characteristics. This cannot be changed later."
+        >
+          <Switch />
         </Form.Item>
 
         <Form.Item>

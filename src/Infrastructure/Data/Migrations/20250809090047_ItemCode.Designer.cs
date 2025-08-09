@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace BaseTemplate.Infrastructure.Data.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250807084313_Initialize")]
-    partial class Initialize
+    [Migration("20250809090047_ItemCode")]
+    partial class ItemCode
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -173,6 +173,10 @@ namespace BaseTemplate.Infrastructure.Data.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
+                    b.Property<string>("Code")
+                        .IsRequired()
+                        .HasColumnType("text");
+
                     b.Property<DateTimeOffset>("Created")
                         .HasColumnType("timestamp with time zone");
 
@@ -181,6 +185,9 @@ namespace BaseTemplate.Infrastructure.Data.Migrations
 
                     b.Property<string>("Description")
                         .HasColumnType("text");
+
+                    b.Property<bool>("HasVariant")
+                        .HasColumnType("boolean");
 
                     b.Property<bool>("IsActive")
                         .HasColumnType("boolean");
@@ -197,9 +204,6 @@ namespace BaseTemplate.Infrastructure.Data.Migrations
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("text");
-
-                    b.Property<decimal>("Price")
-                        .HasColumnType("numeric");
 
                     b.Property<int>("SpecificationId")
                         .HasColumnType("integer");
@@ -260,6 +264,94 @@ namespace BaseTemplate.Infrastructure.Data.Migrations
                     b.HasIndex("TenantId");
 
                     b.ToTable("ItemCharacteristicType");
+                });
+
+            modelBuilder.Entity("BaseTemplate.Domain.Entities.ItemVariant", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Code")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTimeOffset>("Created")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("CreatedBy")
+                        .HasColumnType("integer");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<int>("ItemId")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTimeOffset?>("LastModified")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int?>("LastModifiedBy")
+                        .HasColumnType("integer");
+
+                    b.Property<decimal>("Price")
+                        .HasColumnType("numeric");
+
+                    b.Property<int>("TenantId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ItemId");
+
+                    b.HasIndex("TenantId");
+
+                    b.ToTable("ItemVariant");
+                });
+
+            modelBuilder.Entity("BaseTemplate.Domain.Entities.ItemVariantCharacteristic", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("CharacteristicId")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTimeOffset>("Created")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("CreatedBy")
+                        .HasColumnType("integer");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<int>("ItemVariantId")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTimeOffset?>("LastModified")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int?>("LastModifiedBy")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("TenantId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CharacteristicId");
+
+                    b.HasIndex("ItemVariantId");
+
+                    b.HasIndex("TenantId");
+
+                    b.ToTable("ItemVariantCharacteristic");
                 });
 
             modelBuilder.Entity("BaseTemplate.Domain.Entities.Specification", b =>
@@ -501,7 +593,7 @@ namespace BaseTemplate.Infrastructure.Data.Migrations
             modelBuilder.Entity("BaseTemplate.Domain.Entities.Characteristic", b =>
                 {
                     b.HasOne("BaseTemplate.Domain.Entities.CharacteristicType", "CharacteristicType")
-                        .WithMany()
+                        .WithMany("CharacteristicList")
                         .HasForeignKey("CharacteristicTypeId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -570,6 +662,52 @@ namespace BaseTemplate.Infrastructure.Data.Migrations
                     b.Navigation("CharacteristicType");
 
                     b.Navigation("Item");
+
+                    b.Navigation("Tenant");
+                });
+
+            modelBuilder.Entity("BaseTemplate.Domain.Entities.ItemVariant", b =>
+                {
+                    b.HasOne("BaseTemplate.Domain.Entities.Item", "Item")
+                        .WithMany()
+                        .HasForeignKey("ItemId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("BaseTemplate.Domain.Entities.Tenant", "Tenant")
+                        .WithMany()
+                        .HasForeignKey("TenantId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Item");
+
+                    b.Navigation("Tenant");
+                });
+
+            modelBuilder.Entity("BaseTemplate.Domain.Entities.ItemVariantCharacteristic", b =>
+                {
+                    b.HasOne("BaseTemplate.Domain.Entities.Characteristic", "Characteristic")
+                        .WithMany()
+                        .HasForeignKey("CharacteristicId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("BaseTemplate.Domain.Entities.ItemVariant", "ItemVariant")
+                        .WithMany("ItemVariantCharacteristicList")
+                        .HasForeignKey("ItemVariantId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("BaseTemplate.Domain.Entities.Tenant", "Tenant")
+                        .WithMany()
+                        .HasForeignKey("TenantId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Characteristic");
+
+                    b.Navigation("ItemVariant");
 
                     b.Navigation("Tenant");
                 });
@@ -646,9 +784,19 @@ namespace BaseTemplate.Infrastructure.Data.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("BaseTemplate.Domain.Entities.CharacteristicType", b =>
+                {
+                    b.Navigation("CharacteristicList");
+                });
+
             modelBuilder.Entity("BaseTemplate.Domain.Entities.Item", b =>
                 {
                     b.Navigation("ItemCharacteristicTypeList");
+                });
+
+            modelBuilder.Entity("BaseTemplate.Domain.Entities.ItemVariant", b =>
+                {
+                    b.Navigation("ItemVariantCharacteristicList");
                 });
 
             modelBuilder.Entity("BaseTemplate.Domain.Entities.Specification", b =>

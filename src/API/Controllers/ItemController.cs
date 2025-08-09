@@ -2,6 +2,7 @@ using BaseTemplate.Application.Common.Models;
 using BaseTemplate.Application.TenantFeatures.Items.Commands.CreateItem;
 using BaseTemplate.Application.TenantFeatures.Items.Commands.DeleteItem;
 using BaseTemplate.Application.TenantFeatures.Items.Commands.UpdateItem;
+using BaseTemplate.Application.TenantFeatures.Items.Commands.UpdateItemCharacteristicType;
 using BaseTemplate.Application.TenantFeatures.Items.Queries.GetItemById;
 using BaseTemplate.Application.TenantFeatures.Items.Queries.GetItemsWithPagination;
 using Microsoft.AspNetCore.Authorization;
@@ -41,5 +42,11 @@ public class ItemController : ApiControllerBase
     public async Task<ActionResult<Result<bool>>> Delete(int id)
     {
         return await SendAsync(new DeleteItemCommand(id));
+    }
+
+    [HttpPut("characteristic-type")]
+    public async Task<ActionResult<Result<bool>>> UpdateCharacteristicTypes(UpdateItemCharacteristicTypeCommand command)
+    {
+        return await SendAsync(command);
     }
 }

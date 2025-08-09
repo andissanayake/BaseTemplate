@@ -101,6 +101,16 @@ const ItemList: React.FC = () => {
         specificationFullPath || "No specification",
     },
     {
+      title: "Has Variants",
+      dataIndex: "hasVariant",
+      key: "hasVariant",
+      render: (hasVariant: boolean) => (
+        <Tag color={hasVariant ? "green" : "default"}>
+          {hasVariant ? "Yes" : "No"}
+        </Tag>
+      ),
+    },
+    {
       title: "Tags",
       dataIndex: "tags",
       key: "tags",

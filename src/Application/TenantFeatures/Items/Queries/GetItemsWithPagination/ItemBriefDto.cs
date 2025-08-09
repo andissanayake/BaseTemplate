@@ -10,4 +10,5 @@ public class ItemBriefDto
     public string? Tags { get; init; }
     public int SpecificationId { get; init; }
     public string SpecificationFullPath { get; init; } = string.Empty;
-} 
+    public bool? HasVariant { get; init; }
+}

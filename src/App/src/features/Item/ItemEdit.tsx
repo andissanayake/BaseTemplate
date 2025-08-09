@@ -1,107 +1,68 @@
-import React, { useEffect, useState } from "react";
-import {
-  Form,
-  Input,
-  notification,
-  Button,
-  Space,
-  Typography,
-  Select,
-} from "antd";
+import React, { useState, useRef } from "react";
+import { Button, Space, Typography, Steps } from "antd";
 import { useItemStore } from "./itemStore";
 import { useNavigate, useParams } from "react-router-dom";
-import { apiClient } from "../../common/apiClient";
-import { useAsyncEffect } from "../../common/useAsyncEffect";
-import { handleFormValidationErrors } from "../../common/formErrorHandler";
-import { Item } from "./ItemModel";
-import { SpecificationModel } from "../Specification/SpecificationModel";
-import { getAllSpecifications } from "../Specification/SpecificationUtils";
+import {
+  ItemBasicInfoStep,
+  ItemBasicInfoStepHandle,
+} from "./ItemBasicInfoStep";
+import {
+  ItemCharacteristicTypesStep,
+  ItemCharacteristicTypesStepHandle,
+} from "./ItemCharacteristicTypesStep";
 
 const ItemEdit: React.FC = () => {
   const { setLoading } = useItemStore();
-  const [form] = Form.useForm();
   const navigate = useNavigate();
   const { itemId } = useParams();
-  const [specificationOptions, setSpecificationOptions] = useState<
-    { value: number; label: string }[]
-  >([]);
+  const [currentStep, setCurrentStep] = useState(0);
+
+  const basicInfoRef = useRef<ItemBasicInfoStepHandle>(null);
+  const characteristicTypesRef =
+    useRef<ItemCharacteristicTypesStepHandle>(null);
 
   if (!itemId) throw new Error("itemId is required");
 
-  useEffect(() => {
-    loadSpecifications();
-  }, []);
-
-  const loadSpecifications = () => {
-    apiClient.get<{ specifications: SpecificationModel[] }>(
-      "/api/specification",
-      {
-        onSuccess: (data) => {
-          if (data?.specifications) {
-            // Flatten specifications for dropdown
-            const allSpecs = getAllSpecifications(data.specifications);
-            const options = allSpecs.map((spec) => ({
-              value: spec.id,
-              label: spec.fullPath || spec.name,
-            }));
-            setSpecificationOptions(options);
-          }
-        },
-        onServerError: () => {
-          notification.error({ message: "Failed to load specifications!" });
-        },
-      }
-    );
+  const handleStepSave = () => {
+    if (currentStep === 0) {
+      basicInfoRef.current?.save();
+    } else if (currentStep === 1) {
+      characteristicTypesRef.current?.save();
+    }
   };
 
-  const handleSaveItem = () => {
-    form.validateFields().then(async (values) => {
-      values.id = +itemId;
-      values.tags = values.tags?.join(",") || "";
-      setLoading(true);
-      apiClient.put<boolean>(`/api/item`, values, {
-        onSuccess: () => {
-          notification.success({
-            message: "Item updated successfully!",
-          });
-          navigate(`/items`);
-        },
-        onValidationError: (updateErrors) => {
-          handleFormValidationErrors({
-            form,
-            errors: updateErrors,
-          });
-        },
-        onServerError: () => {
-          notification.error({ message: "Failed to save item!" });
-        },
-        onFinally: () => {
-          setLoading(false);
-        },
-      });
-    });
+  const handleStepSuccess = () => {
+    if (currentStep === 0) {
+      setCurrentStep(1);
+    } else {
+      navigate(`/items`);
+    }
   };
 
-  useAsyncEffect(async () => {
-    form.resetFields();
-    setLoading(true);
-    apiClient.get<Item>(`/api/item/${itemId}`, {
-      onSuccess: (data) => {
-        if (data) {
-          form.setFieldsValue({
-            ...data,
-            tags: data.tags ? data.tags.split(",").filter(Boolean) : [],
-          });
-        }
-      },
-      onServerError: () => {
-        notification.error({ message: "Failed to fetch item!" });
-      },
-      onFinally: () => {
-        setLoading(false);
-      },
-    });
-  }, [itemId, form]);
+  const steps = [
+    {
+      title: "Basic Information",
+      content: (
+        <ItemBasicInfoStep
+          ref={basicInfoRef}
+          itemId={itemId}
+          onSaveSuccess={handleStepSuccess}
+          onLoadingChange={setLoading}
+        />
+      ),
+    },
+    {
+      title: "Characteristic Types",
+      content: (
+        <ItemCharacteristicTypesStep
+          ref={characteristicTypesRef}
+          itemId={itemId}
+          onSaveSuccess={handleStepSuccess}
+          onLoadingChange={setLoading}
+        />
+      ),
+    },
+  ];
 
   return (
     <>
@@ -110,56 +71,31 @@ const ItemEdit: React.FC = () => {
           Edit Item
         </Typography.Title>
       </Space>
-      <Form form={form} layout="vertical" onFinish={handleSaveItem}>
-        <Form.Item
-          label="Name"
-          name="name"
-          rules={[{ required: true, message: "Please enter the item name!" }]}
-        >
-          <Input placeholder="Enter item name" />
-        </Form.Item>
 
-        <Form.Item label="Description" name="description">
-          <Input.TextArea placeholder="Enter item description" />
-        </Form.Item>
+      <Steps current={currentStep} items={steps} style={{ marginBottom: 24 }} />
 
-        <Form.Item
-          label="Specification"
-          name="specificationId"
-          rules={[
-            { required: true, message: "Please select a specification!" },
-          ]}
-        >
-          <Select
-            placeholder="Select specification"
-            options={specificationOptions}
-            showSearch
-            filterOption={(input, option) =>
-              (option?.label ?? "").toLowerCase().includes(input.toLowerCase())
-            }
-          />
-        </Form.Item>
+      <div style={{ marginBottom: 24 }}>{steps[currentStep].content}</div>
 
-        <Form.Item label="Tags" name="tags">
-          <Select
-            mode="tags"
-            style={{ width: "100%" }}
-            placeholder="Enter tags"
-            tokenSeparators={[","]}
-          />
-        </Form.Item>
-
-        <Form.Item>
-          <Space>
-            <Button type="primary" htmlType="submit">
-              Submit
+      <div style={{ textAlign: "right" }}>
+        <Space>
+          <Button onClick={() => navigate(`/items`)}>Cancel</Button>
+          {currentStep > 0 && (
+            <Button onClick={() => setCurrentStep(currentStep - 1)}>
+              Previous
             </Button>
-            <Button type="default" onClick={() => navigate(`/items`)}>
-              Cancel
+          )}
+          {currentStep === 0 && (
+            <Button type="primary" onClick={handleStepSave}>
+              Next
             </Button>
-          </Space>
-        </Form.Item>
-      </Form>
+          )}
+          {currentStep === 1 && (
+            <Button type="primary" onClick={handleStepSave}>
+              Save & Finish
+            </Button>
+          )}
+        </Space>
+      </div>
     </>
   );
 };

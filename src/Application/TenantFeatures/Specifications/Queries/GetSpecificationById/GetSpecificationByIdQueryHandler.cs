@@ -25,7 +25,7 @@ public class GetSpecificationByIdQueryHandler(IAppDbContext context) : IRequestH
         }
 
         // Find the requested specification
-        var specification = allSpecifications.FirstOrDefault(s => s.Id == request.Id);
+        var specification = allSpecifications.Single(s => s.Id == request.Id);
 
         var response = new GetSpecificationByIdResponse
         {

@@ -10,6 +10,7 @@ public class ItemDto
     public int SpecificationId { get; init; }
     public string SpecificationFullPath { get; init; } = string.Empty;
     public List<ItemCharacteristicTypeDto> CharacteristicTypes { get; init; } = [];
+    public bool? HasVariant { get; init; }
 }
 
 public class ItemCharacteristicTypeDto
