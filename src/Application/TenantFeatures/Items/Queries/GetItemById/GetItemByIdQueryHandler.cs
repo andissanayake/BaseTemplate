@@ -29,6 +29,7 @@ public class GetItemByIdQueryHandler(IAppDbContext context) : IRequestHandler<Ge
         {
             Id = entity.Id,
             Name = entity.Name,
+            Code = entity.Code,
             Description = entity.Description,
             IsActive = entity.IsActive,
             Tags = entity.Tags,
