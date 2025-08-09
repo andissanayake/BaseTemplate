@@ -5,7 +5,17 @@ import {
   useImperativeHandle,
   useCallback,
 } from "react";
-import { Typography, Row, Col, Card, Space, Switch, notification } from "antd";
+import {
+  Typography,
+  Row,
+  Col,
+  Card,
+  Space,
+  Switch,
+  notification,
+  Alert,
+  Button,
+} from "antd";
 import { CharacteristicType, ItemCharacteristicType } from "./ItemTypes";
 import { apiClient } from "../../common/apiClient";
 import { useAsyncEffect } from "../../common/useAsyncEffect";
@@ -30,6 +40,7 @@ const ItemCharacteristicTypesStep = forwardRef<
   >([]);
   const [selectedCharacteristicTypes, setSelectedCharacteristicTypes] =
     useState<number[]>([]);
+  const [isSelectionEnabled, setIsSelectionEnabled] = useState(false);
 
   useEffect(() => {
     loadCharacteristicTypes();
@@ -52,6 +63,8 @@ const ItemCharacteristicTypesStep = forwardRef<
     characteristicTypeId: number,
     checked: boolean
   ) => {
+    if (!isSelectionEnabled) return;
+
     if (checked) {
       setSelectedCharacteristicTypes((prev) => [...prev, characteristicTypeId]);
     } else {
@@ -61,6 +74,10 @@ const ItemCharacteristicTypesStep = forwardRef<
     }
   };
 
+  const handleEnableSelection = () => {
+    setIsSelectionEnabled(true);
+  };
+
   const handleSave = useCallback(() => {
     onLoadingChange(true);
     const command = {
@@ -68,7 +85,7 @@ const ItemCharacteristicTypesStep = forwardRef<
       characteristicTypeIds: selectedCharacteristicTypes,
     };
 
-    apiClient.put<boolean>("/api/item/characteristic-types", command, {
+    apiClient.put<boolean>("/api/item/characteristic-type", command, {
       onSuccess: () => {
         notification.success({
           message: "Item characteristic types updated successfully!",
@@ -127,6 +144,32 @@ const ItemCharacteristicTypesStep = forwardRef<
         for variant generation.
       </Typography.Paragraph>
 
+      {!isSelectionEnabled && (
+        <Alert
+          message="Characteristic Type Selection Disabled"
+          description={
+            <div>
+              <p>
+                If you change characteristic selection, your existing item
+                variants will be discontinued and new item variants will be
+                generated.
+              </p>
+              <Button
+                type="primary"
+                size="small"
+                onClick={handleEnableSelection}
+                style={{ marginTop: 8 }}
+              >
+                Enable Characteristic Selection
+              </Button>
+            </div>
+          }
+          type="warning"
+          showIcon
+          style={{ marginBottom: 16 }}
+        />
+      )}
+
       <Row gutter={[16, 16]}>
         {characteristicTypes.map((characteristicType) => (
           <Col xs={24} sm={12} md={8} key={characteristicType.id}>
@@ -158,6 +201,7 @@ const ItemCharacteristicTypesStep = forwardRef<
                     checked={selectedCharacteristicTypes.includes(
                       characteristicType.id
                     )}
+                    disabled={!isSelectionEnabled}
                     onChange={(checked) =>
                       handleCharacteristicTypeToggle(
                         characteristicType.id,
