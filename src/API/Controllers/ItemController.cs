@@ -1,7 +1,9 @@
 using BaseTemplate.Application.Common.Models;
 using BaseTemplate.Application.TenantFeatures.Items.Commands.CreateItem;
 using BaseTemplate.Application.TenantFeatures.Items.Commands.DeleteItem;
+using BaseTemplate.Application.TenantFeatures.Items.Commands.GenerateVariants;
 using BaseTemplate.Application.TenantFeatures.Items.Commands.UpdateItem;
+using BaseTemplate.Application.TenantFeatures.Items.Commands.UpdateItemCharacteristicType;
 using BaseTemplate.Application.TenantFeatures.Items.Queries.GetItemById;
 using BaseTemplate.Application.TenantFeatures.Items.Queries.GetItemsWithPagination;
 using Microsoft.AspNetCore.Authorization;
@@ -41,5 +43,17 @@ public class ItemController : ApiControllerBase
     public async Task<ActionResult<Result<bool>>> Delete(int id)
     {
         return await SendAsync(new DeleteItemCommand(id));
+    }
+
+    [HttpPut("characteristic-types")]
+    public async Task<ActionResult<Result<bool>>> UpdateCharacteristicTypes(UpdateItemCharacteristicTypeCommand command)
+    {
+        return await SendAsync(command);
+    }
+
+    [HttpPost("generate-variants")]
+    public async Task<ActionResult<Result<bool>>> GenerateVariants(GenerateVariantsCommand command)
+    {
+        return await SendAsync(command);
     }
 }

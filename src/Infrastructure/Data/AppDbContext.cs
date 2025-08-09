@@ -58,6 +58,8 @@ public class AppDbContext(DbContextOptions<AppDbContext> options, IUserProfileSe
     public DbSet<Item> Item { get; set; }
     public DbSet<Specification> Specification { get; set; }
     public DbSet<ItemCharacteristicType> ItemCharacteristicType { get; set; }
+    public DbSet<ItemVariant> ItemVariant { get; set; }
+    public DbSet<ItemVariantCharacteristic> ItemVariantCharacteristic { get; set; }
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);
@@ -74,6 +76,8 @@ public class AppDbContext(DbContextOptions<AppDbContext> options, IUserProfileSe
         builder.Entity<Item>().HasQueryFilter(e => !e.IsDeleted && e.TenantId == _profileService.UserProfile.TenantId);
         builder.Entity<Specification>().HasQueryFilter(e => !e.IsDeleted && e.TenantId == _profileService.UserProfile.TenantId);
         builder.Entity<ItemCharacteristicType>().HasQueryFilter(e => !e.IsDeleted && e.TenantId == _profileService.UserProfile.TenantId);
+        builder.Entity<ItemVariant>().HasQueryFilter(e => !e.IsDeleted && e.TenantId == _profileService.UserProfile.TenantId);
+        builder.Entity<ItemVariantCharacteristic>().HasQueryFilter(e => !e.IsDeleted && e.TenantId == _profileService.UserProfile.TenantId);
     }
 
 
