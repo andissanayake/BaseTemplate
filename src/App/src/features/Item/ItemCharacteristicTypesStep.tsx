@@ -118,11 +118,13 @@ const ItemCharacteristicTypesStep = forwardRef<
     }),
     [handleSave]
   );
+
   return (
     <div>
       <Typography.Title level={4}>Select Characteristic Types</Typography.Title>
       <Typography.Paragraph>
-        Choose which characteristic types should be associated with this item.
+        Choose which characteristic types should be associated with this item
+        for variant generation.
       </Typography.Paragraph>
 
       <Row gutter={[16, 16]}>
