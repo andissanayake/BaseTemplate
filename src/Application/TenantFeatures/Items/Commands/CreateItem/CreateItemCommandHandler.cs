@@ -9,6 +9,7 @@ public class CreateItemCommandHandler(IAppDbContext context) : IRequestHandler<C
         var entity = new Item
         {
             Name = request.Name,
+            Code = request.Code,
             Description = request.Description,
             Tags = request.Tags,
             IsActive = true,

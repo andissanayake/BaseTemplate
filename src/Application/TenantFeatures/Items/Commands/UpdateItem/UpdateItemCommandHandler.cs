@@ -12,6 +12,7 @@ public class UpdateItemCommandHandler(IAppDbContext context) : IRequestHandler<U
             .SingleAsync(i => i.Id == request.Id, cancellationToken);
 
         entity.Name = request.Name;
+        entity.Code = request.Code;
         entity.Description = request.Description;
         entity.Tags = request.Tags;
         entity.IsActive = request.IsActive;

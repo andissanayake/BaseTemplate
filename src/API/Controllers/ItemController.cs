@@ -4,6 +4,7 @@ using BaseTemplate.Application.TenantFeatures.Items.Commands.DeleteItem;
 using BaseTemplate.Application.TenantFeatures.Items.Commands.UpdateItem;
 using BaseTemplate.Application.TenantFeatures.Items.Commands.UpdateItemCharacteristicType;
 using BaseTemplate.Application.TenantFeatures.Items.Queries.GetItemById;
+using BaseTemplate.Application.TenantFeatures.Items.Queries.GetItemVariantByItemId;
 using BaseTemplate.Application.TenantFeatures.Items.Queries.GetItemsWithPagination;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -24,6 +25,17 @@ public class ItemController : ApiControllerBase
     public async Task<ActionResult<Result<ItemDto>>> GetById(int id)
     {
         return await SendAsync(new GetItemByIdQuery(id));
+    }
+
+    /// <summary>
+    /// Get all variants for a specific item
+    /// </summary>
+    /// <param name="itemId">The item ID to get variants for</param>
+    /// <returns>List of item variants with details and characteristics</returns>
+    [HttpGet("{itemId}/variants")]
+    public async Task<ActionResult<Result<List<ItemVariantDto>>>> GetItemVariants(int itemId)
+    {
+        return await SendAsync(new GetItemVariantsByItemIdQuery(itemId));
     }
 
     [HttpPost]

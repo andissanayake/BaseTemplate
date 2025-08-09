@@ -127,6 +127,18 @@ const ItemBasicInfoStep = forwardRef<
         <Input placeholder="Enter item name" />
       </Form.Item>
 
+      <Form.Item
+        label="Code"
+        name="code"
+        rules={[
+          { required: true, message: "Please enter the item code!" },
+          { max: 50, message: "Code cannot exceed 50 characters!" },
+        ]}
+        extra="Unique identifier for the item (e.g., SHIRT, LAPTOP)"
+      >
+        <Input placeholder="Enter item code" />
+      </Form.Item>
+
       <Form.Item label="Description" name="description">
         <Input.TextArea placeholder="Enter item description" />
       </Form.Item>
