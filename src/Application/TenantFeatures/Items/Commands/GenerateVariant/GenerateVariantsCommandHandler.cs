@@ -1,6 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 
-namespace BaseTemplate.Application.TenantFeatures.Items.Commands.GenerateVariants;
+namespace BaseTemplate.Application.TenantFeatures.Items.Commands.GenerateVariant;
 
 public class GenerateVariantsCommandHandler(IAppDbContext context) : IRequestHandler<GenerateVariantsCommand, bool>
 {
@@ -13,75 +13,75 @@ public class GenerateVariantsCommandHandler(IAppDbContext context) : IRequestHan
             .Include(i => i.ItemCharacteristicTypeList)
             .SingleAsync(i => i.Id == request.ItemId, cancellationToken);
 
-        // Verify that the provided characteristic type IDs are associated with the item
-        var itemCharacteristicTypeIds = item.ItemCharacteristicTypeList.Select(ict => ict.CharacteristicTypeId).ToList();
-        var invalidCharacteristicTypeIds = request.CharacteristicTypeIds.Except(itemCharacteristicTypeIds).ToList();
+        //// Verify that the provided characteristic type IDs are associated with the item
+        //var itemCharacteristicTypeIds = item.ItemCharacteristicTypeList.Select(ict => ict.CharacteristicTypeId).ToList();
+        //var invalidCharacteristicTypeIds = request.CharacteristicTypeIds.Except(itemCharacteristicTypeIds).ToList();
 
-        if (invalidCharacteristicTypeIds.Any())
-        {
-            return Result<bool>.Failure($"Characteristic type IDs {string.Join(", ", invalidCharacteristicTypeIds)} are not associated with this item.");
-        }
+        //if (invalidCharacteristicTypeIds.Any())
+        //{
+        //    return Result<bool>.Validation($"Characteristic type IDs {string.Join(", ", invalidCharacteristicTypeIds)} are not associated with this item.");
+        //}
 
-        // Get characteristics grouped by their types (only for the specified characteristic types)
-        var characteristics = await _context.Characteristic
-            .Where(c => request.CharacteristicTypeIds.Contains(c.CharacteristicTypeId) && c.IsActive)
-            .GroupBy(c => c.CharacteristicTypeId)
-            .ToListAsync(cancellationToken);
+        //// Get characteristics grouped by their types (only for the specified characteristic types)
+        //var characteristics = await _context.Characteristic
+        //    .Where(c => request.CharacteristicTypeIds.Contains(c.CharacteristicTypeId) && c.IsActive)
+        //    .GroupBy(c => c.CharacteristicTypeId)
+        //    .ToListAsync(cancellationToken);
 
-        if (!characteristics.Any())
-        {
-            return Result<bool>.Failure("No active characteristics found for the provided characteristic type IDs.");
-        }
+        //if (!characteristics.Any())
+        //{
+        //    return Result<bool>.Validation("No active characteristics found for the provided characteristic type IDs.");
+        //}
 
-        // Ensure we have characteristics for all requested characteristic types
-        var foundCharacteristicTypeIds = characteristics.Select(g => g.Key).ToList();
-        var missingCharacteristicTypeIds = request.CharacteristicTypeIds.Except(foundCharacteristicTypeIds).ToList();
+        //// Ensure we have characteristics for all requested characteristic types
+        //var foundCharacteristicTypeIds = characteristics.Select(g => g.Key).ToList();
+        //var missingCharacteristicTypeIds = request.CharacteristicTypeIds.Except(foundCharacteristicTypeIds).ToList();
 
-        if (missingCharacteristicTypeIds.Any())
-        {
-            return Result<bool>.Failure($"No active characteristics found for characteristic type IDs: {string.Join(", ", missingCharacteristicTypeIds)}");
-        }
+        //if (missingCharacteristicTypeIds.Any())
+        //{
+        //    return Result<bool>.Validation($"No active characteristics found for characteristic type IDs: {string.Join(", ", missingCharacteristicTypeIds)}");
+        //}
 
-        // Remove existing variants for this item
-        var existingVariants = await _context.ItemVariant
-            .Include(iv => iv.ItemVariantCharacteristicList)
-            .Where(iv => iv.ItemId == request.ItemId)
-            .ToListAsync(cancellationToken);
+        //// Remove existing variants for this item
+        //var existingVariants = await _context.ItemVariant
+        //    .Include(iv => iv.ItemVariantCharacteristicList)
+        //    .Where(iv => iv.ItemId == request.ItemId)
+        //    .ToListAsync(cancellationToken);
 
-        foreach (var variant in existingVariants)
-        {
-            _context.ItemVariantCharacteristic.RemoveRange(variant.ItemVariantCharacteristicList);
-        }
-        _context.ItemVariant.RemoveRange(existingVariants);
+        //foreach (var variant in existingVariants)
+        //{
+        //    _context.ItemVariantCharacteristic.RemoveRange(variant.ItemVariantCharacteristicList);
+        //}
+        //_context.ItemVariant.RemoveRange(existingVariants);
 
-        // Generate all possible combinations
-        var combinations = GenerateCharacteristicCombinations(characteristics.ToList());
-        
-        var newVariants = new List<ItemVariant>();
-        var variantNumber = 1;
+        //// Generate all possible combinations
+        //var combinations = GenerateCharacteristicCombinations(characteristics.ToList());
 
-        foreach (var combination in combinations)
-        {
-            // Generate variant code based on characteristic codes
-            var codes = combination.Select(c => c.Code).OrderBy(c => c);
-            var variantCode = $"{item.Name}-{string.Join("-", codes)}";
+        //var newVariants = new List<ItemVariant>();
+        //var variantNumber = 1;
 
-            var variant = new ItemVariant
-            {
-                ItemId = request.ItemId,
-                Code = variantCode,
-                Price = 0, // Default price, can be updated later
-                ItemVariantCharacteristicList = combination.Select(c => new ItemVariantCharacteristic
-                {
-                    CharacteristicId = c.Id
-                }).ToList()
-            };
+        //foreach (var combination in combinations)
+        //{
+        //    // Generate variant code based on characteristic codes
+        //    var codes = combination.Select(c => c.Code).OrderBy(c => c);
+        //    var variantCode = $"{item.Name}-{string.Join("-", codes)}";
 
-            newVariants.Add(variant);
-            variantNumber++;
-        }
+        //    var variant = new ItemVariant
+        //    {
+        //        ItemId = request.ItemId,
+        //        Code = variantCode,
+        //        Price = 0, // Default price, can be updated later
+        //        ItemVariantCharacteristicList = combination.Select(c => new ItemVariantCharacteristic
+        //        {
+        //            CharacteristicId = c.Id
+        //        }).ToList()
+        //    };
 
-        _context.ItemVariant.AddRange(newVariants);
+        //    newVariants.Add(variant);
+        //    variantNumber++;
+        //}
+
+        //_context.ItemVariant.AddRange(newVariants);
         await _context.SaveChangesAsync(cancellationToken);
 
         return Result<bool>.Success(true);
@@ -90,7 +90,7 @@ public class GenerateVariantsCommandHandler(IAppDbContext context) : IRequestHan
     private static List<List<Characteristic>> GenerateCharacteristicCombinations(List<IGrouping<int, Characteristic>> characteristicGroups)
     {
         var combinations = new List<List<Characteristic>>();
-        
+
         if (!characteristicGroups.Any())
             return combinations;
 

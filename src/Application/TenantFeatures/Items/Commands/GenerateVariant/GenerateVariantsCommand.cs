@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace BaseTemplate.Application.TenantFeatures.Items.Commands.GenerateVariants;
+namespace BaseTemplate.Application.TenantFeatures.Items.Commands.GenerateVariant;
 
 [Authorize(Roles = Roles.ItemManager)]
 public record GenerateVariantsCommand : IRequest<bool>

@@ -13,7 +13,7 @@ public class UpdateItemCharacteristicTypeCommandHandler(IAppDbContext context) :
             .SingleAsync(i => i.Id == request.ItemId, cancellationToken);
 
         // Verify that all provided characteristic type IDs exist and are active
-        if (request.CharacteristicTypeIds.Any())
+        if (request.CharacteristicTypeIds.Count != 0)
         {
             var existingCharacteristicTypeIds = await _context.CharacteristicType
                 .Where(ct => request.CharacteristicTypeIds.Contains(ct.Id) && ct.IsActive)
@@ -21,7 +21,7 @@ public class UpdateItemCharacteristicTypeCommandHandler(IAppDbContext context) :
                 .ToListAsync(cancellationToken);
 
             var invalidIds = request.CharacteristicTypeIds.Except(existingCharacteristicTypeIds).ToList();
-            if (invalidIds.Any())
+            if (invalidIds.Count != 0)
             {
                 return Result<bool>.Validation($"Invalid or inactive characteristic type IDs: {string.Join(", ", invalidIds)}");
             }
@@ -35,7 +35,7 @@ public class UpdateItemCharacteristicTypeCommandHandler(IAppDbContext context) :
         _context.ItemCharacteristicType.RemoveRange(existingCharacteristicTypes);
 
         // Add new characteristic type relationships
-        if (request.CharacteristicTypeIds.Any())
+        if (request.CharacteristicTypeIds.Count != 0)
         {
             var newCharacteristicTypes = request.CharacteristicTypeIds.Select(characteristicTypeId => new ItemCharacteristicType
             {

@@ -1,7 +1,7 @@
 using BaseTemplate.Application.Common.Models;
 using BaseTemplate.Application.TenantFeatures.Items.Commands.CreateItem;
 using BaseTemplate.Application.TenantFeatures.Items.Commands.DeleteItem;
-using BaseTemplate.Application.TenantFeatures.Items.Commands.GenerateVariants;
+using BaseTemplate.Application.TenantFeatures.Items.Commands.GenerateVariant;
 using BaseTemplate.Application.TenantFeatures.Items.Commands.UpdateItem;
 using BaseTemplate.Application.TenantFeatures.Items.Commands.UpdateItemCharacteristicType;
 using BaseTemplate.Application.TenantFeatures.Items.Queries.GetItemById;
